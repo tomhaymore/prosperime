@@ -30,6 +30,8 @@ class Entity(models.Model):
 		return self.name
 
 class Relationship(models.Model):
+	entity1 = models.ForeignKey(Entity)
+	entity2 = models.ForeignKey(Entity)
 	type = models.CharField(max_length=150) # employee, advisor, etc
 	current = models.BooleanField() #
 	attribution = models.URLField(blank=True,null=True)
@@ -44,7 +46,7 @@ class Financing(models.Model):
 
 class Office(models.Model):
 	entity = models.ForeignKey(Entity)
-	type = models.CharField(blank=True,null=True)
+	description = models.CharField(blank=True,null=True)
 	addr_1 = models.CharField(max_length=150)
 	addr_2 = models.CharField(max_length=150,blank=True,null=True)
 	addr_3 = models.CharField(max_length=150,blank=True,null=True)
