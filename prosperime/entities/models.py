@@ -18,6 +18,7 @@ class Entity(models.Model):
 	deadpooled_date = models.DateField(blank=True,null=True)
 	created = models.TimeField(auto_now_add=True)
 	updated = models.TimeField(auto_now=True)
+	cb_udpated = models.TimeField(blank=True,null=True)
 	cb_permalink = models.CharField(max_length=250,blank=True,null=True)
 	cb_url = models.URLField(blank=True,null=True)
 	logo = models.URLField(blank=True,null=True)
@@ -32,7 +33,7 @@ class Entity(models.Model):
 class Relationship(models.Model):
 	entity1 = models.ForeignKey(Entity)
 	entity2 = models.ForeignKey(Entity)
-	type = models.CharField(max_length=150) # employee, advisor, etc
+	description = models.CharField(max_length=150) # employee, advisor, etc
 	current = models.BooleanField() #
 	attribution = models.URLField(blank=True,null=True)
 
