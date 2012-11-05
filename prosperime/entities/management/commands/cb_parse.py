@@ -78,7 +78,7 @@ class Command(BaseCommand):
 			if e.cb_permalink is not "null":
 				data = getEntityCBInfo(e.cb_permalink)
 				# only update if information has changed since last update
-				if data['updated_at'] > e.cb_updated:
+				if datetime.strptime(data['updated_at'],"%a %b %d %H:%M:%S UTC %Y") > e.cb_updated:
 					addAllDetails(e,data)
 					self.stdout("Added details for " + e.name)
 	
