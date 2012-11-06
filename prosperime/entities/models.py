@@ -11,9 +11,9 @@ class Entity(models.Model):
 	summary = models.TextField(blank=True,null=True) # quick 1-2 sentence overview of entity
 	description = models.TextField(blank=True,null=True) # more comprehensive overview
 	url = models.URLField(blank=True,null=True)
-	twitter_handle = models.CharField(blank=True,null=True)
+	twitter_handle = models.CharField(max_length=250,blank=True,null=True)
 	aliases = models.TextField(blank=True,null=True)
-	domain = models.CharField(blank=True,null=True)
+	domain = models.CharField(max_length=250,blank=True,null=True)
 	founded_date = models.DateField(blank=True,null=True)
 	deadpooled_date = models.DateField(blank=True,null=True)
 	created = models.TimeField(auto_now_add=True)
@@ -22,8 +22,8 @@ class Entity(models.Model):
 	cb_permalink = models.CharField(max_length=250,blank=True,null=True)
 	cb_url = models.URLField(blank=True,null=True)
 	logo = models.URLField(blank=True,null=True)
-	total_money = modelsDecimalField(blank=True,null=True)
-	relationship = models.ManyToManyField('self',symmetrical=False,through="Relationship") # for advising, employment relationships 
+	total_money = models.DecimalField(decimal_places=2,max_digits=15,blank=True,null=True)
+	rel = models.ManyToManyField('self',symmetrical=False,through="Relationship") # for advising, employment relationships 
 	no_employees = models.IntegerField(blank=True,null=True)
 	
 	# returns name
