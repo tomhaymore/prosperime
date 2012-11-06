@@ -40,7 +40,7 @@ class Command(BaseCommand):
 		data = simplejson.load(urllib2.urlopen(cb_url))
 		for d in data:
 			d['type'] = type['single']
-			if not entityExists((d['permalink']):
+			if not entityExists((d['permalink'])):
 				addEntity(d)
 	
 	def addEntity(self, data):
@@ -295,13 +295,9 @@ class Command(BaseCommand):
 		
 	def handle(self):
 		""" gets basic info for all entities, then cycles through and updates information """
-		# check to see if db is empty
-		entities = Entity.objects.all()
-		if entities is None:
-			# if db is empty, run initial scrape again
-			for type in ENTITY_TYPES:
-				getAllEntities(type)
-			updateAllEntities()
-		else:
+		for type in ENTITY_TYPES:
+			getAllEntities(type)
+		updateAllEntities()
+		
 			
 			
