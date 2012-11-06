@@ -45,7 +45,7 @@ class Command(BaseCommand):
 	
 	def addEntity(self, data):
 		""" adds entity """
-		e = new Entity()
+		e = Entity()
 		fields = getFieldsQuick(data)
 		e.update(fields)
 		e.save()
@@ -95,8 +95,8 @@ class Command(BaseCommand):
 				'twitter_handle':data.twitter_username,
 				'aliases':data.alias_list,
 				'domain':data.category_code,
-				'founded_date':datetime.strptime(data.founded_month+"/"+data.founded_day+"/"+data.founded_year,"%m/%d%Y")
-				'deadpooled_date':datetime.strptime(data.deadpooled_month+"/"+data.deadpooled_day+"/"+data.deadpooled_year,"%m/%d%Y")
+				'founded_date':datetime.strptime(data.founded_month+"/"+data.founded_day+"/"+data.founded_year,"%m/%d%Y"),
+				'deadpooled_date':datetime.strptime(data.deadpooled_month+"/"+data.deadpooled_day+"/"+data.deadpooled_year,"%m/%d%Y"),
 				'cb_url':data.crunchbase_url,
 				'logo':data.image.available_sizes[0],
 				'logo_attribution':data.image.attribution,
@@ -113,8 +113,8 @@ class Command(BaseCommand):
 				'url':data.homepage_url,
 				'birthplace':data.birthplace,
 				'twitter_handle':data.twitter_username,
-				'birth_date':datetime.strptime(data.birth_month+"/"+data.birth_day+"/"+data.birth_year,"%m/%d/%Y')
-				'logo':data.image.available_sizes[0]
+				'birth_date':datetime.strptime(data.birth_month+"/"+data.birth_day+"/"+data.birth_year,"%m/%d/%Y"),
+				'logo':data.image.available_sizes[0],
 				'logo_attribution':data.image.attribution
 			}
 		elif data.type == 'financial-organizations':
@@ -168,9 +168,9 @@ class Command(BaseCommand):
 				
 	def getEntityCBInfo(self,entity):
 		cb_url = CB_BASE_URL + entity.type + "/" + entity.name + ".js"
-		data = simplejson.load(urllib2.urlopen(cb_url,PARAMS)
+		data = simplejson.load(urllib2.urlopen(cb_url,PARAMS))
 		# check to see if entity exists
-		if entityExists(data.permalink) is not None:
+		if entityExists(data.permalink):
 			e = updateEntity(data,entity.type) # update with relevant data but don't add new entity
 		else:
 			e = addEntity(data,entity.type) # add and update with relevant data
@@ -184,7 +184,7 @@ class Command(BaseCommand):
 		fields = getFields(data,entity_type)
 		e.update(fields)
 		e.save()
-		self.stdout(ent
+		self.stdout(e.full_name + " updated")
 		return e
 	
 	def parseRelationships(self,entity,data):
@@ -208,7 +208,8 @@ class Command(BaseCommand):
 		""" determines if relationship between entity already exists """
 		if person in entity.relationship_set:
 			return True
-		else return False
+		else:
+			return False
 	
 	def addRelationship(self,entity,person,rel):
 		""" adds relationship """
@@ -267,9 +268,9 @@ class Command(BaseCommand):
 	def officeExists(self,entity,office):
 		""" checks whether office exists """
 		try:
-			o = Office.objects.filter(entity=entity,description=office['description']
+			o = Office.objects.filter(entity=entity,description=office['description'])
 			return True
-		else:
+		except:
 			return False
 	
 	def addOffice(self,entity,office):
