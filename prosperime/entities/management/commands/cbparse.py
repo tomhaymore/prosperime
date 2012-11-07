@@ -28,7 +28,7 @@ class Command(BaseCommand):
 	def getEntityList(self,type):	
 		""" returns list of all entities of particular type """
 		entities = ()
-		cb_url = CB_BASE_URL + type.plural + ".js?" + PARAMS
+		cb_url = self.CB_BASE_URL + type.plural + ".js?" + self.PARAMS
 		data = simplejson.load(urllib2.urlopen(cb_url))
 		for d in data:
 			entities.append({'permalink':d.permalink,'type':type.single})
@@ -36,20 +36,21 @@ class Command(BaseCommand):
 	
 	def getAllEntities(self,type):
 		""" adds all entities of particular type with minimum information """
-		cb_url = CB_BASE_URL + type['plural'] + ".js?" + PARAMS
+		cb_url = self.CB_BASE_URL + type['plural'] + ".js?" + self.PARAMS
 		data = simplejson.load(urllib2.urlopen(cb_url))
 		for d in data:
 			d['type'] = type['single']
-			if not entityExists((d['permalink'])):
-				addEntity(d)
+			if not self.entityExists((d['permalink'])):
+				self.addEntity(d)
 	
 	def addEntity(self, data):
 		""" adds entity """
 		e = Entity()
-		fields = getFieldsQuick(data)
-		e.update(fields)
+		fields = self.getFieldsQuick(data)
+		for k,v in fields.iteritems():
+			setattr(e,k,v)
 		e.save()
-		self.stdout(e.full_name + " added")
+		self.stdout.write(e.full_name + " added")
 		return e
 	
 	def getFieldsQuick(self,data):
@@ -80,7 +81,7 @@ class Command(BaseCommand):
 				# only update if information has changed since last update
 				if datetime.strptime(data['updated_at'],"%a %b %d %H:%M:%S UTC %Y") > e.cb_updated:
 					addAllDetails(e,data)
-					self.stdout("Added details for " + e.name)
+					self.stdout.write("Added details for " + e.name)
 	
 	def getFields(self,data):
 		""" maps CB fields to our database """
@@ -158,7 +159,7 @@ class Command(BaseCommand):
 		parseFinancings(entity,data)
 		parseOffices(entity,data)
 		# report 
-		self.stdout(entity.full_name + " updated")
+		self.stdout.write(entity.full_name + " updated")
 			
 	def entityExists(self,permalink):
 		try:
@@ -184,7 +185,7 @@ class Command(BaseCommand):
 		fields = getFields(data,entity_type)
 		e.update(fields)
 		e.save()
-		self.stdout(e.full_name + " updated")
+		self.stdout.write(e.full_name + " updated")
 		return e
 	
 	def parseRelationships(self,entity,data):
@@ -292,13 +293,13 @@ class Command(BaseCommand):
 		o.latitute = office['latitude']
 		o.longitude = office['longitude']
 		o.save()
-		self.stdout(office.description + " office for " + entity.name + " update")
+		self.stdout.write(office.description + " office for " + entity.name + " update")
 		
-	def handle(self):
+	def handle(self,types=ENTITY_TYPES, *args, **options):
 		""" gets basic info for all entities, then cycles through and updates information """
-		for type in ENTITY_TYPES:
-			getAllEntities(type)
-		updateAllEntities()
+		for type in types:
+			self.getAllEntities(type)
+		self.updateAllEntities()
 		
 			
 			
