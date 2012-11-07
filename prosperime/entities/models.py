@@ -23,7 +23,7 @@ class Entity(models.Model):
 	cb_url = models.URLField(blank=True,null=True)
 	logo = models.URLField(blank=True,null=True)
 	total_money = models.DecimalField(decimal_places=2,max_digits=15,blank=True,null=True)
-	rel = models.ManyToManyField('self',symmetrical=False,through="Relationship") # for advising, employment relationships 
+	rels = models.ManyToManyField('self',symmetrical=False,through="Relationship") # for advising, employment relationships 
 	no_employees = models.IntegerField(blank=True,null=True)
 	
 	# returns name
@@ -31,8 +31,8 @@ class Entity(models.Model):
 		return self.name
 
 class Relationship(models.Model):
-	entity1 = models.ForeignKey(Entity)
-	entity2 = models.ForeignKey(Entity)
+	entity1 = models.ForeignKey(Entity,related_name="entity1")
+	entity2 = models.ForeignKey(Entity,related_name="entity2")
 	description = models.CharField(max_length=150) # employee, advisor, etc
 	current = models.BooleanField() #
 	attribution = models.URLField(blank=True,null=True)
@@ -40,14 +40,14 @@ class Relationship(models.Model):
 class Financing(models.Model):
 	investors = models.ManyToManyField(Entity)
 	round = models.CharField(max_length=15)
-	amount = models.DecimalField(max_length=15)
+	amount = models.DecimalField(max_digits=15,decimal_places=2)
 	currency = models.CharField(max_length=5)
 	date = models.DateField(blank=True,null=True)
 	source_url = models.URLField(blank=True,null=True)
 
 class Office(models.Model):
 	entity = models.ForeignKey(Entity)
-	description = models.CharField(blank=True,null=True)
+	description = models.CharField(max_length=450,blank=True,null=True)
 	addr_1 = models.CharField(max_length=150)
 	addr_2 = models.CharField(max_length=150,blank=True,null=True)
 	addr_3 = models.CharField(max_length=150,blank=True,null=True)
@@ -55,8 +55,8 @@ class Office(models.Model):
 	city = models.CharField(max_length=250)
 	state_code = models.CharField(max_length=5)
 	country_code = models.CharField(max_length=50)
-	latitute = models.DecimalField()
-	longitute = models.DecimalField()
+	latitute = models.DecimalField(decimal_places=7,max_digits=10)
+	longitute = models.DecimalField(decimal_places=7,max_digits=10)
 
 class Scan(models.Model):
 	entity = models.ForeignKey(Entity) # entity
