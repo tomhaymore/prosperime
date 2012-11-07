@@ -50,7 +50,7 @@ class Command(BaseCommand):
 		for k,v in fields.iteritems():
 			setattr(e,k,v)
 		e.save()
-		self.stdout.write(e.full_name + " added")
+		self.stdout.write(e.full_name.encode("utf8") + " added\n")
 		return e
 	
 	def getFieldsQuick(self,data):
@@ -81,48 +81,51 @@ class Command(BaseCommand):
 				# only update if information has changed since last update
 				if datetime.strptime(data['updated_at'],"%a %b %d %H:%M:%S UTC %Y") > e.cb_updated:
 					addAllDetails(e,data)
-					self.stdout.write("Added details for " + e.name)
+					self.stdout.write("Added details for " + e.name.encode("utf8") + "\n")
 	
 	def getFields(self,data):
 		""" maps CB fields to our database """
 		if data.type == 'company':
 			fields = {
-				'cb_permalink':data.permalink,
-				'full_name':data.name,
+				'cb_permalink':data['permalink'],
+				'full_name':data.['name'],
 				'type':'organization',
-				'summary':data.description,
-				'description':data.overview,
-				'url':data.homepage_url,
-				'twitter_handle':data.twitter_username,
-				'aliases':data.alias_list,
-				'domain':data.category_code,
-				'founded_date':datetime.strptime(data.founded_month+"/"+data.founded_day+"/"+data.founded_year,"%m/%d%Y"),
-				'deadpooled_date':datetime.strptime(data.deadpooled_month+"/"+data.deadpooled_day+"/"+data.deadpooled_year,"%m/%d%Y"),
-				'cb_url':data.crunchbase_url,
-				'logo':data.image.available_sizes[0],
-				'logo_attribution':data.image.attribution,
-				'total_money':data.total_money_raised,
-				'no_employees':data.number_of_employees
+				'subtype':'company',
+				'summary':data.['description'],
+				'description':data.['overview'],
+				'url':data.['homepage_url'],
+				'twitter_handle':data.['twitter_username'],
+				'aliases':data.['alias_list'],
+				'domain':data.['category_code'],
+				'founded_date':datetime.strptime(data['founded_month']+"/"+data['founded_day']+"/"+data['founded_year'],"%m/%d%Y"),
+				'deadpooled_date':datetime.strptime(data['deadpooled_month']+"/"+data['deadpooled_day']+"/"+data['deadpooled_year'],"%m/%d%Y"),
+				'cb_url':data['crunchbase_url'],
+				'logo':data['image']['available_sizes'][0],
+				'logo_attribution':data['image.attribution'],
+				'total_money':data['total_money_raised'],
+				'no_employees':data['number_of_employees']
 				}
 		elif entity_type == 'person':
 			fields = {
-				'cb_permalink':data.permalink,
-				'first_name':data.first_name,
-				'last_name':data.last_name,
-				'type':data.type,
-				'description':data.overview,
-				'url':data.homepage_url,
-				'birthplace':data.birthplace,
-				'twitter_handle':data.twitter_username,
-				'birth_date':datetime.strptime(data.birth_month+"/"+data.birth_day+"/"+data.birth_year,"%m/%d/%Y"),
-				'logo':data.image.available_sizes[0],
-				'logo_attribution':data.image.attribution
+				'cb_permalink':data['permalink'],
+				'full_name':data['first_name'] + " " + data['last_name'],
+				'first_name':data['first_name'],
+				'last_name':data['last_name'],
+				'type':'person',
+				'description':data['overview'],
+				'url':data['homepage_url'],
+				'birthplace':data['birthplace'],
+				'twitter_handle':data['twitter_username'],
+				'birth_date':datetime.strptime(data['birth_month']+"/"+data['birth_day']+"/"+data['birth_year'],"%m/%d/%Y"),
+				'logo':data['image']['available_sizes'][0],
+				'logo_attribution':data['image']['attribution']
 			}
 		elif data.type == 'financial-organizations':
 			fields = {
 				'cb_permalink':data['permalink'],
 				'full_name':data['name'],
 				'type':'organization',
+				'subtype':'financial-organization',
 				'summary':data['description'],
 				'description':data['overview'],
 				'url':data['homepage_url'],
@@ -139,11 +142,12 @@ class Command(BaseCommand):
 				'cb_permalink':data['permalink'],
 				'full_name':data['name'],
 				'type':'service-provider',
+				'subtype':'service-provider',
 				'description':data['overview'],
 				'url':data['homepage_url'],
 				'aliases':data['alias_list'],
 				'cb_url':data['crunchbase_url'],
-				'logo':data['image.available_sizes'][0],
+				'logo':data['image']['available_sizes'][0],
 				'logo_attribution':data['image.attribution'],
 				}
 		fields['cb_updated'] = datetime.now()
@@ -151,15 +155,15 @@ class Command(BaseCommand):
 	
 	def addAllDetails(self,entity,data):
 		""" adds remainder of details from CB to db """
-		fields = getFields(data)
+		fields = self.getFields(data)
 		entity.update(fields)
 		entity.save()
 		# adds relationships, financings, offices
-		parseRelationships(entity,data)
-		parseFinancings(entity,data)
-		parseOffices(entity,data)
+		self.parseRelationships(entity,data)
+		self.parseFinancings(entity,data)
+		self.parseOffices(entity,data)
 		# report 
-		self.stdout.write(entity.full_name + " updated")
+		self.stdout.write(entity.full_name.encode("utf8") + " updated\n")
 			
 	def entityExists(self,permalink):
 		try:
@@ -168,24 +172,24 @@ class Command(BaseCommand):
 			return None
 				
 	def getEntityCBInfo(self,entity):
-		cb_url = CB_BASE_URL + entity.type + "/" + entity.name + ".js"
+		cb_url = self.CB_BASE_URL + entity.type + "/" + entity.name + ".js"
 		data = simplejson.load(urllib2.urlopen(cb_url,PARAMS))
 		# check to see if entity exists
-		if entityExists(data.permalink):
-			e = updateEntity(data,entity.type) # update with relevant data but don't add new entity
+		if self.entityExists(data.permalink):
+			e = self.updateEntity(data,entity.type) # update with relevant data but don't add new entity
 		else:
-			e = addEntity(data,entity.type) # add and update with relevant data
-		parseRelationships(e,data)
-		parseOffices(e,data)
+			e = self.addEntity(data,entity.type) # add and update with relevant data
+		self.parseRelationships(e,data)
+		self.parseOffices(e,data)
 		if entity.type == "company":
-			parseFinancings(e,data)	
+			self.parseFinancings(e,data)	
 				
 	def updateEntity(self,data,entity_type,entity):
 		e = Entity.objects.get(cb_permalink=data.permalink)
-		fields = getFields(data,entity_type)
+		fields = self.getFields(data,entity_type)
 		e.update(fields)
 		e.save()
-		self.stdout.write(e.full_name + " updated")
+		self.stdout.write(e.full_name.encode("utf8") + " updated\n")
 		return e
 	
 	def parseRelationships(self,entity,data):
@@ -193,17 +197,17 @@ class Command(BaseCommand):
 		rels = data.relationships
 		for r in rels:
 			# check to see if person already exists
-			if not entityExists(r['person']['permalink']):
+			if not self.entityExists(r['person']['permalink']):
 				data = {'first_name':r['person']['first_name'],'last_name':r['person']['last_name'],'permalink':r['person']['permalink']}
 				p = addEntity(data)
-				addRelationship(entity,p,r)
+				self.addRelationship(entity,p,r)
 			else:
 				p = Entity.objects.get(cb_permalink=r['person']['permalink'])
 				# check to see if relationship already exists
-				if relExists(entity,p):
-					updateRelationship(entity,p,r)
+				if self.relExists(entity,p):
+					self.updateRelationship(entity,p,r)
 				else:
-					addRelationship(entity,p,r)
+					self.addRelationship(entity,p,r)
 	
 	def relExists(self,entity,person):
 		""" determines if relationship between entity already exists """
@@ -230,10 +234,10 @@ class Command(BaseCommand):
 		fins = data.funding_rounds
 		for fin in fins:
 			# check to see if financing already exists
-			if not FinancingExists(entity,f):
-				f = addFinancing(entity,f)
+			if not self.FinancingExists(entity,f):
+				f = self.addFinancing(entity,f)
 			else:
-				f = updateFinancing(entity,f)
+				f = self.updateFinancing(entity,f)
 	
 	def addFinancing(self,entity,f):
 		""" adds financing """
@@ -252,8 +256,8 @@ class Command(BaseCommand):
 			if entityExists(i_sub.permalink):
 				e = Entity.objects.get(cb_permalink=i_sub.permalink)
 			else:
-				cbEntity = getEntity({"name":i_sub.name,"permalink":i_sub.permalink,"type":type})
-				e = addEntity(cbEntity,type)
+				cbEntity = self.getEntity({"name":i_sub.name,"permalink":i_sub.permalink,"type":type})
+				e = self.addEntity(cbEntity,type)
 			fin.investors.add(e)
 		fin.save()
 	
@@ -261,10 +265,10 @@ class Command(BaseCommand):
 		""" loops through all offices, adds them and connects them to entities """
 		offices = data.offices
 		for o in offices:
-			if officeExists(entity,o):
-				updateOffice(entity,o)
+			if self.officeExists(entity,o):
+				self.updateOffice(entity,o)
 			else:
-				addOffice(entity,o)
+				self.addOffice(entity,o)
 	
 	def officeExists(self,entity,office):
 		""" checks whether office exists """
@@ -278,7 +282,7 @@ class Command(BaseCommand):
 		""" adds office and links it to entity """
 		o = Office.objects.create(description=office['description'],addr1=office["address1"],addr2=office["address2"],zip_code=office["zip_code"],city=office["city"],state_code=office["state_code"],country_code=office["county_code"],latitute=office["latitude"],longitude=office["longitude"])
 		o.save()
-		write(o.description + " office for " + entity.name + " added")
+		self.stdout.write(o.description + " office for " + entity.name + " added\n")
 		
 	def updateOffice(self,entity,office):
 		""" updates office details """
@@ -293,7 +297,7 @@ class Command(BaseCommand):
 		o.latitute = office['latitude']
 		o.longitude = office['longitude']
 		o.save()
-		self.stdout.write(office.description + " office for " + entity.name + " update")
+		self.stdout.write(office.description + " office for " + entity.name + " updated\n")
 		
 	def handle(self,types=ENTITY_TYPES, *args, **options):
 		""" gets basic info for all entities, then cycles through and updates information """
