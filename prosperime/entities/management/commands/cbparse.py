@@ -16,7 +16,9 @@ class Command(BaseCommand):
 	CB_KEY = "jwyw2d2vx63k3z6336yzpd4h"
 
 	CB_BASE_URL = "http://api.crunchbase.com/v/1/"
-
+	
+	CURRENT_ENTITIES = self.getCurrentEntities()
+	
 	ENTITY_TYPES = (
 		{'single':'company','plural':'companies'},
 		{'single':'person','plural':'people'},
@@ -26,6 +28,13 @@ class Command(BaseCommand):
 	
 	PARAMS = urllib.urlencode({'api_key':CB_KEY})
 	
+	def getCurrentEntities(self):
+		entities = Entities.objects.all()
+		permalinks = ()
+		for e in entities:
+			permalinks.append(e.permalink)
+		return permalinks
+		
 	def getJSON(self,url):
 		return simplejson.load(urllib2.urlopen(url))
 	
@@ -48,7 +57,14 @@ class Command(BaseCommand):
 		""" adds all entities of particular type with minimum information """
 		# need to add some set logic her
 		cb_url = self.CB_BASE_URL + type['plural'] + ".js?" + self.PARAMS
-		data = simplejson.load(urllib2.urlopen(cb_url))
+		try:
+			@retry(tries=3)
+			data = self.getJSON(cb_url)
+		except urllib2.HTTPError, e:
+			self.stdout.write(e.code)
+		except urllib2.URLError, e:
+			self.stdout.write(e.args)
+
 		for d in data:
 			d['type'] = type['single']
 			if not self.entityExists((d['permalink'])):
@@ -177,10 +193,13 @@ class Command(BaseCommand):
 		self.stdout.write(entity.full_name.encode("utf8") + " updated\n")
 			
 	def entityExists(self,permalink):
-		try:
-			e = Entity.objects.get(cb_permalink=permalink)
-		except:
-			return None
+		if permalink in CURRENT_ENTITIES:
+			return true
+		else return false 
+		#try:
+		#	e = Entity.objects.get(cb_permalink=permalink)
+		#except:
+		#	return None
 				
 	def getEntityCBInfo(self,entity):
 		cb_url = self.CB_BASE_URL + entity.type + "/" + entity.name + ".js"
