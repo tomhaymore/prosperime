@@ -5,6 +5,7 @@ import pkg_resources
 pkg_resources.require('simplejson') # not sure why this is necessary
 import simplejson
 from datetime import datetime
+from _retry import retry
 
 # Django imports
 from django.core.management.base import BaseCommand, CommandError
@@ -25,17 +26,27 @@ class Command(BaseCommand):
 	
 	PARAMS = urllib.urlencode({'api_key':CB_KEY})
 	
+	def getJSON(self,url):
+		return simplejson.load(urllib2.urlopen(url))
+	
 	def getEntityList(self,type):	
 		""" returns list of all entities of particular type """
 		entities = ()
 		cb_url = self.CB_BASE_URL + type.plural + ".js?" + self.PARAMS
-		data = simplejson.load(urllib2.urlopen(cb_url))
+		try:
+			@retry(tries=3)
+			data = self.getJSON(cb_url)
+		except urllib2.HTTPError, e:
+			self.stdout.write(e.code)
+		except urllib2.URLError, e:
+			self.stdout.write(e.args)
 		for d in data:
 			entities.append({'permalink':d.permalink,'type':type.single})
 		return entities
 	
 	def getAllEntities(self,type):
 		""" adds all entities of particular type with minimum information """
+		# need to add some set logic her
 		cb_url = self.CB_BASE_URL + type['plural'] + ".js?" + self.PARAMS
 		data = simplejson.load(urllib2.urlopen(cb_url))
 		for d in data:
@@ -88,19 +99,19 @@ class Command(BaseCommand):
 		if data.type == 'company':
 			fields = {
 				'cb_permalink':data['permalink'],
-				'full_name':data.['name'],
+				'full_name':data['name'],
 				'type':'organization',
 				'subtype':'company',
-				'summary':data.['description'],
-				'description':data.['overview'],
-				'url':data.['homepage_url'],
-				'twitter_handle':data.['twitter_username'],
-				'aliases':data.['alias_list'],
-				'domain':data.['category_code'],
+				'summary':data['description'],
+				'description':data['overview'],
+				'url':data['homepage_url'],
+				'twitter_handle':data['twitter_username'],
+				'aliases':data['alias_list'],
+				'domain':data['category_code'],
 				'founded_date':datetime.strptime(data['founded_month']+"/"+data['founded_day']+"/"+data['founded_year'],"%m/%d%Y"),
 				'deadpooled_date':datetime.strptime(data['deadpooled_month']+"/"+data['deadpooled_day']+"/"+data['deadpooled_year'],"%m/%d%Y"),
 				'cb_url':data['crunchbase_url'],
-				'logo':data['image']['available_sizes'][0],
+				'logo':data['image']['available_sizes'][1],
 				'logo_attribution':data['image.attribution'],
 				'total_money':data['total_money_raised'],
 				'no_employees':data['number_of_employees']
@@ -117,7 +128,7 @@ class Command(BaseCommand):
 				'birthplace':data['birthplace'],
 				'twitter_handle':data['twitter_username'],
 				'birth_date':datetime.strptime(data['birth_month']+"/"+data['birth_day']+"/"+data['birth_year'],"%m/%d/%Y"),
-				'logo':data['image']['available_sizes'][0],
+				'logo':data['image']['available_sizes'][1],
 				'logo_attribution':data['image']['attribution']
 			}
 		elif data.type == 'financial-organizations':
@@ -133,7 +144,7 @@ class Command(BaseCommand):
 				'aliases':data['alias_list'],
 				'founded_date':datetime.strptime(data['founded_month']+"/"+data['founded_day']+"/"+data['founded_year'],"%m/%d%Y"),
 				'cb_url':data['crunchbase_url'],
-				'logo':data['image.available_sizes'][0],
+				'logo':data['image.available_sizes'][1],
 				'logo_attribution':data['image.attribution'],
 				'no_employees':data['number_of_employees']
 				}
@@ -147,7 +158,7 @@ class Command(BaseCommand):
 				'url':data['homepage_url'],
 				'aliases':data['alias_list'],
 				'cb_url':data['crunchbase_url'],
-				'logo':data['image']['available_sizes'][0],
+				'logo':data['image']['available_sizes'][1],
 				'logo_attribution':data['image.attribution'],
 				}
 		fields['cb_updated'] = datetime.now()
