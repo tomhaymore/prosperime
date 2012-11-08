@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
 	CB_BASE_URL = "http://api.crunchbase.com/v/1/"
 	
-	CURRENT_ENTITIES = self.getCurrentEntities()
+	CURRENT_ENTITIES = ()
 	
 	ENTITY_TYPES = (
 		{'single':'company','plural':'companies'},
@@ -29,12 +29,13 @@ class Command(BaseCommand):
 	PARAMS = urllib.urlencode({'api_key':CB_KEY})
 	
 	def getCurrentEntities(self):
-		entities = Entities.objects.all()
-		permalinks = ()
+		entities = Entity.objects.all()
+		permalinks = []
 		for e in entities:
-			permalinks.append(e.permalink)
+			permalinks.append(e.cb_permalink)
 		return permalinks
-		
+	
+	#@retry(tries=3)		
 	def getJSON(self,url):
 		return simplejson.load(urllib2.urlopen(url))
 	
@@ -43,12 +44,11 @@ class Command(BaseCommand):
 		entities = ()
 		cb_url = self.CB_BASE_URL + type.plural + ".js?" + self.PARAMS
 		try:
-			@retry(tries=3)
 			data = self.getJSON(cb_url)
 		except urllib2.HTTPError, e:
-			self.stdout.write(e.code)
+			self.stdout.write(str(e.code))
 		except urllib2.URLError, e:
-			self.stdout.write(e.args)
+			self.stdout.write(str(e.args))
 		for d in data:
 			entities.append({'permalink':d.permalink,'type':type.single})
 		return entities
@@ -58,7 +58,6 @@ class Command(BaseCommand):
 		# need to add some set logic her
 		cb_url = self.CB_BASE_URL + type['plural'] + ".js?" + self.PARAMS
 		try:
-			@retry(tries=3)
 			data = self.getJSON(cb_url)
 		except urllib2.HTTPError, e:
 			self.stdout.write(e.code)
@@ -193,13 +192,13 @@ class Command(BaseCommand):
 		self.stdout.write(entity.full_name.encode("utf8") + " updated\n")
 			
 	def entityExists(self,permalink):
-		if permalink in CURRENT_ENTITIES:
-			return true
-		else return false 
-		#try:
-		#	e = Entity.objects.get(cb_permalink=permalink)
-		#except:
-		#	return None
+		#if permalink in self.CURRENT_ENTITIES:
+		#	return True
+		#return False 
+		try:
+			e = Entity.objects.get(cb_permalink=permalink)
+		except:
+			return None
 				
 	def getEntityCBInfo(self,entity):
 		cb_url = self.CB_BASE_URL + entity.type + "/" + entity.name + ".js"
@@ -329,8 +328,9 @@ class Command(BaseCommand):
 		o.save()
 		self.stdout.write(office.description + " office for " + entity.name + " updated\n")
 		
-	def handle(self,types=ENTITY_TYPES, *args, **options):
+	def handle(self,types=ENTITY_TYPES,*args, **options):
 		""" gets basic info for all entities, then cycles through and updates information """
+		self.CURRENT_ENTITIES = self.getCurrentEntities()
 		for type in types:
 			self.getAllEntities(type)
 		self.updateAllEntities()
