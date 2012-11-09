@@ -28,7 +28,7 @@ class Entity(models.Model):
 	
 	# returns name
 	def __unicode__(self):
-		return self.name
+		return self.full_name
 
 class Relationship(models.Model):
 	entity1 = models.ForeignKey(Entity,related_name="entity1")
