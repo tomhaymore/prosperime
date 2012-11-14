@@ -14,20 +14,25 @@ class Entity(models.Model):
 	twitter_handle = models.CharField(max_length=250,blank=True,null=True)
 	aliases = models.TextField(blank=True,null=True)
 	domain = models.CharField(max_length=250,blank=True,null=True)
-	founded_date = models.DateField(blank=True,null=True)
-	deadpooled_date = models.DateField(blank=True,null=True)
-	created = models.TimeField(auto_now_add=True)
-	updated = models.TimeField(auto_now=True)
-	cb_udpated = models.TimeField(blank=True,null=True)
+	founded_date = models.DateTimeField(blank=True,null=True)
+	deadpooled_date = models.DateTimeField(blank=True,null=True)
+	created = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
+	cb_type = models.CharField(max_length=25,blank=True,null=True)
+	cb_updated = models.DateTimeField(blank=True,null=True)
 	cb_permalink = models.CharField(max_length=250,blank=True,null=True)
 	cb_url = models.URLField(blank=True,null=True)
-	logo = models.URLField(blank=True,null=True)
-	total_money = models.DecimalField(decimal_places=2,max_digits=15,blank=True,null=True)
+	logo = models.ImageField(max_length=200,blank=True,null=True)
+	total_money = models.CharField(max_length=15,null=True,blank=True)
 	rels = models.ManyToManyField('self',symmetrical=False,through="Relationship") # for advising, employment relationships 
 	no_employees = models.IntegerField(blank=True,null=True)
 	
 	# returns name
 	def __unicode__(self):
+		return self.full_name
+
+	# returns name
+	def name(self):
 		return self.full_name
 
 class Relationship(models.Model):
@@ -48,15 +53,21 @@ class Financing(models.Model):
 class Office(models.Model):
 	entity = models.ForeignKey(Entity)
 	description = models.CharField(max_length=450,blank=True,null=True)
-	addr_1 = models.CharField(max_length=150)
+	addr_1 = models.CharField(max_length=150,blank=True,null=True)
 	addr_2 = models.CharField(max_length=150,blank=True,null=True)
 	addr_3 = models.CharField(max_length=150,blank=True,null=True)
-	zip_code = models.IntegerField(max_length=9)
-	city = models.CharField(max_length=250)
-	state_code = models.CharField(max_length=5)
-	country_code = models.CharField(max_length=50)
-	latitute = models.DecimalField(decimal_places=7,max_digits=10)
-	longitute = models.DecimalField(decimal_places=7,max_digits=10)
+	zip_code = models.CharField(max_length=45,blank=True,null=True)
+	city = models.CharField(max_length=250,blank=True,null=True)
+	state_code = models.CharField(max_length=5,blank=True,null=True)
+	country_code = models.CharField(max_length=50,blank=True,null=True)
+	latitude = models.DecimalField(decimal_places=7,max_digits=10,null=True)
+	longitude = models.DecimalField(decimal_places=7,max_digits=10,null=True)
+
+	def __unicode__(self):
+		return self.entity.name() + " office"
+
+	def name(self):
+		return self.entity.name() + " office"	
 
 class Scan(models.Model):
 	entity = models.ForeignKey(Entity) # entity
