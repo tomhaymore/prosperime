@@ -11,6 +11,7 @@ from optparse import make_option
 # Django imports
 from django.core.management.base import BaseCommand, CommandError
 from entities.models import Entity, Relationship, Financing, Office
+from django.core.files import File
 
 class Command(BaseCommand):
 	
@@ -74,7 +75,6 @@ class Command(BaseCommand):
 	def getEntityList(self,type):	
 		""" returns list of all entities of particular type """
 		entities = ()
-		#cb_url = self.CB_BASE_URL + type.plural + ".js?" + self.PARAMS
 		cb_url = self.getCBURL('list',type.single)
 		try:
 			data = self.getJSON(cb_url)
@@ -114,9 +114,6 @@ class Command(BaseCommand):
 	
 	def entityExists(self,permalink):
 		""" checks to see if a CB entity has already been added to db """
-		#if permalink in self.CURRENT_ENTITIES:
-		#	return True
-		#return False 
 		e = Entity.objects.filter(cb_permalink=permalink)
 		if not e:
 			return False
@@ -127,6 +124,7 @@ class Command(BaseCommand):
 		""" maps CB permalink, name, and type to db """
 		# checks to see what type of entity
 		if data['type'] == 'person':
+			# if person, add separate name fields and combine for "full_name"
 			fields = {
 				'cb_permalink':data['permalink'],
 				'full_name':data['first_name'] + " " + data['last_name'],
@@ -136,6 +134,7 @@ class Command(BaseCommand):
 				'cb_type':data['type']
 			}
 		else:
+			# if not person, just full_name field gets filled
 			fields = {
 				'cb_permalink':data['permalink'],
 				'full_name':data['name'],
@@ -164,10 +163,22 @@ class Command(BaseCommand):
 		for k,v in fields.iteritems():
 			setattr(entity,k,v)
 		entity.save()
+		# add logo
+		# TODO wrap this in new function
+		if data['image']:
+			img_url = "http://www.crunchbase.com/" + data['image']['available_sizes'][2][1]
+			img_filename = entity.name() + "_logo.jpg"
+			#self.stdout.write(img_url)
+			img = urllib2.urlopen(img_url)
+			#entity.logo = img
+			entity.logo.save(img_filename,File(open(img[0])),True)
+			#entity.logo = img_url
+			entity.logo_cb_attribution = data['image']['attribution']
+			entity.save()
 		# adds relationships, financings, offices
 		self.parseRelationships(entity,data)
-		self.parseOffices(entity,data)
 		if entity.type == "company":
+			self.parseOffices(entity,data)
 			self.parseFinancings(e,data)
 		# report 
 		self.stdout.write(entity.name().encode("utf8","ignore") + " updated\n")
@@ -175,7 +186,7 @@ class Command(BaseCommand):
 	
 	def getEntityCBInfo(self,entity):
 		""" fetches full profile of entity from CB """
-		cb_url = self.getCBURL('info',entity.cb_type,entity=entity))
+		cb_url = self.getCBURL('info',entity.cb_type,entity=entity)
 		try:
 			data = self.getJSON(cb_url)
 		except urllib2.HTTPError, e:
@@ -184,21 +195,10 @@ class Command(BaseCommand):
 			self.stdout.write(e.args)
 		data['cb_type'] = entity.cb_type
 		return data
-
-		# check to see if entity exists
-		#if self.entityExists(data['permalink']):
-		#	e = self.updateEntity(data,entity.cb_type,entity) # update with relevant data but don't add new entity
-		#else:
-		#	e = self.addEntity(data,entity.type) # add and update with relevant data
-		#self.parseRelationships(e,data)
-		#self.parseOffices(e,data)
-		#if entity.type == "company":
-		#	self.parseFinancings(e,data)
 	
 	def getFields(self,data,type):
 		""" maps CB fields to db """
 		if type == 'company':
-			
 			fields = {
 				'cb_permalink':data['permalink'],
 				'full_name':data['name'],
@@ -210,36 +210,26 @@ class Command(BaseCommand):
 				'twitter_handle':data['twitter_username'],
 				'aliases':data['alias_list'],
 				'domain':data['category_code'],
-				#'founded_date':founded_date,
-				#'deadpooled_date':deadpooled_date,
 				'cb_url':data['crunchbase_url'],
 				#'logo':data['image']['available_sizes'][1],
 				#'logo_attribution':data['image']['attribution'],
 				'total_money':data['total_money_raised'],
 				'no_employees':data['number_of_employees']
 				}
-			# convert dates to datetime objects
+			# convert dates to datetime objects or empty strings
 			founded_date = str(data['founded_month'])+"/"+str(data['founded_day'])+"/"+str(data['founded_year'])
 			try:
 				founded_date = datetime.strptime(founded_date,"%m/%d/%Y")
 			except:
 				founded_date = ''
-			if founded_date:
-				fields['founded_date'] = founded_date
+			fields['founded_date'] = founded_date
 			deadpooled_date = str(data['deadpooled_month'])+"/"+str(data['deadpooled_day'])+"/"+str(data['deadpooled_year'])
 			try:
 				deadpooled_date = datetime.strptime(deadpooled_date,"%m/%d/%Y")
 			except:
 				deadpooled_date = ''
-			if deadpooled_date:
-					fields['deadpooled_date'] = deadpooled_date
+			fields['deadpooled_date'] = deadpooled_date
 		elif type == 'person':
-			# convert dates to datetime objects
-			birth_date = str(data['birth_month'])+"/"+str(data['birth_day'])+"/"+str(data['birth_year'])
-			try:
-				birth_date = datetime.strptime(birth_date,"%m/%d/%Y")
-			except:
-				birth_date = ''
 			fields = {
 				'cb_permalink':data['permalink'],
 				'full_name':data['first_name'] + " " + data['last_name'],
@@ -250,17 +240,17 @@ class Command(BaseCommand):
 				'url':data['homepage_url'],
 				'birthplace':data['birthplace'],
 				'twitter_handle':data['twitter_username'],
-				'birth_date':birth_date,
+				}
 				#'logo':data['image']['available_sizes'][0][1],
 				#'logo_attribution':data['image']['attribution']
-			}
-		elif type == 'financial-organizations':
-			# convert dates to datetime objects
-			founded_date = str(data['founded_month'])+"/"+str(data['founded_day'])+"/"+str(data['founded_year'])
+				# convert dates to datetime objects
+			birth_date = str(data['born_month'])+"/"+str(data['born_day'])+"/"+str(data['born_year'])
 			try:
-				founded_date = datetime.strptime(founded_date,"%m/%d/%Y")
+				birth_date = datetime.strptime(birth_date,"%m/%d/%Y")
 			except:
-				founded_date = ''
+				birth_date = ''
+			fields['birth_date'] = birth_date
+		elif type == 'financial-organizations':
 			fields = {
 				'cb_permalink':data['permalink'],
 				'full_name':data['name'],
@@ -271,12 +261,18 @@ class Command(BaseCommand):
 				'url':data['homepage_url'],
 				'twitter_handle':data['twitter_username'],
 				'aliases':data['alias_list'],
-				'founded_date':founded_date,
 				'cb_url':data['crunchbase_url'],
 				#'logo':data['image.available_sizes'][0][1],
 				#'logo_attribution':data['image.attribution'],
 				'no_employees':data['number_of_employees']
 				}
+				# convert dates to datetime objects
+			founded_date = str(data['founded_month'])+"/"+str(data['founded_day'])+"/"+str(data['founded_year'])
+			try:
+				founded_date = datetime.strptime(founded_date,"%m/%d/%Y")
+			except:
+				founded_date = ''
+			fields['founded_date'] = founded_date
 		elif type == 'service-provider':
 			fields = {
 				'cb_permalink':data['permalink'],
@@ -306,22 +302,29 @@ class Command(BaseCommand):
 		""" loops through all relationships, adds people who don't already exist, updates and adds relationships """
 		rels = data['relationships']
 		for r in rels:
-			# check to see if person already exists
-			if not self.entityExists(r['person']['permalink']):
-				data = {'type':'person','first_name':r['person']['first_name'],'last_name':r['person']['last_name'],'permalink':r['person']['permalink']}
-				p = self.addEntity(data)
-				self.addRelationship(entity,p,r)
+			if entity.cb_type == "person":
+				permalink = r['firm']['permalink']
 			else:
-				p = Entity.objects.get(cb_permalink=r['person']['permalink'])
-				# check to see if relationship already exists
-				if self.relExists(entity,p):
-					self.updateRelationship(entity,p,r)
+				permalink = r['person']['permalink']
+			# check to see if person already exists
+			if not self.entityExists(permalink):
+				if entity.cb_type == 'person':
+					data = {'type':'person','first_name':r['person']['first_name'],'last_name':r['person']['last_name'],'permalink':r['person']['permalink']}
 				else:
-					self.addRelationship(entity,p,r)
+					data = {'type':r['firm']['type_of_entity'],'name':r['firm']['name'],'permalink':r['firm']['permalink']}
+				e = self.addEntity(data)
+				self.addRelationship(entity,e,r)
+			else:
+				e = Entity.objects.get(cb_permalink=permalink)
+				# check to see if relationship already exists
+				if self.relExists(entity,e):
+					self.updateRelationship(entity,e,r)
+				else:
+					self.addRelationship(entity,e,r)
 	
-	def relExists(self,entity,person):
+	def relExists(self,entity1,entity2):
 		""" determines if relationship between entity already exists """
-		if person in entity.rels.all():
+		if entity2 in entity1.rels.all():
 			return True
 		else:
 			return False
@@ -424,10 +427,9 @@ class Command(BaseCommand):
 			o.longitude = str(office['longitude'])
 		o.save()
 		self.stdout.write(o.name().encode('utf8','ignore') + " office for " + entity.name().encode('utf8','ignore') + " updated\n")
-		
+
 	def handle(self,types=ENTITY_TYPES,*args, **options):
 		""" gets basic info for all entities, then cycles through and updates information """
-		
 		
 		if options['update']:
 			self.updateAllEntities()

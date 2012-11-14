@@ -2,6 +2,12 @@ from django.db import models
 
 # Create your models here.
 class Entity(models.Model):
+	
+	# returns path for uploading logos
+	def _getLogoPath(self,instance,filename):
+		path = "logos/" + instance.full_name
+		return path
+
 	full_name = models.CharField(max_length=250)
 	first_name = models.CharField(max_length=150)
 	middle_name = models.CharField(max_length=150)
@@ -22,7 +28,8 @@ class Entity(models.Model):
 	cb_updated = models.DateTimeField(blank=True,null=True)
 	cb_permalink = models.CharField(max_length=250,blank=True,null=True)
 	cb_url = models.URLField(blank=True,null=True)
-	logo = models.ImageField(max_length=200,blank=True,null=True)
+	logo = models.ImageField(max_length=200,upload_to=_getLogoPath,null=True)
+	logo_cb_attribution = models.CharField(max_length=450,null=True)
 	total_money = models.CharField(max_length=15,null=True,blank=True)
 	rels = models.ManyToManyField('self',symmetrical=False,through="Relationship") # for advising, employment relationships 
 	no_employees = models.IntegerField(blank=True,null=True)
