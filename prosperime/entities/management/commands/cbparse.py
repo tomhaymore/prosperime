@@ -1,6 +1,7 @@
 # Python imports
 import urllib
 import urllib2
+from urlparse import urlparse
 import pkg_resources
 pkg_resources.require('simplejson') # not sure why this is necessary
 import simplejson
@@ -70,7 +71,11 @@ class Command(BaseCommand):
 	def getJSON(self,url):
 		""" returns JSON file in Python-readable format from URL"""
 		self.stdout.write("fetching " + url + "\n")
-		return simplejson.load(urllib2.urlopen(url))
+		try:
+			return simplejson.load(urllib2.urlopen(url))
+		except simplejson.JSONDecodeError, e:
+			self.stdout.write(str(e.args))
+			return None
 	
 	def getEntityList(self,type):	
 		""" returns list of all entities of particular type """
@@ -152,10 +157,13 @@ class Command(BaseCommand):
 			# make sure it has a CB entry
 			if e.cb_permalink is not "null":
 				data = self.getEntityCBInfo(e)
-				# only update if information has changed since last update
-				if not e.cb_updated or datetime.strptime(data['updated_at'],"%a %b %d %H:%M:%S UTC %Y") > e.cb_updated:
-					self.addAllDetails(e,data)
-					self.stdout.write("Added details for " + e.name().encode("utf8","ignore") + "\n")
+				# make sure API returned valid JSON
+				if data:
+					#self.stdout.write('recieved data \n')
+					# only update if information has changed since last update
+					if not e.cb_updated or datetime.strptime(data['updated_at'],"%a %b %d %H:%M:%S UTC %Y") > e.cb_updated:
+						self.addAllDetails(e,data)
+						self.stdout.write("Added details for " + e.name().encode("utf8","ignore") + "\n")
 	
 	def addAllDetails(self,entity,data):
 		""" adds remainder of details from CB to db """
@@ -166,12 +174,14 @@ class Command(BaseCommand):
 		# add logo
 		# TODO wrap this in new function
 		if data['image']:
+			self.stdout.write("Adding image for " + entity.name().encode('utf8','ignore') + "\n")
 			img_url = "http://www.crunchbase.com/" + data['image']['available_sizes'][2][1]
-			img_filename = entity.name() + "_logo.jpg"
+			img_filename = urlparse(img_url).path.split('/')[-1]
 			#self.stdout.write(img_url)
-			img = urllib2.urlopen(img_url)
+			img = urllib2.urlopen(img_url).read()
+			#img = urllib.urlretrieve(img_url)
 			#entity.logo = img
-			entity.logo.save(img_filename,File(open(img[0])),True)
+			entity.logo.save(img_filename,img,True)
 			#entity.logo = img_url
 			entity.logo_cb_attribution = data['image']['attribution']
 			entity.save()
@@ -187,14 +197,10 @@ class Command(BaseCommand):
 	def getEntityCBInfo(self,entity):
 		""" fetches full profile of entity from CB """
 		cb_url = self.getCBURL('info',entity.cb_type,entity=entity)
-		try:
-			data = self.getJSON(cb_url)
-		except urllib2.HTTPError, e:
-			self.stdout.write(e.code)
-		except urllib2.URLError, e:
-			self.stdout.write(e.args)
-		data['cb_type'] = entity.cb_type
-		return data
+		data = self.getJSON(cb_url)
+		if data:
+			data['cb_type'] = entity.cb_type
+			return data
 	
 	def getFields(self,data,type):
 		""" maps CB fields to db """
