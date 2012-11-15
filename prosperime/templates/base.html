@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<!--<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/main.css" />-->
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css" />
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" />
+	<style>
+		body {
+			padding-top: 60px;
+		}
+	</style>
+	<link href="{{ STATIC_URL }}img/favicon.jpg" rel="icon"  />
+	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/main.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+<head> <title>{% block title %}Prosperime: Don't work, prosper {% endblock %}</title> </head>
+
+<body>
+	<div class="navbar navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container">
+				<a class="brand" href="/">Prosperime</a>
+				<div class="nav-collapse">
+					<ul class="nav">
+						<li>
+							<a href="/">Home</a>
+						</li>
+						{% if user.is_staff %}                
+                		<li>
+                			<a href="/settings/">Account</a>
+                		</li>
+                		{% endif %}
+                		{% if user.is_authenticated %}
+                		<li>
+                			<a href="/accounts/logout/">Logout</a>
+                		</li>
+                		{% endif %}
+						<li>
+							<a href="/about">About</a>
+						</li>
+						<li>
+							<a href="/contact">Contact</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+        
+	</div>
+   
+    <div class="container">
+        
+
+        <div id="content">
+            <div id="mainContent">{% block content %}{% endblock %}</div>
+            
+            <div id="sidebar"> {% block sidebar %} {% endblock %} </div>
+            <div class="spacer"></div>
+        </div>
+    </div>
+    
+
+</body>
+</html>
