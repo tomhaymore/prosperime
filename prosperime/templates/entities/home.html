@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>{{user.username}}/home</h2>
+<!--<a class="btn">Documents</a><a class="btn">Messages</a>-->
+<hr />
+<h3>Documents</h3> 
+{% if docs %}
+	<div>
+		<span class="pull-left">Filter by: </span>
+			<ul class="nav nav-pills">
+				<li class="active"><a href="#">Date</a></li>
+				<li><a href="#">From</a></li>
+				<li><a href="#">To</a></li>
+				<li><a href="#">Type</a></li>
+				<li><a href="#">Title</a></li>
+			</ul>
+	</div>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Type</th>
+				<th>Size</th>
+			</tr>
+		</thead>
+		{% for d in docs|slice:":10" %}
+			<tbody>
+				<td><a href="{{MEDIA_URL}}files/{{d.id}}">{{d.name}}</a></td>
+				<td>{{d.type}}</td>
+				<td>{{d.orig_date}}</td>
+			</tbody>
+		{% endfor %}
+	</table>
+{% else %}
+You have no documents
+{% endif %}
+
+<h3>Messages</h3> 
+{% if msgs %}
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Account</th>
+				<th>From</th>
+				<th>Subject</th>
+				<th>Sent</th>
+			</tr>
+		</thead>
+		{% for m in msgs|slice:":10" %}
+			<tbody>
+				<td>{{m.service}}</td>
+				<td>{{m.msg_from}}</td>
+				<td>{{m.subject}}</td>
+				<td>{{m.sent}}</td>
+			</tbody>
+		{% endfor %}
+	</table>
+{% else %}
+You have no messages
+{% endif %}
+
+<p><a href="/doc/refresh">Refresh accounts</a></p>
+
+
+{% endblock %}
