@@ -1,4 +1,5 @@
 from django.conf.urls.defaults import patterns, include, url
+from django.conf import settings
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -6,7 +7,8 @@ from django.conf.urls.defaults import patterns, include, url
 
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'prosperime.views.home', name='home'),
+    url(r'^$', 'entities.views.home', name='home'),
+    (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     # url(r'^prosperime/', include('prosperime.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
