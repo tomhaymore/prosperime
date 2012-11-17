@@ -1,67 +1,60 @@
 {% extends "base.html" %}
 
+{% block sidebar %}
+
+<p class="form-header">Location</p>
+	{% for l in locations %}
+		<label class="checkbox">
+			<input type="checkbox" value="{{l}}"> {{l}}</option>
+		</label>
+	{% endfor %}
+<p class="form-header">Sector</p>
+	{% for s in sectors %}
+		<label class="checkbox">
+			<input type="checkbox" value="{{s}}"> {{s}}</option>
+		</label>
+	{% endfor %}
+
+<p class="form-header">Size</p>
+	{% for k,v in sizes.items %}
+		<label class="checkbox">
+			<input type="checkbox" value="{{k}}"> {{v}}</option>
+		</label>
+	{% endfor %}
+	<ul class="formParams">
+
+	</ul> 
+<p class="form-header">Stage</p>
+	{% for s in stages %}
+		<label class="checkbox">
+			<input type="checkbox" value="{{s}}"> {{s}}</option>
+		</label>
+	{% endfor %}
+	<ul class="formParams">
+
+	</ul> 
+
+
+{% endblock %}
+
 {% block content %}
 
-<h2>{{user.username}}/home</h2>
-<!--<a class="btn">Documents</a><a class="btn">Messages</a>-->
-<hr />
-<h3>Documents</h3> 
-{% if docs %}
-	<div>
-		<span class="pull-left">Filter by: </span>
-			<ul class="nav nav-pills">
-				<li class="active"><a href="#">Date</a></li>
-				<li><a href="#">From</a></li>
-				<li><a href="#">To</a></li>
-				<li><a href="#">Type</a></li>
-				<li><a href="#">Title</a></li>
-			</ul>
-	</div>
-	<table class="table">
-		<thead>
-			<tr>
-				<th>Name</th>
-				<th>Type</th>
-				<th>Size</th>
-			</tr>
-		</thead>
-		{% for d in docs|slice:":10" %}
-			<tbody>
-				<td><a href="{{MEDIA_URL}}files/{{d.id}}">{{d.name}}</a></td>
-				<td>{{d.type}}</td>
-				<td>{{d.orig_date}}</td>
-			</tbody>
-		{% endfor %}
-	</table>
-{% else %}
-You have no documents
-{% endif %}
+{% if entities %}
 
-<h3>Messages</h3> 
-{% if msgs %}
-	<table class="table">
-		<thead>
-			<tr>
-				<th>Account</th>
-				<th>From</th>
-				<th>Subject</th>
-				<th>Sent</th>
-			</tr>
-		</thead>
-		{% for m in msgs|slice:":10" %}
-			<tbody>
-				<td>{{m.service}}</td>
-				<td>{{m.msg_from}}</td>
-				<td>{{m.subject}}</td>
-				<td>{{m.sent}}</td>
-			</tbody>
+		{% for e in entities|slice:":20" %}
+			<div class="list-preview">
+				{% if e.logo %}
+					<img class="logo-preview" src="{{e.logo.url}}" />
+				{% endif %}
+				<span class="company-header">{{e.name}}</span>
+				<div class="clear"></div>
+				{{e.domain}}<br/>
+				{{e.summary}}
+			</div>
 		{% endfor %}
-	</table>
 {% else %}
-You have no messages
+I'm sorry, the Internets ate our database.
 {% endif %}
-
-<p><a href="/doc/refresh">Refresh accounts</a></p>
 
 
 {% endblock %}
