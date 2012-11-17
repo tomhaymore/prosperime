@@ -1,4 +1,5 @@
 # Python imports
+import os
 import urllib
 import urllib2
 from urlparse import urlparse
@@ -174,26 +175,36 @@ class Command(BaseCommand):
 		# add logo
 		# TODO wrap this in new function
 		if data['image']:
-			self.stdout.write("Adding image for " + entity.name().encode('utf8','ignore') + "\n")
-			img_url = "http://www.crunchbase.com/" + data['image']['available_sizes'][2][1]
-			img_filename = urlparse(img_url).path.split('/')[-1]
-			#self.stdout.write(img_url)
-			img = urllib2.urlopen(img_url).read()
-			#img = urllib.urlretrieve(img_url)
-			#entity.logo = img
-			entity.logo.save(img_filename,img,True)
-			#entity.logo = img_url
+			self.getCBImage(entity,data['image']['available_sizes'][2][1])
 			entity.logo_cb_attribution = data['image']['attribution']
 			entity.save()
 		# adds relationships, financings, offices
 		self.parseRelationships(entity,data)
-		if entity.type == "company":
+		if entity.cb_type == "company":
 			self.parseOffices(entity,data)
-			self.parseFinancings(e,data)
+			self.parseFinancings(entity,data)
+		elif entity.cb_type == 'financial-organization' or entity.cb_type == 'service-provider':
+			self.parseOffices(entity,data)
 		# report 
 		self.stdout.write(entity.name().encode("utf8","ignore") + " updated\n")
 	
-	
+	def getCBImage(self,entity,url):
+		self.stdout.write("Adding image for " + entity.name().encode('utf8','ignore') + "\n")
+		img_url = "http://www.crunchbase.com/" + url
+		img_filename = urlparse(img_url).path.split('/')[-1]
+		img = None
+		try:
+			img = urllib2.urlopen(img_url)
+		except urllib2.HTTPError, e:
+			self.stdout.write(str(e.code))
+		if img:
+			with open('tmp_img','wb') as f:
+				f.write(img.read())
+			with open('tmp_img','r') as f:
+				img_file = File(f)
+				entity.logo.save(img_filename,img_file,True)
+			os.remove('tmp_img')
+
 	def getEntityCBInfo(self,entity):
 		""" fetches full profile of entity from CB """
 		cb_url = self.getCBURL('info',entity.cb_type,entity=entity)
@@ -217,8 +228,6 @@ class Command(BaseCommand):
 				'aliases':data['alias_list'],
 				'domain':data['category_code'],
 				'cb_url':data['crunchbase_url'],
-				#'logo':data['image']['available_sizes'][1],
-				#'logo_attribution':data['image']['attribution'],
 				'total_money':data['total_money_raised'],
 				'no_employees':data['number_of_employees']
 				}
@@ -227,13 +236,13 @@ class Command(BaseCommand):
 			try:
 				founded_date = datetime.strptime(founded_date,"%m/%d/%Y")
 			except:
-				founded_date = ''
+				founded_date = None
 			fields['founded_date'] = founded_date
 			deadpooled_date = str(data['deadpooled_month'])+"/"+str(data['deadpooled_day'])+"/"+str(data['deadpooled_year'])
 			try:
 				deadpooled_date = datetime.strptime(deadpooled_date,"%m/%d/%Y")
 			except:
-				deadpooled_date = ''
+				deadpooled_date = None
 			fields['deadpooled_date'] = deadpooled_date
 		elif type == 'person':
 			fields = {
@@ -247,14 +256,12 @@ class Command(BaseCommand):
 				'birthplace':data['birthplace'],
 				'twitter_handle':data['twitter_username'],
 				}
-				#'logo':data['image']['available_sizes'][0][1],
-				#'logo_attribution':data['image']['attribution']
 				# convert dates to datetime objects
 			birth_date = str(data['born_month'])+"/"+str(data['born_day'])+"/"+str(data['born_year'])
 			try:
 				birth_date = datetime.strptime(birth_date,"%m/%d/%Y")
 			except:
-				birth_date = ''
+				birth_date = None
 			fields['birth_date'] = birth_date
 		elif type == 'financial-organizations':
 			fields = {
@@ -268,8 +275,6 @@ class Command(BaseCommand):
 				'twitter_handle':data['twitter_username'],
 				'aliases':data['alias_list'],
 				'cb_url':data['crunchbase_url'],
-				#'logo':data['image.available_sizes'][0][1],
-				#'logo_attribution':data['image.attribution'],
 				'no_employees':data['number_of_employees']
 				}
 				# convert dates to datetime objects
@@ -277,7 +282,7 @@ class Command(BaseCommand):
 			try:
 				founded_date = datetime.strptime(founded_date,"%m/%d/%Y")
 			except:
-				founded_date = ''
+				founded_date = None
 			fields['founded_date'] = founded_date
 		elif type == 'service-provider':
 			fields = {
@@ -289,8 +294,6 @@ class Command(BaseCommand):
 				'url':data['homepage_url'],
 				'aliases':data['alias_list'],
 				'cb_url':data['crunchbase_url'],
-				#'logo':data['image']['available_sizes'][0][1],
-				#'logo_attribution':data['image.attribution'],
 				}
 		fields['cb_updated'] = datetime.now()
 		return fields	
@@ -315,9 +318,9 @@ class Command(BaseCommand):
 			# check to see if person already exists
 			if not self.entityExists(permalink):
 				if entity.cb_type == 'person':
-					data = {'type':'person','first_name':r['person']['first_name'],'last_name':r['person']['last_name'],'permalink':r['person']['permalink']}
-				else:
 					data = {'type':r['firm']['type_of_entity'],'name':r['firm']['name'],'permalink':r['firm']['permalink']}
+				else:
+					data = {'type':'person','first_name':r['person']['first_name'],'last_name':r['person']['last_name'],'permalink':r['person']['permalink']}
 				e = self.addEntity(data)
 				self.addRelationship(entity,e,r)
 			else:
@@ -352,33 +355,53 @@ class Command(BaseCommand):
 	def parseFinancings(self,entity,data):
 		""" loops through all financings, adds entities that don't exist, adds and updates financings """
 		financings = data['funding_rounds']
-		for fin in financingss:
+		for fin in financings:
 			# check to see if financing already exists
-			if not self.FinancingExists(entity,f):
+			if not self.financingExists(entity,f):
 				f = self.addFinancing(entity,f)
 			else:
 				f = self.updateFinancing(entity,f)
 	
+	def financingExists(self,entity,financing):
+		fin = Financing.objects.filter(round=financing['round_code'])
+		if not fin:
+			return False
+		else:
+			return True
+
 	def addFinancing(self,entity,f):
 		""" adds financing """
 		fin = Financing.objects.create(round=f.round_code,amount=f.raised_amount,currency=f.raised_currency,date=datetime.strptime(f.funded_month+"/"+f.funded_day+"/"+f.funded_year,"%m/%d/%Y"))
 		fin.save()
-		for i in f.investments:
-			if i.company is not "null":
-				i_sub = i.company
-				type = 'company'
-			elif i.financial_org is not "null":
-				i_sub = i.financial_org
-				type = 'financial_org'
-			elif i.person is not "null":
-				i_sub = i.person
-				type = 'person'
-			if entityExists(i_sub.permalink):
-				e = Entity.objects.get(cb_permalink=i_sub.permalink)
+		# loop through each individual investment
+		for i in f['investments']:
+			# check to see what type of investor
+			if i['company'] is not "null":
+				i_sub = i['company']
+				cb_type = 'company'
+			elif i['financial_org'] is not "null":
+				i_sub = i['financial_org']
+				cb_type = 'financial_org'
+			elif i['person'] is not "null":
+				i_sub = i['person']
+				cb_type = 'person'
+			# check to see if this entity already exists
+			if self.entityExists(i_sub.permalink):
+				# retrieve entity
+				e = Entity.objects.get(cb_permalink=i_sub['permalink'])
 			else:
-				cbEntity = self.getEntity({"name":i_sub.name,"permalink":i_sub.permalink,"type":type})
-				e = self.addEntity(cbEntity,type)
-			fin.investors.add(e)
+				# add entity to db
+				if cb_type == 'person':
+					e = self.addEntity({'first_name':i_sub['first_name'],'last_name':i_sub['last_name'],"permalink":i_sub['permalink'],"cb_type":cb_type,'type':'person'})
+				else:
+					e = self.addEntity({"name":i_sub['name'],"permalink":i_sub['permalink'],"cb_type":cb_type,'type':'organization'})
+				# get full CB info
+				data = self.getEntityCBInfo(e)
+				# add remainder of CB data to db
+				self.addAllDetails(e,data)
+			# now that financing and all parties are created, add investment relationship
+			inv = Investment.objects.create(investor=e,financing=fin)
+			inv.save()
 		fin.save()
 	
 	def parseOffices(self,entity,data):

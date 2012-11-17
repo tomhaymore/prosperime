@@ -4,8 +4,8 @@ from django.db import models
 class Entity(models.Model):
 	
 	# returns path for uploading logos
-	def _getLogoPath(self,instance,filename):
-		path = "logos/" + instance.full_name
+	def _getLogoPath(self,filename):
+		path = "logos/" + self.full_name + "/" + filename
 		return path
 
 	full_name = models.CharField(max_length=250)
@@ -50,12 +50,19 @@ class Relationship(models.Model):
 	attribution = models.URLField(blank=True,null=True)
 
 class Financing(models.Model):
-	investors = models.ManyToManyField(Entity)
+	investors = models.ManyToManyField(Entity,through="Investment")
 	round = models.CharField(max_length=15)
 	amount = models.DecimalField(max_digits=15,decimal_places=2)
 	currency = models.CharField(max_length=5)
 	date = models.DateField(blank=True,null=True)
 	source_url = models.URLField(blank=True,null=True)
+	created = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
+
+class Investment(models.Model):
+	investor = models.ForeignKey(Entity,related_name="investor")
+	financing = models.ForeignKey(Financing)
+	amount = models.DecimalField(decimal_places=2,max_digits=15,null=True)
 
 class Office(models.Model):
 	entity = models.ForeignKey(Entity)
@@ -69,12 +76,11 @@ class Office(models.Model):
 	country_code = models.CharField(max_length=50,blank=True,null=True)
 	latitude = models.DecimalField(decimal_places=7,max_digits=10,null=True)
 	longitude = models.DecimalField(decimal_places=7,max_digits=10,null=True)
+	created = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
 
 	def __unicode__(self):
 		return self.entity.name() + " office"
 
 	def name(self):
 		return self.entity.name() + " office"	
-
-class Scan(models.Model):
-	entity = models.ForeignKey(Entity) # entity
