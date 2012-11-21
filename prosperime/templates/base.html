@@ -9,39 +9,46 @@
 		}
 	</style>
 	<link href="{{ STATIC_URL }}img/favicon.jpg" rel="icon"  />
+	<script type="text/javascript" src="{{ STATIC_URL }}js/json2.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}js/main.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/app.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
 <head> <title>{% block title %}Prosperime: Don't work, prosper {% endblock %}</title> </head>
 
 <body>
 	<div class="navbar navbar-fixed-top">
 		<div class="navbar-inner">
-			<div class="container">
-				<a class="brand" href="/">Prosperime</a>
-				<div class="nav-collapse">
-					<ul class="nav">
-						<li>
-							<a href="/">Home</a>
-						</li>
-						{% if user.is_staff %}                
-                		<li>
-                			<a href="/settings/">Account</a>
-                		</li>
-                		{% endif %}
-                		{% if user.is_authenticated %}
-                		<li>
-                			<a href="/accounts/logout/">Logout</a>
-                		</li>
-                		{% endif %}
-						<li>
-							<a href="/about">About</a>
-						</li>
-						<li>
-							<a href="/contact">Contact</a>
-						</li>
-					</ul>
-				</div>
+			<div class="container-fluid">
+				
+					<div class="span2 offset1">
+						<a class="brand" href="/">Prosperime</a>
+					</div>
+					<div class="span4 offset4 nav-collapse">
+						<ul class="nav">
+							<li>
+								<a href="/">Home</a>
+							</li>
+							{% if user.is_staff %}                
+	                		<li>
+	                			<a href="/settings/">Account</a>
+	                		</li>
+	                		{% endif %}
+	                		{% if user.is_authenticated %}
+	                		<li>
+	                			<a href="/accounts/logout/">Logout</a>
+	                		</li>
+	                		{% endif %}
+							<li>
+								<a href="/about">About</a>
+							</li>
+							<li>
+								<a href="/contact">Contact</a>
+							</li>
+						</ul>
+					</div>
+				
 			</div>
 		</div>
         
@@ -49,21 +56,24 @@
    
     <div class="container-fluid">
         
-        <div class="row-fluid">
+      <!--   <div class="row-fluid"> -->
 
-	        <div class="span3">
+	        <div class="span2 offset1">
 	            {% block sidebar %} {% endblock %} 
 	        </div>
 
-            <div class="span9">
+            <div class="span6">
             	{% block content %}{% endblock %}
             </div>
 	            
-
+            <div class="span2">
+	            {% block rightSidebar %} {% endblock %} 
 	        </div>
-	    </div>
+	        
+	   <!--  </div> -->
     </div>
     
-
+{% block templates %}
+{% endblock %}
 </body>
 </html>

@@ -8,6 +8,7 @@ from django.conf import settings
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'entities.views.home', name='home'),
+    url(r'^companies/','entities.views.companies'),
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     # url(r'^prosperime/', include('prosperime.foo.urls')),
 

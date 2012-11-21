@@ -1,21 +1,24 @@
 .form-header {
 	font-weight: bold;
-	font-size: 1.3em;
+	font-size: 1.1em;
 	border-bottom: 1px solid black;
-	margin-top:10px;
+	/*margin-top:10px;*/
+}
+
+.search-form-module {
+	margin-bottom: 10px;
 }
 
 label.checkbox {
-	font-size:0.9em;
+	font-size:1em;
 }
 
 img.logo-preview {
 	width:100px;
-	float: left;
 }
 
 .company-header {
-	float:left;
+
 	font-weight: bold;
 	font-size: 1.2em;
 }
@@ -26,5 +29,55 @@ img.logo-preview {
 
 .list-preview {
 	border-top: 1px solid #ccc;
+	/*border: 1px solid #ccc;
+	/*border-radius: 2px;*/
+	padding: 5px;
+	min-height: 85px;
+	margin: 5px 0 10px 0;
+}
+
+.left-list-preview {
+	float:left;
+	width:150px;
+}
+
+.right-list-preview {
+	float:left;
+}
+
+.rounded {
+	border: 1px solid #ccc;
+	padding: 5px;
+	border-radius: 2px;
+	font-size:0.9em;
+	margin-bottom: 15px;
+}
+
+.sidebar-header {
+	font-weight: bold;
+	font-size: 1.2em;
+	margin-bottom:5px;
+}
+
+.main-header {
+	font-weight: bold;
+	font-size:1.2em;
+}
+
+.search-container {
+	border: 1px solid #ccc;
+	/*padding: 5px;*/
+	padding:0px;
+	border-radius: 2px;
+	font-size:0.9em;
+	/*margin-bottom: 15px;*/
+}
+
+.search-form-header {
+	background-color: #6B8FD4;
+	padding: 5px;
+}
+
+.search-form-module {
 	padding: 5px;
 }
