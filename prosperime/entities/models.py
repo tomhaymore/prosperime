@@ -28,7 +28,7 @@ class Entity(models.Model):
 	cb_updated = models.DateTimeField(blank=True,null=True)
 	cb_permalink = models.CharField(max_length=250,blank=True,null=True)
 	cb_url = models.URLField(blank=True,null=True)
-	logo = models.ImageField(max_length=200,upload_to=_getLogoPath,null=True)
+	logo = models.ImageField(max_length=450,upload_to=_getLogoPath,null=True)
 	logo_cb_attribution = models.CharField(max_length=450,null=True)
 	total_money = models.CharField(max_length=15,null=True,blank=True)
 	rels = models.ManyToManyField('self',symmetrical=False,through="Relationship") # for advising, employment relationships 
@@ -51,8 +51,9 @@ class Relationship(models.Model):
 
 class Financing(models.Model):
 	investors = models.ManyToManyField(Entity,through="Investment")
+	target = models.ForeignKey(Entity,related_name="target")
 	round = models.CharField(max_length=15)
-	amount = models.DecimalField(max_digits=15,decimal_places=2)
+	amount = models.DecimalField(max_digits=15,decimal_places=2,null=True)
 	currency = models.CharField(max_length=5)
 	date = models.DateField(blank=True,null=True)
 	source_url = models.URLField(blank=True,null=True)

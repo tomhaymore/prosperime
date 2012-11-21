@@ -12,7 +12,7 @@ from optparse import make_option
 
 # Django imports
 from django.core.management.base import BaseCommand, CommandError
-from entities.models import Entity, Relationship, Financing, Office
+from entities.models import Entity, Relationship, Financing, Office, Investment
 from django.core.files import File
 
 class Command(BaseCommand):
@@ -108,10 +108,13 @@ class Command(BaseCommand):
 			if self.entityExists((d['permalink'])) is False:
 				self.addEntity(d)
 	
-	def addEntity(self, data):
+	def addEntity(self, data,map_fields=True):
 		""" adds entity """
 		e = Entity()
-		fields = self.getFieldsQuick(data)
+		if map_fields:
+			fields = self.getFieldsQuick(data)
+		else: 
+			fields = data
 		for k,v in fields.iteritems():
 			setattr(e,k,v)
 		e.save()
@@ -357,21 +360,25 @@ class Command(BaseCommand):
 		financings = data['funding_rounds']
 		for fin in financings:
 			# check to see if financing already exists
-			if not self.financingExists(entity,f):
-				f = self.addFinancing(entity,f)
+			if not self.financingExists(entity,fin):
+				f = self.addFinancing(entity,fin)
 			else:
-				f = self.updateFinancing(entity,f)
+				f = self.updateFinancing(entity,fin)
 	
 	def financingExists(self,entity,financing):
-		fin = Financing.objects.filter(round=financing['round_code'])
-		if not fin:
+		try:
+			fin = Financing.objects.get(round=financing['round_code'],target=entity)
+		except:
 			return False
-		else:
-			return True
+		return True
 
 	def addFinancing(self,entity,f):
 		""" adds financing """
-		fin = Financing.objects.create(round=f.round_code,amount=f.raised_amount,currency=f.raised_currency,date=datetime.strptime(f.funded_month+"/"+f.funded_day+"/"+f.funded_year,"%m/%d/%Y"))
+		# gets datetime object from cb dates
+		fin_date = self.constructDate(f['funded_month'],f['funded_day'],f['funded_year'])
+		if f['raised_amount'] is not None:
+			f['raised_amount'] = str(f['raised_amount'])
+		fin = Financing.objects.create(target=entity,round=f['round_code'],amount=f['raised_amount'],currency=f['raised_currency_code'],date=fin_date)
 		fin.save()
 		# loop through each individual investment
 		for i in f['investments']:
@@ -386,24 +393,72 @@ class Command(BaseCommand):
 				i_sub = i['person']
 				cb_type = 'person'
 			# check to see if this entity already exists
-			if self.entityExists(i_sub.permalink):
-				# retrieve entity
-				e = Entity.objects.get(cb_permalink=i_sub['permalink'])
-			else:
-				# add entity to db
-				if cb_type == 'person':
-					e = self.addEntity({'first_name':i_sub['first_name'],'last_name':i_sub['last_name'],"permalink":i_sub['permalink'],"cb_type":cb_type,'type':'person'})
+			if i_sub:
+				if self.entityExists(i_sub['permalink']):
+					# retrieve entity
+					e = Entity.objects.get(cb_permalink=i_sub['permalink'])
 				else:
-					e = self.addEntity({"name":i_sub['name'],"permalink":i_sub['permalink'],"cb_type":cb_type,'type':'organization'})
-				# get full CB info
-				data = self.getEntityCBInfo(e)
-				# add remainder of CB data to db
-				self.addAllDetails(e,data)
-			# now that financing and all parties are created, add investment relationship
-			inv = Investment.objects.create(investor=e,financing=fin)
-			inv.save()
+					# add entity to db
+					if cb_type == 'person':
+						e = self.addEntity({'first_name':i_sub['first_name'],'last_name':i_sub['last_name'],"permalink":i_sub['permalink'],"cb_type":cb_type,'type':'person'})
+					else:
+						e = self.addEntity({"name":i_sub['name'],"permalink":i_sub['permalink'],"cb_type":cb_type,'type':'organization'})
+					# get full CB info
+					data = self.getEntityCBInfo(e)
+					# add remainder of CB data to db
+					self.addAllDetails(e,data)
+				# now that financing and all parties are created, add investment relationship
+				inv = Investment.objects.create(investor=e,financing=fin)
+				inv.save()
 		fin.save()
 	
+	def updateFinancing(self,entity,cb_financing):
+		# fetch financing
+		fin = Financing.objects.get(round=cb_financing['round_code'],target=entity)
+		# fetch investments, see if they exist already
+		for i in cb_financing['investments']:
+			if i['company'] is not None:
+				i_sub = i['company']
+				i['cb_type'] = 'company'
+			elif i['financial_org'] is not None:
+				i_sub = i['financial_org']
+				i['cb_type'] = 'financial_org'
+			elif i['person'] is not None:
+				i_sub = i['person']
+				i['cb_type'] = 'person'
+			if not self.investmentExists(fin,i_sub['permalink']):
+				if i['cb_type'] == 'person':
+					# it's a personal investor
+					full_name = i_sub['first_name'] + " " + i_sub['last_name']
+					e = self.addEntity({'first_name':i_sub['first_name'],'last_name':i_sub['last_name'],'full_name':full_name,'permalink':i_sub['permalink'],'type':"person",'cb_type':i['cb_type']},False)
+				else:
+					# it's an organizational investor
+					e = self.addEntity({'full_name':i_sub['name'],'permalink':i_sub['permalink'],'type':"organization",'cb_type':i['cb_type']},False)
+				investment = Investment.objects.create(financing=fin,investor=e)
+
+	def constructDate(self,month,day,year):
+		""" takes three values, checks which are none and returns date value or none """
+		# check to see what values are null
+		if month is None and day is None and year is None:
+			# all values are None, return None
+			return None
+		elif month is None and day is None:
+			date = datetime.strptime(year,"%Y")
+		elif day is None:
+			date = datetime.strptime(str(month)+"/"+str(year),"%m/%Y")
+		else:
+			date = datetime.strptime(str(month)+"/"+str(day)+"/"+str(year),"%m/%d/%Y")
+		return date
+
+	def investmentExists(self,financing,cb_permalink):
+		try:
+			investor = Entity.objects.get(cb_permalink=cb_permalink)
+		except:
+			return False
+		if investor in financing.investors.all():
+			return True
+		return False
+
 	def parseOffices(self,entity,data):
 		""" loops through all offices, adds them and connects them to entities """
 		offices = data['offices']
