@@ -5,9 +5,9 @@ $(function(){
 
 	// Models
 
-	// Param: dynamically loaded search param
+	// Filter: dynamically loaded search param
 
-	window.Param = Backbone.Model.extend({
+	window.Filter = Backbone.Model.extend({
 
 
 	});
@@ -18,10 +18,15 @@ $(function(){
 
 	// Collections
 
-	window.Params = Backbone.Collection.extend({
+	// Filters: collection of filters
 
-		model:Param,
+	window.Filters = Backbone.Collection.extend({
+
+		model:Filter,
+		url: '/filters'
 	})
+
+	// Orgs: collection of orgs
 
 	window.Orgs = Backbone.Collection.extend({
 
@@ -30,7 +35,10 @@ $(function(){
 
 	});
 
+	// instantiate collections
+
 	window.orgs = new Orgs;
+	window.filters = new Filters;
 
 	// Views
 
@@ -81,6 +89,50 @@ $(function(){
 			return this;
 		}
 	});
+
+	window.FilterSingleView = Backbone.View.extend ({
+
+		template: _.template($("#search-filters-template").html()),
+
+		initialize: function() {
+			this.model.on('change',this.render,this);
+		}
+
+		render: function() {
+			var renderedContent = this.template(this.model.toJSON());
+			$(this.el).html(renderedContent);
+			return this;
+		}
+	});
+
+	window.FilterListView = Backbone.View.extend ({
+
+		el: $("#search-container"),
+		tag: div,
+		template: _.template($("#search-module-template").html()),
+
+		initialize: function() {
+			_.bindAll(this,'render');
+			this.collection.bind('reset',this.render);
+
+		},
+
+		render: function() {
+			var $filters,
+				collection = this.collection;
+
+			$(this.el).html(this.tepmlate({}));
+			$filters = $(".search-form-module");
+			this.collection.each(function(filter)) {
+				var view = new FilterSingleView({
+					model: filter,
+					collection: collection
+				});
+				$filters.append(view.render().el);
+			};
+			return this;
+		}
+	})
 
 });
 

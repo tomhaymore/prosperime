@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'entities.views.home', name='home'),
     url(r'^companies/','entities.views.companies'),
+    url(r'^filters/','entities.views.filters'),
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     # url(r'^prosperime/', include('prosperime.foo.urls')),
 

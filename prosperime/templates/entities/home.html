@@ -124,4 +124,25 @@ I'm sorry, the Internets ate our database.
 	<p class="main-header">Search Hello</p>
 	<div class="org-list"></div>
 </script>
+
+<script type="text/template" id="search-module-template">
+	<div id="search-container" class="rounded">
+		<div class="search-form-header sidebar-header">
+			Refine Your Search
+		</div>
+	</div>
+</script>
+
+<script type="text/template" id="search-params-template">
+	<div class="search-form-module">
+		<% _.each(categories, function(category) { %>
+			<p class="form-header"><%= category %></p>
+			<% _.each(params, function(param) {
+				<label class="checkbox">
+					<input type="checkbox" value="<%= param %>"><%= param %></option>
+				</label>
+			<% }); %>
+		<% }); %>
+	</div>
+</script>
 {% endblock %}
