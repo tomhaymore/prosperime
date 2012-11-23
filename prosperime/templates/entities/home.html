@@ -2,7 +2,7 @@
 
 {% block sidebar %}
 
-<div class="search-container rounded">
+<div id="search-container" class="rounded">
 	<div class="search-form-header sidebar-header">
 		Refine Your Search
 	</div>
@@ -51,9 +51,11 @@
 {% endblock %}
 
 {% block content %}
-<p class="main-header">Search Results</p>
+<div id="search-results-list">
+	<p class="main-header">Search Results</p>
+
 {% if entities %}
-	<div id="org-list">
+	
 		{% for e in entities|slice:":20" %}
 			<div class="list-preview">
 				
@@ -103,7 +105,7 @@ I'm sorry, the Internets ate our database.
 
 {% block templates %}
 <script type="text/template" id="org-single-template">
-	<div class="list-preview">			
+	<li class="list-preview">			
 		<div class="left-list-preview">
 			
 			<div class="img-holder">
@@ -117,32 +119,30 @@ I'm sorry, the Internets ate our database.
 			<p><%= summary %></p>
 		</div>
 		<div class="clear"></div>
-	</div>
+	</li>
 </script>
 
 <script type="text/template" id="org-list-template">
-	<p class="main-header">Search Hello</p>
-	<div class="org-list"></div>
+	<p class="main-header">Search Results</p>
+	<ul class="org-list"></ul>
+</script>
+
+<script type="text/template" id="search-header-template">
+	<div class="search-form-header sidebar-header">
+		Refine Your Search
+	</div>
 </script>
 
 <script type="text/template" id="search-module-template">
-	<div id="search-container" class="rounded">
-		<div class="search-form-header sidebar-header">
-			Refine Your Search
-		</div>
+	<div class="search-form-module">
+		<p class="form-header"><%= category %></p>
+		<ul class="filters-list"></ul>
 	</div>
 </script>
 
-<script type="text/template" id="search-params-template">
-	<div class="search-form-module">
-		<% _.each(categories, function(category) { %>
-			<p class="form-header"><%= category %></p>
-			<% _.each(params, function(param) {
-				<label class="checkbox">
-					<input type="checkbox" value="<%= param %>"><%= param %></option>
-				</label>
-			<% }); %>
-		<% }); %>
-	</div>
+<script type="text/template" id="search-filters-template">
+	<label class="checkbox">
+		<input type="checkbox" value="<%= value %>"><%= name %></option>
+	</label>
 </script>
 {% endblock %}

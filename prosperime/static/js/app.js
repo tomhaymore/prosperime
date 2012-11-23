@@ -63,7 +63,9 @@ $(function(){
 	});
 
 	window.OrgListView = Backbone.View.extend({
-		el: $('#org-list'),
+		
+		//el: $('#org-list'),
+		el: $('#search-results-list'),
 		tag: "div",
 		template: _.template($('#org-list-template').html()),
 
@@ -91,12 +93,12 @@ $(function(){
 	});
 
 	window.FilterSingleView = Backbone.View.extend ({
-
+		tag: '<li>',
 		template: _.template($("#search-filters-template").html()),
 
 		initialize: function() {
 			this.model.on('change',this.render,this);
-		}
+		},
 
 		render: function() {
 			var renderedContent = this.template(this.model.toJSON());
@@ -108,7 +110,7 @@ $(function(){
 	window.FilterListView = Backbone.View.extend ({
 
 		el: $("#search-container"),
-		tag: div,
+		tag: 'div',
 		template: _.template($("#search-module-template").html()),
 
 		initialize: function() {
@@ -119,20 +121,40 @@ $(function(){
 
 		render: function() {
 			var $filters,
+				filterCategories,
 				collection = this.collection;
 
-			$(this.el).html(this.tepmlate({}));
-			$filters = $(".search-form-module");
-			this.collection.each(function(filter)) {
-				var view = new FilterSingleView({
-					model: filter,
-					collection: collection
+			$(this.el).empty();
+			$(this.el).append(_.template($("#search-header-template").html()));
+			
+			// putll out unique list of categories
+			categories = filters.map(function(model) { return model.get('category'); });
+			categories = _.uniq(categories);
+			for (var i = 0; i < categories.length; i++) { 
+				category = categories[i];
+				//console.log(category);
+				// render collection view with appropriate category variable
+				$(this.el).append(this.template({'category':category}));
+				// assign comtainer for models to a jQuery object
+				$filters = this.$(".filters-list:last");
+				// loop through each model in the collection
+				this.collection.each(function(filter) {
+					// only render filters from this category
+
+					if (filter.get('category') == category) {
+						// console.log(filter.get('category'));
+						var view = new FilterSingleView({
+							model: filter,
+							collection: collection
+						});
+						$filters.append(view.render().el);
+					}
 				});
-				$filters.append(view.render().el);
-			};
+			}
 			return this;
 		}
-	})
+	});
+
 
 });
 
