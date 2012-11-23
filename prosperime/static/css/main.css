@@ -1,3 +1,16 @@
+/* Components */
+
+ul {
+	margin:0px;
+	padding:0;
+
+}
+
+li {
+	list-style: none;
+	margin-left: 0;
+}
+
 .form-header {
 	font-weight: bold;
 	font-size: 1.1em;

@@ -105,15 +105,15 @@ def filters(request):
 	# categories.append(locationsDict)
 	# cats = {'categories':categories}
 	filters = []
-	locations = Office.objects.values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()[:20]
+	locations = Office.objects.values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()[:10]
 	for l in locations:
 		if l['city']:
-			filters.append({'name':l['city'],'value':l['city'],'category':'Location'})
-	sectors = Entity.objects.values('domain').distinct()
+			filters.append({'name':l['city'],'value':l['city'],'category':'Location','count':l['freq'],'selected':None})
+	sectors = Entity.objects.values('domain').annotate(freq=Count('pk')).distinct()
 	for s in sectors:
 		if s['domain']:
 			name = " ".join(word.capitalize() for word in s['domain'].replace("_"," ").split())
-			filters.append({'name':name,'value':s['domain'],'category':'Sector'})
+			filters.append({'name':name,'value':s['domain'],'category':'Sector','count':s['freq'],'selected':None})
 	sizes = {
 		'a':'1-10',
 		'b':'11-25',
@@ -124,8 +124,8 @@ def filters(request):
 		'g':'501+'
 	}
 	for k,v in sizes.iteritems():
-		filters.append({'name':v,'value':k,'category':'Size'})
+		filters.append({'name':v,'value':k,'category':'Size','count':None,'selected':None})
 	stages = ['seed','a','b','c','d','e','f','g','h','IPO']
 	for s in stages:
-		filters.append({'name':s,'value':s.lower(),'category':'Stage'})
+		filters.append({'name':s,'value':s.lower(),'category':'Stage','count':None,'selected':None})
 	return HttpResponse(simplejson.dumps(filters), mimetype="application/json")

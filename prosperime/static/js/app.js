@@ -93,7 +93,7 @@ $(function(){
 	});
 
 	window.FilterSingleView = Backbone.View.extend ({
-		tag: '<li>',
+		tagName: 'li',
 		template: _.template($("#search-filters-template").html()),
 
 		initialize: function() {
@@ -110,7 +110,7 @@ $(function(){
 	window.FilterListView = Backbone.View.extend ({
 
 		el: $("#search-container"),
-		tag: 'div',
+		tagName: 'div',
 		template: _.template($("#search-module-template").html()),
 
 		initialize: function() {
