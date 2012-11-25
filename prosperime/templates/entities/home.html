@@ -142,7 +142,7 @@ I'm sorry, the Internets ate our database.
 
 <script type="text/template" id="search-filters-template">
 	<label class="checkbox">
-		<input type="checkbox" value="<%= value %>"><%= name %> <% if (count != null) {%> (<%= count %>) <% }%></option>
+		<input name="<%= category %>-filters" class="input-search-filter" type="checkbox" value="<%= value %>"><%= name %> <% if (count != null) {%> (<%= count %>) <% }%></option>
 	</label>
 </script>
 {% endblock %}

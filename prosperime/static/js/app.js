@@ -104,6 +104,48 @@ $(function(){
 			var renderedContent = this.template(this.model.toJSON());
 			$(this.el).html(renderedContent);
 			return this;
+		},
+
+		events: {
+			"click input.filter" : "filter"
+		},
+
+		filter: function() {
+			// create array of all selected filters
+			var urlParams;
+
+			var locationFilters = $("input[name='Location-filters']:checked").map(function(filter) { return this.value });
+			var sectorFilters = $("input[name='Sector-filters']:checked").map(function(filter) { return this.value });
+			var sizeFilters = $("input[name='Size-filters']:checked").map(function(filter) { return this.value });
+			var stageFilters = $("input[name='Stage-filters']:checked").map(function(filter) { return this.value });
+			
+			// construct URL
+			
+			for (var i = 0; i < locationFilters.length; i++) {
+				if (i == 0) {
+					urlParams = "loc=" + encodeURIComponent(locationFilters[i]);
+				} else {
+					urlParams += "&loc=" + encodeURIComponent(locationFilters[i]);
+				}
+			}	
+
+			for (var i = 0; i < sectorFilters.length; i++) {
+				urlParams += "&sector=" + encodeURIComponent(sectorFilters[i]);
+			}
+
+			for (var i = 0; i < sizeFilters.length; i++) {
+				urlParams += "&size=" + encodeURIComponent(sizeFilters[i]);
+			}
+			for (var i = 0; i < stageFilters.length; i++) {
+				urlParams += "&stage=" + encodeURIComponent(stageFilters[i]);
+			}
+
+			filterUrl = "/search/?" + urlParams
+
+			// trigger router to navigate
+
+			this.navigate(filterUrl,{trigger:true});
+
 		}
 	});
 
