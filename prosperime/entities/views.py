@@ -62,48 +62,6 @@ def companies(request):
 
 def filters(request):
 	""" serves up JSON file of params for searches """
-	# should break this down by type -- that might mean more requests to the server, however
-	# TODO: add count for different filters; needs to accept parameters to limit result set
-	# categories = []
-	# sizesDict = {'name':'Size','value':'sizes','filters':[
-	# 	{'name':'1-10','value':'a'},
-	# 	{'name':'11-25','value':'b'},
-	# 	{'name':'26-50','value':'c'},
-	# 	{'name':'51-100','value':'d'},
-	# 	{'name':'101-250','value':'e'},
-	# 	{'name':'251-500','value':'f'},
-	# 	{'name':'500+','value':'g'}]
-	# }
-	# categories.append(sizesDict)
-	# stagesDict = {'name':'Locations','value':'locations','filters':[
-	# 	{'name':'Seed','value':'seed'},
-	# 	{'name':'A','value':'a'},
-	# 	{'name':'B','value':'b'},
-	# 	{'name':'C','value':'c'},
-	# 	{'name':'D','value':'d'},
-	# 	{'name':'E','value':'e'},
-	# 	{'name':'F','value':'f'},
-	# 	{'name':'G','value':'g'},
-	# 	{'name':'H','value':'h'},
-	# 	{'name':'IPO','value':'ipo'},
-	# ]}
-	# categories.append(stagesDict)
-	# sectors = Entity.objects.values('domain').distinct()
-	# sectorsDict = {'filters':[],'name':'Sectors','value':'sectors'}
-	# for s in sectors:
-	# 	if s['domain']:
-	# 		#name = s['domain'].replace("_"," ")
-	# 		name = " ".join(word.capitalize() for word in s['domain'].replace("_"," ").split())
-	# 		sectorsDict['filters'].append({'name':name,'value':s['domain']})
-	# categories.append(sectorsDict)
-	# locations = Office.objects.values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()[:20]
-	# locationsDict = {'filters':[],'name':'Locations','value':'locations'}
-	# for l in locations:
-	# 	if l['city']:
-	# 		value = l['city'].replace(" ","_").lower()
-	# 		locationsDict['filters'].append({'name':l['city'],'value':value})
-	# categories.append(locationsDict)
-	# cats = {'categories':categories}
 	filters = []
 	locations = Office.objects.values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()[:10]
 	for l in locations:

@@ -22,16 +22,58 @@ $(function(){
 
 	window.Filters = Backbone.Collection.extend({
 
+		initialize: function() {
+			// initialize array of meta data
+			this._meta = {};
+		}
+
 		model:Filter,
-		url: '/filters'
+		url: function() {
+			if (this._meta['query'] === undefined) {
+				return '/filters';
+			} else {
+				return '/filters?'+this._meta['query'];
+			}
+		},
+
+		meta: function(prop, value) {
+			if (value === undefined) {
+				// if value is empty, return property of key
+				return this._meta[prop];
+			} else {
+				// if both key and value exist, set value of key
+				this._meta[prop] = value;
+			}
+		}
 	})
 
 	// Orgs: collection of orgs
 
 	window.Orgs = Backbone.Collection.extend({
 
+		initialize: function() {
+			// initialize array of meta data
+			this._meta = {};
+		},
+
 		model: Org,
-		url: '/companies'
+		url: function() {
+			if (this._meta['query'] === undefined) {
+				return '/companies';
+			} else {
+				return '/companies?'+this._meta['query'];
+			}
+		}
+
+		meta: function(prop, value) {
+			if (value === undefined) {
+				// if value is empty, return property of key
+				return this._meta[prop];
+			} else {
+				// if both key and value exist, set value of key
+				this._meta[prop] = value;
+			}
+		}
 
 	});
 
@@ -111,8 +153,8 @@ $(function(){
 		},
 
 		filter: function() {
-			// create array of all selected filters
-			var urlParams;
+			// create dict of all selected filters
+			var selectedFilters = {};
 
 			var locationFilters = $("input[name='Location-filters']:checked").map(function(filter) { return this.value });
 			var sectorFilters = $("input[name='Sector-filters']:checked").map(function(filter) { return this.value });
@@ -120,27 +162,13 @@ $(function(){
 			var stageFilters = $("input[name='Stage-filters']:checked").map(function(filter) { return this.value });
 			
 			// construct URL
-			
-			for (var i = 0; i < locationFilters.length; i++) {
-				if (i == 0) {
-					urlParams = "loc=" + encodeURIComponent(locationFilters[i]);
-				} else {
-					urlParams += "&loc=" + encodeURIComponent(locationFilters[i]);
-				}
-			}	
 
-			for (var i = 0; i < sectorFilters.length; i++) {
-				urlParams += "&sector=" + encodeURIComponent(sectorFilters[i]);
-			}
+			selectedFilters.location = locationFilters;
+			selectedFilters.sector = sectorFilters;
+			selectedFilters.size = sizeFilters;
+			selectedFilters.stage = stageFilters;
 
-			for (var i = 0; i < sizeFilters.length; i++) {
-				urlParams += "&size=" + encodeURIComponent(sizeFilters[i]);
-			}
-			for (var i = 0; i < stageFilters.length; i++) {
-				urlParams += "&stage=" + encodeURIComponent(stageFilters[i]);
-			}
-
-			filterUrl = "/search/?" + urlParams
+			filterUrl = "/search/?" + generateUrl(selectedFilters);
 
 			// trigger router to navigate
 
@@ -196,6 +224,40 @@ $(function(){
 			return this;
 		}
 	});
+
+	window.App = Backbone.Router.extend({
+
+		routes: {
+			"search:query" : "search"
+		},
+
+		search: function(query) {
+			this.orgs.meta('query',query);
+			this.filters.meta('query',query);
+			this.orgs.fetch();
+			this.filters.fetch();
+		}
+
+	});
+
+	// Custome functions
+
+	function generateUrl(params) {
+		var fullUrl = '';
+
+		for (var key in params) {
+			if (params.hasOwnProperty(key)) {
+				for (i=0;i<=key.length;i++) {
+					if (i == 0) {
+						fullUrl += key + "='" + encodeURIComponent(key[i]) + "'";
+					} else {
+						fullUrl += "+" + encodeURIComponent(key[i]);
+					}
+				}
+			}
+		}
+		return fullUrl;
+	}
 
 
 });
