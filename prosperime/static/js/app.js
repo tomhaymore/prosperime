@@ -25,14 +25,17 @@ $(function(){
 		initialize: function() {
 			// initialize array of meta data
 			this._meta = {};
-		}
+		},
 
 		model:Filter,
 		url: function() {
 			if (this._meta['query'] === undefined) {
 				return '/filters';
 			} else {
-				return '/filters?'+this._meta['query'];
+				console.log(this._meta['query']);
+				path = '/filters?' + this._meta['query'];
+				console.log(path);
+				return '/filters/' + this._meta['query'];
 			}
 		},
 
@@ -61,9 +64,9 @@ $(function(){
 			if (this._meta['query'] === undefined) {
 				return '/companies';
 			} else {
-				return '/companies?'+this._meta['query'];
+				return '/companies'+this._meta['query'];
 			}
-		}
+		},
 
 		meta: function(prop, value) {
 			if (value === undefined) {
@@ -149,7 +152,7 @@ $(function(){
 		},
 
 		events: {
-			"click input.filter" : "filter"
+			"click input.input-search-filter" : "filter"
 		},
 
 		filter: function() {
@@ -163,16 +166,29 @@ $(function(){
 			
 			// construct URL
 
-			selectedFilters.location = locationFilters;
-			selectedFilters.sector = sectorFilters;
-			selectedFilters.size = sizeFilters;
-			selectedFilters.stage = stageFilters;
-
-			filterUrl = "/search/?" + generateUrl(selectedFilters);
+			if (locationFilters.length > 0 ) {
+				selectedFilters.location = locationFilters;
+			}
+			if (sectorFilters.length > 0) {
+				selectedFilters.sector = sectorFilters;				
+			}
+			if (sizeFilters.length > 0) {
+				selectedFilters.size = sizeFilters;
+			}
+			if (stageFilters.length > 0) {
+				selectedFilters.stage = stageFilters;
+			}
+			
+			if (jQuery.isEmptyObject(selectedFilters)) {
+				filterUrl = '/search/';
+			} else {
+				filterUrl = "/search/?" + generateUrl(selectedFilters);
+			}
 
 			// trigger router to navigate
-
-			this.navigate(filterUrl,{trigger:true});
+			console.log("trying to trigger search");
+			//Backbone.history.navigate(filterUrl,{trigger:true});
+			App.navigate(filterUrl,{trigger:true});
 
 		}
 	});
@@ -222,18 +238,57 @@ $(function(){
 				});
 			}
 			return this;
+		},
+
+		// uncheck all filters
+
+		uncheckAll: function() {
+			$filters = this.$(".input-search-filter");
+			$filters.prop('checked',false);
 		}
 	});
 
-	window.App = Backbone.Router.extend({
+	window.SearchRouter = Backbone.Router.extend({
 
 		routes: {
-			"search:query" : "search"
+			"" : "home",
+			"search/" : "emptySearch",
+			"search/:query" : "search"
+		},
+
+		initialize: function() {
+			this.orgs = window.orgs;
+			this.filters = window.filters;
+			this.orgsView = new OrgListView({ collection: this.orgs});
+			this.filtersView = new FilterListView({ collection: this.filters});
+		},
+
+		home: function() {
+			console.log("stay home");
+			this.orgs.fetch();
+			this.filters.fetch();
+		},
+
+		emptySearch: function() {
+			console.log('empty search');
+			this.orgs.meta('query','');
+			this.filters.meta('query','');
+			this.orgs.fetch();
+			this.filters.fetch();
 		},
 
 		search: function(query) {
-			this.orgs.meta('query',query);
-			this.filters.meta('query',query);
+			console.log("search triggered");
+			console.log(query);
+			// test for empty search string, make sure to uncheck all filters
+			if (query === undefined) {
+				this.filtersView.uncheckAll();
+				this.orgs.meta('query',null);
+				this.filters.meta('query',null);
+			} else {
+				this.orgs.meta('query',query);
+				this.filters.meta('query',query);	
+			}
 			this.orgs.fetch();
 			this.filters.fetch();
 		}
@@ -244,20 +299,30 @@ $(function(){
 
 	function generateUrl(params) {
 		var fullUrl = '';
-
+		c = 0;
 		for (var key in params) {
 			if (params.hasOwnProperty(key)) {
-				for (i=0;i<=key.length;i++) {
-					if (i == 0) {
-						fullUrl += key + "='" + encodeURIComponent(key[i]) + "'";
+				for (i=0;i<=params[key].length;i++) {
+					if(params[key][i] === undefined) {
+						continue;
 					} else {
-						fullUrl += "+" + encodeURIComponent(key[i]);
+						if (i == 0 && c == 0) {
+							fullUrl += key + "=" + encodeURIComponent(params[key][i]);
+						} else if (i == 0) {
+							fullUrl += "&" + key + "=" + encodeURIComponent(params[key][i]);
+						 } // else {
+						// 	fullUrl += "+'" + encodeURIComponent(params[key][i]) + "'";
+						// }
 					}
 				}
 			}
+			c++;
 		}
 		return fullUrl;
 	}
+
+	window.App = new SearchRouter;
+	Backbone.history.start();
 
 
 });
