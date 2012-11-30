@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from entities.models import Entity, Office, Financing
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.utils import simplejson
 # from django.core import serializers
 
@@ -57,21 +57,7 @@ def home(request):
 
 def companies(request):
 	""" serves up JSON file of company search results """
-	companies =  list(Entity.objects.filter(cb_type="company").values("full_name","summary","logo")[:20])
-	return HttpResponse(simplejson.dumps(companies), mimetype="application/json")
-
-def filters(request):
-	""" serves up JSON file of params for searches """
-	filters = []
-	locations = Office.objects.values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()[:10]
-	for l in locations:
-		if l['city']:
-			filters.append({'name':l['city'],'value':l['city'],'category':'Location','count':l['freq'],'selected':None})
-	sectors = Entity.objects.values('domain').annotate(freq=Count('pk')).distinct()
-	for s in sectors:
-		if s['domain']:
-			name = " ".join(word.capitalize() for word in s['domain'].replace("_"," ").split())
-			filters.append({'name':name,'value':s['domain'],'category':'Sector','count':s['freq'],'selected':None})
+	
 	sizes = {
 		'a':'1-10',
 		'b':'11-25',
@@ -81,9 +67,166 @@ def filters(request):
 		'f':'251-500',
 		'g':'501+'
 	}
-	for k,v in sizes.iteritems():
-		filters.append({'name':v,'value':k,'category':'Size','count':None,'selected':None})
+
+	locationFilters = request.GET.getlist('location')
+	sectorFilters = request.GET.getlist('sector')
+	sizesSelected = request.GET.getlist('size')
+	stagesSelected = request.GET.getlist('stage')
+
+	companyFilters = {}
+	if locationFilters:
+		companyFilters['office__city__in'] = locationFilters
+	if sectorFilters:
+		companyFilters['entity__domain__in'] = sectorFilters
+	if sizesSelected:
+		# parse size code into query
+		size = sizes
+		#companyFilters[]
+
+	companies =  list(Entity.objects.filter(cb_type="company").values("full_name","summary","logo")[:20])
+	return HttpResponse(simplejson.dumps(companies), mimetype="application/json")
+
+def filters(request):
+	""" serves up JSON file of params for searches """
+	# initialize array for all filters
+	filters = []
+	
+	# get search filters
+	locationsSelected = request.GET.getlist('location')
+	sectorsSelected = request.GET.getlist('sector')
+	sizesSelected = request.GET.getlist('size')
+	stagesSelected = request.GET.getlist('stage')
+
+	# print sizesSelected
+	# get a list of all locations
+	locationsBase = Office.objects.values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()[:10]
+	# locationsBase = Office.objects.values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()
+	# locationsFiltered = locationsBase
+
+	# get a count value for each location
+
+	if stagesSelected:
+		print stagesSelected
+		# locationsFiltered = locationsFiltered.filter(financing__round__in=stagesSelected)
+		locationsFiltered = Office.objects.filter(entity__financing__round__in=stagesSelected).values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()[:10]
+		print locationsFiltered.query
+	if sizesSelected and sectorsSelected:
+		# get dictionary of size ranges
+		rgs = getSizeFilter(sizesSelected)
+		# print rgs
+		# setup complex query using size dict
+		c = 0
+		for rg in rgs:
+			print rg
+			if c == 0:
+				q = Q(entity__no_employees__gte=int(rg['lower']),entity__no_employees__lte=int(rg['upper']))		
+			else:
+				q.add(Q(entity__no_employees__gte=int(rg['lower']),entity__no_employees__lte=int(rg['upper'])), Q.OR)
+			c += 1
+		locationsFiltered = Office.objects.filter(q).filter(entity__domain__in=sectorsSelected).values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()[:10]
+		# print locationsFiltered.query
+	if sectorsSelected:
+		locationsFiltered = Office.objects.filter(entity__domain__in=sectorsSelected).values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()[:10]
+	else:
+	 	locationsFiltered = locationsBase
+	# print locations
+
+	locationsFilteredDict = {}
+	for l in locationsFiltered:
+		locationsFilteredDict[l['city']] = l['freq']
+	
+	for l in locationsBase:
+		# make sure it doesn't have a null value
+		if l['city']:
+			# get count from locationsFilteredDict
+			if l['city'] in locationsFilteredDict:
+				freq = locationsFilteredDict[l['city']]
+			else:
+				freq = 0
+			# check to see if the value should be selected
+			if l['city'] in locationsSelected:
+				filters.append({'name':l['city'],'value':l['city'],'category':'Location','count':freq,'selected':True})
+			else:
+				filters.append({'name':l['city'],'value':l['city'],'category':'Location','count':freq,'selected':None})
+	
+	# get a list of all sectors
+	sectorsBase = Entity.objects.values('domain').annotate(freq=Count('pk')).distinct()
+
+	# if locationsSelected and sectorsSelected:
+	# 	sectorsFiltered = Entity.objects.filter(domain__in=sectorsSelected,office__city__in=locationsSelected).values('domain').annotate(freq=Count('pk')).distinct()
+	# elif sectorsSelected:
+	# 	sectorsFiltered = Entity.objects.filter(domain__in=sectorsSelected).values('domain').annotate(freq=Count('pk')).distinct()
+	# elif locationsSelected:
+	if locationsSelected:
+		sectorsFiltered = Entity.objects.filter(office__city__in=locationsSelected).values('domain').annotate(freq=Count('pk')).distinct()
+	else:
+		sectorsFiltered = Entity.objects.values('domain').annotate(freq=Count('pk')).distinct()
+	
+	sectorsFilteredDict = {}
+	for l in sectorsFiltered:
+		sectorsFilteredDict[l['domain']] = l['freq']
+
+	for s in sectorsBase:
+		# make sure it doesn't have a null value
+		if s['domain']:
+			# get count from sectorsFilteredDict
+			if s['domain'] in sectorsFilteredDict:
+				freq = sectorsFilteredDict[s['domain']]
+			else:
+				freq = 0
+			name = " ".join(word.capitalize() for word in s['domain'].replace("_"," ").split())
+			# check to see if the value should be selected
+			if s['domain'] in sectorsSelected:
+				filters.append({'name':name,'value':s['domain'],'category':'Sector','count':freq,'selected':True})
+			else:
+				filters.append({'name':name,'value':s['domain'],'category':'Sector','count':freq,'selected':None})
+	
+	sizes = {
+		'a':'1-10',
+		'b':'11-25',
+		'c':'26-50',
+		'd':'51-100',
+		'e':'101-250',
+		'f':'251-500',
+		'g':'501+'
+	}
+	for k,v in iter(sorted(sizes.iteritems())):
+		if sizesSelected and k in sizesSelected:
+			filters.append({'name':v,'value':k,'category':'Size','count':None,'selected':True})
+		else:
+			filters.append({'name':v,'value':k,'category':'Size','count':None,'selected':None})
+	
 	stages = ['seed','a','b','c','d','e','f','g','h','IPO']
 	for s in stages:
-		filters.append({'name':s,'value':s.lower(),'category':'Stage','count':None,'selected':None})
+		if stagesSelected and s in stagesSelected:
+			filters.append({'name':s,'value':s.lower(),'category':'Stage','count':None,'selected':True})
+		else:
+			filters.append({'name':s,'value':s.lower(),'category':'Stage','count':None,'selected':None})
+	
+	# render response
 	return HttpResponse(simplejson.dumps(filters), mimetype="application/json")
+
+def getSizeFilter(sizes):
+	# dictionary of ranges
+	baseList = {
+		'a':'1-10',
+		'b':'11-25',
+		'c':'26-50',
+		'd':'51-100',
+		'e':'101-250',
+		'f':'251-500',
+		'g':'501+'
+	}
+	# initialize list for holding dicts of upper and lower boundaries
+	sizeBoundaries = []
+	# iterate through base dictionary, for any match from filters add range to result dict
+	for k,v in baseList.iteritems():
+		if k in sizes:
+			rg = v.split('-')
+			sizeBoundaries.append({'lower':rg[0],'upper':rg[1]})
+	return sizeBoundaries
+	
+	
+
+
+	
