@@ -107,11 +107,11 @@ I'm sorry, the Internets ate our database.
 <script type="text/template" id="org-single-template">
 	<li class="list-preview">			
 		<div class="left-list-preview">
-			
+			<% if (logo != '') { %>
 			<div class="img-holder">
-				[img]
+				<img class="logo-preview" src="/media/<%= logo %>" />&nbsp;
 			</div>
-			
+			<% } %>
 		</div>
 		
 		<div class="right-list-preview"

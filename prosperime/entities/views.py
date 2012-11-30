@@ -58,32 +58,42 @@ def home(request):
 def companies(request):
 	""" serves up JSON file of company search results """
 	
-	sizes = {
-		'a':'1-10',
-		'b':'11-25',
-		'c':'26-50',
-		'd':'51-100',
-		'e':'101-250',
-		'f':'251-500',
-		'g':'501+'
-	}
+	# initialize array of companies
+	
+	# companies = []
 
-	locationFilters = request.GET.getlist('location')
-	sectorFilters = request.GET.getlist('sector')
+	# get search filters
+	
+	locationsSelected = request.GET.getlist('location')
+	sectorsSelected = request.GET.getlist('sector')
 	sizesSelected = request.GET.getlist('size')
 	stagesSelected = request.GET.getlist('stage')
 
-	companyFilters = {}
-	if locationFilters:
-		companyFilters['office__city__in'] = locationFilters
-	if sectorFilters:
-		companyFilters['entity__domain__in'] = sectorFilters
-	if sizesSelected:
-		# parse size code into query
-		size = sizes
-		#companyFilters[]
+	companies = Entity.objects.values("full_name","summary","logo").filter(cb_type="company").annotate(freq=Count('financing__pk')).order_by('-freq')
 
-	companies =  list(Entity.objects.filter(cb_type="company").values("full_name","summary","logo")[:20])
+	if locationsSelected:
+		companies = companies.filter(office__city__in=locationsSelected)
+	if sectorsSelected:
+		companies = companies.filter(domain__in=sectorsSelected)
+	if sizesSelected:
+		# get dictionary of size ranges
+		rgs = getSizeFilter(sizesSelected)
+		# print rgs
+		# setup complex query using size dict
+		c = 0
+		for rg in rgs:
+			print rg
+			if c == 0:
+				q = Q(no_employees__gte=int(rg['lower']),no_employees__lte=int(rg['upper']))		
+			else:
+				q.add(Q(no_employees__gte=int(rg['lower']),no_employees__lte=int(rg['upper'])), Q.OR)
+			c += 1
+		companies = companies.filter(q)
+	if stagesSelected:
+		companies = companies.filter(financing__round__in=stagesSelected)
+
+	# companies =  list(Entity.objects.filter(cb_type="company").values("full_name","summary","logo")[:20])
+	companies = list(companies[:20])
 	return HttpResponse(simplejson.dumps(companies), mimetype="application/json")
 
 def filters(request):
@@ -98,19 +108,23 @@ def filters(request):
 	stagesSelected = request.GET.getlist('stage')
 
 	# print sizesSelected
-	# get a list of all locations
-	locationsBase = Office.objects.values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()[:10]
-	# locationsBase = Office.objects.values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()
-	# locationsFiltered = locationsBase
 
-	# get a count value for each location
+	# set base search filter
+	# locationsBase = Office.objects.values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()[:10]
+	locationsBase = Office.objects.values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()
+	locationsFiltered = locationsBase
+
+	# get a count value for each location base on filters
 
 	if stagesSelected:
-		print stagesSelected
-		# locationsFiltered = locationsFiltered.filter(financing__round__in=stagesSelected)
-		locationsFiltered = Office.objects.filter(entity__financing__round__in=stagesSelected).values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()[:10]
+		#print stagesSelected
+		locationsFiltered = locationsFiltered.filter(entity__financing__round__in=stagesSelected)
+		# locationsFiltered = Office.objects.filter(entity__financing__round__in=stagesSelected).values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()[:10]
+		# print locationsFiltered.query
+	if sectorsSelected:
+		locationsFiltered = locationsFiltered.filter(entity__domain__in=sectorsSelected)
 		print locationsFiltered.query
-	if sizesSelected and sectorsSelected:
+	if sizesSelected:
 		# get dictionary of size ranges
 		rgs = getSizeFilter(sizesSelected)
 		# print rgs
@@ -123,13 +137,17 @@ def filters(request):
 			else:
 				q.add(Q(entity__no_employees__gte=int(rg['lower']),entity__no_employees__lte=int(rg['upper'])), Q.OR)
 			c += 1
-		locationsFiltered = Office.objects.filter(q).filter(entity__domain__in=sectorsSelected).values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()[:10]
+		locationsFiltered = locationsFiltered.filter(q)
 		# print locationsFiltered.query
-	if sectorsSelected:
-		locationsFiltered = Office.objects.filter(entity__domain__in=sectorsSelected).values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()[:10]
-	else:
-	 	locationsFiltered = locationsBase
+	# if sectorsSelected:
+	# 	locationsFiltered = Office.objects.filter(entity__domain__in=sectorsSelected).values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()[:10]
+	# else:
+	#  	locationsFiltered = locationsBase
 	# print locations
+
+	locationsBase = locationsBase[:10]
+	print locationsBase.query
+	
 
 	locationsFilteredDict = {}
 	for l in locationsFiltered:
@@ -151,17 +169,32 @@ def filters(request):
 	
 	# get a list of all sectors
 	sectorsBase = Entity.objects.values('domain').annotate(freq=Count('pk')).distinct()
+	sectorsFiltered = sectorsBase
 
-	# if locationsSelected and sectorsSelected:
-	# 	sectorsFiltered = Entity.objects.filter(domain__in=sectorsSelected,office__city__in=locationsSelected).values('domain').annotate(freq=Count('pk')).distinct()
-	# elif sectorsSelected:
-	# 	sectorsFiltered = Entity.objects.filter(domain__in=sectorsSelected).values('domain').annotate(freq=Count('pk')).distinct()
-	# elif locationsSelected:
-	if locationsSelected:
-		sectorsFiltered = Entity.objects.filter(office__city__in=locationsSelected).values('domain').annotate(freq=Count('pk')).distinct()
-	else:
-		sectorsFiltered = Entity.objects.values('domain').annotate(freq=Count('pk')).distinct()
+	# if locationsSelected:
+	# 	sectorsFiltered = Entity.objects.filter(office__city__in=locationsSelected).values('domain').annotate(freq=Count('pk')).distinct()
+	# else:
+	# 	sectorsFiltered = Entity.objects.values('domain').annotate(freq=Count('pk')).distinct()
 	
+	if locationsSelected:
+		sectorsFiltered = sectorsFiltered.filter(office__city__in=locationsSelected)
+	if stagesSelected:
+		sectorsFiltered = sectorsFiltered.filter(financing__round__in=stagesSelected)
+	if sizesSelected:
+		# get dictionary of size ranges
+		rgs = getSizeFilter(sizesSelected)
+		# print rgs
+		# setup complex query using size dict
+		c = 0
+		for rg in rgs:
+			print rg
+			if c == 0:
+				q = Q(no_employees__gte=int(rg['lower']),no_employees__lte=int(rg['upper']))		
+			else:
+				q.add(Q(no_employees__gte=int(rg['lower']),no_employees__lte=int(rg['upper'])), Q.OR)
+			c += 1
+		sectorsFiltered = sectorsFiltered.filter(q)
+
 	sectorsFilteredDict = {}
 	for l in sectorsFiltered:
 		sectorsFilteredDict[l['domain']] = l['freq']
