@@ -3,9 +3,9 @@ import os
 import urllib
 import urllib2
 from urlparse import urlparse
-import pkg_resources
-pkg_resources.require('simplejson') # not sure why this is necessary
-import simplejson
+# import pkg_resources
+# pkg_resources.require('simplejson') # not sure why this is necessary
+# import simplejson
 from datetime import datetime
 from _retry import retry
 from optparse import make_option
@@ -14,6 +14,7 @@ from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 from entities.models import Entity, Relationship, Financing, Office, Investment
 from django.core.files import File
+from django.utils import simplejson
 
 class Command(BaseCommand):
 	
@@ -21,29 +22,32 @@ class Command(BaseCommand):
 			make_option('-u',
 						action="store_true",
 						dest="update"),
+			make_option('-f',
+						action="store_true",
+						dest="full"),
 		)
 		
-	CB_KEY = "jwyw2d2vx63k3z6336yzpd4h"
+	self.CB_KEY = "jwyw2d2vx63k3z6336yzpd4h"
 
-	CB_BASE_URL = "http://api.crunchbase.com/v/1/"
+	self.CB_BASE_URL = "http://api.crunchbase.com/v/1/"
 	
-	CURRENT_ENTITIES = ()
+	self.CURRENT_ENTITIES = ()
 	
-	ENTITY_TYPES = (
+	self.ENTITY_TYPES = (
 		{'single':'company','plural':'companies'},
 		{'single':'person','plural':'people'},
 		{'single':'financial-organization','plural':'financial-organizations'},
 		{'single':'service-provider','plural':'service-providers'}
 	)
 	
-	ENTITY_TYPES_DICT = {
+	self.ENTITY_TYPES_DICT = {
 		"company":"companies",
 		"person":"people",
 		"finacial-organization":"financial-organizations",
 		"service-provider":"service-providers"
 	}
 	
-	PARAMS = urllib.urlencode({'api_key':CB_KEY})
+	self.PARAMS = urllib.urlencode({'api_key':CB_KEY})
 	
 	def getCBURL(self,mode,type,**kwargs):
 		"""constructs URL for accessing CB, based on mode and entity"""
@@ -78,10 +82,10 @@ class Command(BaseCommand):
 			self.stdout.write(str(e.args))
 			return None
 	
-	def getEntityList(self,type):	
+	def getCBEntityList(self,cb_type):	
 		""" returns list of all entities of particular type """
 		entities = ()
-		cb_url = self.getCBURL('list',type.single)
+		cb_url = self.getCBURL('list',cb_type.single)
 		try:
 			data = self.getJSON(cb_url)
 		except urllib2.HTTPError, e:
@@ -92,23 +96,28 @@ class Command(BaseCommand):
 			entities.append({'permalink':d.permalink,'type':type.single})
 		return entities
 	
-	def getAllEntities(self,type):
+	def getAllCBEntities(self,cb_type):
 		""" adds all entities of particular type with minimum information """
-		#cb_url = self.CB_BASE_URL + type['plural'] + ".js?" + self.PARAMS
-		cb_url = self.getCBURL('list',type['single'])
-		try:
-			data = self.getJSON(cb_url)
-		except urllib2.HTTPError, e:
-			self.stdout.write(e.code)
-		except urllib2.URLError, e:
-			self.stdout.write(e.args)
+		data = getCBEntityList(cb_type['single'])
+		# cb_url = self.getCBURL('list',cb_type['single'])
+		# try:
+		# 	data = self.getJSON(cb_url)
+		# except urllib2.HTTPError, e:
+		# 	self.stdout.write(e.code)
+		# except urllib2.URLError, e:
+		# 	self.stdout.write(e.args)
 
 		for d in data:
-			d['type'] = type['single']
-			if self.entityExists((d['permalink'])) is False:
+			d['type'] = cb_type['single']
+			# if self.entityExists((d['permalink'])) is False:
+			# 	self.addEntity(d)
+			# check against list of current entities to see if it already exists
+			if d['permalink'] not in self.CURRENT_ENTITIES:
+				# add it to list of current entitites for any possible duplicate entries
+				self.CURRENT_ENTITIES.append(d['permalink'])
 				self.addEntity(d)
 	
-	def addEntity(self, data,map_fields=True):
+	def addEntity(self,data,map_fields=True):
 		""" adds entity """
 		e = Entity()
 		if map_fields:
@@ -512,15 +521,22 @@ class Command(BaseCommand):
 		o.save()
 		self.stdout.write(o.name().encode('utf8','ignore') + " office for " + entity.name().encode('utf8','ignore') + " updated\n")
 
-	def handle(self,types=ENTITY_TYPES,*args, **options):
+	def handle(self,*args, **options):
 		""" gets basic info for all entities, then cycles through and updates information """
 		
 		if options['update']:
+			# doesn't load any new entities from CB, just updates
+			self.updateAllEntities()
+		elif options['full']:
+			# assumes empty database, starts from scratch
+			for t in self.ENTITY_TYPES:
+				self.getAllCBEntities(t)
 			self.updateAllEntities()
 		else:
+			# default behavior, loads a list of current entities so it only updates those 
 			self.CURRENT_ENTITIES = self.getCurrentEntitiesCBPermalinks()
-			for type in types:
-				self.getAllEntities(type)
+			for t in self.ENTITY_TYPES:
+				self.getAllCBEntities(t)
 			self.updateAllEntities()
 		
 			
