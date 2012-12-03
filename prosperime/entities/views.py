@@ -24,6 +24,9 @@ def login(request):
 			return HttpResponseRedirect('/home')
 
 def home(request):
+	return render_to_response('home.html',context_instance=RequestContext(request))
+
+def search(request):
 	# fetch 20 most recently updated entities
 	entities = Entity.objects.filter(cb_type="company").annotate(rounds=Count('target')).order_by('-rounds')[:20]
 	# fetch all distinct locations
@@ -47,7 +50,7 @@ def home(request):
 	}
 	# test if user is authenticated
 	# show what?
-	return render_to_response('entities/home.html',
+	return render_to_response('entities/searches.html',
 		{'entities':entities,
 		'locations':locations,
 		'sectors':sectors2,
