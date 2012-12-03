@@ -8,8 +8,11 @@ from django.conf import settings
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'entities.views.home', name='home'),
+    url(r'^search/','entities.views.search'),
     url(r'^companies/','entities.views.companies'),
     url(r'^filters/','entities.views.filters'),
+    url(r'^account/authorize','accounts.views.linkedin_authorize'),
+    url(r'^account/authenticate','accounts.views.linkedin_authenticate'),
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     # url(r'^prosperime/', include('prosperime.foo.urls')),
 
