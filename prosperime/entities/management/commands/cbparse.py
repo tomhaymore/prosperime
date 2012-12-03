@@ -22,55 +22,47 @@ class Command(BaseCommand):
 			make_option('-u',
 						action="store_true",
 						dest="update"),
-			make_option('-f',
+			make_option('-c',
 						action="store_true",
-						dest="full"),
+						dest="clean"),
 		)
 		
-	self.CB_KEY = "jwyw2d2vx63k3z6336yzpd4h"
+	CB_KEY = "jwyw2d2vx63k3z6336yzpd4h"
 
-	self.CB_BASE_URL = "http://api.crunchbase.com/v/1/"
+	CB_BASE_URL = "http://api.crunchbase.com/v/1/"
 	
-	self.CURRENT_ENTITIES = ()
+	CURRENT_ENTITIES = []
 	
-	self.ENTITY_TYPES = (
+	ENTITY_TYPES = (
 		{'single':'company','plural':'companies'},
 		{'single':'person','plural':'people'},
 		{'single':'financial-organization','plural':'financial-organizations'},
 		{'single':'service-provider','plural':'service-providers'}
 	)
 	
-	self.ENTITY_TYPES_DICT = {
+	ENTITY_TYPES_DICT = {
 		"company":"companies",
 		"person":"people",
 		"finacial-organization":"financial-organizations",
 		"service-provider":"service-providers"
 	}
 	
-	self.PARAMS = urllib.urlencode({'api_key':CB_KEY})
+	PARAMS = urllib.urlencode({'api_key':CB_KEY})
 	
-	def getCBURL(self,mode,type,**kwargs):
+	def getCBURL(self,mode,cb_type,**kwargs):
 		"""constructs URL for accessing CB, based on mode and entity"""
 		if mode == "list":
 			# get list of all entities of a specific type
-			type = self.getCBPlural(type)
-			cb_url = self.CB_BASE_URL + type + ".js?" + self.PARAMS
+			cb_type = self.getCBPlural(cb_type)
+			cb_url = self.CB_BASE_URL + cb_type + ".js?" + self.PARAMS
 		elif mode == "info":
 			# get info for single entity
-			cb_url = self.CB_BASE_URL + type + "/" + kwargs['entity'].cb_permalink + ".js?" + self.PARAMS
+			cb_url = self.CB_BASE_URL + cb_type + "/" + kwargs['entity'].cb_permalink + ".js?" + self.PARAMS
 		return cb_url
 		
-	def getCBPlural(self,type):
+	def getCBPlural(self,cb_type):
 		"""returns correct plural version of entity type for CB API"""
-		return self.ENTITY_TYPES_DICT[type]
-	
-	def getCurrentEntitiesCBPermalinks(self):
-		"""returns CB permalinks of all entities currenty in db """
-		entities = Entity.objects.all()
-		permalinks = []
-		for e in entities:
-			permalinks.append(e.cb_permalink)
-		return permalinks
+		return self.ENTITY_TYPES_DICT[cb_type]
 	
 	@retry(urllib2.URLError,delay=10)		
 	def getJSON(self,url):
@@ -81,11 +73,19 @@ class Command(BaseCommand):
 		except simplejson.JSONDecodeError, e:
 			self.stdout.write(str(e.args))
 			return None
+
+	def getCurrentEntitiesCBPermalinks(self):
+		"""returns CB permalinks of all entities currenty in db """
+		entities = Entity.objects.filter(cb_permalink__isnull=False)
+		permalinks = []
+		for e in entities:
+			permalinks.append(e.cb_permalink)
+		return permalinks
 	
 	def getCBEntityList(self,cb_type):	
 		""" returns list of all entities of particular type """
-		entities = ()
-		cb_url = self.getCBURL('list',cb_type.single)
+		entities = []
+		cb_url = self.getCBURL('list',cb_type)
 		try:
 			data = self.getJSON(cb_url)
 		except urllib2.HTTPError, e:
@@ -93,12 +93,12 @@ class Command(BaseCommand):
 		except urllib2.URLError, e:
 			self.stdout.write(str(e.args))
 		for d in data:
-			entities.append({'permalink':d.permalink,'type':type.single})
-		return entities
+			entities.append({'permalink':d['permalink'],'type':cb_type})
+		return data
 	
 	def getAllCBEntities(self,cb_type):
 		""" adds all entities of particular type with minimum information """
-		data = getCBEntityList(cb_type['single'])
+		data = self.getCBEntityList(cb_type['single'])
 		# cb_url = self.getCBURL('list',cb_type['single'])
 		# try:
 		# 	data = self.getJSON(cb_url)
@@ -112,18 +112,16 @@ class Command(BaseCommand):
 			# if self.entityExists((d['permalink'])) is False:
 			# 	self.addEntity(d)
 			# check against list of current entities to see if it already exists
-			if d['permalink'] not in self.CURRENT_ENTITIES:
+			# if d['permalink'] not in self.CURRENT_ENTITIES:
+			if not self.entityExists(d['permalink']):
 				# add it to list of current entitites for any possible duplicate entries
 				self.CURRENT_ENTITIES.append(d['permalink'])
 				self.addEntity(d)
 	
-	def addEntity(self,data,map_fields=True):
+	def addEntity(self,data,):
 		""" adds entity """
 		e = Entity()
-		if map_fields:
-			fields = self.getFieldsQuick(data)
-		else: 
-			fields = data
+		fields = self.getFieldsQuick(data)
 		for k,v in fields.iteritems():
 			setattr(e,k,v)
 		e.save()
@@ -132,11 +130,15 @@ class Command(BaseCommand):
 	
 	def entityExists(self,permalink):
 		""" checks to see if a CB entity has already been added to db """
-		e = Entity.objects.filter(cb_permalink=permalink)
-		if not e:
-			return False
-		else:
+		# e = Entity.objects.filter(cb_permalink=permalink)
+		# if not e:
+		# 	return False
+		# else:
+		# 	return True
+		if permalink in self.CURRENT_ENTITIES:
 			return True
+		else:
+			return False
 	
 	def getFieldsQuick(self,data):
 		""" maps CB permalink, name, and type to db """
@@ -165,18 +167,18 @@ class Command(BaseCommand):
 	def updateAllEntities(self):
 		""" grabs all entities from db, updates them based on CB """
 		# fetch all entities from db
-		entities = Entity.objects.all()
+		entities = Entity.objects.filter(cb_permalink__isnull=False)
 		for e in entities:
 			# make sure it has a CB entry
-			if e.cb_permalink is not "null":
-				data = self.getEntityCBInfo(e)
-				# make sure API returned valid JSON
-				if data:
-					#self.stdout.write('recieved data \n')
-					# only update if information has changed since last update
-					if not e.cb_updated or datetime.strptime(data['updated_at'],"%a %b %d %H:%M:%S UTC %Y") > e.cb_updated:
-						self.addAllDetails(e,data)
-						self.stdout.write("Added details for " + e.name().encode("utf8","ignore") + "\n")
+			# if e.cb_permalink is not "null":
+			data = self.getEntityCBInfo(e)
+			# make sure API returned valid JSON
+			if data:
+				#self.stdout.write('recieved data \n')
+				# only update if information has changed since last update
+				if not e.cb_updated or datetime.strptime(data['updated_at'],"%a %b %d %H:%M:%S UTC %Y") > e.cb_updated:
+					self.addAllDetails(e,data)
+					self.stdout.write("Added details for " + e.name().encode("utf8","ignore") + "\n")
 	
 	def addAllDetails(self,entity,data):
 		""" adds remainder of details from CB to db """
@@ -185,7 +187,6 @@ class Command(BaseCommand):
 			setattr(entity,k,v)
 		entity.save()
 		# add logo
-		# TODO wrap this in new function
 		if data['image']:
 			self.getCBImage(entity,data['image']['available_sizes'][2][1])
 			entity.logo_cb_attribution = data['image']['attribution']
@@ -310,14 +311,14 @@ class Command(BaseCommand):
 		fields['cb_updated'] = datetime.now()
 		return fields	
 				
-	def updateEntity(self,data,entity_type,entity):
-		e = Entity.objects.get(cb_permalink=data['permalink'])
-		fields = self.getFields(data,entity_type)
-		for k,v in fields.iteritems():
-			setattr(e,k,v)
-		e.save()
-		self.stdout.write(e.name().encode("utf8") + " updated\n")
-		return e
+	# def updateEntity(self,data,entity_type,entity):
+	# 	e = Entity.objects.get(cb_permalink=data['permalink'])
+	# 	fields = self.getFields(data,entity_type)
+	# 	for k,v in fields.iteritems():
+	# 		setattr(e,k,v)
+	# 	e.save()
+	# 	self.stdout.write(e.name().encode("utf8") + " updated\n")
+	# 	return e
 	
 	def parseRelationships(self,entity,data):
 		""" loops through all relationships, adds people who don't already exist, updates and adds relationships """
@@ -527,7 +528,7 @@ class Command(BaseCommand):
 		if options['update']:
 			# doesn't load any new entities from CB, just updates
 			self.updateAllEntities()
-		elif options['full']:
+		elif options['clean']:
 			# assumes empty database, starts from scratch
 			for t in self.ENTITY_TYPES:
 				self.getAllCBEntities(t)
