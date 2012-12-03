@@ -1,6 +1,7 @@
 import time
 import urllib2
-import simplejson
+# import simplejson
+from django.utils import simplejson
 
 
 def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
