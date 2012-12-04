@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from accounts.models import Account
 from django.contrib.auth.models import User
 from django.utils import simplejson
+from accounts.forms import FinishAuthForm
 
 linkedin_key = '8yb72i9g4zhm'
 linkedin_secret = 'rp6ac7dUxsvJjQpS'
@@ -51,11 +52,7 @@ def linkedin_authorize(request):
 def linkedin_authenticate(request):  
 	consumer = oauth.Consumer(linkedin_key, linkedin_secret)
 	# print request.session['request_token']
-	# access_url = 'https://www.google.com/accounts/OAuthGetAccessToken?oauth_verifier=%s' % (request.GET['oauth_verifier'])
-	# access_token_url = 'https://api.linkedin.com/uas/oauth/accessToken?oauth_verifier=%s' % (request.GET['oauth_verifier'])
 	
-	
-	#token  = oauth.Token(request.session['request_token']['oauth_token'],request.session['request_token']['oauth_verifier'])
 	access_token_url	= 'https://api.linkedin.com/uas/oauth/accessToken'
 	# print access_token_url
 
@@ -66,16 +63,11 @@ def linkedin_authenticate(request):
 	resp, content = client.request(access_token_url, "POST")
 	
 	# print resp
-
-	# if resp['status'] != '200':
-	#     # print content
-	#     raise Exception(request.session['request_token'])
-
 	# print content
 
 	access_token = dict(cgi.parse_qsl(content))
-	print access_token
-	# raise Exception(access_token)
+	# print access_token
+	
 	format = 'json'
 
 	api_url = "http://api.linkedin.com/v1/people/~?format=json"
@@ -93,14 +85,50 @@ def linkedin_authenticate(request):
 	linkedin_user_info = simplejson.loads(content)
 	print linkedin_user_info
 
-	user = User.objects.create_user(linkedin_user_info['firstName']+linkedin_user_info['lastName'])
-	user.save()
+	# store information in a cookie
+	request.session['linkedin_user_info'] = linkedin_user_info
+	request.session['access_token'] = access_token
 
-	profile = Account()
-	profile.owner = user
-	profile.access_token = access_token['oauth_token']
-	profile.token_secret = access_token['oauth_token_secret']
-	profile.service = 'linkedin'
-	profile.save()
+	return HttpResponseRedirect('/account/finish')
 
-	return HttpResponseRedirect('/account/success')
+def finish_login(request):
+
+	if request.POST:
+	
+		# form submitted
+
+		form = FinishAuthForm(request.POST)
+		if form.is_valid():
+			username = form.cleaned_data['username']
+			email = form.cleaned_data['email']
+			password = form.cleaned_data['password']
+
+			# save user
+			user = User.objects.create_user(username,email,password)
+			user.save()
+
+			# update user profile
+			user.profile.first_name = request.session['linkedin_user_info']['firstName']
+			user.profile.last_name = request.session['linkedin_user_info']['lastName']
+			user.profile.headline = request.session['linkedin_user_info']['headline']
+			user.profile.save()
+
+			# create LinkedIn account
+			acct = Account()
+			acct.owner = user
+			acct.access_token = request.session['access_token']['oauth_token']
+			acct.token_secret = request.session['access_token']['oauth_token_secret']
+			acct.service = 'linkedin'
+			acct.save()
+
+		return HttpResponseRedirect('/account/success')
+
+	else:
+		form = FinishAuthForm()
+		return render_to_response('accounts/finish_login.html',{'form':form},context_instance=RequestContext(request))
+
+	
+
+	# TOOD -- add user login / authorization
+
+	
