@@ -14,7 +14,7 @@ class Profile(models.Model):
 		return full_name
 
 	user = models.OneToOneField(User)
-	full_name = models.CharField(max_length=250,null=True,default=_getFullName)
+	full_name = models.CharField(max_length=250,null=True)
 	first_name = models.CharField(max_length=150,null=True)
 	middle_name = models.CharField(max_length=150,null=True)
 	last_name = models.CharField(max_length=150,null=True)
