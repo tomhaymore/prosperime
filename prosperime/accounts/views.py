@@ -1,6 +1,7 @@
 # from Python
 import oauth2 as oauth
 import cgi
+from datetime import datetime, timedelta
 
 # from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login as auth_login
@@ -34,6 +35,8 @@ def linkedin_authorize(request):
 	consumer = oauth.Consumer(linkedin_key, linkedin_secret)
 	client = oauth.Client(consumer)
 
+	request_token_url = "%s?scope=%s" % (request_token_url, scope, )
+
 	# get request token
 	resp, content = client.request(request_token_url,"POST")
 	if resp['status'] != '200':
@@ -44,7 +47,9 @@ def linkedin_authorize(request):
 	request.session['request_token'] = dict(cgi.parse_qsl(content))
 	print request.session['request_token']
 
-	url = "%s?oauth_token=%s&?scope=%s" % (authorize_url, request.session['request_token']['oauth_token'],scope)
+	url = "%s?oauth_token=%s" % (authorize_url, request.session['request_token']['oauth_token'], )
+
+	print url
 
 	return HttpResponseRedirect(url)
   
@@ -66,7 +71,8 @@ def linkedin_authenticate(request):
 	# print content
 
 	access_token = dict(cgi.parse_qsl(content))
-	# print access_token
+	
+	print access_token
 	
 	format = 'json'
 
@@ -92,12 +98,13 @@ def linkedin_authenticate(request):
 	return HttpResponseRedirect('/account/finish')
 
 def finish_login(request):
-
+	# TODO: redirect if not not authenticated through LinkedIn already
 	if request.POST:
 	
 		# form submitted
 
 		form = FinishAuthForm(request.POST)
+		
 		if form.is_valid():
 			username = form.cleaned_data['username']
 			email = form.cleaned_data['email']
@@ -108,6 +115,7 @@ def finish_login(request):
 			user.save()
 
 			# update user profile
+			user.profile.full_name = request.session['linkedin_user_info']['firstName'] + " " + request.session['linkedin_user_info']['lastName']
 			user.profile.first_name = request.session['linkedin_user_info']['firstName']
 			user.profile.last_name = request.session['linkedin_user_info']['lastName']
 			user.profile.headline = request.session['linkedin_user_info']['headline']
@@ -119,13 +127,14 @@ def finish_login(request):
 			acct.access_token = request.session['access_token']['oauth_token']
 			acct.token_secret = request.session['access_token']['oauth_token_secret']
 			acct.service = 'linkedin'
+			acct.expires_on = datetime.now() + timedelta(seconds=int(request.session['access_token']['oauth_authorization_expires_in']))
 			acct.save()
 
-		return HttpResponseRedirect('/account/success')
-
+			return HttpResponseRedirect('/account/success')
 	else:
 		form = FinishAuthForm()
-		return render_to_response('accounts/finish_login.html',{'form':form},context_instance=RequestContext(request))
+
+	return render_to_response('accounts/finish_login.html',{'form':form},context_instance=RequestContext(request))
 
 	
 
