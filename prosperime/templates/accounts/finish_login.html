@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+
+{% endblock %}
+
+{% block content %}
+<h3>Almost finished!</h3>
+<p>We just need a few more bits of information to register you. Please fill out the form below.</p>
+<form action="" method="post" name="finish_login">
+	{% csrf_token %}
+	{{ form.as_p }}
+	<fieldset>
+		<button type="submit" class="btn">Submit</button>
+	</fieldset>
+</form>
+
+{% endblock %}
+
+{% block rightSidebar %}
+
+
+{% endblock %}
