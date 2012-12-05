@@ -18,6 +18,7 @@ from django.utils import simplejson
 
 class Command(BaseCommand):
 	
+	
 	option_list = BaseCommand.option_list + (
 			make_option('-u',
 						action="store_true",
