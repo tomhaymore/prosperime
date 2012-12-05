@@ -14,11 +14,15 @@ class Profile(models.Model):
 		return full_name
 
 	user = models.OneToOneField(User)
-	full_name = models.CharField(max_length=250,null=True)
+	#full_name = models.CharField(max_length=250,null=True)
 	first_name = models.CharField(max_length=150,null=True)
 	middle_name = models.CharField(max_length=150,null=True)
 	last_name = models.CharField(max_length=150,null=True)
 	headline = models.TextField(null=True)
+
+	def full_name(self):
+		full_name = self.first_name + " " + self.last_name
+		return full_name
 
 class Account(models.Model):
     service = models.CharField(max_length=45)
@@ -28,6 +32,8 @@ class Account(models.Model):
     token_secret = models.CharField(max_length=200)
     expires_on = models.DateTimeField(null=True)
     linked_on = models.DateTimeField(auto_now_add=True)
+    last_scanned = models.DateTimeField(null=True)
+    scanning_now = models.BooleanField(default=False)
     status = models.CharField(max_length=15,default="active")
     
     # returns name
