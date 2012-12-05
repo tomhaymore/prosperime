@@ -74,9 +74,9 @@ def linkedin_authenticate(request):
 	
 	print access_token
 	
-	format = 'json'
+	fields = "(headline,id,firstName,lastName)"
 
-	api_url = "http://api.linkedin.com/v1/people/~?format=json"
+	api_url = "http://api.linkedin.com/v1/people/~:" + fields + "?format=json"
 	 
 	token = oauth.Token(
 		key=access_token['oauth_token'], 
@@ -128,6 +128,7 @@ def finish_login(request):
 			acct.token_secret = request.session['access_token']['oauth_token_secret']
 			acct.service = 'linkedin'
 			acct.expires_on = datetime.now() + timedelta(seconds=int(request.session['access_token']['oauth_authorization_expires_in']))
+			acct.uniq_id = request.session['linkedin_user_info']['id']
 			acct.save()
 
 			return HttpResponseRedirect('/account/success')

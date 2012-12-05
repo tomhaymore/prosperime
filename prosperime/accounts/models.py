@@ -34,6 +34,7 @@ class Account(models.Model):
     linked_on = models.DateTimeField(auto_now_add=True)
     last_scanned = models.DateTimeField(null=True)
     scanning_now = models.BooleanField(default=False)
+    uniq_id = models.CharField(max_length=150,null=True)
     status = models.CharField(max_length=15,default="active")
     
     # returns name
