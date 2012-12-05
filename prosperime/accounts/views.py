@@ -115,7 +115,7 @@ def finish_login(request):
 			user.save()
 
 			# update user profile
-			user.profile.full_name = request.session['linkedin_user_info']['firstName'] + " " + request.session['linkedin_user_info']['lastName']
+			# user.profile.full_name = request.session['linkedin_user_info']['firstName'] + " " + request.session['linkedin_user_info']['lastName']
 			user.profile.first_name = request.session['linkedin_user_info']['firstName']
 			user.profile.last_name = request.session['linkedin_user_info']['lastName']
 			user.profile.headline = request.session['linkedin_user_info']['headline']
@@ -137,7 +137,5 @@ def finish_login(request):
 	return render_to_response('accounts/finish_login.html',{'form':form},context_instance=RequestContext(request))
 
 	
-
-	# TOOD -- add user login / authorization
 
 	
