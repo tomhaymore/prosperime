@@ -1,6 +1,7 @@
 from django.db import models
+from django.contrib.auth.models import User, Account
 
-# Create your models here.
+
 class Entity(models.Model):
 	
 	# returns path for uploading logos
@@ -41,6 +42,17 @@ class Entity(models.Model):
 	# returns name
 	def name(self):
 		return self.full_name
+
+class Position(models.Model):
+	entity = models.ForeignKey(Entity)
+	person = models.ForeignKey(User)
+	title = models.CharField(max_length=150,null=True)
+	summary = models.CharField(max_length=450,null=True)
+	description = models.TextField(null=True)
+	current = models.BooleanField(default=True)
+	start_date = models.DateField(null=True)
+	end_date = models.DateField(null=True)
+	status = models.CharField(max_length=15,default="active")
 
 class Relationship(models.Model):
 	entity1 = models.ForeignKey(Entity,related_name="entity1")
