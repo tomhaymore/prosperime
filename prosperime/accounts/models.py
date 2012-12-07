@@ -7,14 +7,8 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
 class Profile(models.Model):
-	
-	# returns path for uploading logos
-	def _getFullName(self):
-		full_name = self.first_name + " " + self.last_name
-		return full_name
 
 	user = models.OneToOneField(User)
-	#full_name = models.CharField(max_length=250,null=True)
 	first_name = models.CharField(max_length=150,null=True)
 	middle_name = models.CharField(max_length=150,null=True)
 	last_name = models.CharField(max_length=150,null=True)
