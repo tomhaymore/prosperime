@@ -3,16 +3,13 @@ import os
 import urllib
 import urllib2
 from urlparse import urlparse
-# import pkg_resources
-# pkg_resources.require('simplejson') # not sure why this is necessary
-# import simplejson
 from datetime import datetime
 from _retry import retry
 from optparse import make_option
 
 # Django imports
 from django.core.management.base import BaseCommand, CommandError
-from entities.models import Entity, Relationship, Financing, Office, Investment
+from entities.models import Entity, Image, Financing, Office, Investment
 from django.core.files import File
 from django.utils import simplejson
 
@@ -36,14 +33,14 @@ class Command(BaseCommand):
 	
 	ENTITY_TYPES = (
 		{'single':'company','plural':'companies'},
-		{'single':'person','plural':'people'},
+		# {'single':'person','plural':'people'},
 		{'single':'financial-organization','plural':'financial-organizations'},
 		{'single':'service-provider','plural':'service-providers'}
 	)
 	
 	ENTITY_TYPES_DICT = {
 		"company":"companies",
-		"person":"people",
+		# "person":"people",
 		"finacial-organization":"financial-organizations",
 		"service-provider":"service-providers"
 	}
@@ -193,7 +190,7 @@ class Command(BaseCommand):
 			entity.logo_cb_attribution = data['image']['attribution']
 			entity.save()
 		# adds relationships, financings, offices
-		self.parseRelationships(entity,data)
+		# self.parseRelationships(entity,data)
 		if entity.cb_type == "company":
 			self.parseOffices(entity,data)
 			self.parseFinancings(entity,data)
@@ -212,11 +209,16 @@ class Command(BaseCommand):
 		except urllib2.HTTPError, e:
 			self.stdout.write(str(e.code))
 		if img:
+			logo = Image()
+			logo.entity = entity
+			logo.source = 'crunchbase'
+			logo.type = 'logo'
+			logo.save()
 			with open('tmp_img','wb') as f:
 				f.write(img.read())
 			with open('tmp_img','r') as f:
 				img_file = File(f)
-				entity.logo.save(img_filename,img_file,True)
+				logo.logo.save(img_filename,img_file,True)
 			os.remove('tmp_img')
 
 	def getEntityCBInfo(self,entity):
@@ -403,8 +405,9 @@ class Command(BaseCommand):
 			elif i['person'] is not "null":
 				i_sub = i['person']
 				cb_type = 'person'
-			# check to see if this entity already exists
-			if i_sub:
+			# skip persons
+			if i_sub and cb_type != 'person':
+				# check to see if this entity already exists
 				if self.entityExists(i_sub['permalink']):
 					# retrieve entity
 					e = Entity.objects.get(cb_permalink=i_sub['permalink'])
@@ -440,12 +443,13 @@ class Command(BaseCommand):
 			if not self.investmentExists(fin,i_sub['permalink']):
 				if i['cb_type'] == 'person':
 					# it's a personal investor
-					full_name = i_sub['first_name'] + " " + i_sub['last_name']
-					e = self.addEntity({'first_name':i_sub['first_name'],'last_name':i_sub['last_name'],'full_name':full_name,'permalink':i_sub['permalink'],'type':"person",'cb_type':i['cb_type']},False)
+					# full_name = i_sub['first_name'] + " " + i_sub['last_name']
+					# e = self.addEntity({'first_name':i_sub['first_name'],'last_name':i_sub['last_name'],'full_name':full_name,'permalink':i_sub['permalink'],'type':"person",'cb_type':i['cb_type']},False)
+					pass
 				else:
 					# it's an organizational investor
 					e = self.addEntity({'full_name':i_sub['name'],'permalink':i_sub['permalink'],'type':"organization",'cb_type':i['cb_type']},False)
-				investment = Investment.objects.create(financing=fin,investor=e)
+					investment = Investment.objects.create(financing=fin,investor=e)
 
 	def constructDate(self,month,day,year):
 		""" takes three values, checks which are none and returns date value or none """
