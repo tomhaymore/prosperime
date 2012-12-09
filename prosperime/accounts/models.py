@@ -24,10 +24,10 @@ class Account(models.Model):
     address = models.CharField(max_length=450,null=True)
     access_token = models.CharField(max_length=200,null=True)
     token_secret = models.CharField(max_length=200,null=True)
-    expires_on = models.DateTimeField(null=True,null=True)
+    expires_on = models.DateTimeField(null=True)
     linked_on = models.DateTimeField(auto_now_add=True,null=True)
-    last_scanned = models.DateTimeField(null=True,null=True)
-    scanning_now = models.BooleanField(default=False,null=True)
+    last_scanned = models.DateTimeField(null=True)
+    scanning_now = models.BooleanField(default=False)
     uniq_id = models.CharField(max_length=150,null=True)
     status = models.CharField(max_length=15,default="active")
     

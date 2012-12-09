@@ -15,7 +15,6 @@ from django.utils import simplejson
 
 class Command(BaseCommand):
 	
-	
 	option_list = BaseCommand.option_list + (
 			make_option('-u',
 						action="store_true",
@@ -68,17 +67,33 @@ class Command(BaseCommand):
 		self.stdout.write("fetching " + url + "\n")
 		try:
 			return simplejson.load(urllib2.urlopen(url))
-		except simplejson.JSONDecodeError, e:
-			self.stdout.write(str(e.args))
+		except:
 			return None
 
 	def getCurrentEntitiesCBPermalinks(self):
 		"""returns CB permalinks of all entities currenty in db """
 		entities = Entity.objects.filter(cb_permalink__isnull=False)
-		permalinks = []
-		for e in entities:
-			permalinks.append(e.cb_permalink)
+		permalinks = [e.cb_permalink for e in entities]
+		# for e in entities:
+		# 	permalinks.append(e.cb_permalink)
 		return permalinks
+
+	def addEntity(self,data):
+		""" adds entity """
+		e = Entity()
+		fields = self.getFieldsQuick(data)
+		for k,v in fields.iteritems():
+			setattr(e,k,v)
+		e.save()
+		self.stdout.write(e.name.encode("utf8") + " added\n")
+		return e
+
+	def entityExists(self,permalink):
+		""" checks to see if a CB entity has already been added to db """
+		if permalink in self.CURRENT_ENTITIES:
+			return True
+		else:
+			return False
 	
 	def getCBEntityList(self,cb_type):	
 		""" returns list of all entities of particular type """
@@ -107,36 +122,11 @@ class Command(BaseCommand):
 
 		for d in data:
 			d['type'] = cb_type['single']
-			# if self.entityExists((d['permalink'])) is False:
-			# 	self.addEntity(d)
-			# check against list of current entities to see if it already exists
-			# if d['permalink'] not in self.CURRENT_ENTITIES:
+			# check to see if entity exists
 			if not self.entityExists(d['permalink']):
 				# add it to list of current entitites for any possible duplicate entries
 				self.CURRENT_ENTITIES.append(d['permalink'])
 				self.addEntity(d)
-	
-	def addEntity(self,data,):
-		""" adds entity """
-		e = Entity()
-		fields = self.getFieldsQuick(data)
-		for k,v in fields.iteritems():
-			setattr(e,k,v)
-		e.save()
-		self.stdout.write(e.full_name.encode("utf8") + " added\n")
-		return e
-	
-	def entityExists(self,permalink):
-		""" checks to see if a CB entity has already been added to db """
-		# e = Entity.objects.filter(cb_permalink=permalink)
-		# if not e:
-		# 	return False
-		# else:
-		# 	return True
-		if permalink in self.CURRENT_ENTITIES:
-			return True
-		else:
-			return False
 	
 	def getFieldsQuick(self,data):
 		""" maps CB permalink, name, and type to db """
@@ -155,7 +145,7 @@ class Command(BaseCommand):
 			# if not person, just full_name field gets filled
 			fields = {
 				'cb_permalink':data['permalink'],
-				'full_name':data['name'],
+				'name':data['name'],
 				'type':'organization',
 				'subtype':data['type'],
 				'cb_type':data['type']
@@ -168,15 +158,13 @@ class Command(BaseCommand):
 		entities = Entity.objects.filter(cb_permalink__isnull=False)
 		for e in entities:
 			# make sure it has a CB entry
-			# if e.cb_permalink is not "null":
 			data = self.getEntityCBInfo(e)
 			# make sure API returned valid JSON
 			if data:
-				#self.stdout.write('recieved data \n')
 				# only update if information has changed since last update
 				if not e.cb_updated or datetime.strptime(data['updated_at'],"%a %b %d %H:%M:%S UTC %Y") > e.cb_updated:
 					self.addAllDetails(e,data)
-					self.stdout.write("Added details for " + e.name().encode("utf8","ignore") + "\n")
+					self.stdout.write("Added details for " + e.name.encode("utf8","ignore") + "\n")
 	
 	def addAllDetails(self,entity,data):
 		""" adds remainder of details from CB to db """
@@ -187,8 +175,8 @@ class Command(BaseCommand):
 		# add logo
 		if data['image']:
 			self.getCBImage(entity,data['image']['available_sizes'][2][1])
-			entity.logo_cb_attribution = data['image']['attribution']
-			entity.save()
+			# entity.logo_cb_attribution = data['image']['attribution']
+			# entity.save()
 		# adds relationships, financings, offices
 		# self.parseRelationships(entity,data)
 		if entity.cb_type == "company":
@@ -197,10 +185,10 @@ class Command(BaseCommand):
 		elif entity.cb_type == 'financial-organization' or entity.cb_type == 'service-provider':
 			self.parseOffices(entity,data)
 		# report 
-		self.stdout.write(entity.name().encode("utf8","ignore") + " updated\n")
+		self.stdout.write(entity.name.encode("utf8","ignore") + " updated\n")
 	
 	def getCBImage(self,entity,url):
-		self.stdout.write("Adding image for " + entity.name().encode('utf8','ignore') + "\n")
+		
 		img_url = "http://www.crunchbase.com/" + url
 		img_filename = urlparse(img_url).path.split('/')[-1]
 		img = None
@@ -220,6 +208,7 @@ class Command(BaseCommand):
 				img_file = File(f)
 				logo.logo.save(img_filename,img_file,True)
 			os.remove('tmp_img')
+		self.stdout.write("Added image for " + entity.name.encode('utf8','ignore') + "\n")
 
 	def getEntityCBInfo(self,entity):
 		""" fetches full profile of entity from CB """
@@ -234,12 +223,12 @@ class Command(BaseCommand):
 		if type == 'company':
 			fields = {
 				'cb_permalink':data['permalink'],
-				'full_name':data['name'],
+				'name':data['name'],
 				'type':'organization',
 				'subtype':'company',
 				'summary':data['description'],
 				'description':data['overview'],
-				'url':data['homepage_url'],
+				'web_url':data['homepage_url'],
 				'twitter_handle':data['twitter_username'],
 				'aliases':data['alias_list'],
 				'domain':data['category_code'],
@@ -279,15 +268,15 @@ class Command(BaseCommand):
 			except:
 				birth_date = None
 			fields['birth_date'] = birth_date
-		elif type == 'financial-organizations':
+		elif type == 'financial-organization':
 			fields = {
 				'cb_permalink':data['permalink'],
-				'full_name':data['name'],
+				'name':data['name'],
 				'type':'organization',
 				'subtype':'financial-organization',
 				'summary':data['description'],
 				'description':data['overview'],
-				'url':data['homepage_url'],
+				'web_url':data['homepage_url'],
 				'twitter_handle':data['twitter_username'],
 				'aliases':data['alias_list'],
 				'cb_url':data['crunchbase_url'],
@@ -303,11 +292,11 @@ class Command(BaseCommand):
 		elif type == 'service-provider':
 			fields = {
 				'cb_permalink':data['permalink'],
-				'full_name':data['name'],
+				'name':data['name'],
 				'type':'service-provider',
 				'subtype':'service-provider',
 				'description':data['overview'],
-				'url':data['homepage_url'],
+				'web_url':data['homepage_url'],
 				'aliases':data['alias_list'],
 				'cb_url':data['crunchbase_url'],
 				}
@@ -380,10 +369,10 @@ class Command(BaseCommand):
 	
 	def financingExists(self,entity,financing):
 		try:
-			fin = Financing.objects.get(round=financing['round_code'],target=entity)
+			fin = Financing.objects.get(round_code=financing['round_code'],target=entity)
 		except:
 			return False
-		return True
+		return fin
 
 	def addFinancing(self,entity,f):
 		""" adds financing """
@@ -391,7 +380,7 @@ class Command(BaseCommand):
 		fin_date = self.constructDate(f['funded_month'],f['funded_day'],f['funded_year'])
 		if f['raised_amount'] is not None:
 			f['raised_amount'] = str(f['raised_amount'])
-		fin = Financing.objects.create(target=entity,round=f['round_code'],amount=f['raised_amount'],currency=f['raised_currency_code'],date=fin_date)
+		fin = Financing.objects.create(target=entity,round_code=f['round_code'],amount=f['raised_amount'],currency=f['raised_currency_code'],date=fin_date)
 		fin.save()
 		# loop through each individual investment
 		for i in f['investments']:
@@ -416,7 +405,8 @@ class Command(BaseCommand):
 					if cb_type == 'person':
 						e = self.addEntity({'first_name':i_sub['first_name'],'last_name':i_sub['last_name'],"permalink":i_sub['permalink'],"cb_type":cb_type,'type':'person'})
 					else:
-						e = self.addEntity({"name":i_sub['name'],"permalink":i_sub['permalink'],"cb_type":cb_type,'type':'organization'})
+						#e = self.addEntity({"name":i_sub['name'],"permalink":i_sub['permalink'],"cb_type":cb_type,'type':'organization'})
+						e = self.addEntity({"name":i_sub['name'],"permalink":i_sub['permalink'],'type':cb_type})
 					# get full CB info
 					data = self.getEntityCBInfo(e)
 					# add remainder of CB data to db
@@ -428,7 +418,7 @@ class Command(BaseCommand):
 	
 	def updateFinancing(self,entity,cb_financing):
 		# fetch financing
-		fin = Financing.objects.get(round=cb_financing['round_code'],target=entity)
+		fin = Financing.objects.get(round_code=cb_financing['round_code'],target=entity)
 		# fetch investments, see if they exist already
 		for i in cb_financing['investments']:
 			if i['company'] is not None:
@@ -448,7 +438,8 @@ class Command(BaseCommand):
 					pass
 				else:
 					# it's an organizational investor
-					e = self.addEntity({'full_name':i_sub['name'],'permalink':i_sub['permalink'],'type':"organization",'cb_type':i['cb_type']},False)
+					# e = self.addEntity({'name':i_sub['name'],'permalink':i_sub['permalink'],'type':"organization",'cb_type':i['cb_type']},False)
+					e = self.addEntity({'name':i_sub['name'],'permalink':i_sub['permalink'],'type':i['cb_type']})
 					investment = Investment.objects.create(financing=fin,investor=e)
 
 	def constructDate(self,month,day,year):
@@ -507,7 +498,7 @@ class Command(BaseCommand):
 		if o.longitude:
 			o.longitude = str(office['longitude'])
 		o.save()
-		self.stdout.write(o.name().encode('utf8','ignore') + " office for " + entity.name().encode('utf8','ignore') + " added\n")
+		self.stdout.write(o.name().encode('utf8','ignore') + " added\n")
 		
 	def updateOffice(self,entity,office):
 		""" updates office details """
@@ -525,7 +516,7 @@ class Command(BaseCommand):
 		if o.longitude:
 			o.longitude = str(office['longitude'])
 		o.save()
-		self.stdout.write(o.name().encode('utf8','ignore') + " office for " + entity.name().encode('utf8','ignore') + " updated\n")
+		self.stdout.write(o.name().encode('utf8','ignore') + " updated\n")
 
 	def handle(self,*args, **options):
 		""" gets basic info for all entities, then cycles through and updates information """

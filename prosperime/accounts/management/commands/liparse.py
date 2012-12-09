@@ -221,14 +221,33 @@ class Command(BaseCommand):
 		co.li_type = data['type']
 		co.ticker = data['ticker']
 		co.web_url = data['website-url']
-		co.domain = data['industries']
+		# co.domain = data['industries']
 		co.li_status = data['status']
 		co.blog_url = data['blog-url']
 		co.twitter_handle = data['twitter-id']
 		co.size_range = data['employee-count-range']
 		co.description = data['description']
 		co.stock_exchange = data['stock-exchange']
+		co.li_last_scanned = datetime.now()
 		co.save()
+
+		# add industries
+		# TODO add manager that handles this any time domain is added to co
+		for i in data['industries']['values']:
+			# check to see if industry already exists
+			industry = self.get_industry(Q(name=i['name'] | li_code=i['code']))
+			if industry:
+				# add industry to domain of company
+				co.domain.add(industry)
+			else:
+				# create new industry
+				industry = Industry()
+				industry.name=i['name']
+				industry.li_code=i['code']
+				industry.save()
+				# add to domain of company
+				co.domain.add(industry)
+
 
 		# get company logo
 		save_li_image(co,data['logo-url'])
@@ -301,6 +320,7 @@ class Command(BaseCommand):
 						# if it's a new company, position must be new as well
 						self.add_position(user,co,p)
 					else:
+						# TODO update company
 						pos = self.get_position(user,co,data)
 						if update == True and pos is None:
 							self.add_position(user,co,data)
@@ -314,8 +334,3 @@ class Command(BaseCommand):
 		acct_id = options['acct_id']
 		# run main process
 		self.process_connections(user=options['user_id'],acct=options["acct_id"])
-	
-	
-
-	# make sure it only calls recently updated
-
