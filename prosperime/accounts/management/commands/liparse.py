@@ -34,12 +34,12 @@ class Command(BaseCommand):
 
 	option_list = BaseCommand.option_list + (
 			# option for storing user id
-			make_option('-u',
+			make_option('-u','user_id'
 						action="store",
 						type="integer",
 						dest="user_id"),
 			# option for storing acct id
-			make_option('-a',
+			make_option('-a','acct_id'
 						action="store",
 						type="integer",
 						dest="acct_id"),
@@ -217,17 +217,17 @@ class Command(BaseCommand):
 		co = Entity()
 		co.type = 'organization'
 		co.li_uniq_id = id
-		co.li_univ_name = data['universal-name']
-		co.li_type = data['type']
+		co.li_univ_name = data['universalName']
+		co.li_type = data['companyType']['code']
 		co.ticker = data['ticker']
-		co.web_url = data['website-url']
+		co.web_url = data['websiteUrl']
 		# co.domain = data['industries']
 		# co.li_status = data['status']
 		co.blog_url = data['blog-url']
-		co.twitter_handle = data['twitter-id']
-		co.size_range = data['employee-count-range']
+		co.twitter_handle = data['twitterId']
+		co.size_range = data['employeeCountRange']
 		co.description = data['description']
-		co.stock_exchange = data['stock-exchange']
+		co.stock_exchange = data['stockExchange']['values'][0]['code']
 		co.li_last_scanned = datetime.now()
 		co.save()
 
@@ -250,10 +250,10 @@ class Command(BaseCommand):
 
 
 		# get company logo
-		save_li_image(co,data['logo-url'])
+		save_li_image(co,data['logoUrl'])
 
 		# add offices
-		for l in data['locations']:
+		for l in data['locations']['values']:
 			self.add_office(co,l)
 
 	def save_li_image(self,co,img_url):
