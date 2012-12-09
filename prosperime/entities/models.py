@@ -98,6 +98,9 @@ class Industry(models.Model):
 	name = models.CharField(max_length=150)
 	li_code = models.CharField(max_length=5,null=True)
 
+	def __unicode__(self):
+		return self.name
+
 class Office(models.Model):
 	entity = models.ForeignKey(Entity)
 	description = models.CharField(max_length=450,blank=True,null=True)
