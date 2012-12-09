@@ -13,7 +13,8 @@ class Entity(models.Model):
 	blog_url = models.URLField(blank=True,null=True)
 	twitter_handle = models.CharField(max_length=250,blank=True,null=True)
 	aliases = models.TextField(blank=True,null=True)
-	domain = models.CharField(max_length=250,blank=True,null=True)
+	#domain = models.CharField(max_length=250,blank=True,null=True)
+	domains = models.ManyToManyField(Industry) # relationships to industry
 	founded_date = models.DateTimeField(blank=True,null=True)
 	deadpooled_date = models.DateTimeField(blank=True,null=True)
 	cb_type = models.CharField(max_length=25,blank=True,null=True)
@@ -92,6 +93,10 @@ class Investment(models.Model):
 	investor = models.ForeignKey(Entity,related_name="investor")
 	financing = models.ForeignKey(Financing)
 	amount = models.DecimalField(decimal_places=2,max_digits=15,null=True)
+
+class Industry(models.Model):
+	name = models.CharField(max_length=150)
+	li_code = models.CharField(max_length=5,null=True)
 
 class Office(models.Model):
 	entity = models.ForeignKey(Entity)
