@@ -222,7 +222,7 @@ class Command(BaseCommand):
 		co.ticker = data['ticker']
 		co.web_url = data['website-url']
 		# co.domain = data['industries']
-		co.li_status = data['status']
+		# co.li_status = data['status']
 		co.blog_url = data['blog-url']
 		co.twitter_handle = data['twitter-id']
 		co.size_range = data['employee-count-range']
