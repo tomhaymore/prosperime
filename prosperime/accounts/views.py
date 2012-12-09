@@ -14,6 +14,7 @@ from accounts.models import Account
 from django.contrib.auth.models import User
 from django.utils import simplejson
 from accounts.forms import FinishAuthForm
+from django.core.management import call_command
 
 linkedin_key = '8yb72i9g4zhm'
 linkedin_secret = 'rp6ac7dUxsvJjQpS'
@@ -130,6 +131,10 @@ def finish_login(request):
 			acct.expires_on = datetime.now() + timedelta(seconds=int(request.session['access_token']['oauth_authorization_expires_in']))
 			acct.uniq_id = request.session['linkedin_user_info']['id']
 			acct.save()
+
+			# start processing connections
+
+			call_command("liparse",acct_id=acct.id,user_id=user.id)
 
 			return HttpResponseRedirect('/account/success')
 	else:
