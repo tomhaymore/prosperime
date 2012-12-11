@@ -17,12 +17,15 @@ from django.utils import simplejson
 # from django.core import serializers
 
 def login(request):
+	if reqeust.user.is_authenticated():
+		return HttpResponseRedirect('/home')
 	if request.method == "POST":
 		user = authenticate(username=request.POST['username'],password=request.POST['password'])
 		if user is not None:
 			auth_login(request,user)
 			return HttpResponseRedirect('/home')
 
+@login_required
 def home(request):
 	return render_to_response('home.html',context_instance=RequestContext(request))
 
