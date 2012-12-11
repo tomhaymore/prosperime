@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 from accounts.models import Account
 from django.contrib.auth.models import User
 from django.utils import simplejson
-from accounts.forms import FinishAuthForm
+from accounts.forms import FinishAuthForm, AuthForm
 from django.core.management import call_command
 
 linkedin_key = '8yb72i9g4zhm'
