@@ -115,6 +115,9 @@ def finish_login(request):
 			user = User.objects.create_user(username,email,password)
 			user.save()
 
+			# log user in
+			auth_login(request,user)
+
 			# update user profile
 			# user.profile.full_name = request.session['linkedin_user_info']['firstName'] + " " + request.session['linkedin_user_info']['lastName']
 			user.profile.first_name = request.session['linkedin_user_info']['firstName']
@@ -141,6 +144,9 @@ def finish_login(request):
 		form = FinishAuthForm()
 
 	return render_to_response('accounts/finish_login.html',{'form':form},context_instance=RequestContext(request))
+
+def success(request):
+	return render_to_response('accounts/success.html',context_instance=RequestContext(request))
 
 	
 
