@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+
+{% endblock %}
+
+{% block content %}
+<div class="span6 offset2">
+<h3>Almost finished!</h3>
+<p>We just need a few more bits of information to register you. Please fill out the form below.</p>
+<form action="" method="post" name="login">
+	{% csrf_token %}
+	{{ form.as_p }}
+	<fieldset>
+		<button type="submit" class="btn">Submit</button>
+	</fieldset>
+</form>
+</div>
+{% endblock %}
+
+{% block rightSidebar %}
+
+
+{% endblock %}
