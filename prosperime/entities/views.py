@@ -4,7 +4,7 @@
 # import simplejson
 
 # from Django
-from django.contrib.auth import authenticate, login as auth_login
+# from django.contrib.auth import authenticate, login as auth_login
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
@@ -16,14 +16,6 @@ from django.db.models import Count, Q
 from django.utils import simplejson
 # from django.core import serializers
 
-def login(request):
-	if reqeust.user.is_authenticated():
-		return HttpResponseRedirect('/home')
-	if request.method == "POST":
-		user = authenticate(username=request.POST['username'],password=request.POST['password'])
-		if user is not None:
-			auth_login(request,user)
-			return HttpResponseRedirect('/home')
 
 @login_required
 def home(request):

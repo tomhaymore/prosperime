@@ -19,6 +19,15 @@ from django.core.management import call_command
 linkedin_key = '8yb72i9g4zhm'
 linkedin_secret = 'rp6ac7dUxsvJjQpS'
 
+def login(request):
+	if reqeust.user.is_authenticated():
+		return HttpResponseRedirect('/home')
+	if request.method == "POST":
+		user = authenticate(username=request.POST['username'],password=request.POST['password'])
+		if user is not None:
+			auth_login(request,user)
+			return HttpResponseRedirect('/home')
+
 def linkedin_authorize(request):
 	
 	# set scope
