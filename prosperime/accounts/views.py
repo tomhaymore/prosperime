@@ -23,10 +23,19 @@ def login(request):
 	if reqeust.user.is_authenticated():
 		return HttpResponseRedirect('/home')
 	if request.method == "POST":
-		user = authenticate(username=request.POST['username'],password=request.POST['password'])
-		if user is not None:
-			auth_login(request,user)
-			return HttpResponseRedirect('/home')
+		
+		form = AuthForm(request.POST)
+
+		if form.is_valid():
+			user = authenticate(username=form.cleaned_data['username'],password=form.cleaned_data['password'])
+			if user is not None:
+				auth_login(request,user)
+				return HttpResponseRedirect('/home')
+	else:
+		form = AuthForm()
+
+	return render_to_response('accounts/login.html',{'form':form},context_instance=RequestContext(request))
+
 
 def linkedin_authorize(request):
 	
