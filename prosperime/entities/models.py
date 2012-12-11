@@ -14,7 +14,7 @@ class Entity(models.Model):
 	twitter_handle = models.CharField(max_length=250,blank=True,null=True)
 	aliases = models.TextField(blank=True,null=True)
 	#domain = models.CharField(max_length=250,blank=True,null=True)
-	domains = models.ManyToManyField(Industry) # relationships to industry
+	domains = models.ManyToManyField("Industry") # relationships to industry
 	founded_date = models.DateTimeField(blank=True,null=True)
 	deadpooled_date = models.DateTimeField(blank=True,null=True)
 	cb_type = models.CharField(max_length=25,blank=True,null=True)
