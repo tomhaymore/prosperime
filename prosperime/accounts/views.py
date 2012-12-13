@@ -20,8 +20,8 @@ linkedin_key = '8yb72i9g4zhm'
 linkedin_secret = 'rp6ac7dUxsvJjQpS'
 
 def login(request):
-	if reqeust.user.is_authenticated():
-		return HttpResponseRedirect('/home')
+	if request.user.is_authenticated():
+		return HttpResponseRedirect('/')
 	if request.method == "POST":
 		
 		form = AuthForm(request.POST)
@@ -30,7 +30,7 @@ def login(request):
 			user = authenticate(username=form.cleaned_data['username'],password=form.cleaned_data['password'])
 			if user is not None:
 				auth_login(request,user)
-				return HttpResponseRedirect('/home')
+				return HttpResponseRedirect('/')
 	else:
 		form = AuthForm()
 
@@ -115,6 +115,9 @@ def linkedin_authenticate(request):
 	request.session['access_token'] = access_token
 
 	return HttpResponseRedirect('/account/finish')
+
+# def linkedin_login(request):
+
 
 def finish_login(request):
 	# TODO: redirect if not not authenticated through LinkedIn already
