@@ -33,7 +33,7 @@ $(function(){
 				return '/filters';
 			} else {
 				console.log(this._meta['query']);
-				path = '/filters?' + this._meta['query'];
+				path = '/filters/?' + this._meta['query'];
 				console.log(path);
 				return '/filters/' + this._meta['query'];
 			}
