@@ -1,60 +1,27 @@
 {% extends "base.html" %}
 
+{% block head %}
+
+{% endblock %}
+
+{% block message %}
+	<div class="message">
+		<p class="message">Use the search filters below to refine your search results. You can save any search for easy reference later. You can also review any saved searches in <a href="/account">your profile</a>.</p>
+	</div>
+{% endblock %}
+
 {% block sidebar %}
 
 <div id="search-container" class="rounded">
-	<div class="search-form-header sidebar-header">
-		Refine Your Search
-	</div>
-	<div class="search-form-module">
-		<p class="form-header">Location</p>
-			{% for l in locations|slice:":5" %}
-				<label class="checkbox">
-					<input type="checkbox" value="{{l}}"> {{l}}</option>
-				</label>
-			{% endfor %}
-	</div>
-
-	<div class="search-form-module">
-		<p class="form-header">Sector</p>
-			{% for s in sectors %}
-				<label class="checkbox">
-					<input type="checkbox" value="{{s}}"> {{s}}</option>
-				</label>
-			{% endfor %}
-	</div>
-
-	<div class="search-form-module">
-		<p class="form-header">Size</p>
-			{% for k,v in sizes.items %}
-				<label class="checkbox">
-					<input type="checkbox" value="{{k}}"> {{v}}</option>
-				</label>
-			{% endfor %}
-			<ul class="form-params">
-
-			</ul> 
-	</div>
-
-	<div class="search-form-module">
-		<p class="form-header">Stage</p>
-			{% for s in stages %}
-				<label class="checkbox">
-					<input type="checkbox" value="{{s}}"> {{s}}</option>
-				</label>
-			{% endfor %}
-			<ul class="form-params">
-
-			</ul> 
-	</div>
+	<!-- dynamically populated search filters -->
 </div>
 {% endblock %}
 
 {% block content %}
 <div id="search-results-list">
-	<p class="main-header">Search Results</p>
-
-{% if entities %}
+	<!-- <p class="main-header">Search Results</p> -->
+</div>
+<!-- {% if entities %}
 	
 		{% for e in entities|slice:":20" %}
 			<div class="list-preview">
@@ -84,7 +51,7 @@
 	</div>
 {% else %}
 I'm sorry, the Internets ate our database.
-{% endif %}
+{% endif %} -->
 
 
 {% endblock %}
@@ -92,13 +59,23 @@ I'm sorry, the Internets ate our database.
 {% block rightSidebar %}
 
 <div class="rounded">
-	<p class="sidebar-header">Keep Track</p>
-	<p>Drag and drop any company you'd like to keep track of here.</p>
+	{% if user %}
+		<p class="sidebar-header">Want to see improvements?</p>
+		<p>We'd love to hear from you -- <a href="mailto:feedback@prosperime.com">please drop us a line</a></p>
+	{% else %}
+		<p class="sidebar-header">Want to see full career paths?</p>
+		<p>Drag and drop any company you'd like to keep track of here.</p>
+	{% endif %}
 </div>
 
 <div class="rounded">
 	<p class="sidebar-header">Save Search</p>
-	<p><a href="#">Save this search</a> to come back and review search results any time.</p>
+	{% if user %}
+		<p><a href="#">Save this search</a> to come back and review search results any time.</p>
+	{% else %}
+		<p><a href="/login">Login</a> or <a href="/register">register</a> to save searches.</p>
+	{% endif %}
+
 </div>
 
 {% endblock %}
@@ -107,15 +84,15 @@ I'm sorry, the Internets ate our database.
 <script type="text/template" id="org-single-template">
 	<li class="list-preview">			
 		<div class="left-list-preview">
-			<% if (logo != '') { %>
+			<% if (image__logo != null) { %>
 			<div class="img-holder">
-				<img class="logo-preview" src="/media/<%= logo %>" />&nbsp;
+				<img class="logo-preview" src="/media/<%= image__logo %>" />&nbsp;
 			</div>
 			<% } %>
 		</div>
 		
 		<div class="right-list-preview"
-			<span class="company-header"><%= full_name %></span><br/>
+			<span class="company-header"><%= name %></span><br/>
 			<p><%= summary %></p>
 		</div>
 		<div class="clear"></div>
@@ -146,3 +123,4 @@ I'm sorry, the Internets ate our database.
 	</label>
 </script>
 {% endblock %}
+
