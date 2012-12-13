@@ -11,46 +11,28 @@ from django.template import RequestContext
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from entities.models import Entity, Office, Financing
+from entities.models import Entity, Office, Financing, Industry
 from django.db.models import Count, Q
 from django.utils import simplejson
 # from django.core import serializers
 
 
-@login_required
+# @login_required
 def home(request):
-	return render_to_response('home.html',context_instance=RequestContext(request))
+	if request.user.is_authenticated():
+		# user is logged in, display personalized information
+		pass
+	data = {}
+	return render_to_response('home.html',data,context_instance=RequestContext(request))
 
 def search(request):
-	# fetch 20 most recently updated entities
-	entities = Entity.objects.filter(cb_type="company").annotate(rounds=Count('target')).order_by('-rounds')[:20]
-	# fetch all distinct locations
-	locations = Office.objects.values_list("city",flat=True).annotate(freq=Count('pk')).order_by('-freq').distinct()
-	#locations = Office.objects.all().values_list('city',flat=True).distinct()
-	# fetch distinct sectors
-	sectors1 = Entity.objects.values_list('domain',flat=True).distinct()
-	sectors2 = [x for x in sectors1 if x]
-	# fetch distinct stages
-	#stages = Financing.objects.values_list('round',flat=True).order_by('round').distinct()
-	stages = ['seed','a','b','c','d','e','f','g','h','IPO']
-	# dictionary of sizes
-	sizes = {
-		'a':'1-10',
-		'b':'11-25',
-		'c':'26-50',
-		'd':'51-100',
-		'e':'101-250',
-		'f':'251-500',
-		'g':'501+'
-	}
+	
 	# test if user is authenticated
 	# show what?
-	return render_to_response('entities/searches.html',
-		{'entities':entities,
-		'locations':locations,
-		'sectors':sectors2,
-		'stages':stages,
-		'sizes':sizes},
+	data = {}
+	if request.user.is_authenticated():
+		data['user'] = request.user
+	return render_to_response('entities/search.html',
 		context_instance=RequestContext(request))
 
 def companies(request):
@@ -67,7 +49,7 @@ def companies(request):
 	sizesSelected = request.GET.getlist('size')
 	stagesSelected = request.GET.getlist('stage')
 
-	companies = Entity.objects.values("full_name","summary","logo").filter(cb_type="company").annotate(freq=Count('financing__pk')).order_by('-freq')
+	companies = Entity.objects.values("name","summary","image__logo").filter(cb_type="company").annotate(freq=Count('financing__pk')).order_by('-freq')
 
 	if locationsSelected:
 		companies = companies.filter(office__city__in=locationsSelected)
@@ -120,7 +102,7 @@ def filters(request):
 		# locationsFiltered = Office.objects.filter(entity__financing__round__in=stagesSelected).values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()[:10]
 		# print locationsFiltered.query
 	if sectorsSelected:
-		locationsFiltered = locationsFiltered.filter(entity__domain__in=sectorsSelected)
+		locationsFiltered = locationsFiltered.filter(entity__domains__name__in=sectorsSelected,)
 		print locationsFiltered.query
 	if sizesSelected:
 		# get dictionary of size ranges
@@ -166,7 +148,8 @@ def filters(request):
 				filters.append({'name':l['city'],'value':l['city'],'category':'Location','count':freq,'selected':None})
 	
 	# get a list of all sectors
-	sectorsBase = Entity.objects.values('domain').annotate(freq=Count('pk')).distinct()
+	# sectorsBase = Entity.objects.values('domain').annotate(freq=Count('pk')).distinct()
+	sectorsBase = Industry.objects.values('name').annotate(freq=Count('pk')).distinct()
 	sectorsFiltered = sectorsBase
 
 	# if locationsSelected:
@@ -175,7 +158,10 @@ def filters(request):
 	# 	sectorsFiltered = Entity.objects.values('domain').annotate(freq=Count('pk')).distinct()
 	
 	if locationsSelected:
-		sectorsFiltered = sectorsFiltered.filter(office__city__in=locationsSelected)
+		# sectorsFiltered = sectorsFiltered.filter(entity__office__city__in=locationsSelected)
+		entitiesFilteredByLoaction = Entity.objects.filter(office__city__in=locationsSelected)
+		sectorsFiltered = sectorsFiltered.filter(entity__in=entitiesFilteredByLoaction)
+		print sectorsFiltered.query
 	if stagesSelected:
 		sectorsFiltered = sectorsFiltered.filter(financing__round__in=stagesSelected)
 	if sizesSelected:
@@ -187,30 +173,30 @@ def filters(request):
 		for rg in rgs:
 			print rg
 			if c == 0:
-				q = Q(no_employees__gte=int(rg['lower']),no_employees__lte=int(rg['upper']))		
+				q = Q(entity__no_employees__gte=int(rg['lower']),entity__no_employees__lte=int(rg['upper']))		
 			else:
-				q.add(Q(no_employees__gte=int(rg['lower']),no_employees__lte=int(rg['upper'])), Q.OR)
+				q.add(Q(entity__no_employees__gte=int(rg['lower']),entity__no_employees__lte=int(rg['upper'])), Q.OR)
 			c += 1
 		sectorsFiltered = sectorsFiltered.filter(q)
 
 	sectorsFilteredDict = {}
 	for l in sectorsFiltered:
-		sectorsFilteredDict[l['domain']] = l['freq']
+		sectorsFilteredDict[l['name']] = l['freq']
 
 	for s in sectorsBase:
 		# make sure it doesn't have a null value
-		if s['domain']:
+		if s['name']:
 			# get count from sectorsFilteredDict
-			if s['domain'] in sectorsFilteredDict:
-				freq = sectorsFilteredDict[s['domain']]
+			if s['name'] in sectorsFilteredDict:
+				freq = sectorsFilteredDict[s['name']]
 			else:
 				freq = 0
-			name = " ".join(word.capitalize() for word in s['domain'].replace("_"," ").split())
+			name = " ".join(word.capitalize() for word in s['name'].replace("_"," ").split())
 			# check to see if the value should be selected
-			if s['domain'] in sectorsSelected:
-				filters.append({'name':name,'value':s['domain'],'category':'Sector','count':freq,'selected':True})
+			if s['name'] in sectorsSelected:
+				filters.append({'name':name,'value':s['name'],'category':'Sector','count':freq,'selected':True})
 			else:
-				filters.append({'name':name,'value':s['domain'],'category':'Sector','count':freq,'selected':None})
+				filters.append({'name':name,'value':s['name'],'category':'Sector','count':freq,'selected':None})
 	
 	sizes = {
 		'a':'1-10',
