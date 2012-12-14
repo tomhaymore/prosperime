@@ -38,6 +38,7 @@ def login(request):
 
 def logout(request):
 	logout(request)
+	return HttpResponseRedirect('/')
 
 def linkedin_authorize(request):
 	
