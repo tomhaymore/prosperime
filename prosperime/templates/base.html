@@ -33,19 +33,14 @@
 							<li>
 								<a href="/">Home</a>
 							</li>
-							{% if user.is_staff %}                
+	                		{% if user.is_authenticated %}
 	                		<li>
 	                			<a href="/settings/">Account</a>
 	                		</li>
-	                		{% endif %}
-	                		{% if user.is_authenticated %}
 	                		<li>
 	                			<a href="/account/logout/">Logout</a>
 	                		</li>
 	                		{% endif %}
-							<li>
-								<a href="/about">About</a>
-							</li>
 							<li>
 								<a href="/contact">Contact</a>
 							</li>
