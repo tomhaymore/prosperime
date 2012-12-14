@@ -4,7 +4,7 @@ import cgi
 from datetime import datetime, timedelta
 
 # from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate, logout, login as auth_login
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
@@ -36,6 +36,8 @@ def login(request):
 
 	return render_to_response('accounts/login.html',{'form':form},context_instance=RequestContext(request))
 
+def logout(request):
+	logout(request)
 
 def linkedin_authorize(request):
 	

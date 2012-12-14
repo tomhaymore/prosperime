@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     url(r'^account/authenticate','accounts.views.linkedin_authenticate'),
     url(r'^account/finish','accounts.views.finish_login'),
     url(r'^account/success','accounts.views.success'),
+    url(r'^account/logout','accounts.views.logout'),
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     # url(r'^prosperime/', include('prosperime.foo.urls')),
 
