@@ -1,5 +1,9 @@
 # Django settings for prosperime project.
 
+# for celery
+import djcelery
+djcelery.setup_loader()
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -124,7 +128,8 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     'entities',
-    'accounts'
+    'accounts',
+    'djcelery',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
@@ -134,8 +139,8 @@ AUTH_PROFILE_MODULE = 'accounts.Profile'
 LOGIN_URL = "/login"
 
 AUTHENTICATION_BACKENDS = (
-    'prosperime.accounts.backends.EmailOrUsernameModelBackend',
-    'django.contrib.auth.backends.ModelBackend'
+    'prosperime.accounts.backends.LinkedinBackend',
+    'django.contrib.auth.backends.ModelBackend',
 )
 
 # A sample logging configuration. The only tangible logging
