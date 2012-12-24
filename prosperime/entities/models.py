@@ -27,7 +27,7 @@ class Entity(models.Model):
 	li_last_scanned = models.DateTimeField(null=True)
 	total_money = models.CharField(max_length=15,null=True,blank=True)
 	no_employees = models.IntegerField(blank=True,null=True)
-	size_range = models.CharField(max_length=2,null=True)
+	size_range = models.CharField(max_length=45,null=True)
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 	status = models.CharField(max_length=15,default="active")
