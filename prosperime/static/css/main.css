@@ -1,5 +1,47 @@
 /* Components */
 
+body {
+	padding-top:40px;
+}
+
+/* Home page */
+
+div#splash-home {
+	background-color: rgb(41,98,162);
+	margin:0;
+	padding: 10px 0 10px 0; 
+}
+
+div.splash-container {
+	margin:0;
+	padding:0;
+}
+
+p.splash-message-header {
+	color:white;
+	font-size: 1.6em;
+	line-height: 1.8em;
+}
+
+p.splash-message {
+	color:#ddd;
+	font-size: 1.1em;
+	line-height: 1.4em;
+}
+
+p.promo-message-header {
+	font-weight: bold;
+	font-size: 1.1em;
+}
+
+p.promo-message {
+	
+}
+
+div#promo-message-container {
+	margin-top:10px;
+}
+
 ul {
 	margin:0px;
 	padding:0;
@@ -93,4 +135,22 @@ img.logo-preview {
 
 .search-form-module {
 	padding: 5px;
+}
+
+div.message {
+	border: 1px solid rgb(58,139,233);
+	/*opacity: 0.7;*/
+	border-radius: 2px;
+	padding: 5px;
+	margin: 0 0 10px 0;
+	
+}
+
+div.message p {
+	font-size:1.1em;
+	/*color:#fff;*/
+	opacity:1.0;
+}
+.message a {
+
 }
