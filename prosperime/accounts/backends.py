@@ -4,6 +4,8 @@ from accounts.models import Account
 
 class LinkedinBackend:
 
+    supports_inactive_user = True
+
     def authenticate(self,acct_id=None):
         try:
             return User.objects.get(account__uniq_id=acct_id)
