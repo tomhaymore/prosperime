@@ -8,19 +8,20 @@ from django.db.models.signals import post_save
 
 class Profile(models.Model):
 
-	user = models.OneToOneField(User)
-	first_name = models.CharField(max_length=150,null=True)
-	middle_name = models.CharField(max_length=150,null=True)
-	last_name = models.CharField(max_length=150,null=True)
-	headline = models.TextField(null=True)
+    user = models.OneToOneField(User)
+    first_name = models.CharField(max_length=150,null=True)
+    middle_name = models.CharField(max_length=150,null=True)
+    last_name = models.CharField(max_length=150,null=True)
+    headline = models.TextField(null=True)
+    status = models.CharField(max_length=15,default="active")
 
-	def full_name(self):
-		full_name = self.first_name + " " + self.last_name
-		return full_name
+    def full_name(self):
+        full_name = self.first_name + " " + self.last_name
+        return full_name
 
 class Account(models.Model):
     service = models.CharField(max_length=45)
-    owner = models.ForeignKey(User)
+    owner = models.ForeignKey(User,related_name='account')
     address = models.CharField(max_length=450,null=True)
     access_token = models.CharField(max_length=200,null=True)
     token_secret = models.CharField(max_length=200,null=True)
