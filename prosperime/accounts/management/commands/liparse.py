@@ -5,13 +5,15 @@ from datetime import datetime, time
 import urllib2
 import os
 from math import ceil
+from optparse import make_option
+import urlparse
 
 # from Django
 from django.utils import simplejson
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
 from accounts.models import Account, Profile
-from entities.models import Position, Entity, Image
+from entities.models import Position, Entity, Image, Industry, Office
 from django.core.files import File
 
 # LinkedIn API credentials
@@ -19,29 +21,31 @@ linkedin_key = '8yb72i9g4zhm'
 linkedin_secret = 'rp6ac7dUxsvJjQpS'
 
 # fields from connections API
-fields = "(headline,firstName,lastName)"
+fields = "(id,headline,firstName,lastName,positions:(start-date,end-date,title,is-current,description,company:(id)))"
 co_fields = "(id,name,universal-name,company-type,ticker,website-url,industries,status,logo-url,blog-rss-url,twitter-id,employee-count-range,locations:(description,address:(postal-code)),description,stock-exchange)"
 
-# construct api url
-api_url = "http://api.linkedin.com/v1/people/~/connections:" + fields + "?format=json"
-co_api_url = "http://api.linkedin.com/v1/companies/"
+
 
 class Command(BaseCommand):
 	
 	acct_id = ''
 
+	# construct api url
+	api_url = "http://api.linkedin.com/v1/people/~/connections:" + fields + "?format=json"
+	co_api_url = "http://api.linkedin.com/v1/companies/"
+
 	# include options for user id + account id
 
 	option_list = BaseCommand.option_list + (
 			# option for storing user id
-			make_option('-u','user_id'
+			make_option('-u','--user_id',
 						action="store",
-						type="integer",
+						type="int",
 						dest="user_id"),
 			# option for storing acct id
-			make_option('-a','acct_id'
+			make_option('-a','--acct_id',
 						action="store",
-						type="integer",
+						type="int",
 						dest="acct_id"),
 		)
 
@@ -56,17 +60,16 @@ class Command(BaseCommand):
 			acct.status = "expired"
 			acct.save()
 			# need to raise exception here
-			# raise Exception
+			raise CommandError
 		elif acct.status == "expired":
 			# need to raise exception here
-			# raise Exception
-
+			raise CommandError
 
 		# assign token to dictionary
 		access_token = {
-			'oauth_token_secret' 	= acct.token_secret,
-			'oauth_token'			= acct.access_token,
-			'last_scanned'			= acct.last_scanned
+			'oauth_token_secret':acct.token_secret,
+			'oauth_token':acct.access_token,
+			'last_scanned':acct.last_scanned
 		}
 
 		return access_token
@@ -86,12 +89,16 @@ class Command(BaseCommand):
 		client = oauth.Client(consumer, token)
 
 		# construct api url 
-		if access_token.last_scanned:
+		if access_token['last_scanned']:
 			unix_time = access_token['last_scanned'].strftime("%s") # convert datetime to unix timestamp
-			api_url += "&modified-since=%s" % (unix_time,)
+			api_url = self.api_url + "&modified-since=%s" % (unix_time,)
+		else:
+			api_url = self.api_url
+
+		# self.stdout.write(api_url)
 
 		resp, content = client.request(api_url)
-
+		
 		# convert connections to JSON
 		content = simplejson.loads(content)
 
@@ -103,32 +110,35 @@ class Command(BaseCommand):
 			# need to paginate
 			pages = ceil((total_count - 500)/ 500)
 			
-		for i in range(1,p+1):
-			start_num = i*500+1
-			page_api_url = api_url += "start=%i&count=500" % (start_num,)
-			resp, content = client.request(api_url)
+			for i in range(1,pages+1):
+				start_num = i*500+1
+				page_api_url = api_url + "start=%i&count=500" % (start_num,)
+				resp, content = client.request(api_url)
 
-			# convert connections to JSON
-			content = simplejson.loads(content)
+				# convert connections to JSON
+				content = simplejson.loads(content)
 
-			# append additional connections
-			connections.append(content['values'])
+				# append additional connections
+				connections.append(content['values'])
 
 		return content
 
 	def add_dormant_user(self,user_info):
 
 		# create dormant user account
-		temp_username = user_info['firstName'] + user_info['lastName']
+		temp_username = user_info['firstName'] + user_info['lastName'] + user_info['id']
+		temp_username = temp_username[:30]
+		# self.stdout.write(temp_username)
 		user = User()
 		user.username = temp_username
-		user.status = "dormant"
 		user.save()
 
 		# create user profile
 		user.profile.first_name = user_info['firstName']
 		user.profile.last_name = user_info['lastName']
-		user.profile.headline = user_info['headline']		
+		if 'headline' in user_info:
+			user.profile.headline = user_info['headline']		
+		user.profile.status = "dormant"
 		user.save()
 
 		# create LinkedIn account
@@ -139,25 +149,45 @@ class Command(BaseCommand):
 		acct.status = "unlinked"
 		acct.save()
 
+		return user
+
 
 	def get_user(self,user_id):
-		user = Account.objects.get(uniq_id=user_id,service="linkedin")
-		if user:
-			# user exists, return co
-			return user
-		# new user, return None
-		return None
+		try:
+			user = Account.objects.get(uniq_id=user_id,service="linkedin")
+		except:
+			# if user does not exist, return None
+			return None
+		# if user exists return user
+		return user
 
 	def add_position(self,user,co,data):
+		# dectionary of values to test for and then add if present
+		positionValues = {'title':'title','description':'summary','current':'is_current'}
+		
 		pos = Position()
 		pos.entity = co
 		pos.person = user
-		pos.title = data['title']
-		pos.summary = data['headline']
-		pos.description = data['summary']
-		pos.start_date = data['start-date']
-		pos.end_date = data['end-date']
-		pos.current = data['is-current']
+
+		for k,v in positionValues.iteritems():
+			if v in data:
+				pos.k = v
+		
+			# pos.title = data['title']
+			# pos.summary = data['headline']
+			# pos.description = data['summary']
+			# pos.start_date = data['start-date']
+			# pos.end_date = data['end-date']
+			# pos.current = data['is-current']
+		
+		# check for start date
+		if 'start-date' in data:
+			start_date = datetime.strptime(str(data['start-date']['month'])+"/"+str(data['start-date']['year']),"%m/%Y")
+			pos.start_date = start_date
+		# check for end date
+		if 'end-date' in data:
+			end_date = datetime.strptime(str(data['end-date']['month'])+"/"+str(data['end-date']['year']),"%m/%Y")
+			pos.end_date = end_date
 		pos.save()
 
 	def update_position(self,user,co,data):
@@ -170,8 +200,8 @@ class Command(BaseCommand):
 		pos.current = data['is-current']
 		pos.save()
 
-	def get_position(self,user,data):
-		pos = Position.objects.filter(entity=co,user=user,title=data['title'])
+	def get_position(self,user,co,data):
+		pos = Position.objects.filter(entity=co,person=user,title=data['title'])
 		if pos:
 			# if position exists, return it
 			return pos
@@ -179,16 +209,17 @@ class Command(BaseCommand):
 		return None
 
 	def get_company(self,id):
-		co = Entity.objects.get(li_uniq_id=id)
-		if co:
-			# co exists, return co
-			return co
-		# new co, return None
-		return None
+		try:
+			co = Entity.objects.get(li_uniq_id=id)
+		except:
+			# if company doesn't exist, return None
+			return None
+		# return company
+		return co
 
 	def get_co_li_profile(self,co_id):
 		# get oauth credentials from account
-		access_token = self.get_access_token(acct_id)
+		access_token = self.get_access_token(self.acct_id)
 
 		# construct oauth client
 		consumer = oauth.Consumer(linkedin_key, linkedin_secret)
@@ -200,12 +231,16 @@ class Command(BaseCommand):
 		client = oauth.Client(consumer, token)
 
 		# construct api url 
-		co_api_url += ":" + co_id + co_fields + "?format=json"
+		co_api_url = self.co_api_url + str(co_id) + ":"  + co_fields + "?format=json"
+
+		print co_api_url
 
 		resp, content = client.request(co_api_url)
 
 		# convert connections to JSON
 		content = simplejson.loads(content)
+
+		print content
 
 		return content
 
@@ -217,51 +252,76 @@ class Command(BaseCommand):
 		co = Entity()
 		co.type = 'organization'
 		co.li_uniq_id = id
-		co.li_univ_name = data['universalName']
-		co.li_type = data['companyType']['code']
-		co.ticker = data['ticker']
-		co.web_url = data['websiteUrl']
+		# coValues = {'li_univ_name':'universalName','li_type':''}
+		if 'universalName' in data:
+			co.li_univ_name = data['universalName']
+		if 'companyType' in data:
+			co.li_type = data['companyType']['code']
+		if 'ticker' in data:
+			co.ticker = data['ticker']
+		if 'websuteUrl' in data:
+			co.web_url = data['websiteUrl']
 		# co.domain = data['industries']
 		# co.li_status = data['status']
-		co.blog_url = data['blog-url']
-		co.twitter_handle = data['twitterId']
-		co.size_range = data['employeeCountRange']
-		co.description = data['description']
-		co.stock_exchange = data['stockExchange']['values'][0]['code']
+		if 'blog-url' in data:
+			co.blog_url = data['blog-url']
+		if 'twitterId' in data:
+			co.twitter_handle = data['twitterId']
+		if 'employeeCountRange' in data:
+			co.size_range = data['employeeCountRange']['name']
+		if 'description' in data:
+			co.description = data['description']
+		if 'stockExchange' in data:
+			co.stock_exchange = data['stockExchange']['code']
 		co.li_last_scanned = datetime.now()
 		co.save()
 
 		# add industries
 		# TODO add manager that handles this any time domain is added to co
-		for i in data['industries']['values']:
-			# check to see if industry already exists
-			industry = self.get_industry(Q(name=i['name'] | li_code=i['code']))
-			if industry:
-				# add industry to domain of company
-				co.domain.add(industry)
-			else:
-				# create new industry
-				industry = Industry()
-				industry.name=i['name']
-				industry.li_code=i['code']
-				industry.save()
-				# add to domain of company
-				co.domain.add(industry)
+		if 'industries' in data:
+			for i in data['industries']['values']:
+				# check to see if industry already exists
+				industry = self.get_industry(i['name'],i['code'])
+				if industry:
+					# add industry to domain of company
+					co.domains.add(industry)
+				else:
+					# create new industry
+					industry = Industry()
+					industry.name=i['name']
+					industry.li_code=i['code']
+					industry.save()
+					# add to domain of company
+					co.domains.add(industry)
 
+		# check to see if company has a logo url
+		if 'logoUrl' in data:
+			# get company logo
+			self.save_li_image(co,data['logoUrl'])
 
-		# get company logo
-		save_li_image(co,data['logoUrl'])
+		# check to see if locations in company profile
+		if 'locations' in data:
+			# add offices
+			for l in data['locations']['values']:
+				self.add_office(co,l)
 
-		# add offices
-		for l in data['locations']['values']:
-			self.add_office(co,l)
+		return co
+
+	def get_industry(self,name,code):
+		try:
+			industry = Industry.objects.get(Q(name=name) | Q(li_code=code))
+		except:
+			# no such industry, return None
+			return None
+		# return industry object
+		return industry
 
 	def save_li_image(self,co,img_url):
 		# self.stdout.write("Adding image for " + entity.name().encode('utf8','ignore') + "\n")
 		# img_url = "http://www.crunchbase.com/" + url
 		# img_filename = urlparse(img_url).path.split('/')[-1]
 		img = None
-		img_ext = urlparse.urlparse(url).path.split('/')[-1].split('.')[1]
+		img_ext = urlparse.urlparse(img_url).path.split('/')[-1].split('.')[1]
 		img_filename = co.name + "." + img_ext
 		try:
 			img = urllib2.urlopen(img_url)
@@ -283,54 +343,93 @@ class Command(BaseCommand):
 
 	def add_office(self,co,office):
 		o = Office()
-		o.description = office['description']
-		o.is_hq = office['is-headquarters']
-		o.addr_1 = office['address']['street1']
-		o.addr_2 = office['address']['street2']
-		o.city = office['address']['city']
-		o.state_code = office['address']['state']
-		o.postal_code = office['address']['postal-code']
-		o.country_code = office['address']['country-code']
+		officeValues = {'description':'description','is-hq':'is-headquarters'}
+		# check to see if there is a description for the office
+		if 'description' in office:
+			o.description = office['description']
+		# check to see if the office has an headquarters value
+		if 'is-headquarters' in office:
+			o.is_hq = office['is-headquarters']
+		
+		addressValues = {'addr_1':'street1','addr_2':'street2','city':'city','state_code':'state','postal_code':'postal-code','country_code':'country-code'}
+		# check to see if there is an address value
+		if 'address' in office:
+			for k,v in addressValues.iteritems(): 
+				if v in office['address']:
+					o.k = office['address'][v]
+			# o.addr_1 = office['address']['street1']
+			# o.addr_2 = office['address']['street2']
+			# o.city = office['address']['city']
+			# o.state_code = office['address']['state']
+			# o.postal_code = office['address']['postal-code']
+			# o.country_code = office['address']['country-code']
+		o.entity = co
 		o.save()
 
 	def process_connections(self,user_id,acct_id):
+		# set update flag
+		update = False
 
+		# get connections
 		connections = self.get_connections(acct_id)
 
 		# loop through connections
 		for c in connections['values']:
+			# self.stdout.write(str(c))
+			# self.stdout.write(c['id'])
 
 			# check to see if new user
 			user = self.get_user(c['id'])
-			if user is None or (user is True and user.status == "dormant"):
-				# flag for only updating positions
-				if user:
-					update = True
-				else:
-					# add dormant user
+			if c['firstName'] == 'private' and c['lastName'] == 'private':
+				pass
+			else:
+				if user is None:
+					# # flag for only updating positions
+					# if user:
+					# 	update = True
+					# else:
+					# 	# add dormant user
+					# 	user = self.add_dormant_user(c)
+				
 					user = self.add_dormant_user(c)
-			
-				for p in c['positions']['values']:
+					# self.stdout.write(user)
+					if 'values' in c['positions']:
+						for p in c['positions']['values']:
 
-					# check to see if new company
-					co = self.get_company(p['id'])
-					if co is False:
-						# add new company
-						co = self.add_company(p['id'])
-						# if it's a new company, position must be new as well
-						self.add_position(user,co,p)
-					else:
-						# TODO update company
-						pos = self.get_position(user,co,data)
-						if update == True and pos is None:
-							self.add_position(user,co,data)
-						elif update == True:
-							self.update_position(pos,data)
-						else:
-							self.add_position(user,co,data)
+							# some LinkedIn positions do not have a company id value
+							if 'id' in p['company']:
+								# check to see if new company
+								co = self.get_company(p['company']['id'])
+								if co is None:
+									# add new company
+									co = self.add_company(p['company']['id'])
+									# if it's a new company, position must be new as well
+									self.add_position(user,co,p)
+								else:
+									# TODO update company
+									pos = self.get_position(user,co,p)
+									if update == True and pos is None:
+										self.add_position(user,co,p)
+									elif update == True:
+										self.update_position(pos,p)
+									else:
+										self.add_position(user,co,p)
+
+	def mark_as_scanning(self,acct_id):
+		self.acct.scanning_now = True
+		self.acct.save()
+
+	def record_scan(self,acct_id):
+		acct = Account.objects.get(pk=acct_id)
+		acct.last_scanned = datetime.now()
+		acct.scanning_now = False
+		acct.save()
 
 	def handle(self,*args, **options):
 		# assign global variables
-		acct_id = options['acct_id']
+		self.acct_id = options['acct_id']
+		self.acct = Account.objects.get(pk=self.acct_id)
 		# run main process
-		self.process_connections(user=options['user_id'],acct=options["acct_id"])
+		self.mark_as_scanning(options['acct_id'])
+		self.process_connections(options['user_id'],options["acct_id"])
+		self.record_scan(options['acct_id'])
