@@ -9,7 +9,7 @@ body {
 div#splash-home {
 	background-color: rgb(41,98,162);
 	margin:0;
-	padding: 10px 0 10px 0; 
+	padding: 20px 0 30px 0; 
 }
 
 div.splash-container {
@@ -23,19 +23,23 @@ p.splash-message-header {
 	line-height: 1.8em;
 }
 
-p.splash-message {
+a.splash-message, p.splash-message {
 	color:#ddd;
 	font-size: 1.1em;
 	line-height: 1.4em;
 }
 
+a.splash-message:hover {
+	color:#fff;
+}
+
 p.promo-message-header {
 	font-weight: bold;
-	font-size: 1.1em;
+	font-size: 1.2em;
 }
 
 p.promo-message {
-	
+
 }
 
 div#promo-message-container {
@@ -153,4 +157,10 @@ div.message p {
 }
 .message a {
 
+}
+
+/* Modifiers */
+
+.left-spacer {
+	margin-left:15px;
 }
