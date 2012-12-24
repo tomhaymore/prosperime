@@ -4,7 +4,7 @@ import cgi
 from datetime import datetime, timedelta
 
 # from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, logout, login as auth_login
+from django.contrib.auth import authenticate, logout as auth_logout, login as auth_login
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
@@ -15,6 +15,7 @@ from django.contrib.auth.models import User
 from django.utils import simplejson
 from accounts.forms import FinishAuthForm, AuthForm
 from django.core.management import call_command
+from linkedin_lib import user_already_registered_li
 
 linkedin_key = '8yb72i9g4zhm'
 linkedin_secret = 'rp6ac7dUxsvJjQpS'
@@ -36,8 +37,9 @@ def login(request):
 
 	return render_to_response('accounts/login.html',{'form':form},context_instance=RequestContext(request))
 
+@login_required
 def logout(request):
-	logout(request)
+	auth_logout(request)
 	return HttpResponseRedirect('/')
 
 def linkedin_authorize(request):
@@ -67,11 +69,11 @@ def linkedin_authorize(request):
 	# parse out request token
 
 	request.session['request_token'] = dict(cgi.parse_qsl(content))
-	print request.session['request_token']
+	# print request.session['request_token']
 
 	url = "%s?oauth_token=%s" % (authorize_url, request.session['request_token']['oauth_token'], )
 
-	print url
+	# print url
 
 	return HttpResponseRedirect(url)
   
@@ -94,7 +96,7 @@ def linkedin_authenticate(request):
 
 	access_token = dict(cgi.parse_qsl(content))
 	
-	print access_token
+	# print access_token
 	
 	fields = "(headline,id,firstName,lastName)"
 
@@ -111,21 +113,44 @@ def linkedin_authenticate(request):
 
 	# linkedin_user_info = dict(cgi.parse_qsl(content))
 	linkedin_user_info = simplejson.loads(content)
-	print linkedin_user_info
+	# print linkedin_user_info
+	# check to see if user already registered (maybe went through registration process again by mistake
 
-	# store information in a cookie
-	request.session['linkedin_user_info'] = linkedin_user_info
-	request.session['access_token'] = access_token
+	# li_user = user_already_registered_li(linkedin_user_info['id'])
+	try:
+		# login and redirect to search page
+		print linkedin_user_info['id']
+		user = authenticate(acct_id=linkedin_user_info['id'])
+		print user
+		if user is not None:
+			auth_login(request,user)
+			return HttpResponseRedirect('/')
+	except:
+		# store information in a cookie
+		request.session['linkedin_user_info'] = linkedin_user_info
+		request.session['access_token'] = access_token
 
-	return HttpResponseRedirect('/account/finish')
+		# print request.session['linkedin_user_info']
+
+		return HttpResponseRedirect('/account/finish')
+	
+
+	
 
 # def linkedin_login(request):
 
 
 def finish_login(request):
 	# TODO: redirect if not not authenticated through LinkedIn already
-	if request.POST:
+	# print request.session['access_token']
+	# print request.session['linkedin_user_info']
 	
+	if request.POST:
+		
+		# print request.session['access_token']
+		# print request.session['linkedin_user_info']
+		linkedin_user_info = request.session['linkedin_user_info']
+		access_token = request.session['access_token']
 		# form submitted
 
 		form = FinishAuthForm(request.POST)
@@ -140,23 +165,32 @@ def finish_login(request):
 			user.save()
 
 			# log user in
-			auth_login(request,user)
+			user = authenticate(username=username,password=password)
+			# make sure authentication worked
+			if user is not None:
+				auth_login(request,user)
+			else:
+				# somehow authentication failed, redirect with error message
+				error_message = "Something went wrong. Please try again."
+				return render_to_response('accounts/finish_login.html',{'form':form,'error_message':error_message},context_instance=RequestContext(request))
+
 
 			# update user profile
 			# user.profile.full_name = request.session['linkedin_user_info']['firstName'] + " " + request.session['linkedin_user_info']['lastName']
-			user.profile.first_name = request.session['linkedin_user_info']['firstName']
-			user.profile.last_name = request.session['linkedin_user_info']['lastName']
-			user.profile.headline = request.session['linkedin_user_info']['headline']
+			
+			user.profile.first_name = linkedin_user_info['firstName']
+			user.profile.last_name = linkedin_user_info['lastName']
+			user.profile.headline = linkedin_user_info['headline']
 			user.profile.save()
 
 			# create LinkedIn account
 			acct = Account()
 			acct.owner = user
-			acct.access_token = request.session['access_token']['oauth_token']
-			acct.token_secret = request.session['access_token']['oauth_token_secret']
+			acct.access_token = access_token['oauth_token']
+			acct.token_secret = access_token['oauth_token_secret']
 			acct.service = 'linkedin'
-			acct.expires_on = datetime.now() + timedelta(seconds=int(request.session['access_token']['oauth_authorization_expires_in']))
-			acct.uniq_id = request.session['linkedin_user_info']['id']
+			acct.expires_on = datetime.now() + timedelta(seconds=int(access_token['oauth_authorization_expires_in']))
+			acct.uniq_id = linkedin_user_info['id']
 			acct.save()
 
 			# start processing connections

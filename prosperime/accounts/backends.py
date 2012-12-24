@@ -1,5 +1,22 @@
 from django.conf import settings
 from django.contrib.auth.models import User
+from accounts.models import Account
+
+class LinkedinBackend:
+
+    def authenticate(self,acct_id=None):
+        try:
+            return User.objects.get(account__uniq_id=acct_id)
+            # acct = Account.objects.get(service="linkedin",uniq_id=acct_id)
+        except:
+            return None
+        # return acct.owner
+
+    def get_user(self, user_id):
+        try:
+            return User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return None
 
 class EmailOrUsernameModelBackend(object):
     def authenticate(self, username=None, password=None):
