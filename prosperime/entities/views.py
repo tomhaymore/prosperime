@@ -21,7 +21,7 @@ from django.utils import simplejson
 def home(request):
 	if request.user.is_authenticated():
 		# user is logged in, display personalized information
-		pass
+		return HttpResponseRedirect('search')
 	data = {}
 	return render_to_response('home.html',data,context_instance=RequestContext(request))
 
