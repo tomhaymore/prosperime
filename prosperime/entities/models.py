@@ -59,7 +59,7 @@ class Image(models.Model):
 
 class Position(models.Model):
 	entity = models.ForeignKey(Entity)
-	person = models.ForeignKey(User)
+	person = models.ForeignKey(User,related_name="positions")
 	title = models.CharField(max_length=150,null=True)
 	summary = models.CharField(max_length=450,null=True)
 	description = models.TextField(null=True)
