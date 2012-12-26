@@ -366,6 +366,16 @@ class Command(BaseCommand):
 		o.entity = co
 		o.save()
 
+	def add_connection(self,user1,user2):
+		"""
+		Adds connections between users
+		"""
+		cxn = connection
+		cxn.person1 = user1
+		cxn.person2 = user2
+		cxn.service = "linkedin"
+		cxn.save()
+
 	def process_connections(self,user_id,acct_id):
 		# set update flag
 		update = False
@@ -380,6 +390,7 @@ class Command(BaseCommand):
 
 			# check to see if new user
 			user = self.get_user(c['id'])
+			# check to see if privacy settings prohibit getting any useful information
 			if c['firstName'] == 'private' and c['lastName'] == 'private':
 				pass
 			else:
@@ -392,6 +403,7 @@ class Command(BaseCommand):
 					# 	user = self.add_dormant_user(c)
 				
 					user = self.add_dormant_user(c)
+					self.add_connection(self.focal_user,user)
 					# self.stdout.write(user)
 					if 'values' in c['positions']:
 						for p in c['positions']['values']:
@@ -414,6 +426,8 @@ class Command(BaseCommand):
 										self.update_position(pos,p)
 									else:
 										self.add_position(user,co,p)
+				else:
+					self.add_connection(self.focal_user,user)
 
 	def mark_as_scanning(self,acct_id):
 		self.acct.scanning_now = True
@@ -429,6 +443,7 @@ class Command(BaseCommand):
 		# assign global variables
 		self.acct_id = options['acct_id']
 		self.acct = Account.objects.get(pk=self.acct_id)
+		self.focal_user = User.objects.get(options['user_id'])
 		# run main process
 		self.mark_as_scanning(options['acct_id'])
 		self.process_connections(options['user_id'],options["acct_id"])

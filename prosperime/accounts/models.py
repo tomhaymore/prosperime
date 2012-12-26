@@ -13,7 +13,7 @@ class Profile(models.Model):
     middle_name = models.CharField(max_length=150,null=True)
     last_name = models.CharField(max_length=150,null=True)
     headline = models.TextField(null=True)
-    connections = models.ManyToManyField(User)
+    connections = models.ManyToManyField('self',through="Connection")
     status = models.CharField(max_length=15,default="active")
 
     def full_name(self):
@@ -36,6 +36,13 @@ class Account(models.Model):
     # returns name
     def __unicode__(self):
         return self.service
+
+class Connection(models.Model):
+    person1 = models.ForeignKey(Profile)
+    person2 = models.ForeignKey(Profile)
+    linked_on = models.DateTimeField(auto_now_add=True,null=True)
+    service = models.CharField(max_length=45)
+    status = models.CharField(max_length=15,default="active")
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
