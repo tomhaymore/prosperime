@@ -11,7 +11,7 @@ from django.template import RequestContext
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from entities.models import Entity, Office, Financing, Industry
+from entities.models import Entity, Office, Financing, Industry, Position
 from django.db.models import Count, Q
 from django.utils import simplejson
 # from django.core import serializers
@@ -57,7 +57,7 @@ def companies(request):
 		companies = companies.filter(domain__in=sectorsSelected)
 	if sizesSelected:
 		# get dictionary of size ranges
-		rgs = getSizeFilter(sizesSelected)
+		rgs = _get_size_filter(sizesSelected)
 		# print rgs
 		# setup complex query using size dict
 		c = 0
@@ -106,7 +106,7 @@ def filters(request):
 		print locationsFiltered.query
 	if sizesSelected:
 		# get dictionary of size ranges
-		rgs = getSizeFilter(sizesSelected)
+		rgs = _get_size_filter(sizesSelected)
 		# print rgs
 		# setup complex query using size dict
 		c = 0
@@ -166,7 +166,7 @@ def filters(request):
 		sectorsFiltered = sectorsFiltered.filter(financing__round__in=stagesSelected)
 	if sizesSelected:
 		# get dictionary of size ranges
-		rgs = getSizeFilter(sizesSelected)
+		rgs = _get_size_filter(sizesSelected)
 		# print rgs
 		# setup complex query using size dict
 		c = 0
@@ -223,9 +223,42 @@ def filters(request):
 	# render response
 	return HttpResponse(simplejson.dumps(filters), mimetype="application/json")
 
-def getSizeFilter(sizes):
+def paths(request):
+	# initialize array of paths
+	paths = []
+
+	# fetch all users
+	# TODO someway to order this to retrieve those most relevant
+	users = User.objects.filter(status='active')[:20]
+
+	# get all of the users connections
+	# cxns = Connections.objects.values('id').filter(Q(person1=user) | Q(person2=user)).distinct()
+
+	# loop through all positions, identify those that belong to connections
+	for u in users:
+		# check if position held by 
+		if request.user in u.profile.connections:
+			connected = True
+			name = u.profile.full_name()
+			current_position = _get_latest_position(u)
+			if current_position is not None:
+				positions = _get_positions_for_path(u.positions)
+			
+		else:
+			connected = False
+			name = None
+			current_position = _get_latest_position(u,anon=True)
+			positions = _get_positions_for_path(u.positions,anon=True)
+			# need to convert positions to anonymous
+
+		paths.append({'full_name':name,'current_position':current_position,'positions':positions,'connected':connected})
+
+
+	return HttpResponse(simplejson.dumps(paths), mimetype="application/json")
+
+def _get_size_filter(sizes):
 	# dictionary of ranges
-	baseList = {
+	base_list = {
 		'a':'1-10',
 		'b':'11-25',
 		'c':'26-50',
@@ -235,15 +268,66 @@ def getSizeFilter(sizes):
 		'g':'501+'
 	}
 	# initialize list for holding dicts of upper and lower boundaries
-	sizeBoundaries = []
+	size_boundaries = []
 	# iterate through base dictionary, for any match from filters add range to result dict
-	for k,v in baseList.iteritems():
+	for k,v in base_list.iteritems():
 		if k in sizes:
 			rg = v.split('-')
-			sizeBoundaries.append({'lower':rg[0],'upper':rg[1]})
-	return sizeBoundaries
+			size_boundaries.append({'lower':rg[0],'upper':rg[1]})
+	return size_boundaries
 	
 	
+def _get_latest_position(user,anon=False):
+	"""
+	Returns string with position title and company of most recent (and current) position, not the users headline or summary
+	"""
+	# grab most recent position, ordered by start date and is current
+	latest_position = Positions.objects.filter(person=user,current=True).order_by('-start_date')[0]
+	# make sure there is a latest position
+	if latest_position:
+		# if anonymous, filter and return
+		if anon:
+			# get domain of company
+			domains = latest_position.entity.domains.all()
+			if domains:
+				co = domains[0].name + " company"
+			else:
+				co = None
+			return latest_position.title + " " + co
+		# not anonymous, return full title and company name
+		return latest_position.title + " at " + latest_position.entity.name
+	# no matches, return None
+	return None
 
+def _get_positions_for_path(positions,anon=False):
+	"""
+	Returns JSON format of all user positions, with possible anonymity
+	"""
+	# # get positions for user
+	# positions = Positions.objects.filter(person=user),order_by('-start_date').values('title','summary','start_date','end_date','entity__name')
+	# check positions
+	if positions:
+		# initialize new array
+		formatted_positions = []
+		# loop through each position
+		for p in positions:
+			# get first industry domain of company
+			domains = p.entity.domains.all()
+			if domains:
+				domain = domains[0].name + " company"
+			attribs = {
+				'domain':domain,
+				'start_date':p.start_date,
+				'end_date':p.end_date,
+				'duration':start_date.year - end_dat.year
+			}
+			formatted_positions.append(attribs)
+			# check to see if anonymous
+			if anon:
+				attribs['co_name'] = domain + " company",
+			else:
+				attribs['co_name'] = p.entity.name
+		return formatted_positions
+	# if no positions, return None
+	return None
 
-	
