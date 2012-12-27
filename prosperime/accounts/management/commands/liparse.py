@@ -12,7 +12,7 @@ import urlparse
 from django.utils import simplejson
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
-from accounts.models import Account, Profile
+from accounts.models import Account, Profile, Connection
 from entities.models import Position, Entity, Image, Industry, Office
 from django.core.files import File
 
@@ -250,6 +250,7 @@ class Command(BaseCommand):
 
 		# add to database
 		co = Entity()
+		co.name = data['name']
 		co.type = 'organization'
 		co.li_uniq_id = id
 		# coValues = {'li_univ_name':'universalName','li_type':''}
