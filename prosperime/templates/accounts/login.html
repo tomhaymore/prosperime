@@ -7,6 +7,9 @@
 {% block content %}
 <div class="span11 offset1">
 <h3>Couldn't stay away?</h3>
+{% if msg %}
+<p class="message_error">{{ msg }}</p>
+{% endif %}
 <p>Enter the information below to log in.</p>
 <form action="" method="post" name="login">
 	{% csrf_token %}

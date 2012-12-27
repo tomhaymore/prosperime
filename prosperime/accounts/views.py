@@ -21,10 +21,14 @@ linkedin_key = '8yb72i9g4zhm'
 linkedin_secret = 'rp6ac7dUxsvJjQpS'
 
 def login(request):
+	# initiate message variable
+	msg = ''
+	# print request.session['_auth_user_backend']
 	if request.user.is_authenticated():
 		return HttpResponseRedirect('/')
 	if request.method == "POST":
-		
+		# make sure using proper authentication backend
+		request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
 		form = AuthForm(request.POST)
 
 		if form.is_valid():
@@ -32,10 +36,12 @@ def login(request):
 			if user is not None:
 				auth_login(request,user)
 				return HttpResponseRedirect('/')
+			else:
+				msg = "For some reason, we can't find you"
 	else:
 		form = AuthForm()
 
-	return render_to_response('accounts/login.html',{'form':form},context_instance=RequestContext(request))
+	return render_to_response('accounts/login.html',{'form':form,'msg':msg},context_instance=RequestContext(request))
 
 @login_required
 def logout(request):
@@ -164,6 +170,8 @@ def finish_login(request):
 			user = User.objects.create_user(username,email,password)
 			user.save()
 
+			# make sure using right backend
+			request.session['_auth_user_backend'] = 'prosperime.accounts.backends.LinkedinBackend'
 			# log user in
 			user = authenticate(username=username,password=password)
 			# make sure authentication worked
