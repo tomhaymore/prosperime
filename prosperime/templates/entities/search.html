@@ -8,6 +8,11 @@
 	<div class="message">
 		<p class="message">Use the search filters below to refine your search results. You can save any search for easy reference later. You can also review any saved searches in <a href="/account">your profile</a>.</p>
 	</div>
+	{% if msg %}
+		<div class="message">
+			{{ msg }}
+		</div>
+	{% endif %}
 {% endblock %}
 
 {% block sidebar %}
@@ -77,6 +82,10 @@ I'm sorry, the Internets ate our database.
 	{% endif %}
 
 </div>
+
+<div class="rounded">
+<a class="btn btn-primary left-spacer" href="/account/authorize">Authorize</a>
+	</div>
 
 {% endblock %}
 
