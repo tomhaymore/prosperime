@@ -123,28 +123,48 @@ def linkedin_authenticate(request):
 	# check to see if user already registered (maybe went through registration process again by mistake
 
 	# li_user = user_already_registered_li(linkedin_user_info['id'])
-	try:
+	# try:
 		# login and redirect to search page
-		print linkedin_user_info['id']
-		user = authenticate(acct_id=linkedin_user_info['id'])
-		print user
-		if user is not None:
-			auth_login(request,user)
-			return HttpResponseRedirect('/')
-	except:
+		# print linkedin_user_info['id']
+	request.session['_auth_user_backend'] = 'prosperime.accounts.backends.LinkedinBackend'
+	user = authenticate(acct_id=linkedin_user_info['id'])
+	
+	if user is not None:
+		auth_login(request,user)
+		return HttpResponseRedirect('/')
+	else:
+	# except:
 		# store information in a cookie
 		request.session['linkedin_user_info'] = linkedin_user_info
 		request.session['access_token'] = access_token
 
 		# print request.session['linkedin_user_info']
-
+	# check to see if user is currently logged in
+	if request.user.is_authenticated():
+		# if loged in, link accounts and return
+		return HttpResponseRedirect('/account/link')
+	else:
+		# if not logged in, ask to finish user registration process
 		return HttpResponseRedirect('/account/finish')
-	
 
-	
+def finish_link(request):
+	# get info for creating an account
+	linkedin_user_info = request.session['linkedin_user_info']
+	access_token = request.session['access_token']
 
-# def linkedin_login(request):
+	# create LinkedIn account
+	acct = Account()
+	acct.owner = request.user
+	acct.access_token = access_token['oauth_token']
+	acct.token_secret = access_token['oauth_token_secret']
+	acct.service = 'linkedin'
+	acct.expires_on = datetime.now() + timedelta(seconds=int(access_token['oauth_authorization_expires_in']))
+	acct.uniq_id = linkedin_user_info['id']
+	acct.save()
 
+	request.session['msg'] = "Your LinkedIn account has been successfully linked."
+
+	return HttpResponseRedirect('/search')
 
 def finish_login(request):
 	# TODO: redirect if not not authenticated through LinkedIn already
