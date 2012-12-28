@@ -139,7 +139,7 @@ class Command(BaseCommand):
 		if 'headline' in user_info:
 			user.profile.headline = user_info['headline']		
 		user.profile.status = "dormant"
-		user.save()
+		user.profile.save()
 
 		# create LinkedIn account
 		acct = Account()
@@ -388,6 +388,12 @@ class Command(BaseCommand):
 		cxn = Connection()
 		cxn.person1 = user1.profile
 		cxn.person2 = user2.profile
+		cxn.service = "linkedin"
+		cxn.save()
+
+		cxn = Connection()
+		cxn.person1 = user2.profile
+		cxn.person2 = user1.profile
 		cxn.service = "linkedin"
 		cxn.save()
 
