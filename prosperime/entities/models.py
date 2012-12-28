@@ -69,7 +69,26 @@ class Position(models.Model):
 	status = models.CharField(max_length=15,default="active")
 
 	def __unicode__(self):
-		return self.title + " at " + self.entity.name
+		if self.title is not None:
+			return self.title + " at " + self.entity.name
+		elif self.summary is not None:
+			return self.summary + " at " + self.entity.name
+		else:
+			return "unnamed position at " + self.entity.name
+
+	def safe_title(self):
+		if self.title is not None:
+			return self.title
+		elif self.summary is not None:
+			return self.summary
+		else:
+			return "unnamed position"
+
+	def duration(self):
+		if self.start_date is not None and self.end_date is not None:
+			return self.start_date.year - self.end_date.year
+		else:
+			return None
 
 # class Relationship(models.Model):
 # 	entity1 = models.ForeignKey(Entity,related_name="entity1")
