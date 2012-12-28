@@ -13,7 +13,7 @@ class Profile(models.Model):
     middle_name = models.CharField(max_length=150,null=True)
     last_name = models.CharField(max_length=150,null=True)
     headline = models.TextField(null=True)
-    connections = models.ManyToManyField('self',through="Connection",symmetrical=False)
+    connections = models.ManyToManyField('self',through="Connection",symmetrical=False,related_name="connections+")
     status = models.CharField(max_length=15,default="active")
 
     def full_name(self):
