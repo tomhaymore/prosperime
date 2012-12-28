@@ -236,7 +236,7 @@ def paths(request):
 
 	# fetch all users
 	# TODO someway to order this to retrieve those most relevant
-	users = User.objects.filter(profile__status='active')[:20]
+	users = User.objects.exclude(pk=request.user.id)[:20]
 
 	# get all of the users connections
 	# cxns = Connections.objects.values('id').filter(Q(person1=user) | Q(person2=user)).distinct()
@@ -244,7 +244,7 @@ def paths(request):
 	# loop through all positions, identify those that belong to connections
 	for u in users:
 		# check if position held by 
-		if request.user in u.profile.connections.all():
+		if request.user.profile in u.profile.connections.all():
 			connected = True
 			name = u.profile.full_name()
 			current_position = _get_latest_position(u)
@@ -302,7 +302,7 @@ def _get_latest_position(user,anon=False):
 				co = None
 			return latest_position[0].safe_title() + " " + co
 		# not anonymous, return full title and company name
-		return latest_position[0].safe_title() + " at " + latest_position.entity.name
+		return latest_position[0].safe_title() + " at " + latest_position[0].entity.name
 	# no matches, return None
 	return None
 
@@ -325,7 +325,8 @@ def _get_positions_for_path(positions,anon=False):
 				domain = domains[0].name + " company"
 			attribs = {
 				'domain':domain,
-				'duration':p.duration()
+				'duration':p.duration(),
+				'title':p.title
 			}
 			if p.start_date is not None:
 				attribs['start_date'] = p.start_date.strftime("%m/%Y")
