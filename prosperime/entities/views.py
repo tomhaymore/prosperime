@@ -30,9 +30,11 @@ def search(request):
 	# test if user is authenticated
 	# show what?
 	data = {}
+	if 'msg' in request.session:
+		data['msg'] = request.session['msg']
 	if request.user.is_authenticated():
 		data['user'] = request.user
-	return render_to_response('entities/search.html',
+	return render_to_response('entities/search.html',data,
 		context_instance=RequestContext(request))
 
 def companies(request):
@@ -49,7 +51,11 @@ def companies(request):
 	sizesSelected = request.GET.getlist('size')
 	stagesSelected = request.GET.getlist('stage')
 
-	companies = Entity.objects.values("name","summary","image__logo").filter(cb_type="company").annotate(freq=Count('financing__pk')).order_by('-freq')
+	print locationsSelected
+
+	companies = Entity.objects.values("name","summary","image__logo").filter(type="organization").annotate(freq=Count('financing__pk')).order_by('-freq')
+
+	# companies = Entity.objects.values("name","summary")
 
 	if locationsSelected:
 		companies = companies.filter(office__city__in=locationsSelected)
@@ -73,6 +79,7 @@ def companies(request):
 		companies = companies.filter(financing__round__in=stagesSelected)
 
 	# companies =  list(Entity.objects.filter(cb_type="company").values("full_name","summary","logo")[:20])
+	print companies.query
 	companies = list(companies[:20])
 	return HttpResponse(simplejson.dumps(companies), mimetype="application/json")
 
@@ -103,7 +110,7 @@ def filters(request):
 		# print locationsFiltered.query
 	if sectorsSelected:
 		locationsFiltered = locationsFiltered.filter(entity__domains__name__in=sectorsSelected,)
-		print locationsFiltered.query
+		# print locationsFiltered.query
 	if sizesSelected:
 		# get dictionary of size ranges
 		rgs = _get_size_filter(sizesSelected)
@@ -126,7 +133,7 @@ def filters(request):
 	# print locations
 
 	locationsBase = locationsBase[:10]
-	print locationsBase.query
+	# print locationsBase.query
 	
 
 	locationsFilteredDict = {}
@@ -161,7 +168,7 @@ def filters(request):
 		# sectorsFiltered = sectorsFiltered.filter(entity__office__city__in=locationsSelected)
 		entitiesFilteredByLoaction = Entity.objects.filter(office__city__in=locationsSelected)
 		sectorsFiltered = sectorsFiltered.filter(entity__in=entitiesFilteredByLoaction)
-		print sectorsFiltered.query
+		# print sectorsFiltered.query
 	if stagesSelected:
 		sectorsFiltered = sectorsFiltered.filter(financing__round__in=stagesSelected)
 	if sizesSelected:
@@ -229,7 +236,7 @@ def paths(request):
 
 	# fetch all users
 	# TODO someway to order this to retrieve those most relevant
-	users = User.objects.filter(status='active')[:20]
+	users = User.objects.filter(profile__status='active')[:20]
 
 	# get all of the users connections
 	# cxns = Connections.objects.values('id').filter(Q(person1=user) | Q(person2=user)).distinct()
@@ -237,18 +244,18 @@ def paths(request):
 	# loop through all positions, identify those that belong to connections
 	for u in users:
 		# check if position held by 
-		if request.user in u.profile.connections:
+		if request.user in u.profile.connections.all():
 			connected = True
 			name = u.profile.full_name()
 			current_position = _get_latest_position(u)
 			if current_position is not None:
-				positions = _get_positions_for_path(u.positions)
+				positions = _get_positions_for_path(u.positions.all())
 			
 		else:
 			connected = False
 			name = None
 			current_position = _get_latest_position(u,anon=True)
-			positions = _get_positions_for_path(u.positions,anon=True)
+			positions = _get_positions_for_path(u.positions.all(),anon=True)
 			# need to convert positions to anonymous
 
 		paths.append({'full_name':name,'current_position':current_position,'positions':positions,'connected':connected})
@@ -282,20 +289,20 @@ def _get_latest_position(user,anon=False):
 	Returns string with position title and company of most recent (and current) position, not the users headline or summary
 	"""
 	# grab most recent position, ordered by start date and is current
-	latest_position = Positions.objects.filter(person=user,current=True).order_by('-start_date')[0]
+	latest_position = Position.objects.filter(person=user,current=True).order_by('-start_date')
 	# make sure there is a latest position
-	if latest_position:
+	if latest_position.exists():
 		# if anonymous, filter and return
 		if anon:
 			# get domain of company
-			domains = latest_position.entity.domains.all()
+			domains = latest_position[0].entity.domains.all()
 			if domains:
 				co = domains[0].name + " company"
 			else:
 				co = None
-			return latest_position.title + " " + co
+			return latest_position[0].safe_title() + " " + co
 		# not anonymous, return full title and company name
-		return latest_position.title + " at " + latest_position.entity.name
+		return latest_position[0].safe_title() + " at " + latest_position.entity.name
 	# no matches, return None
 	return None
 
@@ -311,16 +318,19 @@ def _get_positions_for_path(positions,anon=False):
 		formatted_positions = []
 		# loop through each position
 		for p in positions:
+			# print p.id
 			# get first industry domain of company
 			domains = p.entity.domains.all()
 			if domains:
 				domain = domains[0].name + " company"
 			attribs = {
 				'domain':domain,
-				'start_date':p.start_date,
-				'end_date':p.end_date,
-				'duration':start_date.year - end_dat.year
+				'duration':p.duration()
 			}
+			if p.start_date is not None:
+				attribs['start_date'] = p.start_date.strftime("%m/%Y")
+			if p.end_date is not None:
+				attribs['end_date'] = p.end_date.strftime("%m/%Y")
 			formatted_positions.append(attribs)
 			# check to see if anonymous
 			if anon:
