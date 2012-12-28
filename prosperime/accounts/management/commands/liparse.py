@@ -21,8 +21,8 @@ linkedin_key = '8yb72i9g4zhm'
 linkedin_secret = 'rp6ac7dUxsvJjQpS'
 
 # fields from connections API
-fields = "(id,headline,firstName,lastName,positions:(start-date,end-date,title,is-current,description,company:(id)))"
-co_fields = "(id,name,universal-name,company-type,ticker,website-url,industries,status,logo-url,blog-rss-url,twitter-id,employee-count-range,locations:(description,address:(postal-code)),description,stock-exchange)"
+fields = "(id,headline,firstName,lastName,positions:(start-date,end-date,title,is-current,summary,company:(id)))"
+co_fields = "(id,name,universal-name,company-type,ticker,website-url,industries,status,logo-url,blog-rss-url,twitter-id,employee-count-range,locations:(description,address:(street1,street2,city,state,country-code,postal-code)),description,stock-exchange)"
 
 
 
@@ -152,18 +152,18 @@ class Command(BaseCommand):
 		return user
 
 
-	def get_user(self,user_id):
+	def get_user(self,acct_id):
 		try:
-			user = Account.objects.get(uniq_id=user_id,service="linkedin")
+			acct = Account.objects.get(uniq_id=acct_id,service="linkedin")
 		except:
 			# if user does not exist, return None
 			return None
 		# if user exists return user
-		return user
+		return acct.owner
 
 	def add_position(self,user,co,data):
 		# dectionary of values to test for and then add if present
-		positionValues = {'title':'title','description':'summary','current':'is_current'}
+		positionValues = {'title':'title','description':'summary','current':'isCurrent'}
 		
 		pos = Position()
 		pos.entity = co
@@ -171,7 +171,7 @@ class Command(BaseCommand):
 
 		for k,v in positionValues.iteritems():
 			if v in data:
-				pos.k = v
+				setattr(pos,k,data[v])
 		
 			# pos.title = data['title']
 			# pos.summary = data['headline']
@@ -181,12 +181,20 @@ class Command(BaseCommand):
 			# pos.current = data['is-current']
 		
 		# check for start date
-		if 'start-date' in data:
-			start_date = datetime.strptime(str(data['start-date']['month'])+"/"+str(data['start-date']['year']),"%m/%Y")
+		if 'startDate' in data:
+			# check for month value
+			if 'month' in data['startDate']:
+				start_date = datetime.strptime(str(data['startDate']['month'])+"/"+str(data['startDate']['year']),"%m/%Y")
+			else:
+				start_date = datetime.strptime(str(data['startDate']['year']),"%Y")
 			pos.start_date = start_date
 		# check for end date
-		if 'end-date' in data:
-			end_date = datetime.strptime(str(data['end-date']['month'])+"/"+str(data['end-date']['year']),"%m/%Y")
+		if 'endDate' in data:
+			# check for month value
+			if 'month' in data['endDate']:
+				end_date = datetime.strptime(str(data['endDate']['month'])+"/"+str(data['endDate']['year']),"%m/%Y")
+			else:
+				end_date = datetime.strptime(str(data['endDate']['year']),"%Y")
 			pos.end_date = end_date
 		pos.save()
 
@@ -241,13 +249,18 @@ class Command(BaseCommand):
 		content = simplejson.loads(content)
 
 		print content
-
+		
+		if 'errorCode' in content:
+			return None
 		return content
 
 	def add_company(self,id):
 		# get company profile from LinkedIn
 		data = self.get_co_li_profile(id)
-
+		# if nothing returned from LI, return None
+		if data is None:
+			return None
+		
 		# add to database
 		co = Entity()
 		co.name = data['name']
@@ -260,7 +273,7 @@ class Command(BaseCommand):
 			co.li_type = data['companyType']['code']
 		if 'ticker' in data:
 			co.ticker = data['ticker']
-		if 'websuteUrl' in data:
+		if 'website-urlteUrl' in data:
 			co.web_url = data['websiteUrl']
 		# co.domain = data['industries']
 		# co.li_status = data['status']
@@ -352,12 +365,13 @@ class Command(BaseCommand):
 		if 'is-headquarters' in office:
 			o.is_hq = office['is-headquarters']
 		
-		addressValues = {'addr_1':'street1','addr_2':'street2','city':'city','state_code':'state','postal_code':'postal-code','country_code':'country-code'}
+		addressValues = {'addr_1':'street1','addr_2':'street2','city':'city','state_code':'state','postal_code':'postalCode','country_code':'country-code'}
 		# check to see if there is an address value
 		if 'address' in office:
 			for k,v in addressValues.iteritems(): 
 				if v in office['address']:
-					o.k = office['address'][v]
+					setattr(o,k,office['address'][v])
+					# o.k = office['address'][v]
 			# o.addr_1 = office['address']['street1']
 			# o.addr_2 = office['address']['street2']
 			# o.city = office['address']['city']
@@ -371,9 +385,9 @@ class Command(BaseCommand):
 		"""
 		Adds connections between users
 		"""
-		cxn = connection
-		cxn.person1 = user1
-		cxn.person2 = user2
+		cxn = Connection()
+		cxn.person1 = user1.profile
+		cxn.person2 = user2.profile
 		cxn.service = "linkedin"
 		cxn.save()
 
@@ -417,7 +431,8 @@ class Command(BaseCommand):
 									# add new company
 									co = self.add_company(p['company']['id'])
 									# if it's a new company, position must be new as well
-									self.add_position(user,co,p)
+									if co is not None:
+										self.add_position(user,co,p)
 								else:
 									# TODO update company
 									pos = self.get_position(user,co,p)
@@ -444,7 +459,7 @@ class Command(BaseCommand):
 		# assign global variables
 		self.acct_id = options['acct_id']
 		self.acct = Account.objects.get(pk=self.acct_id)
-		self.focal_user = User.objects.get(options['user_id'])
+		self.focal_user = User.objects.get(pk=options['user_id'])
 		# run main process
 		self.mark_as_scanning(options['acct_id'])
 		self.process_connections(options['user_id'],options["acct_id"])
