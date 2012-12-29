@@ -66,6 +66,9 @@ class Position(models.Model):
 	current = models.BooleanField(default=True)
 	start_date = models.DateField(null=True)
 	end_date = models.DateField(null=True)
+	type = models.CharField(max_length=450,null=True)
+	degree = models.CharField(max_length=450,null=True)
+	field = models.CharField(max_length=450,null=True)
 	status = models.CharField(max_length=15,default="active")
 
 	def __unicode__(self):
@@ -129,7 +132,7 @@ class Office(models.Model):
 	addr_3 = models.CharField(max_length=150,blank=True,null=True)
 	postal_code = models.CharField(max_length=45,blank=True,null=True)
 	city = models.CharField(max_length=250,blank=True,null=True)
-	state_code = models.CharField(max_length=5,blank=True,null=True)
+	state_code = models.CharField(max_length=45,blank=True,null=True)
 	country_code = models.CharField(max_length=50,blank=True,null=True)
 	latitude = models.DecimalField(decimal_places=7,max_digits=10,null=True)
 	longitude = models.DecimalField(decimal_places=7,max_digits=10,null=True)
