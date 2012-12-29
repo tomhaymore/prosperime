@@ -21,7 +21,7 @@ linkedin_key = '8yb72i9g4zhm'
 linkedin_secret = 'rp6ac7dUxsvJjQpS'
 
 # fields from connections API
-fields = "(id,headline,firstName,lastName,positions:(start-date,end-date,title,is-current,summary,company:(id)))"
+fields = "(id,headline,firstName,lastName,positions:(start-date,end-date,title,is-current,summary,company:(id)),public-profile-url)"
 co_fields = "(id,name,universal-name,company-type,ticker,website-url,industries,status,logo-url,blog-rss-url,twitter-id,employee-count-range,locations:(description,address:(street1,street2,city,state,country-code,postal-code)),description,stock-exchange)"
 
 
@@ -146,6 +146,7 @@ class Command(BaseCommand):
 		acct.owner = user
 		acct.service = 'linkedin'
 		acct.uniq_id = user_info['id']
+		acct.public_url = user_info['publicProfileUrl']
 		acct.status = "unlinked"
 		acct.save()
 
@@ -397,6 +398,49 @@ class Command(BaseCommand):
 		cxn.service = "linkedin"
 		cxn.save()
 
+	def get_entity(self,id,type="school"):
+		try:
+			entity = Entity.objects.get(li_type="school",li_uniq_id=id)
+			return entity
+		except:
+			return None
+
+	def add_institution(self,data):
+		ed = Entity()
+		ed.name = data['schoolName']
+		ed.li_uniq_id = data['id']
+		ed.type = 'organization'
+		ed.sub_type = 'ed-institution'
+		ed.li_type = 'school'
+		ed.save()
+		return ed
+
+	def add_ed_position(self,user,ed,data):
+		pos = Position()
+		pos.entity = ed
+		pos.person = user
+		pos.type = 'education'
+		pos.degree = data['degree']
+		pos.field = data['fieldOfStudy']
+		
+		# check for start date
+		if 'startDate' in data:
+			# check for month value
+			if 'month' in data['startDate']:
+				start_date = datetime.strptime(str(data['startDate']['month'])+"/"+str(data['startDate']['year']),"%m/%Y")
+			else:
+				start_date = datetime.strptime(str(data['startDate']['year']),"%Y")
+			pos.start_date = start_date
+		# check for end date
+		if 'endDate' in data:
+			# check for month value
+			if 'month' in data['endDate']:
+				end_date = datetime.strptime(str(data['endDate']['month'])+"/"+str(data['endDate']['year']),"%m/%Y")
+			else:
+				end_date = datetime.strptime(str(data['endDate']['year']),"%Y")
+			pos.end_date = end_date
+		pos.save()
+
 	def process_connections(self,user_id,acct_id):
 		# set update flag
 		update = False
@@ -426,6 +470,24 @@ class Command(BaseCommand):
 					user = self.add_dormant_user(c)
 					self.add_connection(self.focal_user,user)
 					# self.stdout.write(user)
+					# process education
+					# if 'values' in c['educations']:
+					# 	for e in c['educations']['values']:
+					# 		# check for institution id
+					# 		if 'id' in e:
+					# 			# check to see institution alreday exists
+					# 			ed = self.get_entity(e['id'])
+					# 			if ed is None:
+					# 				# add institution
+					# 				ed = self.add_institution(e)
+					# 				# add position
+					# 				if ed is not None:
+					# 					self.add_ed_positition(user,ed,e)
+					# 			else:
+					# 				# add position
+					# 				self.add_ed_position(user,ed,e)
+
+					# process positions
 					if 'values' in c['positions']:
 						for p in c['positions']['values']:
 

@@ -6,6 +6,24 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
+class Account(models.Model):
+    service = models.CharField(max_length=45)
+    owner = models.ForeignKey(User,related_name='account')
+    address = models.CharField(max_length=450,null=True)
+    access_token = models.CharField(max_length=200,null=True)
+    token_secret = models.CharField(max_length=200,null=True)
+    expires_on = models.DateTimeField(null=True)
+    linked_on = models.DateTimeField(auto_now_add=True,null=True)
+    last_scanned = models.DateTimeField(null=True)
+    scanning_now = models.BooleanField(default=False)
+    uniq_id = models.CharField(max_length=150,null=True)
+    public_url = models.URLField(max_length=450,null=True)
+    status = models.CharField(max_length=15,default="active")
+    
+    # returns name
+    def __unicode__(self):
+        return self.service
+
 class Profile(models.Model):
 
     user = models.OneToOneField(User)
@@ -20,22 +38,11 @@ class Profile(models.Model):
         full_name = self.first_name + " " + self.last_name
         return full_name
 
-class Account(models.Model):
-    service = models.CharField(max_length=45)
-    owner = models.ForeignKey(User,related_name='account')
-    address = models.CharField(max_length=450,null=True)
-    access_token = models.CharField(max_length=200,null=True)
-    token_secret = models.CharField(max_length=200,null=True)
-    expires_on = models.DateTimeField(null=True)
-    linked_on = models.DateTimeField(auto_now_add=True,null=True)
-    last_scanned = models.DateTimeField(null=True)
-    scanning_now = models.BooleanField(default=False)
-    uniq_id = models.CharField(max_length=150,null=True)
-    status = models.CharField(max_length=15,default="active")
-    
-    # returns name
-    def __unicode__(self):
-        return self.service
+    def li_linked(self):
+        accts = Account.objects.filter(owner=self.user,service="linkedin",status="active")
+        if accts.exists():
+            return True
+        return False
 
 class Connection(models.Model):
     person1 = models.ForeignKey(Profile,related_name="person1")
