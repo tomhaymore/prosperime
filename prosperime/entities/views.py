@@ -14,6 +14,7 @@ from django.contrib.auth.models import User
 from entities.models import Entity, Office, Financing, Industry, Position
 from django.db.models import Count, Q
 from django.utils import simplejson
+from django.contrib import messages
 # from django.core import serializers
 
 
@@ -29,6 +30,7 @@ def search(request):
 	
 	# test if user is authenticated
 	# show what?
+	# print request.user.li_linked()
 	data = {}
 	if 'msg' in request.session:
 		data['msg'] = request.session['msg']
@@ -250,7 +252,8 @@ def paths(request):
 			current_position = _get_latest_position(u)
 			if current_position is not None:
 				positions = _get_positions_for_path(u.positions.all())
-			
+			else:
+				positions = None
 		else:
 			connected = False
 			name = None
@@ -258,8 +261,8 @@ def paths(request):
 			positions = _get_positions_for_path(u.positions.all(),anon=True)
 			# need to convert positions to anonymous
 
-		paths.append({'full_name':name,'current_position':current_position,'positions':positions,'connected':connected})
-
+		# paths.append({'full_name':name,'current_position':current_position,'positions':positions,'connected':connected})
+		paths.append({'full_name':name,'current_position':current_position,'connected':connected})
 
 	return HttpResponse(simplejson.dumps(paths), mimetype="application/json")
 
@@ -322,7 +325,7 @@ def _get_positions_for_path(positions,anon=False):
 			# get first industry domain of company
 			domains = p.entity.domains.all()
 			if domains:
-				domain = domains[0].name + " company"
+				domain = domains[0].name
 			attribs = {
 				'domain':domain,
 				'duration':p.duration(),
