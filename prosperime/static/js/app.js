@@ -14,7 +14,15 @@ $(function(){
 
 	// Org: search result form for organizations
 
-	window.Org = Backbone.Model.extend();
+	window.Org = Backbone.Model.extend({
+
+	});
+
+	// Path: search result view for career paths
+
+	window.Path = Backbone.Model.extend({
+
+	});
 
 	// Collections
 
@@ -80,12 +88,62 @@ $(function(){
 
 	});
 
+	// Paths: collection of paths
+
+	window.Paths = Backbone.Collection.extend({
+		
+		initialize: function() {
+			// initialize array of meta data
+			this._meta = {};
+		},
+
+		model: Path,
+		url: function() {
+			if (this._meta['query'] === undefined) {
+				return '/paths';
+			} else {
+				return '/paths'+this._meta['query'];
+			}
+		},
+
+		meta: function(prop, value) {
+			if (value === undefined) {
+				// if value is empty, return property of key
+				return this._meta[prop];
+			} else {
+				// if both key and value exist, set value of key
+				this._meta[prop] = value;
+			}
+		}
+	});
+
 	// instantiate collections
 
 	window.orgs = new Orgs;
 	window.filters = new Filters;
+	window.paths = new Paths;
 
 	// Views
+
+	window.PathSingleView = Backbone.View.extend({
+
+		tagName: "li",
+
+		template:_.template($('#path-single-template').html()),
+
+		initialize: function() {
+			this.model.on('change',this.render,this);
+			
+		},
+
+		render: function() {
+			
+			var renderedContent = this.template(this.model.toJSON());
+			$(this.el).html(renderedContent);
+			return this;
+		}
+
+	});
 
 	window.OrgSingleView = Backbone.View.extend({
 
@@ -105,6 +163,34 @@ $(function(){
 			return this;
 		}
 
+	});
+
+	window.PathListView = Backbone.View.extend({
+
+		el: $('#search-results-list'),
+		tag: 'div',
+		template: _.template($('#path-list-template').html()),
+
+		initialize: function() {
+			_.bindAll(this,'render');
+			this.collection.bind('reset',this.render);
+		},
+
+		render: function() {
+			var $paths,
+				collection = this.collection;
+
+			$(this.el).html(this.template({}));
+			$paths = this.$(".path-list");
+			this.collection.each(function(path) {
+				var view = new PathSingleView({
+					model: path,
+					collection: collection
+				});
+				$paths.append(view.render().el);
+			});
+			return this;
+		}
 	});
 
 	window.OrgListView = Backbone.View.extend({
@@ -213,7 +299,7 @@ $(function(){
 			$(this.el).empty();
 			$(this.el).append(_.template($("#search-header-template").html()));
 			
-			// putll out unique list of categories
+			// pull out unique list of categories
 			categories = filters.map(function(model) { return model.get('category'); });
 			categories = _.uniq(categories);
 			for (var i = 0; i < categories.length; i++) { 
@@ -259,22 +345,27 @@ $(function(){
 		initialize: function() {
 			this.orgs = window.orgs;
 			this.filters = window.filters;
+			this.paths = window.paths;
 			this.orgsView = new OrgListView({ collection: this.orgs});
 			this.filtersView = new FilterListView({ collection: this.filters});
+			this.pathsView = new PathListView({ collection: this.paths});
 		},
 
 		home: function() {
 			console.log("stay home");
-			this.orgs.fetch();
+			// this.orgs.fetch();
 			this.filters.fetch();
+			this.paths.fetch();
 		},
 
 		emptySearch: function() {
 			console.log('empty search');
 			this.orgs.meta('query','');
 			this.filters.meta('query','');
+			this.orgs.meta('query','');
 			this.orgs.fetch();
 			this.filters.fetch();
+			this.paths.fetch();
 		},
 
 		search: function(query) {
@@ -295,7 +386,7 @@ $(function(){
 
 	});
 
-	// Custome functions
+	// Custom functions
 
 	function generateUrl(params) {
 		var fullUrl = '';

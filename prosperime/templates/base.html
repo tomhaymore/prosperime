@@ -14,7 +14,7 @@
 	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/uri.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
-	<script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>
+	 <script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/app.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
 	{% block head %} {% endblock %}
@@ -23,23 +23,22 @@
 <body>
 	<div class="navbar navbar-fixed-top">
 		<div class="navbar-inner">
-			<div class="container-fluid">
+
+			<div class="row-fluid">
 				
 					<div class="span2 offset1">
 						<a class="brand" href="/">Prosperime</a>
 					</div>
-					<div class="span4 offset4 nav-collapse">
+					<div class="span4 offset5 nav-collapse">
 						<ul class="nav">
-							<li>
+							<!-- <li>
 								<a href="/">Home</a>
-							</li>
+							</li> -->
 	                		{% if user.is_authenticated %}
 	                		<li>
-	                			<a href="/settings/">Account</a>
+	                			<a href="/settings/">{{user.profile.first_name}} {{user.profile.last_name}}</a>
 	                		</li>
-	                		<li>
-	                			<a href="/account/logout/">Logout</a>
-	                		</li>
+	                		
 	                		{% endif %}
 							<li>
 								<a href="/contact">Contact</a>
@@ -51,30 +50,33 @@
 		</div>
         
 	</div>
-   
-    <div class="container-fluid">
-        
-      <!--   <div class="row-fluid"> -->
-      		<div class="offset1 span10">
-      			{% block message %} {% endblock %}
-      		</div>
+   <div class="offset1 span10">
+	  			{% block message %} {% endblock %}
+	  		</div>
+   <div class="container-fluid">
+	    <div class="row-fluid">
+		    <div class="span10 offset1 main-container">
+				<div class="row-fluid">
+			   
+			        <div class="span3">
+			            {% block sidebar %} {% endblock %} 
+			        </div>
 
-	        <div class="span2 offset1">
-	            {% block sidebar %} {% endblock %} 
-	        </div>
-
-            <div class="span6">
-            	{% block content %}{% endblock %}
-            </div>
-	            
-            <div class="span2">
-	            {% block rightSidebar %} {% endblock %} 
-	        </div>
-	        
-	   <!--  </div> -->
-    </div>
+			        <div class="span6">
+			        	{% block content %}{% endblock %}
+			        </div>
+			            
+			        <div class="span3">
+			            {% block rightSidebar %} {% endblock %} 
+			        </div>
+		        
+				</div>
+		</div>
+		</div>
+	</div>
     
 {% block templates %}
 {% endblock %}
+
 </body>
 </html>

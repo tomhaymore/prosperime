@@ -5,14 +5,19 @@
 {% endblock %}
 
 {% block message %}
-	<div class="message">
-		<p class="message">Use the search filters below to refine your search results. You can save any search for easy reference later. You can also review any saved searches in <a href="/account">your profile</a>.</p>
-	</div>
-	{% if msg %}
-		<div class="message">
-			{{ msg }}
-		</div>
-	{% endif %}
+
+<!-- <div class="message">
+	<p class="message">Use the search filters below to refine your search results. You can save any search for easy reference later. You can also review any saved searches in <a href="/account">your profile</a>.</p>
+</div> -->
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
 {% endblock %}
 
 {% block sidebar %}
@@ -26,37 +31,7 @@
 <div id="search-results-list">
 	<!-- <p class="main-header">Search Results</p> -->
 </div>
-<!-- {% if entities %}
-	
-		{% for e in entities|slice:":20" %}
-			<div class="list-preview">
-				
-				<div class="left-list-preview">
-					{% if e.logo %}
-					<div class="img-holder">
-						<img class="logo-preview" src="{{e.logo.url}}" />&nbsp;
-					</div>
-					{% endif %}
-				</div>
-				
-				<div class="right-list-preview"
-					<span class="company-header">{{e.name}}</span><br/>
-					<strong>{{e.domain}}</strong><br/>
-					<p>{{e.summary}}</p>
-					{% if e.office_set.all %}
-						Locations:
-						{% for o in e.office_set.all %}
-							{{o.city}}{% if o.state_code %}, {{o.state_code}} {% endif %}
-						{% endfor %}
-					{% endif %}
-				</div>
-				<div class="clear"></div>
-			</div>
-		{% endfor %}
-	</div>
-{% else %}
-I'm sorry, the Internets ate our database.
-{% endif %} -->
+
 
 
 {% endblock %}
@@ -83,13 +58,32 @@ I'm sorry, the Internets ate our database.
 
 </div>
 
+{% if not user.profile.li_linked %}
+{{ user.li_linked }}
 <div class="rounded">
 <a class="btn btn-primary left-spacer" href="/account/authorize">Authorize</a>
 	</div>
+{% endif %}
 
 {% endblock %}
 
 {% block templates %}
+<script type="text/template" id="path-single-template">
+	<li class="list-preview">
+		<div class="left-list-preview">
+
+		</div>
+		<div class="right-list-preview">
+			<span class="path-header"><%= full_name %></span>
+		</div>
+	</li>
+</script>
+
+<script type="text/template" id="path-list-template">
+	<p class="main-header">Search Results</p>
+	<ul class="path-list"></ul>
+</script>
+
 <script type="text/template" id="org-single-template">
 	<li class="list-preview">			
 		<div class="left-list-preview">
