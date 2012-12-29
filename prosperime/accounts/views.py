@@ -15,14 +15,13 @@ from django.contrib.auth.models import User
 from django.utils import simplejson
 from accounts.forms import FinishAuthForm, AuthForm
 from django.core.management import call_command
-from linkedin_lib import user_already_registered_li
+from django.contrib import messages
 
 linkedin_key = '8yb72i9g4zhm'
 linkedin_secret = 'rp6ac7dUxsvJjQpS'
 
 def login(request):
-	# initiate message variable
-	msg = ''
+	
 	# print request.session['_auth_user_backend']
 	if request.user.is_authenticated():
 		return HttpResponseRedirect('/')
@@ -35,9 +34,9 @@ def login(request):
 			user = authenticate(username=form.cleaned_data['username'],password=form.cleaned_data['password'])
 			if user is not None:
 				auth_login(request,user)
+				messages.success(request, 'You have successfully logged in.')
 				return HttpResponseRedirect('/')
-			else:
-				msg = "For some reason, we can't find you"
+			
 	else:
 		form = AuthForm()
 
@@ -162,7 +161,7 @@ def finish_link(request):
 	acct.uniq_id = linkedin_user_info['id']
 	acct.save()
 
-	request.session['msg'] = "Your LinkedIn account has been successfully linked."
+	messages.success(request, 'Your LinkedIn account has been successfully linked.')
 
 	return HttpResponseRedirect('/search')
 
@@ -199,7 +198,7 @@ def finish_login(request):
 				auth_login(request,user)
 			else:
 				# somehow authentication failed, redirect with error message
-				error_message = "Something went wrong. Please try again."
+				messages.error(request, 'Something went wrong. Please try again.')
 				return render_to_response('accounts/finish_login.html',{'form':form,'error_message':error_message},context_instance=RequestContext(request))
 
 
