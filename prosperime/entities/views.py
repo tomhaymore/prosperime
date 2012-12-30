@@ -306,9 +306,13 @@ def _get_latest_position(user,anon=False):
 				co = domains[0].name + " company"
 			else:
 				co = None
-			return latest_position[0].safe_title() + " " + co
+			# return latest_position[0].safe_title() + " " + co
+			return co
 		# not anonymous, return full title and company name
-		return latest_position[0].safe_title() + " at " + latest_position[0].entity.name
+		if latest_position[0].safe_title() == "unnamed position":
+			return latest_position[0].entity.name
+		else:
+			return latest_position[0].safe_title() + " at " + latest_position[0].entity.name
 	# no matches, return None
 	return None
 
@@ -323,6 +327,9 @@ def _get_positions_for_path(positions,anon=False):
 		# initialize new array
 		formatted_positions = []
 		# loop through each position
+		no_of_positions = len(positions)
+		print "# of pos: " + str(no_of_positions)
+		i = 0
 		for p in positions:
 			# print p.id
 			# get first industry domain of company
@@ -347,12 +354,20 @@ def _get_positions_for_path(positions,anon=False):
 				attribs['start_date'] = p.start_date.strftime("%m/%Y")
 			if p.end_date is not None:
 				attribs['end_date'] = p.end_date.strftime("%m/%Y")
-			formatted_positions.append(attribs)
+			
 			# check to see if anonymous
 			if anon:
 				attribs['co_name'] = domain + " company",
 			else:
 				attribs['co_name'] = p.entity.name
+
+			formatted_positions.append(attribs)
+			
+			i += 1
+			if i == no_of_positions:
+				attribs['last_position'] = True
+			else:
+				attribs['last_position'] = False
 		return formatted_positions
 	# if no positions, return None
 	return None
