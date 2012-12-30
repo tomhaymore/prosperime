@@ -71,10 +71,23 @@
 <script type="text/template" id="path-single-template">
 	<li class="list-preview">
 		<div class="left-list-preview">
-
+			<% if (profile_pic != null) { %>
+			<div class="img-holder">
+				<img class="logo-preview" src="/media/<%= profile_pic %>" />&nbsp;
+			</div>
+			<% } %>
 		</div>
 		<div class="right-list-preview">
-			<span class="path-header"><%= full_name %></span>
+			<span class="path-name"><%= full_name %></span><span class="path-current-position"><%= current_position %></span>
+			<div class="path-viz">
+				<% if (positions != null) {  
+				_.each(positions,function(pos) { %>
+					<span class="path-viz-pos"><%= pos.co_name %></span>
+				<% })
+				} %>
+
+
+			</div>
 		</div>
 	</li>
 </script>
