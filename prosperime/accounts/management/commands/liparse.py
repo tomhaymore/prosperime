@@ -589,7 +589,7 @@ class Command(BaseCommand):
 		# loop through each position
 		for p in raw_positions:
 			inst_uniq_id = p.get('id')
-			inst_name = p.h3.contents[0]
+			inst_name = p.h3.contents[0].strip()
 			try:
 				degree = p.find("span","degree").contents[0]
 				
