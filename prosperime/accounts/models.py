@@ -38,11 +38,31 @@ class Profile(models.Model):
         full_name = self.first_name + " " + self.last_name
         return full_name
 
+    def std_name(self):
+        std_name = "_".join(self.first_name,self.last_name).lower()
+
     def li_linked(self):
         accts = Account.objects.filter(owner=self.user,service="linkedin",status="active")
         if accts.exists():
             return True
         return False
+
+class Picture(models.Model):
+
+    # returns path for uploading pictures
+    def _get_picture_path(self,filename):
+        path = "pictures/" + self.person.std_name() + "/" + filename
+        return path
+
+    person = models.ForeignKey(Profile,related_name="pictures")
+    pic = models.ImageField(max_length=450,upload_to=_get_picture_path)
+    source = models.CharField(max_length=45,null=True)
+    description = models.TextField(null=True)
+    license = models.TextField(null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=15,default="active")
+
 
 class Connection(models.Model):
     person1 = models.ForeignKey(Profile,related_name="person1")

@@ -15,7 +15,7 @@ from _retry import retry
 from django.utils import simplejson
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
-from accounts.models import Account, Profile, Connection
+from accounts.models import Account, Profile, Connection, Picture
 from entities.models import Position, Entity, Image, Industry, Office
 from django.core.files import File
 
@@ -24,7 +24,7 @@ linkedin_key = '8yb72i9g4zhm'
 linkedin_secret = 'rp6ac7dUxsvJjQpS'
 
 # fields from connections API
-fields = "(id,headline,firstName,lastName,positions:(start-date,end-date,title,is-current,summary,company:(id)),public-profile-url)"
+fields = "(id,picture-url,headline,firstName,lastName,positions:(start-date,end-date,title,is-current,summary,company:(id)),public-profile-url)"
 co_fields = "(id,name,universal-name,company-type,ticker,website-url,industries,status,logo-url,blog-rss-url,twitter-id,employee-count-range,locations:(description,address:(street1,street2,city,state,country-code,postal-code)),description,stock-exchange)"
 
 
@@ -144,6 +144,10 @@ class Command(BaseCommand):
 		user.profile.status = "dormant"
 		user.profile.save()
 
+		# add pofile picture
+		if 'pictureUrl' in user_info:
+			self.add_profile_pic(user,user_info['pictureUrl'])
+
 		# create LinkedIn account
 		acct = Account()
 		acct.owner = user
@@ -156,6 +160,26 @@ class Command(BaseCommand):
 
 		return user
 
+	def add_profile_pic(self,user,img_url):
+		img = None
+		img_ext = urlparse.urlparse(img_url).path.split('/')[-1].split('.')[1]
+		img_filename = user.profile.std_name() + "." + img_ext
+		try:
+			img = urllib2.urlopen(img_url)
+		except urllib2.HTTPError, e:
+			self.stdout.write(str(e.code))
+		if img:
+			pic = Picture()
+			pic.person = user
+			pic.source = 'linkedin'
+			pic.description = 'linkedin profile pic'
+			pic.save()
+			with open('tmp_img','wb') as f:
+				f.write(img.read())
+			with open('tmp_img','r') as f:
+				img_file = File(f)
+				pic.pic.save(img_filename,img_file,True)
+			os.remove('tmp_img')
 
 	def get_user(self,acct_id):
 		try:
