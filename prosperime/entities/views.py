@@ -261,8 +261,8 @@ def paths(request):
 			positions = _get_positions_for_path(u.positions.all(),anon=True)
 			# need to convert positions to anonymous
 
-		# paths.append({'full_name':name,'current_position':current_position,'positions':positions,'connected':connected})
-		paths.append({'full_name':name,'current_position':current_position,'connected':connected})
+		paths.append({'full_name':name,'current_position':current_position,'positions':positions,'connected':connected})
+		# paths.append({'full_name':name,'current_position':current_position,'connected':connected})
 
 	return HttpResponse(simplejson.dumps(paths), mimetype="application/json")
 
@@ -292,7 +292,7 @@ def _get_latest_position(user,anon=False):
 	Returns string with position title and company of most recent (and current) position, not the users headline or summary
 	"""
 	# grab most recent position, ordered by start date and is current
-	latest_position = Position.objects.filter(person=user,current=True).order_by('-start_date')
+	latest_position = Position.objects.filter(person=user,current=True).order_by('start_date')
 	# make sure there is a latest position
 	if latest_position.exists():
 		# if anonymous, filter and return
@@ -326,11 +326,20 @@ def _get_positions_for_path(positions,anon=False):
 			domains = p.entity.domains.all()
 			if domains:
 				domain = domains[0].name
-			attribs = {
-				'domain':domain,
-				'duration':p.duration(),
-				'title':p.title
-			}
+			else:
+				domain = None
+			if p.type == "education":
+				attribs = {
+					'domain':domain,
+					'duration':p.duration(),
+					'title':p.degree + ", " + p.field
+				}
+			else:
+				attribs = {
+					'domain':domain,
+					'duration':p.duration(),
+					'title':p.title
+				}
 			if p.start_date is not None:
 				attribs['start_date'] = p.start_date.strftime("%m/%Y")
 			if p.end_date is not None:
