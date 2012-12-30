@@ -291,6 +291,11 @@ $(function(){
 
 		},
 
+		events: {
+			"click a.search-control-close" : "minimize",
+			"click a.search-control-open" : "maximize"
+		},
+
 		render: function() {
 			var $filters,
 				filterCategories,
@@ -331,7 +336,22 @@ $(function(){
 		uncheckAll: function() {
 			$filters = this.$(".input-search-filter");
 			$filters.prop('checked',false);
+		},
+
+		minimize: function() {
+			$("div#sidebar-column").removeClass("span3").addClass("span1");
+			$("div#main-column").removeClass("span6").addClass("span8");
+			$("a.search-control-close").hide();
+			$("a.search-control-open").show();
+		},
+
+		maximize: function() {
+			$("div#sidebar-column").removeClass("span1").addClass("span3");
+			$("div#main-column").removeClass("span8").addClass("span6");
+			$("a.search-control-close").show();
+			$("a.search-control-open").hide();
 		}
+
 	});
 
 	window.SearchRouter = Backbone.Router.extend({
