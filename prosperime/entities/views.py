@@ -11,6 +11,7 @@ from django.template import RequestContext
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from accounts.models import Picture
 from entities.models import Entity, Office, Financing, Industry, Position
 from django.db.models import Count, Q
 from django.utils import simplejson
@@ -250,6 +251,7 @@ def paths(request):
 			connected = True
 			name = u.profile.full_name()
 			current_position = _get_latest_position(u)
+			profile_pic = _get_profile_pic(u.profile)
 			if current_position is not None:
 				positions = _get_positions_for_path(u.positions.all())
 			else:
@@ -259,9 +261,10 @@ def paths(request):
 			name = None
 			current_position = _get_latest_position(u,anon=True)
 			positions = _get_positions_for_path(u.positions.all(),anon=True)
+			profile_pic = None
 			# need to convert positions to anonymous
 
-		paths.append({'full_name':name,'current_position':current_position,'positions':positions,'connected':connected})
+		paths.append({'profile_pic':profile_pic,'full_name':name,'current_position':current_position,'positions':positions,'connected':connected})
 		# paths.append({'full_name':name,'current_position':current_position,'connected':connected})
 
 	return HttpResponse(simplejson.dumps(paths), mimetype="application/json")
@@ -352,5 +355,11 @@ def _get_positions_for_path(positions,anon=False):
 				attribs['co_name'] = p.entity.name
 		return formatted_positions
 	# if no positions, return None
+	return None
+
+def _get_profile_pic(profile):
+	pics = Picture.objects.filter(person=profile,status="active").order_by("created")
+	if pics.exists():
+		return pics[0].pic
 	return None
 
