@@ -103,7 +103,7 @@ def linkedin_authenticate(request):
 	
 	# print access_token
 	
-	fields = "(headline,id,firstName,lastName)"
+	fields = "(headline,id,first-name,last-name,picture-url)"
 
 	api_url = "http://api.linkedin.com/v1/people/~:" + fields + "?format=json"
 	 
@@ -146,24 +146,6 @@ def linkedin_authenticate(request):
 		# if not logged in, ask to finish user registration process
 		return HttpResponseRedirect('/account/finish')
 
-def finish_link(request):
-	# get info for creating an account
-	linkedin_user_info = request.session['linkedin_user_info']
-	access_token = request.session['access_token']
-
-	# create LinkedIn account
-	acct = Account()
-	acct.owner = request.user
-	acct.access_token = access_token['oauth_token']
-	acct.token_secret = access_token['oauth_token_secret']
-	acct.service = 'linkedin'
-	acct.expires_on = datetime.now() + timedelta(seconds=int(access_token['oauth_authorization_expires_in']))
-	acct.uniq_id = linkedin_user_info['id']
-	acct.save()
-
-	messages.success(request, 'Your LinkedIn account has been successfully linked.')
-
-	return HttpResponseRedirect('/search')
 
 def finish_login(request):
 	# TODO: redirect if not not authenticated through LinkedIn already
@@ -210,6 +192,11 @@ def finish_login(request):
 			user.profile.headline = linkedin_user_info['headline']
 			user.profile.save()
 
+			# add pofile picture
+			if 'pictureUrl' in user_info:
+				_add_profile_pic(user,linkedin_user_info['pictureUrl'])
+
+
 			# create LinkedIn account
 			acct = Account()
 			acct.owner = user
@@ -230,9 +217,49 @@ def finish_login(request):
 
 	return render_to_response('accounts/finish_login.html',{'form':form},context_instance=RequestContext(request))
 
+
+def finish_link(request):
+	# get info for creating an account
+	linkedin_user_info = request.session['linkedin_user_info']
+	access_token = request.session['access_token']
+
+	# create LinkedIn account
+	acct = Account()
+	acct.owner = request.user
+	acct.access_token = access_token['oauth_token']
+	acct.token_secret = access_token['oauth_token_secret']
+	acct.service = 'linkedin'
+	acct.expires_on = datetime.now() + timedelta(seconds=int(access_token['oauth_authorization_expires_in']))
+	acct.uniq_id = linkedin_user_info['id']
+	acct.save()
+
+	messages.success(request, 'Your LinkedIn account has been successfully linked.')
+
+	return HttpResponseRedirect('/search')
+
 def success(request):
 	return render_to_response('accounts/success.html',context_instance=RequestContext(request))
 
+def _add_profile_pic(self,user,img_url):
+	img = None
+	img_ext = urlparse.urlparse(img_url).path.split('/')[-1].split('.')[1]
+	img_filename = user.profile.std_name() + "." + img_ext
+	try:
+		img = urllib2.urlopen(img_url)
+	except urllib2.HTTPError, e:
+		self.stdout.write(str(e.code))
+	if img:
+		pic = Picture()
+		pic.person = user.profile
+		pic.source = 'linkedin'
+		pic.description = 'linkedin profile pic'
+		pic.save()
+		with open('tmp_img','wb') as f:
+			f.write(img.read())
+		with open('tmp_img','r') as f:
+			img_file = File(f)
+			pic.pic.save(img_filename,img_file,True)
+		os.remove('tmp_img')
 	
 
 	

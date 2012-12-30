@@ -170,7 +170,7 @@ class Command(BaseCommand):
 			self.stdout.write(str(e.code))
 		if img:
 			pic = Picture()
-			pic.person = user
+			pic.person = user.profile
 			pic.source = 'linkedin'
 			pic.description = 'linkedin profile pic'
 			pic.save()
