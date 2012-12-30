@@ -240,7 +240,7 @@ def finish_link(request):
 def success(request):
 	return render_to_response('accounts/success.html',context_instance=RequestContext(request))
 
-def _add_profile_pic(self,user,img_url):
+def _add_profile_pic(user,img_url):
 	img = None
 	img_ext = urlparse.urlparse(img_url).path.split('/')[-1].split('.')[1]
 	img_filename = user.profile.std_name() + "." + img_ext
