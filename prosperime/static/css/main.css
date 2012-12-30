@@ -11,7 +11,9 @@ div.main-container {
 	width:1100px;*/
 	background-color: #fff;
 	padding:5px;
-
+	-webkit-box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow: 0 1px 10px rgba(0,0,0,0.1);
+	box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
 }
 
 div.navbar-inner {
@@ -79,7 +81,7 @@ li {
 .form-header {
 	font-weight: bold;
 	font-size: 1.1em;
-	border-bottom: 1px solid black;
+	border-bottom: 1px solid #ccc;
 	/*margin-top:10px;*/
 }
 
@@ -88,7 +90,7 @@ li {
 }
 
 label.checkbox {
-	font-size:1em;
+	font-size:0.95em;
 }
 
 img.logo-preview {
@@ -139,12 +141,13 @@ img.logo-preview {
 
 .main-header {
 	font-weight: bold;
-	font-size:1.2em;
+	font-size:1em;
 }
 
-.search-container {
-	border: 1px solid #ccc;
+#search-container {
+	/*border: 1px solid #ccc;*/
 	/*padding: 5px;*/
+	border-right: 1px solid #ccc;
 	padding:0px;
 	border-radius: 2px;
 	font-size:0.9em;
@@ -178,7 +181,38 @@ div.message p {
 
 }
 
+/* Path */
+
+p.path-name {
+	color: rgb(41,98,152);
+	margin-bottom:2px;
+}
+
+p.path-current-position {
+	margin-top:2px;
+	font-size: 0.9em;
+	margin-bottom:0px;
+}
+
+span.path-viz-pos {
+	font-size:0.9em;
+	margin-right:5px;
+}
+
+/* Search filters */
+
+div#sidebar-column {
+	overflow: hidden;
+}
+
+input.input-search-filter {
+	font-size: 0.8em;
+}
+
 /* Modifiers */
+.overlap-left {
+	margin-left: -50px;
+}
 
 .left-spacer {
 	margin-left:15px;

@@ -22,7 +22,7 @@
 
 {% block sidebar %}
 
-<div id="search-container" class="rounded">
+<div id="search-container" class="">
 	<!-- dynamically populated search filters -->
 </div>
 {% endblock %}
@@ -78,12 +78,16 @@
 			<% } %>
 		</div>
 		<div class="right-list-preview">
-			<span class="path-name"><%= full_name %></span><span class="path-current-position"><%= current_position %></span>
+			<p class="path-name"><%= full_name %></p>
+			<p class="path-current-position"><%= current_position %></p>
 			<div class="path-viz">
 				<% if (positions != null) {  
 				_.each(positions,function(pos) { %>
 					<span class="path-viz-pos"><%= pos.co_name %></span>
-				<% })
+				<% if (pos.last_position == false) { %>
+					<span class="path-viz-sep"><i class="icon-chevron-right"></i></span>
+				<% }
+				}); 
 				} %>
 
 
@@ -93,7 +97,9 @@
 </script>
 
 <script type="text/template" id="path-list-template">
-	<p class="main-header">Search Results</p>
+	<!--<div class="main-header pull-left">Career Paths</div><div class="pull-right btn-group disabled"><button class="btn-small">Paths</button><button class="btn-small">Companies</button></div>-->
+	<p class="main-header">Career Paths</p>
+	<div class="clearfix"></div>
 	<ul class="path-list"></ul>
 </script>
 
@@ -116,13 +122,17 @@
 </script>
 
 <script type="text/template" id="org-list-template">
-	<p class="main-header">Search Results</p>
+	<p class="main-header">Companies</p>
 	<ul class="org-list"></ul>
 </script>
 
 <script type="text/template" id="search-header-template">
-	<div class="search-form-header sidebar-header">
-		Refine Your Search
+	<!--<div class="search-form-header sidebar-header">
+		 Refine Your Search
+	</div>--> 
+	<div class="search-control pull-right">
+		<a title="minimize filters" href="#" class="search-control-close"><i class="icon-chevron-left"></i></a>
+		<a style="display:none;" title="show filters" href="#" class="search-control-open"><i class="icon-chevron-right"></i></a>
 	</div>
 </script>
 
