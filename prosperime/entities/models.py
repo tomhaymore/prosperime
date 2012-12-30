@@ -25,6 +25,7 @@ class Entity(models.Model):
 	li_univ_name = models.CharField(max_length=450,null=True) # LinkedIn universal name 
 	li_type = models.CharField(max_length=15,null=True)	
 	li_last_scanned = models.DateTimeField(null=True)
+	li_url = models.URLField(blank=True,null=True)
 	total_money = models.CharField(max_length=15,null=True,blank=True)
 	no_employees = models.IntegerField(blank=True,null=True)
 	size_range = models.CharField(max_length=45,null=True)
