@@ -162,8 +162,9 @@ class Command(BaseCommand):
 
 	def add_profile_pic(self,user,img_url):
 		img = None
-		img_ext = urlparse.urlparse(img_url).path.split('/')[-1].split('.')[1]
-		img_filename = user.profile.std_name() + "." + img_ext
+		# img_ext = urlparse.urlparse(img_url).path.split('/')[-1].split('.')[1]
+		img_filename = user.profile.std_name() + ".jpg"
+		print img_url
 		try:
 			img = urllib2.urlopen(img_url)
 		except urllib2.HTTPError, e:
@@ -300,9 +301,9 @@ class Command(BaseCommand):
 
 	def add_company(self,id=None,name=None):
 		# get company profile from LinkedIn
-		if name:
+		if name is not None:
 			data = self.get_co_li_profile(name=name)
-		else:
+		elif id is not None:
 			data = self.get_co_li_profile(co_id=id)
 		# if nothing returned from LI, return None
 		if data is None:
@@ -493,7 +494,7 @@ class Command(BaseCommand):
 
 	def process_public_page(self,user,url):
 		# fetch html and soup it
-
+		print "user's public page: " + url
 		html = self.get_public_page(url)
 		soup = BeautifulSoup(html)
 
@@ -513,6 +514,7 @@ class Command(BaseCommand):
 						co = self.get_company_from_name(p['co_uniq_name'])
 						if co is None:
 							# add new company
+							print p['co_uniq_name']
 							co = self.add_company(name=p['co_uniq_name'])
 							# if it's a new company, position must be new as well
 							if co is not None:
