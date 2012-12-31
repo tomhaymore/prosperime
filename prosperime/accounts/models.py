@@ -39,7 +39,7 @@ class Profile(models.Model):
         return full_name
 
     def std_name(self):
-        std_name = "_".join(self.first_name,self.last_name).lower()
+        return "_".join([self.first_name,self.last_name]).lower()
 
     def li_linked(self):
         accts = Account.objects.filter(owner=self.user,service="linkedin",status="active")
