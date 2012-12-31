@@ -281,7 +281,7 @@ $(function(){
 
 	window.FilterListView = Backbone.View.extend ({
 
-		el: $("#search-container"),
+		el: $("#search-filters-container"),
 		tagName: 'div',
 		template: _.template($("#search-module-template").html()),
 
@@ -339,15 +339,17 @@ $(function(){
 		},
 
 		minimize: function() {
-			$("div#sidebar-column").removeClass("span3").addClass("span1");
-			$("div#main-column").removeClass("span6").addClass("span8");
+			$("div#sidebar-column").removeClass("max-filters").addClass("min-filters");
+			$("div#middle-column").removeClass("min-results").addClass("max-results");
+			$("div.search-form-module").hide();
 			$("a.search-control-close").hide();
 			$("a.search-control-open").show();
 		},
 
 		maximize: function() {
-			$("div#sidebar-column").removeClass("span1").addClass("span3");
-			$("div#main-column").removeClass("span8").addClass("span6");
+			$("div#sidebar-column").removeClass("min-filters").addClass("max-filters");
+			$("div#middle-column").removeClass("max-results").addClass("min-results");
+			$("div.search-form-module").show();
 			$("a.search-control-close").show();
 			$("a.search-control-open").hide();
 		}
