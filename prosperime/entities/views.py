@@ -328,7 +328,7 @@ def _get_positions_for_path(positions,anon=False):
 		formatted_positions = []
 		# loop through each position
 		no_of_positions = len(positions)
-		print "# of pos: " + str(no_of_positions)
+		# print "# of pos: " + str(no_of_positions)
 		i = 0
 		for p in positions:
 			# print p.id
