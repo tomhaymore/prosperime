@@ -4,6 +4,7 @@ import datetime
 # Django
 from django.db import models
 from django.contrib.auth.models import User
+# from entities.models import Position
 from django.db.models.signals import post_save
 
 class Account(models.Model):
@@ -25,6 +26,7 @@ class Account(models.Model):
         return self.service
 
 class Profile(models.Model):
+    
 
     user = models.OneToOneField(User)
     first_name = models.CharField(max_length=150,null=True)
@@ -46,6 +48,11 @@ class Profile(models.Model):
         if accts.exists():
             return True
         return False
+
+    def no_of_positions(self):
+        from entities.models import Position
+        pos = Position.objects.filter(person=self.user)
+        return len(pos)
 
 class Picture(models.Model):
 
