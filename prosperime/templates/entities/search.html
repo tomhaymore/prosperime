@@ -70,9 +70,11 @@
 	<li class="list-preview">
 		<div class="left-list-preview">
 			<% if (profile_pic != null) { %>
+			<!--
 			<div class="img-holder">
 				<img class="logo-preview" src="/media/<%= profile_pic %>" />&nbsp;
 			</div>
+			-->
 			<% } %>
 		</div>
 		<div class="right-list-preview">
@@ -80,11 +82,22 @@
 			<p class="path-current-position"><%= current_position %></p>
 			<div class="path-viz">
 				<% if (positions != null) {  
-				_.each(positions,function(pos) { %>
-					<span class="path-viz-pos"><%= pos.co_name %></span>
-				<% if (pos.last_position == false) { %>
-					<span class="path-viz-sep"><i class="icon-chevron-right"></i></span>
+				var i = 0;
+				_.each(positions,function(pos) { 
+					if (i <= 4) { %>
+					<span class="path-viz-pos"><a href="#"><%= pos.co_name %></a></span>
+				<% } else { %>
+					<span class="path-viz-pos" style="display:none;"><a href="#"><%= pos.co_name %></a></span>
 				<% }
+				if (pos.last_position == false && i < 4) { %>
+					<span class="path-viz-sep"> &gt; </span>
+				<% } else if (pos.last_position == false && i >= 4) {%>
+					<span class="path-viz-sep" style="display:none;"> &gt; </span>
+				<%
+				}
+
+				i++;
+					
 				}); 
 				} %>
 
@@ -96,7 +109,7 @@
 
 <script type="text/template" id="path-list-template">
 	<!--<div class="main-header pull-left">Career Paths</div><div class="pull-right btn-group disabled"><button class="btn-small">Paths</button><button class="btn-small">Companies</button></div>-->
-	<p class="main-header">Career Paths</p>
+	<p class="main-header pull-left">Career Paths</p><p class="search-view pull-right"><a class="search-view-link">Search companies</a></p>
 	<div class="clearfix"></div>
 	<ul class="path-list"></ul>
 </script>

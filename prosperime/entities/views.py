@@ -54,7 +54,7 @@ def companies(request):
 	sizesSelected = request.GET.getlist('size')
 	stagesSelected = request.GET.getlist('stage')
 
-	print locationsSelected
+	# print locationsSelected
 
 	companies = Entity.objects.values("name","summary","image__logo").filter(type="organization").annotate(freq=Count('financing__pk')).order_by('-freq')
 
@@ -63,7 +63,7 @@ def companies(request):
 	if locationsSelected:
 		companies = companies.filter(office__city__in=locationsSelected)
 	if sectorsSelected:
-		companies = companies.filter(domain__in=sectorsSelected)
+		companies = companies.filter(domains__name__in=sectorsSelected)
 	if sizesSelected:
 		# get dictionary of size ranges
 		rgs = _get_size_filter(sizesSelected)
@@ -82,11 +82,114 @@ def companies(request):
 		companies = companies.filter(financing__round__in=stagesSelected)
 
 	# companies =  list(Entity.objects.filter(cb_type="company").values("full_name","summary","logo")[:20])
-	print companies.query
+	# print companies.query
 	companies = list(companies[:20])
 	return HttpResponse(simplejson.dumps(companies), mimetype="application/json")
 
+def path_filters(request):
+	
+	""" serves up JSON object of params for path searches """
+
+	# initialize array for all filters
+	filters = []
+
+	# get search filters
+	locationsSelected = request.GET.getlist('location')
+	sectorsSelected = request.GET.getlist('sector')
+	positionsSelected = request.GET.getlist('position')
+
+	# set base filters
+
+	# set location filters
+	locationsBase = User.objects.values("positions__entity__office__city").annotate(freq=Count('pk')).order_by('-freq').distinct()
+	locationsFiltered = locationsBase
+
+	if positionsSelected:
+		locationsFiltered = locationsFiltered.filter(positions__title__in=positionsSelected)
+	
+	if sectorsSelected:
+		locationsFiltered = locationsFiltered.filter(positions__entity__domains__name__in=sectorsSelected)
+
+	locationsFilteredDict = {}
+	for l in locationsFiltered:
+		locationsFilteredDict[l['positions__entity__office__city']] = l['freq']
+
+	for l in locationsBase:
+		# make sure it doesn't have a null value
+		if l['positions__entity__office__city']:
+			# get count from locationsFilteredDict
+			if l['positions__entity__office__city'] in locationsFilteredDict:
+				freq = locationsFilteredDict[l['positions__entity__office__city']]
+			else:
+				freq = 0
+			# check to see if the value should be selected
+			if l['positions__entity__office__city'] in locationsSelected:
+				filters.append({'name':l['positions__entity__office__city'],'value':l['positions__entity__office__city'],'category':'Location','count':freq,'selected':True})
+			else:
+				filters.append({'name':l['positions__entity__office__city'],'value':l['positions__entity__office__city'],'category':'Location','count':freq,'selected':None})
+
+	# get sector filters
+	sectorsBase = User.objects.values('positions__entity__domains__name').annotate(freq=Count('pk')).distinct()
+	sectorsFiltered = sectorsBase
+
+	if locationsSelected:
+		sectorsFiltered = sectorsFiltered.filter(positions__entity__office__city__in=locationsSelected)
+
+	if positionsSelected:
+		sectorsFiltered = sectorsFiltered.filter(positions__title__in=positionsSelected)
+
+	sectorsFilteredDict = {}
+	for s in sectorsFiltered:
+		sectorsFilteredDict[s['positions__entity__domains__name']] = s['freq']
+
+	for s in sectorsBase:
+		# make sure it doesn't have a null value
+		if s['positions__entity__domains__name']:
+			# get count from sectorsFilteredDict
+			if s['positions__entity__domains__name'] in sectorsFilteredDict:
+				freq = sectorsFilteredDict[s['positions__entity__domains__name']]
+			else:
+				freq = 0
+			name = " ".join(word.capitalize() for word in s['positions__entity__domains__name'].replace("_"," ").split())
+			# check to see if the value should be selected
+			if s['positions__entity__domains__name'] in sectorsSelected:
+				filters.append({'name':name,'value':s['positions__entity__domains__name'],'category':'Sector','count':freq,'selected':True})
+			else:
+				filters.append({'name':name,'value':s['positions__entity__domains__name'],'category':'Sector','count':freq,'selected':None})
+	
+	# get position filters
+	positionsBase = User.objects.values('positions__title').annotate(freq=Count('pk')).distinct()
+	positionsFiltered = positionsBase
+
+	if locationsSelected:
+		positionsFiltered = positionsFiltered.filter(positions__entity__office__city__in=locationsSelected)
+	if sectorsSelected:
+		positionsSelected = positionsFiltered.filter(positions__entity__domains__name__in=sectorsSelected)
+
+	positionsFilteredDict = {}
+	for p in positionsFiltered:
+		positionsFilteredDict[p['positions__title']] = p['freq']
+
+	for p in positionsBase:
+		# make sure it doesn't have a null value
+		if p['positions__title']:
+			# get count from positionsFilteredDict
+			if p['positions__title'] in positionsFilteredDict:
+				freq = positionsFilteredDict[p['positions__title']]
+			else:
+				freq = 0
+			# check to see if the value should be selected
+			if p['positions__title'] in positionsSelected:
+				selected = True
+			else:
+				selected = False
+			filters.append({'name':p['positions__title'],'value':p['positions__title'],'category':'Positions','count':freq,'selected':selected})
+
+	# render response
+	return HttpResponse(simplejson.dumps(filters), mimetype="application/json")
+
 def filters(request):
+
 	""" serves up JSON file of params for searches """
 	# initialize array for all filters
 	filters = []
@@ -112,7 +215,7 @@ def filters(request):
 		# locationsFiltered = Office.objects.filter(entity__financing__round__in=stagesSelected).values("city").annotate(freq=Count('pk')).order_by('-freq').distinct()[:10]
 		# print locationsFiltered.query
 	if sectorsSelected:
-		locationsFiltered = locationsFiltered.filter(entity__domains__name__in=sectorsSelected,)
+		locationsFiltered = locationsFiltered.filter(entity__domains__name__in=sectorsSelected)
 		# print locationsFiltered.query
 	if sizesSelected:
 		# get dictionary of size ranges
@@ -237,12 +340,23 @@ def paths(request):
 	# initialize array of paths
 	paths = []
 
+	# get search filters
+	locationsSelected = request.GET.getlist('location')
+	sectorsSelected = request.GET.getlist('sector')
+	positionsSelected = request.GET.getlist('position')
+
 	# fetch all users
 	# TODO someway to order this to retrieve those most relevant
-	users = User.objects.exclude(pk=request.user.id)[:20]
+	users = User.objects.annotate(no_of_pos=Count('positions__pk')).exclude(pk=request.user.id).order_by('-no_of_pos')
 
-	# get all of the users connections
-	# cxns = Connections.objects.values('id').filter(Q(person1=user) | Q(person2=user)).distinct()
+	if locationsSelected:
+		users = users.filter(positions__entity__office__city__in=locationsSelected)
+	if sectorsSelected:
+		users = users.filter(positions__entity__domains__name__in=sectorsSelected)
+	if positionsSelected:
+		users = users.filter(positions__title_in=positionsSelected)
+
+	users = users[:20]
 
 	# loop through all positions, identify those that belong to connections
 	for u in users:
@@ -375,6 +489,6 @@ def _get_positions_for_path(positions,anon=False):
 def _get_profile_pic(profile):
 	pics = Picture.objects.filter(person=profile,status="active").order_by("created")
 	if pics.exists():
-		return pics[0].pic
+		return pics[0].pic.path
 	return None
 

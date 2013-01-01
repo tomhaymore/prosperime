@@ -199,6 +199,10 @@ span.path-viz-pos {
 	margin-right:5px;
 }
 
+div.path-viz {
+	margin-top: 5px;
+	font-size: 0.9em;
+}
 /* Search filters */
 
 div.max-filters{

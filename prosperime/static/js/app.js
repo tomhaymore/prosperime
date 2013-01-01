@@ -32,18 +32,34 @@ $(function(){
 
 		initialize: function() {
 			// initialize array of meta data
-			this._meta = {};
+			this._meta = {
+				'view':'paths'
+			};
 		},
 
 		model:Filter,
 		url: function() {
+			// set base path to either company or path filters
+			var init_path;
+			if (this._meta['view'] == 'companies') {
+				init_path = '/filters/';
+			} else if (this._meta['view'] == 'paths') {
+				init_path = '/pathfilters/';
+			} else {
+				init_path = '/pathfilters/';
+			}
+
+			// add queries if they exist
 			if (this._meta['query'] === undefined) {
-				return '/filters';
+				// return '/filters';
+				return init_path
 			} else {
 				console.log(this._meta['query']);
-				path = '/filters/?' + this._meta['query'];
+				path = init_path + this._meta['query'];
+
 				console.log(path);
-				return '/filters/' + this._meta['query'];
+				// return '/filters/' + this._meta['query'];
+				return path;
 			}
 		},
 
@@ -265,14 +281,21 @@ $(function(){
 				selectedFilters.stage = stageFilters;
 			}
 			
+			// set initial URL path
+
+			// var init_path = window.filters._meta['view'];
+			var init_path = this.collection._meta['view'];
+
 			if (jQuery.isEmptyObject(selectedFilters)) {
-				filterUrl = '/search/';
+				// filterUrl = '/search/';
+				filterUrl = init_path + "/";
 			} else {
-				filterUrl = "/search/?" + generateUrl(selectedFilters);
+				filterUrl = init_path + "/?" + generateUrl(selectedFilters);
 			}
 
 			// trigger router to navigate
 			console.log("trying to trigger search");
+			console.log(filterUrl);
 			//Backbone.history.navigate(filterUrl,{trigger:true});
 			App.navigate(filterUrl,{trigger:true});
 
@@ -359,40 +382,76 @@ $(function(){
 	window.SearchRouter = Backbone.Router.extend({
 
 		routes: {
-			"" : "home",
-			"search/" : "emptySearch",
-			"search/:query" : "search"
+			"" : "emptySearch",
+			"paths/" : "emptyPathSearch",
+			"paths/:query" : "pathSearch",
+			"companies/" : "emptyCompanySearch",
+			"companies/:query" : "companySearch"
 		},
 
 		initialize: function() {
 			this.orgs = window.orgs;
 			this.filters = window.filters;
 			this.paths = window.paths;
-			this.orgsView = new OrgListView({ collection: this.orgs});
+			// show paths and path filters by default
+			// this.orgsView = new OrgListView({ collection: this.orgs});
 			this.filtersView = new FilterListView({ collection: this.filters});
 			this.pathsView = new PathListView({ collection: this.paths});
 		},
 
-		home: function() {
+		emptySearch: function() {
 			console.log("stay home");
 			// this.orgs.fetch();
 			this.filters.fetch();
 			this.paths.fetch();
 		},
 
-		emptySearch: function() {
-			console.log('empty search');
-			this.orgs.meta('query','');
+		emptyPathSearch: function() {
+			console.log('empty path search');
+			// reset to career paths as default
+			this.filters.meta('view','paths');
 			this.filters.meta('query','');
-			this.orgs.meta('query','');
-			this.orgs.fetch();
+			this.paths.meta('query','');
+			// fetch filters
 			this.filters.fetch();
+			// fetch paths
 			this.paths.fetch();
 		},
 
-		search: function(query) {
-			console.log("search triggered");
+		pathSearch: function(query) {
+			console.log("searching paths");
 			console.log(query);
+			// set to path view
+			this.filters.meta('view','paths');
+			// test for empty search string, make sure to uncheck all filters
+			if (query === undefined) {
+				this.filtersView.uncheckAll();
+				this.paths.meta('query',null);
+				this.filters.meta('query',null);
+			} else {
+				this.paths.meta('query',query);
+				this.filters.meta('query',query);	
+			}
+			this.paths.fetch();
+			this.filters.fetch();
+		},
+
+		emptyCompanySearch: function() {
+			console.log('empty company search');
+			// reset to company search
+			this.filters.meta('view','companies');
+			this.filters.meta('query','');
+			// fetch filters
+			this.filters.fetch();
+			// fetch orgs
+			this.orgs.fetch();
+		},
+
+		companySearch: function(query) {
+			console.log("searching companies");
+			console.log(query);
+			// set to path view
+			this.filters.meta('view','companies');
 			// test for empty search string, make sure to uncheck all filters
 			if (query === undefined) {
 				this.filtersView.uncheckAll();
