@@ -307,6 +307,7 @@ class Command(BaseCommand):
 			data = self.get_co_li_profile(co_id=id)
 		# if nothing returned from LI, return None
 		if data is None:
+			# TODO add company
 			return None
 		
 		# add to database
@@ -559,7 +560,7 @@ class Command(BaseCommand):
 			if co_uniq_name:
 				co_uniq_name = co_uniq_name.get('href')
 				m = re.search("(?<=\/company\/)([\w-]*)",co_uniq_name)
-				co_uniq_name = m.group(0)
+				co_uniq_name = m.group(0).strip()
 				# get start and end dates
 				start_date = p.find("abbr","dtstart")
 				if start_date is not None:
@@ -580,7 +581,7 @@ class Command(BaseCommand):
 				except:
 					descr = None
 				# append to main positions array
-				positions.append({'title':title,'co_uniq_name':co_uniq_name,'start_date':start_date,'end_date':end_date,'summary':descr,'isCurrent':current})
+				positions.append({'title':title,'co_uniq_name':co_uniq_name,'startDate':start_date,'endDate':end_date,'summary':descr,'isCurrent':current})
 		return positions
 
 	def extract_ed_pos_from_public_page(self,data):
