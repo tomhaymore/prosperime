@@ -4,3 +4,4 @@
 local_settings.py
 django14_env/*
 prosperime/media/logos/*
+prosperime/media*
