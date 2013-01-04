@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from accounts.models import Account
+# from accounts.models import Account
 
 
 class Entity(models.Model):
@@ -93,6 +93,16 @@ class Position(models.Model):
 			return self.start_date.year - self.end_date.year
 		else:
 			return None
+
+	def safe_start_time(self):
+		if self.start_date is not None:
+			return self.start_date.strftime("%m/%Y")
+		return None
+
+	def safe_end_time(self):
+		if self.end_date is not None:
+			return self.end_date.strftime("%m/%Y")
+		return None
 
 # class Relationship(models.Model):
 # 	entity1 = models.ForeignKey(Entity,related_name="entity1")
