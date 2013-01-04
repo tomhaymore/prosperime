@@ -110,6 +110,8 @@ def path_filters(request):
 	if sectorsSelected:
 		locationsFiltered = locationsFiltered.filter(positions__entity__domains__name__in=sectorsSelected)
 
+	locationsBase = locationsBase[:10]
+
 	locationsFilteredDict = {}
 	for l in locationsFiltered:
 		locationsFilteredDict[l['positions__entity__office__city']] = l['freq']
@@ -382,6 +384,38 @@ def paths(request):
 		# paths.append({'full_name':name,'current_position':current_position,'connected':connected})
 
 	return HttpResponse(simplejson.dumps(paths), mimetype="application/json")
+
+def path(request,user_id):
+	# fetch path
+	positions = Position.objects.filter(person__id=user_id)
+	# initialize arrays
+	path = {}
+	# loop through positions
+	i = 0
+	prev_employer = None
+	for p in positions:
+		# check if even
+		if i % 2 == 0:
+			even = True
+		else:
+			even = False
+		# check if same employer as previous position
+		if p.entity == prev_employer:
+			# append to current box rather than create a new one
+			path[p.entity.name].append({'title':p.title,'duration':p.duration(),'start_date':p.safe_start_time(),'end_date':p.safe_end_time()})
+		else:
+			# add new box
+			path[p.entity.name] = [{'title':p.title,'duration':p.duration(),'start_date':p.safe_start_time(),'end_date':p.safe_end_time()}]
+		prev_employer = p.entity
+		i += 1
+
+	# convert to list
+	# path = list(path)
+
+	return HttpResponse(simplejson.dumps(path),mimetype="application/json")
+
+
+
 
 def _get_size_filter(sizes):
 	# dictionary of ranges
