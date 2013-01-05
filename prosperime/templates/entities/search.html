@@ -78,33 +78,74 @@
 			<% } %>
 		</div>
 		<div class="right-list-preview">
-			<p class="path-name"><%= full_name %></p>
+			<p class="path-name"><a class="path-name-link"><%= full_name %></a></p>
 			<p class="path-current-position"><%= current_position %></p>
 			<div class="path-viz">
-				<% if (positions != null) {  
-				var i = 0;
-				_.each(positions,function(pos) { 
-					if (i <= 4) { %>
-					<span class="path-viz-pos"><a href="#"><%= pos.co_name %></a></span>
-				<% } else { %>
-					<span class="path-viz-pos" style="display:none;"><a href="#"><%= pos.co_name %></a></span>
-				<% }
-				if (pos.last_position == false && i < 4) { %>
-					<span class="path-viz-sep"> &gt; </span>
-				<% } else if (pos.last_position == false && i >= 4) {%>
-					<span class="path-viz-sep" style="display:none;"> &gt; </span>
-				<%
-				}
+				<div class="path-viz-short">
+					<% if (positions != null) {  
+					var i = 0;
+					_.each(positions,function(pos) { 
+						if (i <= 4) { %>
+						<span class="path-viz-pos"><a href="#"><%= pos.co_name %></a></span>
+					<% } else { %>
+						<span class="path-viz-pos" style="display:none;"><a href="#"><%= pos.co_name %></a></span>
+					<% }
+					if (pos.last_position == false && i < 4) { %>
+						<span class="path-viz-sep"> &gt; </span>
+					<% } else if (pos.last_position == false && i >= 4) {%>
+						<span class="path-viz-sep" style="display:none;"> &gt; </span>
+					<%
+					}
 
-				i++;
-					
-				}); 
-				} %>
-
+					i++;
+						
+					}); 
+					} %>
+				</div>
+				<div class="path-viz-long" style="display:none;">
+				</div>
 
 			</div>
 		</div>
 	</li>
+</script>
+
+<script type="text/template" id="path-single-viz-template">
+	<div class="path-viz-timeline">
+		<div class="path-viz-timeline-left"></div>
+		<div class="path-viz-timeline-center"></div>
+		<div class="path-viz-timeline-right"></div>
+		<% if (positions != null) {
+			var $pathLeft = $("div.path-viz-timeline-left");
+			var $pathCenter = $("div.path-viz-timeline-center");
+			var $pathRigth = $("div.path-viz-timeline-right");
+			var length = _.size(positions);
+			var i = 0;
+			_.each(positions,function(pos) { %>
+				// render position
+				var renderedPos = 0;
+
+				// test if even
+				if (i % 2 == 0) {
+					$pathRight.append()
+				} else {
+
+				}
+				<div class="path-viz-row">
+					<div class="path-viz-sep-circle pull-left"></div>
+					<div class="path-viz-pos pull-left"><%= pos.co_name %></div>
+					<div class="clearfix"></div>
+				</div>
+				<% if (i <= length) { %>
+				<div class="path-viz-row">
+					<div class="path-viz-sep-line pull-left"></div>
+					<div class="clearfix"></div>
+				</div>
+				<% }
+				i++; 
+			});
+		} %>
+	</div>
 </script>
 
 <script type="text/template" id="path-list-template">
@@ -142,8 +183,8 @@
 		 Refine Your Search
 	</div>--> 
 	<div class="search-control pull-right">
-		<a title="minimize filters" href="#" class="search-control-close"><i class="icon-chevron-left"></i></a>
-		<a style="display:none;" title="show filters" href="#" class="search-control-open"><i class="icon-chevron-right"></i></a>
+		<a title="minimize filters" class="search-control-close"><i class="icon-chevron-left"></i></a>
+		<a style="display:none;" title="show filters" class="search-control-open"><i class="icon-chevron-right"></i></a>
 	</div>
 </script>
 

@@ -114,6 +114,7 @@ img.logo-preview {
 	padding: 5px;
 	min-height: 85px;
 	margin: 5px 0 10px 0;
+	overflow: auto;
 }
 
 .left-list-preview {
@@ -203,7 +204,185 @@ div.path-viz {
 	margin-top: 5px;
 	font-size: 0.9em;
 }
+
+a.path-name-link:hover {
+	cursor: pointer;
+}
+
+div.path-viz-sep-circle {
+	position: relative;
+    margin: 1em 1em;
+    width: 1.2em; 
+    height: 1.2em;
+    border-radius: 50%;
+    background: midnightblue;
+    /*background: rgb(41,98,162);*/
+    /*border: 20px solid white;*/
+    /*border-top-color: darkblue;*/
+}
+
+div.path-viz-sep-line {
+	position:relative;
+	margin: 1em 1em;
+	width: 2px;
+	height: 1.5em;
+	border:2px solid midnightblue;
+}
+
+div.path-viz-pos {
+	margin-top:1em;
+}
+
+.viz-row {
+	top:10px;
+}
+
+.viz-row0 {
+	top:10px;
+}
+
+.viz-row1 {
+	top:20px;
+}
+
+.viz-row2 {
+	top:30px;
+}
+
+.viz-row3 {
+	top:40px;
+}
+
+div.path-viz-pos {
+	position:relative;
+	border: 1px solid rgb(41,98,162);
+	border-radius: 2px;
+	padding:2px;
+	padding-left:5px;
+	padding-right:5px;
+  	/*box-shadow:         2px 2px 2px 2px #ccc;*/
+}
+
+div.path-viz-pos .notch-right {
+    position: absolute;
+    top: 10px;
+    right: -8px;
+    margin: 0;
+    border-right: 0;
+    border-top: 8px solid transparent;
+    border-left: 8px solid rgb(41,98,162);
+    border-bottom: 8px solid transparent;
+    padding: 0;
+    width: 0;
+    height: 0;
+    /* ie6 height fix */
+    font-size: 0;
+    line-height: 0;
+     /* ie6 transparent fix */
+    _border-right-color: pink;
+    _border-left-color: pink;
+    _filter: chroma(color=pink);
+}
+
+div.path-viz-pos .notch-left {
+    position: absolute;
+    top: 10px;
+    left: -8px;
+    margin: 0;
+    border-left: 0;
+    border-top: 8px solid transparent;
+    border-right: 8px solid rgb(41,98,162);
+    border-bottom: 8px solid transparent;
+    padding: 0;
+    width: 0;
+    height: 0;
+    /* ie6 height fix */
+    font-size: 0;
+    line-height: 0;
+     /* ie6 transparent fix */
+    _border-right-color: pink;
+    _border-left-color: pink;
+    _filter: chroma(color=pink);
+}
+
+span.path-viz-pos-co {
+	font-size: 0.9em;
+}
+
+div.path-viz-pos ul {
+	list-style: none;
+	margin-left: 10px;
+	margin-top: 5px;
+	font-size:0.8em;
+	line-height:1em;
+	width:200px;
+}
+
+div.path-viz-timeline-left {
+	margin-left:20px;
+}
+div.path-viz-timeline-center {
+	/*height: 250px;*/
+	background-image: url('http://127.0.0.1:8000/static/img/path-viz-line.png');
+	background-repeat: repeat-y;
+	background-position:center;
+	width:25px;
+}
+
+.viz-line-height0 {
+	height:100px;
+}
+
+.viz-line-height1 {
+	height:125;
+}
+
+.viz-line-height2 {
+	height:150px;
+}
+
+.viz-line-height3 {
+	height:175px;
+}
+
+.viz-line-height4 {
+	height:200px;
+}
+
+.viz-line-height5 {
+	height:225px;
+}
+
+.viz-line-height6 {
+	height:250px;
+}
+
+.viz-line-height7 {
+	height:275px;
+}
+
+.viz-line-height8 {
+	height:300px;
+}
+
+.viz-line-height9 {
+	height:325px;
+}
+
+.viz-line-height10 {
+	height:350px;
+}
+
+.viz-line-height11 {
+	height:375px;
+}
+
+.viz-line-height12 {
+	height:400px;
+}
+
 /* Search filters */
+
 
 div.max-filters{
 	width:25%;
@@ -227,6 +406,10 @@ div.max-results {
 
 input.input-search-filter {
 	font-size: 0.8em;
+}
+
+a.search-control-close:hover, a.search-control-open:hover {
+	cursor: pointer;
 }
 
 /* Modifiers */

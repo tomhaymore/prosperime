@@ -147,6 +147,10 @@ $(function(){
 
 		template:_.template($('#path-single-template').html()),
 
+		events: {
+			"click a.path-name-link" : "renderViz"
+		},
+
 		initialize: function() {
 			this.model.on('change',this.render,this);
 			
@@ -157,6 +161,22 @@ $(function(){
 			var renderedContent = this.template(this.model.toJSON());
 			$(this.el).html(renderedContent);
 			return this;
+		},
+
+		renderViz: function() {
+			var pathURL = "/path/" + this.model.id;
+			// var renderedPath = pathTemplate(this.model.toJSON());
+			// $(this.el).find("div.path-viz-long").html(renderedPath);
+			$(this.el).find("div.path-viz-long").load(pathURL);
+			$(this.el).find("div.path-viz-short").toggle();
+			$(this.el).find("div.path-viz-long").toggle();
+		},
+
+		togglePath: function() {
+			console.log('trying to toggle');
+			console.log($(this.el));
+			$(this.el).find("div.path-viz-short").toggle();
+			$(this.el).find("div.path-viz-long").toggle();
 		}
 
 	});
