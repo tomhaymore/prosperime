@@ -14,11 +14,8 @@ from accounts.models import Account
 from django.contrib.auth.models import User
 from django.utils import simplejson
 from accounts.forms import FinishAuthForm, AuthForm
-from django.core.management import call_command
 from django.contrib import messages
-
-linkedin_key = '8yb72i9g4zhm'
-linkedin_secret = 'rp6ac7dUxsvJjQpS'
+from lilib import LIProfile
 
 def login(request):
 	
@@ -49,95 +46,90 @@ def logout(request):
 
 def linkedin_authorize(request):
 	
-	# set scope
-	scope = 'r_fullprofile+r_emailaddress+r_network'
+	# # set scope
+	# scope = 'r_fullprofile+r_emailaddress+r_network'
 
-	# set callback
-	callback = 'http://127.0.0.1:8000/account/authenticate/'
+	# # set callback
+	# callback = 'http://127.0.0.1:8000/account/authenticate/'
 
-	# set urls
-	request_token_url	= 'https://api.linkedin.com/uas/oauth/requestToken'
-	# access_token_url	= 'https://api.linkedin.com/uas/oauth/accessToken'
-	authorize_url		= 'https://www.linkedin.com/uas/oauth/authenticate'
+	# # set urls
+	# request_token_url	= 'https://api.linkedin.com/uas/oauth/requestToken'
+	# # access_token_url	= 'https://api.linkedin.com/uas/oauth/accessToken'
+	# authorize_url		= 'https://www.linkedin.com/uas/oauth/authenticate'
 
-	# setup OAuth
-	consumer = oauth.Consumer(linkedin_key, linkedin_secret)
-	client = oauth.Client(consumer)
+	# # setup OAuth
+	# consumer = oauth.Consumer(linkedin_key, linkedin_secret)
+	# client = oauth.Client(consumer)
 
-	request_token_url = "%s?scope=%s" % (request_token_url, scope, )
+	# request_token_url = "%s?scope=%s" % (request_token_url, scope, )
 
-	# get request token
-	resp, content = client.request(request_token_url,"POST")
-	if resp['status'] != '200':
-		raise Exception(content)
+	# # get request token
+	# resp, content = client.request(request_token_url,"POST")
+	# if resp['status'] != '200':
+	# 	raise Exception(content)
 	
+	liparser = LIProfile()
+
+	redirect_url, request_token = liparser.authorize()
+
 	# parse out request token
 
-	request.session['request_token'] = dict(cgi.parse_qsl(content))
-	# print request.session['request_token']
+	# request.session['request_token'] = dict(cgi.parse_qsl(content))
+	request.session['request_token'] = request_token
 
-	url = "%s?oauth_token=%s" % (authorize_url, request.session['request_token']['oauth_token'], )
+	# redirect_url = "%s?oauth_token=%s" % (authorize_url, request.session['request_token']['oauth_token'], )
 
 	# print url
 
-	return HttpResponseRedirect(url)
+	return HttpResponseRedirect(redirect_url)
   
 # @login_required
 def linkedin_authenticate(request):  
-	consumer = oauth.Consumer(linkedin_key, linkedin_secret)
-	# print request.session['request_token']
+	# consumer = oauth.Consumer(linkedin_key, linkedin_secret)
 	
-	access_token_url = 'https://api.linkedin.com/uas/oauth/accessToken'
-	# print access_token_url
+	# access_token_url = 'https://api.linkedin.com/uas/oauth/accessToken'
 
-	token = oauth.Token(request.session['request_token']['oauth_token'],request.session['request_token']['oauth_token_secret'])
-	token.set_verifier(request.GET['oauth_verifier'])
-	client = oauth.Client(consumer, token)
+	# token = oauth.Token(request.session['request_token']['oauth_token'],request.session['request_token']['oauth_token_secret'])
+	# token.set_verifier(request.GET['oauth_verifier'])
+	# client = oauth.Client(consumer, token)
 
-	resp, content = client.request(access_token_url, "POST")
+	# resp, content = client.request(access_token_url, "POST")
+
+	# access_token = dict(cgi.parse_qsl(content))
 	
-	# print resp
-	# print content
-
-	access_token = dict(cgi.parse_qsl(content))
+	# # print access_token
 	
-	# print access_token
-	
-	fields = "(headline,id,first-name,last-name,picture-url)"
+	# fields = "(headline,id,first-name,last-name,picture-url)"
 
-	api_url = "http://api.linkedin.com/v1/people/~:" + fields + "?format=json"
+	# api_url = "http://api.linkedin.com/v1/people/~:" + fields + "?format=json"
 	 
-	token = oauth.Token(
-		key=access_token['oauth_token'], 
-		secret=access_token['oauth_token_secret'])
+	# token = oauth.Token(
+	# 	key=access_token['oauth_token'], 
+	# 	secret=access_token['oauth_token_secret'])
 
+	# client = oauth.Client(consumer, token)
 
-	client = oauth.Client(consumer, token)
+	# resp, content = client.request(api_url)
 
-	resp, content = client.request(api_url)
+	# linkedin_user_info = simplejson.loads(content)
+	liparser = LIProfile()
 
-	# linkedin_user_info = dict(cgi.parse_qsl(content))
-	linkedin_user_info = simplejson.loads(content)
-	# print linkedin_user_info
-	# check to see if user already registered (maybe went through registration process again by mistake
-
-	# li_user = user_already_registered_li(linkedin_user_info['id'])
-	# try:
-		# login and redirect to search page
-		# print linkedin_user_info['id']
+	access_token, linkedin_user_info = liparser.authenticate(request.session['request_token'],request.GET['oauth_verifier'])
+	print linkedin_user_info
+	print 'hello'
 	request.session['_auth_user_backend'] = 'prosperime.accounts.backends.LinkedinBackend'
-	user = authenticate(acct_id=linkedin_user_info['id'])
 	
+	user = authenticate(acct_id=linkedin_user_info['id'])
+	print user
+	print linkedin_user_info['id']
 	if user is not None:
 		auth_login(request,user)
 		return HttpResponseRedirect('/')
 	else:
-	# except:
 		# store information in a cookie
 		request.session['linkedin_user_info'] = linkedin_user_info
 		request.session['access_token'] = access_token
 
-		# print request.session['linkedin_user_info']
 	# check to see if user is currently logged in
 	if request.user.is_authenticated():
 		# if loged in, link accounts and return

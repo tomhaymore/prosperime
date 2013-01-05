@@ -31,7 +31,7 @@ class LIBase():
 	co_api_url = "http://api.linkedin.com/v1/companies/"
 
 	# initialize variable for account
-	self.acct = None
+	acct = None
 
 	def get_access_token(self,acct_id=None):
 
@@ -47,6 +47,7 @@ class LIBase():
 			# need to raise exception here
 			# TODO refresh token
 		elif self.acct.status == "expired":
+			pass
 			# need to raise exception here
 			# TODO refresh token
 
@@ -69,7 +70,7 @@ class LIBase():
 		access_token = self.get_access_token(self.acct.id)
 
 		# construct oauth client
-		consumer = oauth.Consumer(linkedin_key, linkedin_secret)
+		consumer = oauth.Consumer(self.linkedin_key, self.linkedin_secret)
  
 		token = oauth.Token(
 			key=access_token['oauth_token'], 
@@ -340,35 +341,38 @@ class LIProfile(LIBase):
 	# set urls
 	request_token_url	= 'https://api.linkedin.com/uas/oauth/requestToken'
 	authorize_url		= 'https://www.linkedin.com/uas/oauth/authenticate'
-	
-	self.user = None
-	self.acct = None
+	access_token_url = 'https://api.linkedin.com/uas/oauth/accessToken'
+
+	user = None
+	acct = None
 
 	def authorize(self):
 		# setup OAuth
-		consumer = oauth.Consumer(linkedin_key, linkedin_secret)
+		consumer = oauth.Consumer(self.linkedin_key, self.linkedin_secret)
 		client = oauth.Client(consumer)
 
-		request_token_url = "%s?scope=%s" % (request_token_url, scope, )
+		request_token_url = "%s?scope=%s" % (self.request_token_url, self.scope, )
 
 		# get request token
-		resp, content = client.request(request_token_url,"POST")
+		resp, content = client.request(self.request_token_url,"POST")
 		if resp['status'] != '200':
 			raise Exception(content)
 
-		return content
+		request_token = dict(cgi.parse_qsl(content))
 
-	def authenticate(self,request_token):
+		redirect_url = "%s?oauth_token=%s" % (self.authorize_url, request_token['oauth_token'], )
+
+		return (redirect_url, request_token,)
+
+	def authenticate(self,request_token,oauth_verifier):
 		# construct oauth client
-		consumer = oauth.Consumer(linkedin_key, linkedin_secret)
-		
-		access_token_url = 'https://api.linkedin.com/uas/oauth/accessToken'
+		consumer = oauth.Consumer(self.linkedin_key, self.linkedin_secret)
 
 		token = oauth.Token(request_token['oauth_token'],request_token['oauth_token_secret'])
-		token.set_verifier(request_token['oauth_verifier'])
+		token.set_verifier(oauth_verifier)
 		client = oauth.Client(consumer, token)
 
-		resp, content = client.request(access_token_url, "POST")
+		resp, content = client.request(self.access_token_url, "POST")
 
 		access_token = dict(cgi.parse_qsl(content))
 		
@@ -386,7 +390,7 @@ class LIProfile(LIBase):
 
 		resp, content = client.request(api_url)
 
-		return simplejson.loads(content)
+		return (access_token,simplejson.loads(content),)
 
 	def process_profile(self,acct_id=None,user_id=None):
 
@@ -433,7 +437,6 @@ class LIProfile(LIBase):
 					pos = self.get_position(self.user,inst,p)
 					if pos is None:
 						self.add_ed_position(self.user,inst,p)
-
 
 	def fetch_profile(self):
 
