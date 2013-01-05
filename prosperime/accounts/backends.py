@@ -8,7 +8,7 @@ class LinkedinBackend:
 
     def authenticate(self,acct_id=None):
         try:
-            return User.objects.get(account__uniq_id=acct_id,status='active')
+            return User.objects.get(account__uniq_id=acct_id,profile__status='active')
             # acct = Account.objects.get(service="linkedin",uniq_id=acct_id)
         except:
             return None
