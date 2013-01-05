@@ -456,7 +456,7 @@ class Command(BaseCommand):
 	def add_institution(self,data):
 		ed = Entity()
 		ed.name = data['inst_name']
-		ed.li_uniq_id = data['inst_uniq_id']
+		# ed.li_uniq_id = data['inst_uniq_id']
 		ed.type = 'organization'
 		ed.sub_type = 'ed-institution'
 		ed.li_type = 'school'
