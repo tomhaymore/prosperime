@@ -633,25 +633,7 @@ class Command(BaseCommand):
 				
 					user = self.add_dormant_user(c)
 					self.add_connection(self.focal_user,user)
-					# self.stdout.write(user)
 					
-					# process education
-					# if 'values' in c['educations']:
-					# 	for e in c['educations']['values']:
-					# 		# check for institution id
-					# 		if 'id' in e:
-					# 			# check to see institution alreday exists
-					# 			ed = self.get_entity(e['id'])
-					# 			if ed is None:
-					# 				# add institution
-					# 				ed = self.add_institution(e)
-					# 				# add position
-					# 				if ed is not None:
-					# 					self.add_ed_positition(user,ed,e)
-					# 			else:
-					# 				# add position
-					# 				self.add_ed_position(user,ed,e)
-
 					# process positions from API
 					if 'values' in c['positions']:
 						for p in c['positions']['values']:
