@@ -87,7 +87,7 @@ def linkedin_authenticate(request):
 	consumer = oauth.Consumer(linkedin_key, linkedin_secret)
 	# print request.session['request_token']
 	
-	access_token_url	= 'https://api.linkedin.com/uas/oauth/accessToken'
+	access_token_url = 'https://api.linkedin.com/uas/oauth/accessToken'
 	# print access_token_url
 
 	token = oauth.Token(request.session['request_token']['oauth_token'],request.session['request_token']['oauth_token_secret'])
@@ -149,16 +149,12 @@ def linkedin_authenticate(request):
 
 def finish_login(request):
 	# TODO: redirect if not not authenticated through LinkedIn already
-	# print request.session['access_token']
-	# print request.session['linkedin_user_info']
 	
 	if request.POST:
-		
-		# print request.session['access_token']
-		# print request.session['linkedin_user_info']
+		# form submitted
+
 		linkedin_user_info = request.session['linkedin_user_info']
 		access_token = request.session['access_token']
-		# form submitted
 
 		form = FinishAuthForm(request.POST)
 		
@@ -167,12 +163,18 @@ def finish_login(request):
 			email = form.cleaned_data['email']
 			password = form.cleaned_data['password']
 
-			# save user
-			user = User.objects.create_user(username,email,password)
-			user.save()
+			# check to see if dormant user already exists
+			try: 
+				user = User.objects.get(status="dormant",account__uniq_id=linkedin_user_info['id'])
+				existing = True
+			except:
+				# create user
+				user = User.objects.create_user(username,email,password)
+				user.save()
+				existing = False
 
 			# make sure using right backend
-			request.session['_auth_user_backend'] = 'prosperime.accounts.backends.LinkedinBackend'
+			request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
 			# log user in
 			user = authenticate(username=username,password=password)
 			# make sure authentication worked
@@ -197,19 +199,25 @@ def finish_login(request):
 				_add_profile_pic(user,linkedin_user_info['pictureUrl'])
 
 
-			# create LinkedIn account
-			acct = Account()
+			
+			if existing:
+				# get existing LI account
+				acct = Account.objects.get(owner=user,service="linkedin")
+			else:
+				# create LinkedIn account
+				acct = Account()
 			acct.owner = user
 			acct.access_token = access_token['oauth_token']
 			acct.token_secret = access_token['oauth_token_secret']
 			acct.service = 'linkedin'
 			acct.expires_on = datetime.now() + timedelta(seconds=int(access_token['oauth_authorization_expires_in']))
 			acct.uniq_id = linkedin_user_info['id']
+			acct.status = "active"
 			acct.save()
 
-			# start processing connections
+			# finish processing LI profile
 
-			call_command("liparse",acct_id=acct.id,user_id=user.id)
+			# start processing connections
 
 			return HttpResponseRedirect('/account/success')
 	else:
