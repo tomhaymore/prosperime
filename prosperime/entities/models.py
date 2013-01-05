@@ -96,12 +96,12 @@ class Position(models.Model):
 
 	def safe_start_time(self):
 		if self.start_date is not None:
-			return self.start_date.strftime("%m/%Y")
+			return self.start_date.strftime("%b %Y")
 		return None
 
 	def safe_end_time(self):
 		if self.end_date is not None:
-			return self.end_date.strftime("%m/%Y")
+			return self.end_date.strftime("%b %Y")
 		return None
 
 # class Relationship(models.Model):
