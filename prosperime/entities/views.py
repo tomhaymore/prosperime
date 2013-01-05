@@ -380,7 +380,7 @@ def paths(request):
 			profile_pic = None
 			# need to convert positions to anonymous
 
-		paths.append({'profile_pic':profile_pic,'full_name':name,'current_position':current_position,'positions':positions,'connected':connected})
+		paths.append({'id':u.id,'profile_pic':profile_pic,'full_name':name,'current_position':current_position,'positions':positions,'connected':connected})
 		# paths.append({'full_name':name,'current_position':current_position,'connected':connected})
 
 	return HttpResponse(simplejson.dumps(paths), mimetype="application/json")
@@ -389,6 +389,8 @@ def path(request,user_id):
 	# fetch path
 	positions = Position.objects.filter(person__id=user_id)
 	# initialize arrays
+	path_even = {}
+	path_odd = {}
 	path = {}
 	# loop through positions
 	i = 0
@@ -396,9 +398,9 @@ def path(request,user_id):
 	for p in positions:
 		# check if even
 		if i % 2 == 0:
-			even = True
+			flag = "even"
 		else:
-			even = False
+			flag = "odd"
 		# check if same employer as previous position
 		if p.entity == prev_employer:
 			# append to current box rather than create a new one
@@ -411,8 +413,10 @@ def path(request,user_id):
 
 	# convert to list
 	# path = list(path)
-
-	return HttpResponse(simplejson.dumps(path),mimetype="application/json")
+	odd = [1,3,5,7,9,11,13,15,17,19]
+	even = [0,2,4,6,8,10,12,14,16,18]
+	# return HttpResponse(simplejson.dumps(path),mimetype="application/json")
+	return render_to_response('entities/path_viz.html',{'path':path,'odd':odd,'even':even},context_instance=RequestContext(request))
 
 
 
