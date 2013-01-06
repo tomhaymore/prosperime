@@ -16,6 +16,7 @@ from django.utils import simplejson
 from accounts.forms import FinishAuthForm, AuthForm
 from django.contrib import messages
 from lilib import LIProfile
+from accounts.tasks import ProcessLIProfile, ProcessLIConnections
 
 def login(request):
 	
@@ -208,8 +209,10 @@ def finish_login(request):
 			acct.save()
 
 			# finish processing LI profile
+			ProcessLIProfile.delay(user.id,acct.id)
 
 			# start processing connections
+			ProcessLIConnections.delay(user.id,acct.id)
 
 			return HttpResponseRedirect('/account/success')
 	else:
