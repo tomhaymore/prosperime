@@ -343,6 +343,8 @@ class LIProfile(LIBase):
 	authorize_url		= 'https://www.linkedin.com/uas/oauth/authenticate'
 	access_token_url = 'https://api.linkedin.com/uas/oauth/accessToken'
 
+	consumer = oauth.Consumer(LIBase.linkedin_key, LIBase.linkedin_secret)
+
 	user = None
 	acct = None
 
@@ -366,11 +368,11 @@ class LIProfile(LIBase):
 
 	def authenticate(self,request_token,oauth_verifier):
 		# construct oauth client
-		consumer = oauth.Consumer(self.linkedin_key, self.linkedin_secret)
+		
 
 		token = oauth.Token(request_token['oauth_token'],request_token['oauth_token_secret'])
 		token.set_verifier(oauth_verifier)
-		client = oauth.Client(consumer, token)
+		client = oauth.Client(self.consumer, token)
 
 		resp, content = client.request(self.access_token_url, "POST")
 
@@ -386,13 +388,13 @@ class LIProfile(LIBase):
 			key=access_token['oauth_token'], 
 			secret=access_token['oauth_token_secret'])
 
-		client = oauth.Client(consumer, token)
+		client = oauth.Client(self.consumer, token)
 
 		resp, content = client.request(api_url)
 
 		return (access_token,simplejson.loads(content),)
 
-	def process_profile(self,acct_id=None,user_id=None):
+	def process_profile(self,user_id=None,acct_id=None):
 
 		# get user and account objects
 		if user_id is not None:
@@ -403,7 +405,7 @@ class LIProfile(LIBase):
 			self.user = self.acct.owner
 
 		# fetch profile data from LinkedIn
-		profile = fetch_profile(self.acct.id)
+		profile = self.fetch_profile()
 
 		# make sure positions are present
 		if 'positions' in profile:
@@ -444,19 +446,19 @@ class LIProfile(LIBase):
 		fields = "(headline,id,first-name,last-name,picture-url,positions:(start-date,end-date,title,is-current,summary,company:(id)),public-profile-url),educations:(school-name,field-of-study,degree,start-date,end-date))"
 		
 		# construct url
-		api_url = "http://api.linkedin.com/v1/people/id=%s:%s?format=json" % (acct.uniq_id,fields,)
+		api_url = "http://api.linkedin.com/v1/people/id=%s:%s?format=json" % (self.acct.uniq_id,fields,)
 		 
 		# ready oauth client
 		token = oauth.Token(
 			key=self.acct.access_token, 
 			secret=self.acct.token_secret)
 
-		client = oauth.Client(consumer, token)
+		client = oauth.Client(self.consumer, token)
 
 		# fetch results
 		resp, content = client.request(api_url)
 
-		return simpleson.loads(content)
+		return simplejson.loads(content)
 
 	def add_profile_pic(self,user,url):
 		img = None
