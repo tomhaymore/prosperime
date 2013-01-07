@@ -171,3 +171,8 @@ LOGGING = {
 
 import dj_database_url
 DATABASES['default'] =  dj_database_url.config()
+
+try:
+  from settings_dev import *
+except ImportError:
+  pass
