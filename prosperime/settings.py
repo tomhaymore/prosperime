@@ -1,5 +1,7 @@
 # Django settings for prosperime project.
 
+import os
+
 # for celery
 import djcelery
 djcelery.setup_loader()
@@ -132,7 +134,7 @@ INSTALLED_APPS = (
     'entities',
     'accounts',
     'djcelery',
-    'south',
+    # 'south',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
@@ -172,7 +174,10 @@ LOGGING = {
 import dj_database_url
 DATABASES['default'] =  dj_database_url.config()
 
-try:
-  from settings_dev import *
-except ImportError:
-  pass
+if os.environ['DEVELOPMENT']:
+    from settings_dev import *
+
+# try:
+#   from settings_dev import *
+# except ImportError:
+#   pass
