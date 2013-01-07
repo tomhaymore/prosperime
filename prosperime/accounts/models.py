@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
 class Account(models.Model):
+    
     service = models.CharField(max_length=45)
     owner = models.ForeignKey(User,related_name='account')
     address = models.CharField(max_length=450,null=True)
@@ -26,7 +27,6 @@ class Account(models.Model):
         return self.service
 
 class Profile(models.Model):
-    
 
     user = models.OneToOneField(User)
     first_name = models.CharField(max_length=150,null=True)
