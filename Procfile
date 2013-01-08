@@ -1,1 +1,1 @@
-web: python prosperime/manage.py runserver 0.0.0.0:$PORT -noreload
+web: python prosperime/manage.py runserver 0.0.0.0:$PORT --noreload
