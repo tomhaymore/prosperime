@@ -174,10 +174,10 @@ LOGGING = {
 import dj_database_url
 DATABASES['default'] =  dj_database_url.config()
 
-if os.environ['DEVELOPMENT']:
-    from settings_dev import *
+# if os.environ['DEVELOPMENT']:
+#     from settings_dev import *
 
-# try:
-#   from settings_dev import *
-# except ImportError:
-#   pass
+try:
+  from settings_dev import *
+except ImportError:
+  pass
