@@ -18,6 +18,9 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+# LI callback
+LI_CALLBACK = "http://obscure-dawn-2353.herokuapp.com//account/authenticate"
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.

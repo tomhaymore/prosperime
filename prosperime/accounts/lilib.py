@@ -17,6 +17,7 @@ from django.contrib.auth.models import User
 from accounts.models import Account, Profile, Connection, Picture
 from entities.models import Position, Entity, Image, Industry, Office
 from django.core.files import File
+from django.conf import settings
 
 
 
@@ -337,7 +338,9 @@ class LIProfile(LIBase):
 	# set scope
 	scope = 'r_fullprofile+r_emailaddress+r_network'
 	# set callback
-	callback = 'http://127.0.0.1:8000/account/authenticate/'
+	# callback = 'http://127.0.0.1:8000/account/authenticate/'
+	callback = settings.LI_CALLBACK
+	
 	# set urls
 	request_token_url	= 'https://api.linkedin.com/uas/oauth/requestToken'
 	authorize_url		= 'https://www.linkedin.com/uas/oauth/authenticate'
