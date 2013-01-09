@@ -16,7 +16,7 @@ from django.utils import simplejson
 from accounts.forms import FinishAuthForm, AuthForm
 from django.contrib import messages
 from lilib import LIProfile
-from accounts.tasks import ProcessLIProfile, ProcessLIConnections
+from accounts.tasks import process_li_profile, process_li_connections
 
 def login(request):
 	
@@ -38,7 +38,7 @@ def login(request):
 	else:
 		form = AuthForm()
 
-	return render_to_response('accounts/login.html',{'form':form,'msg':msg},context_instance=RequestContext(request))
+	return render_to_response('accounts/login.html',{'form':form},context_instance=RequestContext(request))
 
 @login_required
 def logout(request):
