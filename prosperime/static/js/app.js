@@ -167,6 +167,7 @@ $(function(){
 			var pathURL = "/path/" + this.model.id;
 			// var renderedPath = pathTemplate(this.model.toJSON());
 			// $(this.el).find("div.path-viz-long").html(renderedPath);
+			_gaq.push(['_trackEvent','Search','Show Path',this.model.id])
 			$(this.el).find("div.path-viz-long").load(pathURL);
 			$(this.el).find("div.path-viz-short").toggle();
 			$(this.el).find("div.path-viz-long").toggle();
@@ -278,6 +279,9 @@ $(function(){
 		},
 
 		filter: function() {
+			// track with google
+			_gaq.push(['_trackEvent','Search','Filter',this.model.value])
+
 			// create dict of all selected filters
 			var selectedFilters = {};
 
