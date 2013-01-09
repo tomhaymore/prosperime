@@ -1,10 +1,13 @@
 # Django settings for prosperime project.
 
 import os
-
+import django
 # for celery
 import djcelery
 djcelery.setup_loader()
+
+DJANGO_ROOT = os.path.dirname(os.path.realpath(django.__file__))
+SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -51,8 +54,8 @@ USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = '/Users/thaymore/Projects/prosperime/prosperime/media/'
-
+# MEDIA_ROOT = '/Users/thaymore/Projects/prosperime/prosperime/media/'
+MEDIA_ROOT = os.path.join(SITE_ROOT, 'media')
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
@@ -68,7 +71,7 @@ STATIC_ROOT = ''
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
 
-STATIC_CSS_URL = '127.0.0.1:8000/static/'
+# STATIC_CSS_URL = '127.0.0.1:8000/static/'
 
 # URL prefix for admin static files -- CSS, JavaScript and images.
 # Make sure to use a trailing slash.
@@ -82,6 +85,11 @@ STATICFILES_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     '/Users/thaymore/Projects/prosperime/prosperime/static',
 )
+
+STATICFILES_DIRS = (
+    os.path.join(SITE_ROOT, 'static')
+)
+
 
 # List of finder classes that know how to find static files in
 # various locations.
@@ -115,11 +123,15 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'prosperime.urls'
 
+# TEMPLATE_DIRS = (
+#     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+#     # Always use forward slashes, even on Windows.
+#     # Don't forget to use absolute paths, not relative paths.
+#     '/Users/thaymore/Projects/prosperime/prosperime/templates',
+# )
+
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    '/Users/thaymore/Projects/prosperime/prosperime/templates',
+    os.path.join(SITE_ROOT, 'templates')
 )
 
 INSTALLED_APPS = (
