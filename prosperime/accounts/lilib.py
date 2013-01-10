@@ -9,7 +9,8 @@ from math import ceil
 from optparse import make_option
 import urlparse
 from bs4 import BeautifulSoup
-from _retry import retry
+# from _retry import retry
+from utilities.helpers import retry
 
 # from Django
 from django.utils import simplejson
@@ -340,7 +341,7 @@ class LIProfile(LIBase):
 	# set callback
 	# callback = 'http://127.0.0.1:8000/account/authenticate/'
 	callback = settings.LI_CALLBACK
-	
+
 	# set urls
 	request_token_url	= 'https://api.linkedin.com/uas/oauth/requestToken'
 	authorize_url		= 'https://www.linkedin.com/uas/oauth/authenticate'
