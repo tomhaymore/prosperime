@@ -122,10 +122,10 @@ img.logo-preview {
 	overflow: auto;
 }
 
-.left-list-preview {
+/*.left-list-preview {
 	float:left;
 	width:150px;
-}
+}*/
 
 .right-list-preview {
 	float:left;
@@ -415,6 +415,10 @@ input.input-search-filter {
 
 a.search-control-close:hover, a.search-control-open:hover {
 	cursor: pointer;
+}
+
+div.profile-img-holder img {
+	width:45px;
 }
 
 /* Modifiers */

@@ -527,6 +527,6 @@ def _get_positions_for_path(positions,anon=False):
 def _get_profile_pic(profile):
 	pics = Picture.objects.filter(person=profile,status="active").order_by("created")
 	if pics.exists():
-		return pics[0].pic.path
+		return pics[0].pic.__unicode__()
 	return None
 

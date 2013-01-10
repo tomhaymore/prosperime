@@ -70,17 +70,19 @@
 	<li class="list-preview">
 		<div class="left-list-preview">
 			<% if (profile_pic != null) { %>
-			<!--
-			<div class="img-holder">
+			
+			<div class="profile-img-holder pull-left">
 				<img class="logo-preview" src="/media/<%= profile_pic %>" />&nbsp;
 			</div>
-			-->
+			
 			<% } %>
 		</div>
-		<div class="right-list-preview">
+		<div class="right-list-preview pull-left">
 			<p class="path-name"><a class="path-name-link"><%= full_name %></a></p>
 			<p class="path-current-position"><%= current_position %></p>
-			<div class="path-viz">
+		</div>
+		<div class="clearfix"></div>
+		<div class="path-viz">
 				<div class="path-viz-short">
 					<% if (positions != null) {  
 					var i = 0;
@@ -105,7 +107,7 @@
 				<div class="path-viz-long" style="display:none;">
 				</div>
 
-			</div>
+			
 		</div>
 	</li>
 </script>
