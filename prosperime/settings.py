@@ -3,6 +3,8 @@
 import os
 import django
 # for celery
+BROKER_BACKEND = 'django'
+
 import djcelery
 djcelery.setup_loader()
 
@@ -94,7 +96,7 @@ STATIC_URL = '/static/'
 # )
 
 STATICFILES_DIRS = (
-        
+
     )
 
 # List of finder classes that know how to find static files in
@@ -151,6 +153,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'entities',
     'accounts',
+    'kombu.transport.django',
     'djcelery',
     # 'south',
     # Uncomment the next line to enable admin documentation:
