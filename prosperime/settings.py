@@ -94,7 +94,7 @@ STATIC_URL = '/static/'
 # )
 
 STATICFILES_DIRS = (
-        '/app/prosperime/static',
+        '/static',
     )
 
 # List of finder classes that know how to find static files in
