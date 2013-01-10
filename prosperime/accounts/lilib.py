@@ -2,6 +2,7 @@
 import oauth2 as oauth
 import cgi
 from datetime import datetime, time
+import urllib
 import urllib2
 import os
 import re
@@ -357,10 +358,10 @@ class LIProfile(LIBase):
 		consumer = oauth.Consumer(self.linkedin_key, self.linkedin_secret)
 		client = oauth.Client(consumer)
 
-		request_token_url = "%s?scope=%s&oauth_callback=%s" % (self.request_token_url, self.scope, self.callback)
+		request_token_url = "%s?scope=%s" % (self.request_token_url, self.scope,)
 
 		# get request token
-		resp, content = client.request(self.request_token_url,"POST")
+		resp, content = client.request(self.request_token_url,"POST",body=urllib.urlencode({'oauth_callbcak':self.callback}))
 		if resp['status'] != '200':
 			raise Exception(content)
 
