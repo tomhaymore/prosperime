@@ -22,7 +22,7 @@ urlpatterns = patterns('',
     url(r'^account/success','accounts.views.success'),
     url(r'^account/logout','accounts.views.logout'),
     url(r'^account/login','accounts.views.login'),
-    (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
+    (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': prosperime.settings.MEDIA_ROOT}),
     # url(r'^prosperime/', include('prosperime.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
@@ -34,5 +34,5 @@ urlpatterns = patterns('',
 
 if not settings.DEBUG:
     urlpatterns += patterns('',
-        (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
+        (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': prosperime.settings.STATIC_ROOT}),
     )
