@@ -357,7 +357,7 @@ class LIProfile(LIBase):
 		consumer = oauth.Consumer(self.linkedin_key, self.linkedin_secret)
 		client = oauth.Client(consumer)
 
-		request_token_url = "%s?scope=%s" % (self.request_token_url, self.scope, )
+		request_token_url = "%s?scope=%s&oauth_callback=%s" % (self.request_token_url, self.scope, self.callback)
 
 		# get request token
 		resp, content = client.request(self.request_token_url,"POST")
