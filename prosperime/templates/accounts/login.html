@@ -10,7 +10,7 @@
 {% if msg %}
 <p class="message_error">{{ msg }}</p>
 {% endif %}
-<p>Enter the information below to log in.</p>
+<!-- <p>Enter the information below to log in.</p> -->
 <form action="" method="post" name="login">
 	{% csrf_token %}
 	{{ form.non_field_errors }}

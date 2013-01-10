@@ -8,5 +8,5 @@ class FinishAuthForm(forms.Form):
 	confirm_password = forms.CharField(widget=forms.PasswordInput,label="Confirm Password")
 
 class AuthForm(forms.Form):
-	username = forms.CharField(label="Username")
+	username = forms.CharField(label="Username or Email")
 	password = forms.CharField(widget=forms.PasswordInput,label="Password")
