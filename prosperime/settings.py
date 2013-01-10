@@ -89,10 +89,13 @@ STATIC_URL = '/static/'
 #     '/Users/thaymore/Projects/prosperime/prosperime/static',
 # )
 
-STATICFILES_DIRS = (
-    os.path.join(SITE_ROOT, 'static'),
-)
+# STATICFILES_DIRS = (
+#     os.path.join(SITE_ROOT, 'static'),
+# )
 
+STATICFILES_DIRS = (
+        '/app/prosperime/static',
+    )
 
 # List of finder classes that know how to find static files in
 # various locations.
