@@ -1,1 +1,1 @@
-web: python prosperime/manage.py collectstatic; gunicorn prosperime.wsgi
+web: python prosperime/manage.py collectstatic --noinput; gunicorn prosperime.wsgi
