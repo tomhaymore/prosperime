@@ -121,8 +121,8 @@ def linkedin_authenticate(request):
 	request.session['_auth_user_backend'] = 'prosperime.accounts.backends.LinkedinBackend'
 	
 	user = authenticate(acct_id=linkedin_user_info['id'])
-	print user
-	print linkedin_user_info['id']
+	# print user
+	# print linkedin_user_info['id']
 	if user is not None:
 		auth_login(request,user)
 		return HttpResponseRedirect('/')
@@ -188,7 +188,7 @@ def finish_login(request):
 			user.profile.save()
 
 			# add pofile picture
-			if 'pictureUrl' in user_info:
+			if 'pictureUrl' in linkedin_user_info:
 				_add_profile_pic(user,linkedin_user_info['pictureUrl'])
 
 
@@ -235,6 +235,12 @@ def finish_link(request):
 	acct.expires_on = datetime.now() + timedelta(seconds=int(access_token['oauth_authorization_expires_in']))
 	acct.uniq_id = linkedin_user_info['id']
 	acct.save()
+
+	# finish processing LI profile
+	ProcessLIProfile.delay(request.user.id,acct.id)
+
+	# start processing connections
+	ProcessLIConnections.delay(request.user.id,acct.id)
 
 	messages.success(request, 'Your LinkedIn account has been successfully linked.')
 
