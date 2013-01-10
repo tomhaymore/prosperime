@@ -1,7 +1,7 @@
 /* Components */
 
 body {
-	padding-top:40px;
+	/*padding-top:40px;*/
 	background-color:whitesmoke;
 }
 
@@ -19,6 +19,11 @@ div.main-container {
 div.navbar-inner {
 	background-color: #fff;
 	background-image: none;
+}
+
+div.nav-container {
+	padding-left: 0px;
+	padding-right: 0px;
 }
 
 ul.nav-list {
