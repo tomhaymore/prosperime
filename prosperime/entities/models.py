@@ -37,15 +37,19 @@ class Entity(models.Model):
 	def __unicode__(self):
 		return self.name
 
+
+	def std_name(self):
+		return self.lower().replace(" ","_")
+
 class Image(models.Model):
 	
 	# returns path for uploading logos
-	def _getLogoPath(self,filename):
-		path = "logos/" + self.entity.name + "/" + filename
+	def _get_logo_path(self,filename):
+		path = "logos/" + self.entity.std_name() + "/" + filename
 		return path
 
 	entity = models.ForeignKey(Entity)
-	logo = models.ImageField(max_length=450,upload_to=_getLogoPath)
+	logo = models.ImageField(max_length=450,upload_to=_get_logo_path)
 	source = models.CharField(max_length=450,null=True)
 	logo_type = models.CharField(max_length=15,null=True)
 	description = models.TextField(null=True)
