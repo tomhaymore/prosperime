@@ -359,14 +359,15 @@ class LIProfile(LIBase):
 		client = oauth.Client(consumer)
 
 		request_token_url = "%s?scope=%s" % (self.request_token_url, self.scope,)
-
+		print request_token_url
 		# get request token
-		resp, content = client.request(self.request_token_url,"POST",body=urllib.urlencode({'oauth_callbcak':self.callback}))
+		resp, content = client.request(self.request_token_url,"POST",body=urllib.urlencode({'oauth_callback':self.callback}))
 		if resp['status'] != '200':
 			raise Exception(content)
 
 		request_token = dict(cgi.parse_qsl(content))
 
+		print request_token
 		redirect_url = "%s?oauth_token=%s" % (self.authorize_url, request_token['oauth_token'], )
 
 		return (redirect_url, request_token,)
@@ -555,6 +556,7 @@ class LIConnections(LIBase):
 		
 		# fetch connections data		
 		content = self.fetch_data_oauth(self.acct.id,self.api_url)
+		print content
 
 		# parse out connections from returned data
 		connections = content['values']
