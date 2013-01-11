@@ -116,8 +116,17 @@ def linkedin_authenticate(request):
 	liparser = LIProfile()
 
 	access_token, linkedin_user_info = liparser.authenticate(request.session['request_token'],request.GET['oauth_verifier'])
-	print linkedin_user_info
-	print 'hello'
+	# print linkedin_user_info
+	
+	# check if user is already logged on
+
+	request.session['linkedin_user_info'] = linkedin_user_info
+	request.session['access_token'] = access_token
+	
+	if request.user.is_authenticated():
+		# if loged in, link accounts and return
+		return HttpResponseRedirect('/account/link')
+
 	request.session['_auth_user_backend'] = 'prosperime.accounts.backends.LinkedinBackend'
 	
 	user = authenticate(acct_id=linkedin_user_info['id'])
