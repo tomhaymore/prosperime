@@ -199,7 +199,9 @@ def finish_login(request):
 
 			# add pofile picture
 			if 'pictureUrl' in linkedin_user_info:
-				_add_profile_pic(user,linkedin_user_info['pictureUrl'])
+				# _add_profile_pic(user,linkedin_user_info['pictureUrl'])
+				li_parser = LIProfile()
+				li_parser.add_profile_pic(user,linkedin_user_info['pictureUrl'])
 
 
 			
@@ -245,6 +247,12 @@ def finish_link(request):
 	acct.expires_on = datetime.now() + timedelta(seconds=int(access_token['oauth_authorization_expires_in']))
 	acct.uniq_id = linkedin_user_info['id']
 	acct.save()
+
+	# add pofile picture
+	if 'pictureUrl' in linkedin_user_info:
+		li_parser = LIProfile()
+		li_parser.add_profile_pic(request.user,linkedin_user_info['pictureUrl'])
+		# _add_profile_pic(request.user,linkedin_user_info['pictureUrl'])
 
 	# finish processing LI profile
 	process_li_profile.delay(request.user.id,acct.id)
