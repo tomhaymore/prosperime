@@ -2,6 +2,7 @@
 import oauth2 as oauth
 import cgi
 from datetime import datetime, timedelta
+import urlparse
 
 # from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, logout as auth_logout, login as auth_login
@@ -122,7 +123,7 @@ def linkedin_authenticate(request):
 
 	request.session['linkedin_user_info'] = linkedin_user_info
 	request.session['access_token'] = access_token
-	
+
 	if request.user.is_authenticated():
 		# if loged in, link accounts and return
 		return HttpResponseRedirect('/account/link')
