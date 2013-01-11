@@ -335,6 +335,31 @@ class LIBase():
 			formatted_date = datetime.strptime(date,"%Y-%m-%d")
 		return formatted_date
 
+	def add_profile_pic(self,user,img_url):
+		"""
+		fetches LI profile pic and uploads to db
+		"""
+		img = None
+		
+		img_filename = user.profile.std_name() + ".jpg"
+		
+		try:
+			img = urllib2.urlopen(img_url)
+		except urllib2.HTTPError, e:
+			self.stdout.write(str(e.code))
+		if img:
+			pic = Picture()
+			pic.person = user.profile
+			pic.source = 'linkedin'
+			pic.description = 'linkedin profile pic'
+			pic.save()
+			with open('tmp_img','wb') as f:
+				f.write(img.read())
+			with open('tmp_img','r') as f:
+				img_file = File(f)
+				pic.pic.save(img_filename,img_file,True)
+			os.remove('tmp_img')
+
 class LIProfile(LIBase):
 	
 	# set scope
@@ -358,10 +383,14 @@ class LIProfile(LIBase):
 		consumer = oauth.Consumer(self.linkedin_key, self.linkedin_secret)
 		client = oauth.Client(consumer)
 
+		# scope = urllib.urlencode({'scope':'r_fullprofile+r_emailaddress+r_network'})
+		# request_token_url = "%s?%s" % (self.request_token_url, scope,)
+
 		request_token_url = "%s?scope=%s" % (self.request_token_url, self.scope,)
 		print request_token_url
 		# get request token
-		resp, content = client.request(self.request_token_url,"POST",body=urllib.urlencode({'oauth_callback':self.callback}))
+		resp, content = client.request(self.request_token_url,"POST",body=urllib.urlencode({'oauth_callback':self.callback,'scope':'r_fullprofile r_emailaddress r_network'}))
+		# resp, content = client.request(self.request_token_url,"POST")
 		if resp['status'] != '200':
 			raise Exception(content)
 
@@ -466,26 +495,26 @@ class LIProfile(LIBase):
 
 		return simplejson.loads(content)
 
-	def add_profile_pic(self,user,url):
-		img = None
-		img_ext = urlparse.urlparse(img_url).path.split('/')[-1].split('.')[1]
-		img_filename = user.profile.std_name() + "." + img_ext
-		try:
-			img = urllib2.urlopen(img_url)
-		except urllib2.HTTPError, e:
-			self.stdout.write(str(e.code))
-		if img:
-			pic = Picture()
-			pic.person = user.profile
-			pic.source = 'linkedin'
-			pic.description = 'linkedin profile pic'
-			pic.save()
-			with open('tmp_img','wb') as f:
-				f.write(img.read())
-			with open('tmp_img','r') as f:
-				img_file = File(f)
-				pic.pic.save(img_filename,img_file,True)
-			os.remove('tmp_img')
+	# def add_profile_pic(self,user,url):
+	# 	img = None
+	# 	img_ext = urlparse.urlparse(img_url).path.split('/')[-1].split('.')[1]
+	# 	img_filename = user.profile.std_name() + "." + img_ext
+	# 	try:
+	# 		img = urllib2.urlopen(img_url)
+	# 	except urllib2.HTTPError, e:
+	# 		self.stdout.write(str(e.code))
+	# 	if img:
+	# 		pic = Picture()
+	# 		pic.person = user.profile
+	# 		pic.source = 'linkedin'
+	# 		pic.description = 'linkedin profile pic'
+	# 		pic.save()
+	# 		with open('tmp_img','wb') as f:
+	# 			f.write(img.read())
+	# 		with open('tmp_img','r') as f:
+	# 			img_file = File(f)
+	# 			pic.pic.save(img_filename,img_file,True)
+	# 		os.remove('tmp_img')
 
 class LIConnections(LIBase):
 
