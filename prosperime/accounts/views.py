@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from accounts.models import Account
+from accounts.models import Account, Profile
 from django.contrib.auth.models import User
 from django.utils import simplejson
 from accounts.forms import FinishAuthForm, AuthForm
@@ -238,6 +238,16 @@ def finish_link(request):
 	linkedin_user_info = request.session['linkedin_user_info']
 	access_token = request.session['access_token']
 
+	# add profile if it doesn't exit (for superadmin after reset)
+	try:
+		request.user.profile
+	except:
+		request.user.profile = Profile()
+		request.user.profile.first_name = linkedin_user_info['firstName']
+		request.user.profile.last_name = linkedin_user_info['lastName']
+		request.user.profile.headline = linkedin_user_info['headline']
+		request.user.profile.save()
+
 	# create LinkedIn account
 	acct = Account()
 	acct.owner = request.user
@@ -258,7 +268,7 @@ def finish_link(request):
 	process_li_profile.delay(request.user.id,acct.id)
 
 	# start processing connections
-	process_li_connections.delay(request.user.id,acct.id)
+	# process_li_connections.delay(request.user.id,acct.id)
 
 	messages.success(request, 'Your LinkedIn account has been successfully linked.')
 
