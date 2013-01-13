@@ -12,6 +12,7 @@ import urlparse
 from bs4 import BeautifulSoup
 # from _retry import retry
 from utilities.helpers import retry
+import dateutil
 
 # from Django
 from django.utils import simplejson
@@ -97,6 +98,22 @@ class LIBase():
 
 		return content
 
+	def get_company(self,id=None,name=None):
+		if id:
+			try:
+				co = Entity.objects.get(li_uniq_id=id)
+			except:
+				# if company doesn't exist, return None
+				return None
+		elif name:
+			try:
+				co = Entity.objects.get(li_univ_name=id)
+			except:
+				# if company doesn't exist, return None
+				return None
+		# return company
+		return co
+
 	def add_company(self,id=None,name=None):
 		# get company profile from LinkedIn
 		if name is not None:
@@ -174,13 +191,13 @@ class LIBase():
 		"""
 		# construct api url 
 		if name:
-			co_api_url = self.co_api_url + "universal-name=" + str(co_id) + ":"  + co_fields + "?format=json"
+			co_api_url = self.co_api_url + "universal-name=" + str(name) + ":"  + self.co_fields + "?format=json"
 		else:
-			co_api_url = self.co_api_url + str(co_id) + ":"  + co_fields + "?format=json"
+			co_api_url = self.co_api_url + str(co_id) + ":"  + self.co_fields + "?format=json"
 
 		print co_api_url
 
-		content = self.fetch_data_oauth(acct_id,co_api_url)
+		content = self.fetch_data_oauth(self.acct.id,co_api_url)
 
 		# check for erros
 		if 'errorCode' in content:
@@ -244,7 +261,7 @@ class LIBase():
 		o.entity = co
 		o.save()
 
-	def add_position(self,user,co,pos):
+	def add_position(self,user,co,data):
 		# dectionary of values to test for and then add if present
 		positionValues = {'title':'title','description':'summary','current':'isCurrent'}
 		
@@ -258,14 +275,17 @@ class LIBase():
 		
 		# check for start date
 		if 'startDate' in data:
-			pos.start_date = self.format_date(data['startDate'])
+			pos.start_date = self.format_dates(data['startDate'])
 		# check for end date
 		if 'endDate' in data:
-			pos.end_date = self.format_date(data['endDate'])
+			pos.end_date = self.format_dates(data['endDate'])
 		pos.save()
 
-	def get_position(self,user,co,data):
-		pos = Position.objects.filter(entity=co,person=user,title=data['title'])
+	def get_position(self,user,co,data,**kwargs):
+		if kwargs.get('type') == 'ed':
+			pos = Position.objects.filter(entity=co,person=user,degree=data['degree'])
+		else:
+			pos = Position.objects.filter(entity=co,person=user,title=data['title'])
 		if pos:
 			# if position exists, return it
 			return pos
@@ -310,15 +330,17 @@ class LIBase():
 		pos.entity = ed
 		pos.person = user
 		pos.type = 'education'
-		pos.degree = data['degree']
-		pos.field = data['fieldOfStudy']
+		if 'degree' in data:
+			pos.degree = data['degree']
+		if 'fieldOfStudy' in data:
+			pos.field = data['fieldOfStudy']
 		
 		# check for start date
 		if 'startDate' in data:
-			pos.start_date = self.format_date(data['startDate'])
+			pos.start_date = self.format_dates(data['startDate'])
 		# check for end date
 		if 'endDate' in data:
-			pos.end_date = self.format_date(data['endDate'])
+			pos.end_date = self.format_dates(data['endDate'])
 		
 		pos.save()
 
@@ -326,13 +348,19 @@ class LIBase():
 		"""
 		converts string to Python datetime object according to structure of string
 		"""
+		if date is None:
+			return None
+
 		if 'month' in date:
 			formatted_date = datetime.strptime(str(date['month'])+"/"+str(date['year']),"%m/%Y")
 		elif 'year' in date:
 			formatted_date = datetime.strptime(str(date['year']),"%Y")
 		else:
 			# start date comes from public profile, in Y-m-d format
-			formatted_date = datetime.strptime(date,"%Y-%m-%d")
+			try:
+				formatted_date = datetime.strptime(date,"%Y-%m-%d")
+			except:
+				formatted_date = dateutil.parser.parse(date)
 		return formatted_date
 
 	def add_profile_pic(self,user,img_url):
@@ -359,6 +387,25 @@ class LIBase():
 				img_file = File(f)
 				pic.pic.save(img_filename,img_file,True)
 			os.remove('tmp_img')
+
+	def mark_as_scanning(self):
+		"""
+		marks account as currently being last_scanned
+		"""
+		# set scanning to true
+		self.acct.scanning_now = True
+		# save changes
+		self.acct.save()
+
+	def record_scan(self):
+		"""
+		marks account scan as finished, records time
+		"""
+		# finish scan and record time
+		self.acct.last_scanned = datetime.now()
+		self.acct.scanning_now = False
+		# save changes
+		self.acct.save()
 
 class LIProfile(LIBase):
 	
@@ -541,7 +588,7 @@ class LIConnections(LIBase):
 
 			# check to see if new user based on LI uniq id
 			try:
-				user = User.objects.get(account__uniq_id=c['id'],service="linkedin")
+				user = User.objects.get(account__uniq_id=c['id'],account__service="linkedin")
 			except:
 				user = None
 			# check to see if privacy settings prohibit getting any useful information
@@ -553,33 +600,33 @@ class LIConnections(LIBase):
 					# add new dormant user
 					user = self.add_dormant_user(c)
 					self.add_connection(self.user,user)
-					
-					# process positions from API
-					if 'values' in c['positions']:
-						for p in c['positions']['values']:
+				
+				# process positions from API
+				if 'values' in c['positions']:
+					for p in c['positions']['values']:
 
-							# some LinkedIn positions do not have a company id value
-							if 'id' in p['company']:
-								# check to see if new company
-								co = self.get_company(id=p['company']['id'])
-								if co is None:
-									# add new company
-									co = self.add_company(id=p['company']['id'])
-									# if it's a new company, position must be new as well
-									if co is not None:
-										self.add_position(user,co,p)
-								else:
-									# TODO update company
-									pos = self.get_position(user,co,p)
-									if pos is None:
-										self.add_position(user,co,p)
-									# else:
-									# 	self.add_position(user,co,p)
-					# process public profile page
-					if 'publicProfileUrl' in c:
-						self.process_public_page(user,c['publicProfileUrl'])
-				else:
-					self.add_connection(self.focal_user,user)
+						# some LinkedIn positions do not have a company id value
+						if 'id' in p['company']:
+							# check to see if new company
+							co = self.get_company(id=p['company']['id'])
+							if co is None:
+								# add new company
+								co = self.add_company(id=p['company']['id'])
+								# if it's a new company, position must be new as well
+								if co is not None:
+									self.add_position(user,co,p)
+							else:
+								# TODO update company
+								pos = self.get_position(user,co,p)
+								if pos is None:
+									self.add_position(user,co,p)
+								# else:
+								# 	self.add_position(user,co,p)
+				# process public profile page
+				if 'publicProfileUrl' in c:
+					self.process_public_page(user,c['publicProfileUrl'])
+				
+				self.add_connection(self.user,user)
 
 	def get_connections(self,start=0):
 		
@@ -691,7 +738,8 @@ class LIConnections(LIBase):
 	def process_public_page(self,user,url):
 		# fetch html and soup it
 		
-		html = self.get_public_page(url)
+		# html = self.get_public_page(url)
+		html = urllib2.urlopen(url)
 		soup = BeautifulSoup(html)
 
 		# get all profile container divs
@@ -732,7 +780,7 @@ class LIConnections(LIBase):
 							self.add_position(user,inst,p)
 					else:
 						# TODO update company
-						pos = self.get_position(user,inst,p)
+						pos = self.get_position(user,inst,p,type="ed")
 						if pos is None:
 							self.add_ed_position(user,inst,p)
 
@@ -751,6 +799,7 @@ class LIConnections(LIBase):
 				co_uniq_name = co_uniq_name.get('href')
 				m = re.search("(?<=\/company\/)([\w-]*)",co_uniq_name)
 				co_uniq_name = m.group(0).strip()
+				print co_uniq_name
 				# get start and end dates
 				start_date = p.find("abbr","dtstart")
 				if start_date is not None:
@@ -792,25 +841,8 @@ class LIConnections(LIBase):
 				major = p.find("span","major").contents[0]
 			except:
 				major = None
-			positions.append({'inst_uniq_id':inst_uniq_id,'inst_name':inst_name,'degree':degree,'major':major})
+			positions.append({'inst_uniq_id':inst_uniq_id,'inst_name':inst_name,'degree':degree,'fieldofStudy':major})
 		return positions
 
-	def mark_as_scanning(self):
-		"""
-		marks account as currently being last_scanned
-		"""
-		# set scanning to true
-		self.acct.scanning_now = True
-		# save changes
-		self.acct.save()
 
-	def record_scan(self):
-		"""
-		marks account scan as finished, records time
-		"""
-		# finish scan and record time
-		self.acct.last_scanned = datetime.now()
-		self.acct.scanning_now = False
-		# save changes
-		self.acct.save()
 
