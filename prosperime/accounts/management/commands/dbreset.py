@@ -3,7 +3,7 @@ from optparse import make_option
 
 # from Django
 from django.contrib.auth.models import User
-from accounts.models import Profile, Connection
+from accounts.models import Profile, Connection, Account
 from entities.models import Position, Entity
 from django.core.management.base import BaseCommand, CommandError
 
@@ -35,6 +35,10 @@ class Command(BaseCommand):
 			# reset all users save admin
 			users = User.objects.exclude(pk=1)
 			users.delete()
+
+			# reset all accounts
+			accts = Account.objects.all()
+			accts.delete()
 
 			# reset all connections
 			cxns = Connection.objects.all()
