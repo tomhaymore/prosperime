@@ -37,9 +37,8 @@ class Entity(models.Model):
 	def __unicode__(self):
 		return self.name
 
-
 	def std_name(self):
-		return self.lower().replace(" ","_")
+		return self.name.lower().replace(" ","_")
 
 class Image(models.Model):
 	
