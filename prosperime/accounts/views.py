@@ -268,7 +268,7 @@ def finish_link(request):
 	process_li_profile.delay(request.user.id,acct.id)
 
 	# start processing connections
-	# process_li_connections.delay(request.user.id,acct.id)
+	process_li_connections.delay(request.user.id,acct.id)
 
 	messages.success(request, 'Your LinkedIn account has been successfully linked.')
 
