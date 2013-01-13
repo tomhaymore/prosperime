@@ -489,12 +489,20 @@ def _get_positions_for_path(positions,anon=False):
 			if domains:
 				domain = domains[0].name
 			else:
-				domain = None
+				domain = ''
 			if p.type == "education":
+				if p.degree is not None and p.field is not None:
+					title = p.degree + ", " + p.field
+				elif p.degree is not None:
+					title = p.degree
+				elif p.field is not None:
+					title = p.field
+				else:
+					title = None
 				attribs = {
 					'domain':domain,
 					'duration':p.duration(),
-					'title':p.degree + ", " + p.field
+					'title':title
 				}
 			else:
 				attribs = {
