@@ -421,6 +421,39 @@ div.profile-img-holder img {
 	width:45px;
 }
 
+/* Careers API */
+
+.careers-name {
+	font-size:18px;
+}
+.careers-user-thumbnail {
+	display:inline-block;
+	background-color: #ccc;
+}
+
+.careers-user-thumbnail img {
+	width:35px;
+	-moz-transition: all 0.5s; 
+    -webkit-transition: all 0.5s;  
+    -ms-transition: all 0.5s;  
+    -o-transition: all 0.5s;  
+    transition: all 0.5s; 
+    opacity:0.4;
+    filter:alpha(opacity=40);
+    maring-right: 5px;
+}
+
+.careers-user-thumbnail img:hover {
+	opacity:1;
+    filter:alpha(opacity=100);
+}
+
+.career-description {
+	margin-top:10px;
+	font-size:1.2em;
+	font-style:italic;
+}
+
 /* Modifiers */
 .overlap-left {
 	margin-left: -50px;
