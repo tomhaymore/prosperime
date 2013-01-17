@@ -54,6 +54,21 @@ class Profile(models.Model):
         pos = Position.objects.filter(person=self.user)
         return len(pos)
 
+    def _industries(self):
+        all_domains = []
+        positions = self.user.positions
+        for pos in positions.all():
+            domains = [i for i in pos.entity.domains.all() if i is not None ]
+            all_domains = all_domains + domains
+        return all_domains
+
+    def default_profile_pic(self):
+        if self.pictures.all():
+            return self.pictures.all()[0].pic
+
+    # domains = property(_industries)
+
+
 class Picture(models.Model):
 
     # returns path for uploading pictures
