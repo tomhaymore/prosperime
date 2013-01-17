@@ -10,8 +10,8 @@ linkedin_key = '8yb72i9g4zhm'
 linkedin_secret = 'rp6ac7dUxsvJjQpS'
 
 access_token = {
-	'oauth_token_secret': '485e5fc6-3087-4a9a-8eb9-62def3cb0894', 
-	'oauth_token': '4ac2be32-32b8-4555-bbee-ee365039e55f'
+	'oauth_token_secret': '8b6f0d3c-07c4-473c-ae1d-861448af054c', 
+	'oauth_token': '3a966b90-a051-4c06-bc14-35e3628e4c98'
 	}
 
 def test_profile():
