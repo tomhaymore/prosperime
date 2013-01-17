@@ -127,6 +127,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware'
 )
 
 ROOT_URLCONF = 'prosperime.urls'
@@ -155,6 +156,7 @@ INSTALLED_APPS = (
     'accounts',
     'kombu.transport.django',
     'djcelery',
+    # 'debug_toolbar'
     # 'south',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
