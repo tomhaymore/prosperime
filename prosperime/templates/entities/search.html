@@ -35,7 +35,7 @@
 {% endblock %}
 
 {% block rightSidebar %}
-
+<div id="search-right-sidebar">
 <div class="rounded">
 	{% if user %}
 		<p class="sidebar-header">Want to see improvements?</p>
@@ -55,7 +55,7 @@
 	{% endif %}
 
 </div>
-
+</div>
 {% if not user.profile.li_linked %}
 {{ user.li_linked }}
 <div class="rounded">
