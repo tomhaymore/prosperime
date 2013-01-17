@@ -1,0 +1,44 @@
+
+
+
+<div id="careers-container">
+{% for k,v in careers.items %}
+	<div class="careers-single">
+		<div class="careers-name pull-left">
+			<p>{{k}}</p>
+			<p class="career-description">{{k.description}}</p>
+
+		</div>
+		<div class="careers-thumbnails pull-right">
+			<div class="careers-user-thumbnails-list">
+			{% for u in v.users.values %}
+				{% if u.profile_pic != None %}
+					<span class="careers-user-thumbnail"><img src="{{MEDIA_URL}}{{u.profile_pic}}" /></span>
+				{% else %}
+					<span class="careers-user-thumbnail"><img src="{{MEDIA_URL}}pictures/anon.jpg" /></i></span>
+				{% endif %}
+			{% endfor %}
+			</div>
+			<div class="careers-orgs-thumbnails-list">
+			{% for o in v.orgs.values %}
+				{% if e.logo != None %}
+					<span class="careers-org-thumbnail"><img src="{{MEDIA_URL}}{{e.logo}}" /></span>
+				{% else %}
+					<span class="careers-org-thumbnail"><img src="" /></span>
+				{% endif %}
+			{% endfor %}
+			</div>
+		</div>
+		<div class="clearfix"></div>
+	</div>
+{% endfor %}
+</div>
+<div id="network-containter">
+	<span class="title">Overview</span>
+	<div class="nav">
+		<a class="nav-people" data-cat="people">{{overview.users.count}} people</a>
+		<a class="nav-positions" data-cat="positions">{{overview.positions.count}} positions</a>
+		<a class="nav-orgs" data-cat="orgs">{{overview.orgs.count}} companies</a>
+	</div>
+	
+</div>
