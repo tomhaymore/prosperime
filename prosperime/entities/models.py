@@ -13,7 +13,6 @@ class Entity(models.Model):
 	blog_url = models.URLField(blank=True,null=True)
 	twitter_handle = models.CharField(max_length=250,blank=True,null=True)
 	aliases = models.TextField(blank=True,null=True)
-	#domain = models.CharField(max_length=250,blank=True,null=True)
 	domains = models.ManyToManyField("Industry") # relationships to industry
 	founded_date = models.DateTimeField(blank=True,null=True)
 	deadpooled_date = models.DateTimeField(blank=True,null=True)
@@ -40,6 +39,11 @@ class Entity(models.Model):
 	def std_name(self):
 		return self.name.lower().replace(" ","_")
 
+	def default_logo(self):
+		if self.images.all():
+			return self.images.all()[0].logo
+		return None
+
 class Image(models.Model):
 	
 	# returns path for uploading logos
@@ -47,7 +51,7 @@ class Image(models.Model):
 		path = "logos/" + self.entity.std_name() + "/" + filename
 		return path
 
-	entity = models.ForeignKey(Entity)
+	entity = models.ForeignKey(Entity,related_name="images")
 	logo = models.ImageField(max_length=450,upload_to=_get_logo_path)
 	source = models.CharField(max_length=450,null=True)
 	logo_type = models.CharField(max_length=15,null=True)
@@ -62,7 +66,7 @@ class Image(models.Model):
 		return " ".join([self.entity.name,self.description,'logo'])
 
 class Position(models.Model):
-	entity = models.ForeignKey(Entity)
+	entity = models.ForeignKey(Entity,related_name="positions")
 	person = models.ForeignKey(User,related_name="positions")
 	title = models.CharField(max_length=150,null=True)
 	summary = models.CharField(max_length=450,null=True)
@@ -107,12 +111,8 @@ class Position(models.Model):
 			return self.end_date.strftime("%b %Y")
 		return None
 
-# class Relationship(models.Model):
-# 	entity1 = models.ForeignKey(Entity,related_name="entity1")
-# 	entity2 = models.ForeignKey(Entity,related_name="entity2")
-# 	description = models.CharField(max_length=150) # employee, advisor, etc
-# 	current = models.BooleanField() #
-# 	attribution = models.URLField(blank=True,null=True)
+	def industries(self):
+		return self.entity.domains.all()
 
 class Financing(models.Model):
 	investors = models.ManyToManyField(Entity,through="Investment")
@@ -132,7 +132,9 @@ class Investment(models.Model):
 
 class Industry(models.Model):
 	name = models.CharField(max_length=150)
+	description = models.TextField(blank=True,null=True)
 	li_code = models.CharField(max_length=5,null=True)
+	li_group = models.CharField(max_length=15,null=True)
 
 	def __unicode__(self):
 		return self.name
