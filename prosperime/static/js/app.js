@@ -410,7 +410,9 @@ $(function(){
 			"paths/" : "emptyPathSearch",
 			"paths/:query" : "pathSearch",
 			"companies/" : "emptyCompanySearch",
-			"companies/:query" : "companySearch"
+			"companies/:query" : "companySearch",
+			"careers/" : "emptyCareerSearch",
+			"careers/:query" : "careerSearch"
 		},
 
 		initialize: function() {
@@ -421,6 +423,26 @@ $(function(){
 			// this.orgsView = new OrgListView({ collection: this.orgs});
 			this.filtersView = new FilterListView({ collection: this.filters});
 			this.pathsView = new PathListView({ collection: this.paths});
+		},
+
+		emptyCareerSearch: function() {
+			this.filters.fetch()
+			console.log("careers search");
+			$.get('/careers/', function(data) {
+				window.fullCareers = $(data);
+				// window.careers = $(data).find("#careers-container");
+				// window.overview = $(data).find("#network-container");
+				$("div#search-results-list").empty().html(fullCareers[0]);
+				$("div#search-right-sidebar").empty().html(fullCareers[2])
+			});
+			// $("div#search-results-list").empty().html(careers);
+			// $("div#search-right-sidebar").empty().html(overview);
+			// $("div#search-results-list").empty().load("/careers/");
+			// $("div#search-right-sidebar").empty().load("/careers/overview");
+		},
+
+		careerSearch: function() {
+
 		},
 
 		emptySearch: function() {
