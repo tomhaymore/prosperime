@@ -1,34 +1,69 @@
 
-
-
 <div id="careers-container">
+<p class="main-header pull-left">Career Paths</p>
+<div class="clearfix"></div>
 {% for k,v in careers.items %}
 	<div class="careers-single">
-		<div class="careers-name pull-left">
-			<p>{{k}}</p>
+		<div class="careers-intro pull-left">
+			<a class="careers-name" data-id="{{forloop.counter0}}">{{k}}</a>
 			<p class="career-description">{{k.description}}</p>
-
+			<!-- <a class="careers-expand" data-id="{{forloop.counter0}}">Show more</a> -->
 		</div>
 		<div class="careers-thumbnails pull-right">
-			<div class="careers-user-thumbnails-list">
+			<div class="careers-user-thumbnails-list" data-id="{{forloop.counter0}}">
 			{% for u in v.users.values %}
 				{% if u.profile_pic != None %}
-					<span class="careers-user-thumbnail"><img src="{{MEDIA_URL}}{{u.profile_pic}}" /></span>
+					<span class="careers-user-thumbnail"><img title="{{u.first_name}} {{u.last_name}}" src="{{MEDIA_URL}}{{u.profile_pic}}" /></span>
 				{% else %}
-					<span class="careers-user-thumbnail"><img src="{{MEDIA_URL}}pictures/anon.jpg" /></i></span>
+					<span class="careers-user-thumbnail"><img title="{{u.first_name}} {{u.last_name}}" src="{{MEDIA_URL}}pictures/anon.jpg" /></i></span>
 				{% endif %}
 			{% endfor %}
 			</div>
 			<div class="careers-orgs-thumbnails-list">
 			{% for o in v.orgs.values %}
-				{% if e.logo != None %}
-					<span class="careers-org-thumbnail"><img src="{{MEDIA_URL}}{{e.logo}}" /></span>
+				{% if o.logo != None %}
+					<!-- <span class="careers-org-thumbnail"><img title="{{o.name}}" src="{{MEDIA_URL}}{{o.logo}}" /></span> -->
 				{% else %}
-					<span class="careers-org-thumbnail"><img src="" /></span>
+					<!-- <span class="careers-org-thumbnail"><img title="{{o.name}}" src="" /></span> -->
 				{% endif %}
 			{% endfor %}
 			</div>
 		</div>
+		<div class="clearfix"></div>
+		<div class="careers-info" data-id="{{forloop.counter0}}" style="display:none;">
+			
+			<div class="careers-stats pull-left">
+				<div class="pull-left right-spacer careers-stats-holder" data-type="users" data-id="{{forloop.counter0}}"><span data-type="users" data-id="{{forloop.counter0}}" class="careers-stats-count">{{v.users.count}}</span> <br/>
+						<span>people</span></div>
+				<div class="pull-left right-spacer careers-stats-holder" data-type="positions" data-id="{{forloop.counter0}}"><span data-type="positions" data-id="{{forloop.counter0}}" class="careers-stats-count">{{v.positions.count}}</span><br/>
+						<span>positions</span></div>
+				<div class="pull-left right-spacer careers-stats-holder" data-type="orgs" data-id="{{forloop.counter0}}"><span data-type="orgs" data-id="{{forloop.counter0}}" class="careers-stats-count">{{v.orgs.count}}</span><br/>
+						<span>companies</span></div>
+				<div class="clearfix"></div>
+			</div>
+			<div class="careers-info-list pull-right">
+				<div class="careers-info-positions" data-id="{{forloop.counter0}}">
+					{% for p in v.positions.values %}
+						{% if forloop.last %}
+							{{p.title}}
+						{% else %}
+							{{p.title}},
+						{% endif %}
+					{% endfor %}
+				</div>
+				<div class="careers-info-orgs" data-id="{{forloop.counter0}}">
+					{% for o in v.orgs.values %}
+						{% if forloop.last %}
+							{{o.name}}
+						{% else %}
+							{{o.name}}, 
+						{% endif %}
+					{% endfor %}
+				</div>
+			</div>
+
+		</div>
+		
 		<div class="clearfix"></div>
 	</div>
 {% endfor %}
@@ -39,6 +74,44 @@
 		<a class="nav-people" data-cat="people">{{overview.users.count}} people</a>
 		<a class="nav-positions" data-cat="positions">{{overview.positions.count}} positions</a>
 		<a class="nav-orgs" data-cat="orgs">{{overview.orgs.count}} companies</a>
+		<div id="arc-container">
+		    
+		    
+		</div>
 	</div>
-	
 </div>
+<script>
+		window.archtype = Raphael("arc-container", 200, 100);
+		archtype.customAttributes.arc = function (xloc, yloc, value, total, R) {
+		    var alpha = 360 / total * value,
+		        a = (90 - alpha) * Math.PI / 180,
+		        x = xloc + R * Math.cos(a),
+		        y = yloc - R * Math.sin(a),
+		        path;
+		    if (total == value) {
+		        path = [
+		            ["M", xloc, yloc - R],
+		            ["A", R, R, 0, 1, 1, xloc - 0.01, yloc - R]
+		        ];
+		    } else {
+		        path = [
+		            ["M", xloc, yloc - R],
+		            ["A", R, R, 0, +(alpha > 180), 1, x, y]
+		        ];
+		    }
+		    return {
+		        path: path
+		    };
+		};
+
+		//make an arc at 50,50 with a radius of 30 that grows from 0 to 40 of 100 with a bounce
+		var my_arc = archtype.path().attr({
+		    "stroke": "#f00",
+		    "stroke-width": 14,
+		    arc: [50, 50, 0, 100, 30]
+		});
+
+		my_arc.animate({
+		    arc: [50, 50, 50, 100, 30]
+		}, 1500, "bounce");
+	</script>

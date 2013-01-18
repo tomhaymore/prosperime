@@ -403,6 +403,69 @@ $(function(){
 
 	});
 
+	window.CareersView = Backbone.View.extend({
+
+		el: $("#search-results-list"),
+
+		initialize: function() {
+			_.bindAll(this,'render');
+		},
+
+		events: {
+			"click .careers-name"			: "expandInfo",
+			"click .careers-stats-holder"	: "exposeInfo"
+
+		},
+
+		render: function() {
+			$(this.el).empty();
+			console.log('trying to render');
+			$.get('/careers/', function(data) {
+				window.fullCareers = $(data);
+				$("div#search-results-list").html(fullCareers[0]);
+				// $(this.el).append(fullCareers[0]);
+				$("div#search-right-sidebar").empty().html(fullCareers[2]);
+				$("div#search-right-sidebar").append(fullCareers[4]);
+				
+			});
+			return this;
+		},
+
+		expandInfo: function(ev) {
+			var divId = $(ev.target).data("id");
+			var div = $.find(".careers-info[data-id='"+divId+"']");
+			if ($(div).is(":visible")) {
+				$(div).hide('fast');
+			} else {
+				$(".careers-info").hide('fast');
+				$(div).show('fast');
+			}
+			
+		},
+
+		exposeInfo: function(ev) {
+			var countType = $(ev.target).data("type");
+			var divId = $(ev.target).data("id");
+			var thumbnailsList = $.find(".careers-user-thumbnails-list[data-id='"+divId+"']");
+			var thumbnails = $(thumbnailsList).find('img');
+			var positions = $.find(".careers-info-positions[data-id='"+divId+"']");
+			var orgs = $.find(".careers-info-orgs[data-id='"+divId+"']");
+			console.log(countType);
+			if (countType == "users") {	
+				$(thumbnails).removeClass("careers-users-thumbnails").addClass("careers-users-thumbnails-expose");
+			} else if (countType == "positions") {
+				$(thumbnails).removeClass("careers-users-thumbnails-expose").removeClass("careers-users-thumbnails");
+				$(orgs).hide()
+				$(positions).show();
+			} else if (countType == "orgs") {
+				$(thumbnails).removeClass("careers-users-thumbnails-expose").removeClass("careers-users-thumbnails");
+				$(positions).hide();
+				$(orgs).show();
+			}
+		}
+
+	});
+
 	window.SearchRouter = Backbone.Router.extend({
 
 		routes: {
@@ -428,13 +491,16 @@ $(function(){
 		emptyCareerSearch: function() {
 			this.filters.fetch()
 			console.log("careers search");
-			$.get('/careers/', function(data) {
-				window.fullCareers = $(data);
-				// window.careers = $(data).find("#careers-container");
-				// window.overview = $(data).find("#network-container");
-				$("div#search-results-list").empty().html(fullCareers[0]);
-				$("div#search-right-sidebar").empty().html(fullCareers[2])
-			});
+			this.careersView = new CareersView();
+			this.careersView.render();
+			// $.get('/careers/', function(data) {
+			// 	window.fullCareers = $(data);
+			// 	// window.careers = $(data).find("#careers-container");
+			// 	// window.overview = $(data).find("#network-container");
+			// 	$("div#search-results-list").empty().html(fullCareers[0]);
+			// 	$("div#search-right-sidebar").empty().html(fullCareers[2]);
+			// 	$("div#search-right-sidebar").append(fullCareers[4]);
+			// });
 			// $("div#search-results-list").empty().html(careers);
 			// $("div#search-right-sidebar").empty().html(overview);
 			// $("div#search-results-list").empty().load("/careers/");
