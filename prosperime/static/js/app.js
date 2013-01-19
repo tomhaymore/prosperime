@@ -412,14 +412,14 @@ $(function(){
 		},
 
 		events: {
-			"click .careers-name"			: "expandInfo",
-			"click .careers-stats-holder"	: "exposeInfo"
+			"hover .careers-single"		: "fadeIn",
+			"mouseout .careers-single"	: "fadeOut"
 
 		},
 
 		render: function() {
 			$(this.el).empty();
-			console.log('trying to render');
+			
 			$.get('/careers/', function(data) {
 				window.fullCareers = $(data);
 				$("div#search-results-list").html(fullCareers[0]);
@@ -431,37 +431,26 @@ $(function(){
 			return this;
 		},
 
-		expandInfo: function(ev) {
-			var divId = $(ev.target).data("id");
-			var div = $.find(".careers-info[data-id='"+divId+"']");
-			if ($(div).is(":visible")) {
-				$(div).hide('fast');
-			} else {
-				$(".careers-info").hide('fast');
-				$(div).show('fast');
-			}
+		fadeIn: function(ev) {
+			$("img.careers-user-thumbnail").removeClass("careers-user-thumbnail-expose");
+			console.log(ev.target);
+			var par = $(ev.target).parent(".careers-single");
+			var imgs = $(par).find('img');
+			$(imgs).toggleClass("careers-user-thumbnail-expose");
+
+			var stats = $(par).find('div.careers-stats');
+			$(stats).addClass("careers-stats-expose");
 			
+
 		},
 
-		exposeInfo: function(ev) {
-			var countType = $(ev.target).data("type");
-			var divId = $(ev.target).data("id");
-			var thumbnailsList = $.find(".careers-user-thumbnails-list[data-id='"+divId+"']");
-			var thumbnails = $(thumbnailsList).find('img');
-			var positions = $.find(".careers-info-positions[data-id='"+divId+"']");
-			var orgs = $.find(".careers-info-orgs[data-id='"+divId+"']");
-			console.log(countType);
-			if (countType == "users") {	
-				$(thumbnails).removeClass("careers-users-thumbnails").addClass("careers-users-thumbnails-expose");
-			} else if (countType == "positions") {
-				$(thumbnails).removeClass("careers-users-thumbnails-expose").removeClass("careers-users-thumbnails");
-				$(orgs).hide()
-				$(positions).show();
-			} else if (countType == "orgs") {
-				$(thumbnails).removeClass("careers-users-thumbnails-expose").removeClass("careers-users-thumbnails");
-				$(positions).hide();
-				$(orgs).show();
-			}
+		fadeOut: function(ev) {
+			var par = $(ev.target).parent(".careers-single");
+			var imgs = $(par).find('img');
+			$(imgs).removeClass("careers-user-thumbnail-expose");
+
+			var stats = $(par).find('div.careers-stats');
+			$(stats).removeClass("careers-stats-expose");
 		}
 
 	});
