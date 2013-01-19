@@ -3,6 +3,7 @@
 body {
 	/*padding-top:40px;*/
 	background-color:whitesmoke;
+	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 }
 
 div.main-container {
@@ -33,7 +34,8 @@ ul.nav-list {
 /* Home page */
 
 div#splash-home {
-	background-color: rgb(41,98,162);
+	/*background-color: rgb(41,98,162);*/
+	background-image: url('/static/img/bg-gradient-1.png');
 	margin:0;
 	padding: 20px 0 30px 0; 
 }
@@ -44,15 +46,28 @@ div.splash-container {
 }
 
 p.splash-message-header {
-	color:white;
+	/*color:white;*/
+	/*color:#363a3d;*/
+	color:#000;
 	font-size: 1.6em;
 	line-height: 1.8em;
+	margin-top:30px;
+	font-weight: 500;
+}
+
+p.splash-message-subheader {
+	font-size: 1.4em;
+	line-height: 1.6em;
+	/*font-weight: bold;*/
+	color:#363a3d;
 }
 
 a.splash-message, p.splash-message {
-	color:#ddd;
-	font-size: 1.1em;
+	/*color:#ddd;*/
+	color:#363a3d;
+	font-size: 1.2em;
 	line-height: 1.4em;
+	vertical-align: middle;
 }
 
 a.splash-message:hover {
@@ -434,12 +449,13 @@ div.profile-img-holder img {
 	color:rgb(41,98,162);
 	cursor:pointer;
 }
-.careers-user-thumbnail {
+.careers-user-thumbnails-list span {
 	display:inline-block;
 	background-color: #ccc;
+	width: 35px;
 }
 
-.careers-user-thumbnail img {
+.careers-user-thumbnail {
 	width:35px;
 	-moz-transition: all 0.5s; 
     -webkit-transition: all 0.5s;  
@@ -448,10 +464,10 @@ div.profile-img-holder img {
     transition: all 0.5s; 
     opacity:0.4;
     filter:alpha(opacity=40);
-    maring-right: 5px;
+    margin-right: 5px;
 }
 
-.careers-user-thumbnail-expose, .careers-user-thumbnail img:hover {
+.careers-user-thumbnail-expose, .careers-user-thumbnail:hover {
 	opacity:1;
     filter:alpha(opacity=100);
 }
@@ -478,8 +494,9 @@ div.profile-img-holder img {
 
 .careers-stats {
 	font-size:0.9em;
-	color:#ccc;
+	color:#999;
 	text-align: center;
+	margin-left:15px;
 }
 
 .careers-stats div {
@@ -498,7 +515,7 @@ div.profile-img-holder img {
 	
 }
 
-.careers-stats div:hover {
+.careers-stats-expose, .careers-stats div:hover {
 	color:rgb(41,98,162);
 }
 
@@ -536,4 +553,12 @@ a.careers-expand:hover {
 
 .right-spacer {
 	margin-right: 15px;
+}
+
+.top-spacer {
+	margin-top: 15px;
+}
+
+.clearfix {
+	z-index: -9999;
 }
