@@ -226,7 +226,8 @@ def finish_login(request):
 			# start processing connections
 			process_li_connections.delay(user.id,acct.id)
 
-			return HttpResponseRedirect('/account/success')
+			#return HttpResponseRedirect('/account/success')
+			return HttpResponseRedirect('/search')
 	else:
 		form = FinishAuthForm()
 

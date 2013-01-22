@@ -429,3 +429,86 @@ div.profile-img-holder img {
 .left-spacer {
 	margin-left:15px;
 }
+
+
+
+/*PATH VIZ - CLAYTON */
+.center {
+	text-align:center;
+}
+
+.timeline {
+	overflow: hidden;
+	width:100%;
+	border:1px solid #999;
+	padding:4px;
+	border-collapse:separate;
+	border-radius:8px;
+}
+
+.timeline tr {
+	padding:4px;
+}
+
+.timeline td {
+	border-radius:4px;
+	-webkit-border-radius:4px;
+	-moz-border-radius:4px;
+}
+
+.timeline-col-highlighted {
+	/*border:1px solid midnightblue;*/
+	font-size:12px;
+	border-radius:5px;
+	background-color:#eee;
+	*background-color: #ddd;
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#eee),to(#ddd) );
+	background-image: -webkit-linear-gradient(top, #eee, #ddd);
+	background-image: -o-linear-gradient(top, #eee, #ddd);
+	background-image: linear-gradient(to bottom, #eee, #ddd);
+	background-image: -moz-linear-gradient(top, #eee, #ddd);
+	background-repeat: repeat-x;
+}
+
+.timeline td .timeline-row-bottom {
+	/*border-top:1px solid #999;*/
+	/*width:100%;*/
+}
+
+.timeline-col-start {
+	text-align:left;
+	font-weight:bold;
+}
+
+.timeline-col-end {
+	text-align:right;
+	font-weight:bold;
+
+}
+
+.popover-content {
+	display: none;
+}
+
+.popover {
+	text-align: center;
+}
+
+.timeline-company-span {
+
+}
+
+.timeline td .timeline-title-span {
+	/*display:none;*/
+}
+
+.Ryan {
+	background:red;
+}
+
+.Brown-timeline {
+	background:blue;
+}
+
+
+

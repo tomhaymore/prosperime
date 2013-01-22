@@ -99,6 +99,7 @@ class LIBase():
 		return content
 
 	def get_company(self,id=None,name=None):
+		co = None
 		if id:
 			try:
 				co = Entity.objects.get(li_uniq_id=id)
@@ -537,7 +538,6 @@ class LIProfile(LIBase):
 
 		client = oauth.Client(self.consumer, token)
 
-		# fetch results
 		resp, content = client.request(api_url)
 
 		return simplejson.loads(content)

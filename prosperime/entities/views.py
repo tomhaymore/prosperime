@@ -25,7 +25,7 @@ def home(request):
 		# user is logged in, display personalized information
 		return HttpResponseRedirect('search')
 	data = {}
-	return render_to_response('home.html',data,context_instance=RequestContext(request))
+	return render_to_response('home.html',data,context_instance=RequestContext(request)) ## Clay - change this
 
 def search(request):
 	
@@ -480,24 +480,55 @@ def _get_positions_for_path(positions,anon=False):
 		formatted_positions = []
 		# loop through each position
 		no_of_positions = len(positions)
+		# attribs['no_of_positions'] = no_of_positions
 		# print "# of pos: " + str(no_of_positions)
 		i = 0
 		for p in positions:
 			# print p.id
 			# get first industry domain of company
 			domains = p.entity.domains.all()
+
+
 			if domains:
 				domain = domains[0].name
 			else:
 				domain = None
+
+			
+			print p.type
+			# education or org
 			if p.type == "education":
-				attribs = {
-					'domain':domain,
-					'duration':p.duration(),
-					'title':p.degree + ", " + p.field
-				}
+				if p.degree is not None:
+					if p.field is not None:
+						attribs = {
+							'domain':domain,
+							'duration':p.duration(),
+							'title':p.degree + ", " + p.field,
+							'type': "education"
+						}
+					else:
+						attribs = {
+							'domain':domain,
+							'duration':p.duration(),
+							'title':p.degree,
+							'type': "education"
+						}
+				else:
+					if p.field is not None:
+						attribs = {
+							'domain':domain,
+							'duration':p.duration(),
+							'title': p.field,
+							'type:': 'education'
+						}
+				# attribs = {
+				# 	'domain':domain,
+				# 	'duration':p.duration(),
+				# 	'title':p.degree + ", " + p.field
+				# }
 			else:
 				attribs = {
+					'type': 'org',
 					'domain':domain,
 					'duration':p.duration(),
 					'title':p.title
@@ -520,6 +551,8 @@ def _get_positions_for_path(positions,anon=False):
 				attribs['last_position'] = True
 			else:
 				attribs['last_position'] = False
+
+			attribs['no_of_positions'] = no_of_positions
 		return formatted_positions
 	# if no positions, return None
 	return None
