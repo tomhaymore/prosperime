@@ -38,6 +38,7 @@ div#splash-home {
 	background-image: url('/static/img/bg-gradient-1.png');
 	margin:0;
 	padding: 20px 0 30px 0; 
+	height:250px;
 }
 
 div.splash-container {
@@ -84,7 +85,8 @@ p.promo-message {
 }
 
 div#promo-message-container {
-	margin-top:10px;
+	padding-top:10px;
+	background-color: whitesmoke;
 }
 
 ul {
