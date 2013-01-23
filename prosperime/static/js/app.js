@@ -3,6 +3,29 @@
 
 $(function(){
 
+	// window.archtype = Raphael($("#arc-container"), 150, 150);
+
+	// archtype.customAttributes.arc = function (xloc, yloc, value, total, R) {
+	//     var alpha = 360 / total * value,
+	//         a = (90 - alpha) * Math.PI / 180,
+	//         x = xloc + R * Math.cos(a),
+	//         y = yloc - R * Math.sin(a),
+	//         path;
+	//     if (total == value) {
+	//         path = [
+	//             ["M", xloc, yloc - R],
+	//             ["A", R, R, 0, 1, 1, xloc - 0.01, yloc - R]
+	//         ];
+	//     } else {
+	//         path = [
+	//             ["M", xloc, yloc - R],
+	//             ["A", R, R, 0, +(alpha > 180), 1, x, y]
+	//         ];
+	//     }
+	//     return {
+	//         path: path
+	//     };
+	// };
 	// Models
 
 	// Filter: dynamically loaded search param
@@ -45,6 +68,8 @@ $(function(){
 				init_path = '/filters/';
 			} else if (this._meta['view'] == 'paths') {
 				init_path = '/pathfilters/';
+			} else if (this._meta['view'] == 'careers') {
+				init_path = '/careerfilters/';
 			} else {
 				init_path = '/pathfilters/';
 			}
@@ -289,7 +314,8 @@ $(function(){
 			var sectorFilters = $("input[name='Sector-filters']:checked").map(function(filter) { return this.value });
 			var sizeFilters = $("input[name='Size-filters']:checked").map(function(filter) { return this.value });
 			var stageFilters = $("input[name='Stage-filters']:checked").map(function(filter) { return this.value });
-			
+			var positionFilters = $("input[name='Positions-filters']:checked").map(function(filter) { return this.value });
+
 			// construct URL
 
 			if (locationFilters.length > 0 ) {
@@ -303,6 +329,9 @@ $(function(){
 			}
 			if (stageFilters.length > 0) {
 				selectedFilters.stage = stageFilters;
+			}
+			if (positionFilters.length > 0) {
+				selectedFilters.position = positionFilters;
 			}
 			
 			// set initial URL path
@@ -403,54 +432,187 @@ $(function(){
 
 	});
 
+	
+	window.arcMeta = {
+		'peopleArc':null, 
+		'orgsArc':null, 
+		'positionsArc': null,
+		'usersCount': null,
+		'orgsCount': null,
+		'positionsCount': null,
+		'fullUsersCount': null,
+		'fullOrgsCount': null,
+		'fullPositionsCount': null,
+	};
+
 	window.CareersView = Backbone.View.extend({
+
+		// var peopleArc, orgsArc, positionsArc, usersCount,orgsCount,positionsCount,fullUsersCount,fullOrgsCount,fullPositionsCount,
+		// initialize array of meta data
 
 		el: $("#search-results-list"),
 
+		url: function() {
+			if (this._meta['query'] === undefined) {
+				return '/careers';
+			} else {
+				return '/careers'+this._meta['query'];
+			}
+		},
+
 		initialize: function() {
 			_.bindAll(this,'render');
+			this._meta = {};
+			// window.archtype = Raphael("arc-container", 150, 150);
+			
+
+			// archtype.customAttributes.arc = function (xloc, yloc, value, total, R) {
+			//     var alpha = 360 / total * value,
+			//         a = (90 - alpha) * Math.PI / 180,
+			//         x = xloc + R * Math.cos(a),
+			//         y = yloc - R * Math.sin(a),
+			//         path;
+			//     if (total == value) {
+			//         path = [
+			//             ["M", xloc, yloc - R],
+			//             ["A", R, R, 0, 1, 1, xloc - 0.01, yloc - R]
+			//         ];
+			//     } else {
+			//         path = [
+			//             ["M", xloc, yloc - R],
+			//             ["A", R, R, 0, +(alpha > 180), 1, x, y]
+			//         ];
+			//     }
+			//     return {
+			//         path: path
+			//     };
+			// };
 		},
 
 		events: {
 			"hover .careers-single"		: "fadeIn",
-			"mouseout .careers-single"	: "fadeOut"
+			"click .careers-single"		: "expandCareer",
+			// "click .careers-single"		: "drawArc"
 
 		},
 
 		render: function() {
 			$(this.el).empty();
 			
-			$.get('/careers/', function(data) {
-				window.fullCareers = $(data);
-				$("div#search-results-list").html(fullCareers[0]);
-				// $(this.el).append(fullCareers[0]);
-				$("div#search-right-sidebar").empty().html(fullCareers[2]);
-				$("div#search-right-sidebar").append(fullCareers[4]);
+			var _this = this;
+
+			$.get(_this.url(), function(data) {
 				
-			});
+				fullCareers = $(data);
+				$("div#search-results-list").html(fullCareers[0]);
+				
+				$("div#search-right-sidebar").empty().html(fullCareers[2]);
+				
+				// $("div#search-right-sidebar").append(fullCareers[4]);
+
+				var thisContainer = fullCareers.find("#careers-header");
+
+				// arcMeta.fullUsersCount = thisContainer.data('userscount');
+				// arcMeta.fullPositionsCount = thisContainer.data('positionscount');
+				// arcMeta.fullOrgsCount = thisContainer.data('orgscount');
+
+				_this.meta('fullUsersCount',thisContainer.data('userscount'));
+				_this.meta('fullPositionsCount',thisContainer.data('positionscount'));
+				_this.meta('fullOrgsCount',thisContainer.data('orgscount'));
+
+
+			});	
+
+
+			// arcMeta.peopleArc = archtype.path().attr({
+			//     "stroke": "#f00",
+			//     "stroke-width": 10,
+			//     arc: [75, 60, 100, 100, 30]
+			// });
+
+			// arcMeta.orgsArc = archtype.path().attr({
+			// 	"stroke": "#8c8c8c",
+			// 	"stroke-width": 10,
+			// 	arc: [75, 60,100,100,40]
+			// })
+
+			// arcMeta.positionsArc = archtype.path().attr({
+			// 	"stroke": "#8c8c8c",
+			// 	"stroke-width": 10,
+			// 	arc: [75, 60,100,100,50]
+			// })
+
+
 			return this;
 		},
 
 		fadeIn: function(ev) {
 			$("img.careers-user-thumbnail").removeClass("careers-user-thumbnail-expose");
-			console.log(ev.target);
-			var par = $(ev.target).parent(".careers-single");
-			var imgs = $(par).find('img');
+
+			var imgs = ($(ev.currentTarget).find('img'));
 			$(imgs).toggleClass("careers-user-thumbnail-expose");
 
-			var stats = $(par).find('div.careers-stats');
-			$(stats).addClass("careers-stats-expose");
+			var stats = ($(ev.currentTarget).find('div.careers-stats'));
+			$(stats).toggleClass("careers-stats-expose");
 			
-
 		},
 
-		fadeOut: function(ev) {
-			var par = $(ev.target).parent(".careers-single");
-			var imgs = $(par).find('img');
-			$(imgs).removeClass("careers-user-thumbnail-expose");
+		drawArc: function(ev) {
+			this.expandCareer(ev);
+			var thisCareer = $(ev.currentTarget);
+			// console.log(thisCareer.data());
+			usersCount = thisCareer.data('userscount');
+			positionsCount = thisCareer.data('positionscount')
+			orgsCount = thisCareer.data('orgscount');
+			
+			// console.log([75,60,usersCount,arcMeta.fullUsersCount,30]);
+			
+			arcMeta.peopleArc.attr({arc:[75,60,usersCount,arcMeta.fullUsersCount,30]});
+			arcMeta.orgsArc.attr({arc:[75,60,orgsCount,arcMeta.fullOrgsCount,40]});
+			arcMeta.positionsArc.attr({arc:[75,60,positionsCount,arcMeta.fullPositionsCount,50]});
 
-			var stats = $(par).find('div.careers-stats');
-			$(stats).removeClass("careers-stats-expose");
+	
+		},
+
+		expandCareer: function(ev) {
+			
+			var currentTarget = $(ev.currentTarget);
+			
+			usersCount = currentTarget.data('userscount');
+			positionsCount = currentTarget.data('positionscount')
+			orgsCount = currentTarget.data('orgscount');
+
+			var careerInfo = currentTarget.find(".careers-info");
+
+			if (careerInfo.hasClass('hidden')) {
+				$(".careers-info").addClass('hidden');
+				
+				careerInfo.toggleClass('hidden');
+
+				this.updateStats([usersCount,positionsCount,orgsCount])
+			} else {
+				$(".careers-info").addClass('hidden');
+
+				this.updateStats([this.meta('fullUsersCount'),this.meta('fullPositionsCount'),this.meta('fullOrgsCount')])
+			}
+			
+		},
+
+		updateStats: function(stats) {
+
+			$(".careers-stats-people").html(stats[0]);
+			$(".careers-stats-positions").html(stats[1]);
+			$(".careers-stats-orgs").html(stats[2]);
+		},
+
+		meta: function(prop, value) {
+			if (value === undefined) {
+				// if value is empty, return property of key
+				return this._meta[prop];
+			} else {
+				// if both key and value exist, set value of key
+				this._meta[prop] = value;
+			}
 		}
 
 	});
@@ -475,29 +637,34 @@ $(function(){
 			// this.orgsView = new OrgListView({ collection: this.orgs});
 			this.filtersView = new FilterListView({ collection: this.filters});
 			this.pathsView = new PathListView({ collection: this.paths});
+			this.careersView = new CareersView();
 		},
 
 		emptyCareerSearch: function() {
-			this.filters.fetch()
 			console.log("careers search");
-			this.careersView = new CareersView();
+			this.filters.meta('view','careers');
+			this.filters.meta('query','');
+			this.filters.fetch()
+			
 			this.careersView.render();
-			// $.get('/careers/', function(data) {
-			// 	window.fullCareers = $(data);
-			// 	// window.careers = $(data).find("#careers-container");
-			// 	// window.overview = $(data).find("#network-container");
-			// 	$("div#search-results-list").empty().html(fullCareers[0]);
-			// 	$("div#search-right-sidebar").empty().html(fullCareers[2]);
-			// 	$("div#search-right-sidebar").append(fullCareers[4]);
-			// });
-			// $("div#search-results-list").empty().html(careers);
-			// $("div#search-right-sidebar").empty().html(overview);
-			// $("div#search-results-list").empty().load("/careers/");
-			// $("div#search-right-sidebar").empty().load("/careers/overview");
+
 		},
 
-		careerSearch: function() {
-
+		careerSearch: function(query) {
+			console.log(query);
+			this.filters.meta('view','careers');
+			
+			// test for empty search string, make sure to uncheck all filters
+			if (query === undefined) {
+				this.filtersView.uncheckAll();
+				this.careersView.meta('query',null);
+				this.filters.meta('query',null);
+			} else {
+				this.careersView.meta('query',query);
+				this.filters.meta('query',query);	
+			}
+			this.careersView.render();
+			this.filters.fetch();
 		},
 
 		emptySearch: function() {
@@ -593,6 +760,8 @@ $(function(){
 		}
 		return fullUrl;
 	}
+
+
 
 	window.App = new SearchRouter;
 	Backbone.history.start();

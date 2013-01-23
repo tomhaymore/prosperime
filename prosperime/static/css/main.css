@@ -345,7 +345,7 @@ div.path-viz-timeline-left {
 }
 div.path-viz-timeline-center {
 	/*height: 250px;*/
-	background-image: url('http://127.0.0.1:8000/static/img/path-viz-line.png');
+	background-image: url('/static/img/path-viz-line.png');
 	background-repeat: repeat-y;
 	background-position:center;
 	width:25px;
@@ -441,9 +441,20 @@ div.profile-img-holder img {
 /* Careers API */
 
 .careers-single{
-	/*border-bottom: 1px #ccc solid;*/
+	min-height: 50px;
 	margin-bottom: 10px;
 	padding-bottom: 10px;
+	background-position: center bottom;
+	background-repeat: no-repeat;
+	transition: background 0.5s;
+	-moz-transition: background 0.5s;
+	-webkit-transition: background 0.5s;
+	-o-transition: background 0.5s;
+}
+
+.careers-single:hover {
+	background-image: url('/static/img/chevron.png');
+	
 }
 
 .careers-name {
@@ -485,7 +496,6 @@ div.profile-img-holder img {
     filter:alpha(opacity=40);
     maring-right: 5px;
 }
-
 
 
 .career-description {
@@ -544,6 +554,56 @@ a.careers-expand:hover {
 	display:none;
 }
 
+.chevron {
+	background-image: url('/static/img/chevron.png');
+	background-position: center bottom;
+	background-repeat: no-repeat;
+}
+
+span.careers-stats-people {
+	width: 35px;
+	background-color: rgb(41,98,162);
+	color: #fff;
+	display:inline-block;
+	border-radius:1px;
+	text-align: center;
+	margin-bottom: 5px;
+	padding:2px;
+}
+
+span.careers-stats-positions {
+	width: 35px;
+	background-color: rgb(50,121,202);
+	color: #fff;
+	display:inline-block;
+	border-radius:1px;
+	text-align: center;
+	margin-bottom: 5px;
+	padding:2px;
+}
+
+span.careers-stats-orgs {
+	width: 35px;
+	background-color: rgb(59,142,236);
+	color: #fff;
+	display:inline-block;
+	border-radius:1px;
+	text-align: center;
+	margin-bottom: 5px;
+	padding:2px;
+}
+
+.careers-preview-list {
+	margin-left: 15px;
+	font-size: 0.9em;
+	margin-top:15px;
+	margin-right: 15px;
+}
+
+#network-container {
+	position:fixed;
+}
+
 /* Modifiers */
 .overlap-left {
 	margin-left: -50px;
@@ -559,8 +619,4 @@ a.careers-expand:hover {
 
 .top-spacer {
 	margin-top: 15px;
-}
-
-.clearfix {
-	z-index: -9999;
 }
