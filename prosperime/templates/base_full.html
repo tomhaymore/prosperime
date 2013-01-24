@@ -17,17 +17,18 @@
 
 <body>
 	
-		<div class="navbar nav-container navbar-static-top">
-			<div class="navbar-inner nav-container">
-				<div class="container-fluid nav-container">
+		<div class="navbar navbar-static-top">
+			<div class="navbar-inner">
+				<div class="row-fluid">
 					<div class="span2 offset1">
-						<a class="brand" href="/">Prosperime</a>
+						<!-- <a class="brand" href="/">Prosperime</a> -->
+						<img class="main-logo" src="{{STATIC_URL}}img/logo_1.png" />
 					</div>
-					<div class="span4 offset4 nav-collapse pull-right">
+					<div class="span3 offset4 nav-collapse pull-right">
 						<ul class="nav">
-							<li>
+							<!-- <li>
 								<a href="/">Home</a>
-							</li>
+							</li> -->
 	                		{% if user.is_authenticated %}
 	                		<li>
 	                			<a href="/settings/">Account</a>
@@ -45,7 +46,7 @@
 							</li>
 						</ul>
 					</div>
-				<!-- </div> -->
+				</div>
 			</div>
 		</div>
         
@@ -59,7 +60,7 @@
       		</span>
       	</div>
       	<div class="row-fluid">
-	        <span class="span12">
+	        <span class="span11 offset1">
 	        	{% block promo %} {% endblock %}
 	        </span>
 	        
@@ -67,6 +68,10 @@
     </div>
     
 {% block templates %}
+{% endblock %}
+
+{% block footer %}
+
 {% endblock %}
 <script type="text/javascript">
 
