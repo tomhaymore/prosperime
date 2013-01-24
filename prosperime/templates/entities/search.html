@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-
+<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
 {% endblock %}
 
 {% block message %}
@@ -32,10 +32,11 @@
 	<!-- <p class="main-header">Search Results</p> -->
 </div>
 
+
 {% endblock %}
 
 {% block rightSidebar %}
-
+<div id="search-right-sidebar">
 <div class="rounded">
 	{% if user %}
 		<p class="sidebar-header">Want to see improvements?</p>
@@ -55,7 +56,7 @@
 	{% endif %}
 
 </div>
-
+</div>
 {% if not user.profile.li_linked %}
 {{ user.li_linked }}
 <div class="rounded">
@@ -112,7 +113,6 @@
 	</li>
 </script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js" type="text/javascript"></script>
-<script type="text/javascript" src="../../static/js/tooltip_and_popover.js"></script>
 <script type="text/javascript" src="../../static/js/viz.js"></script>
 <script type="text/template" id="path-single-template-clayton">
  
@@ -138,7 +138,10 @@
 					var num_positions = 0;
 					var ed_list = []
 					var org_list = []
+
+					// Segment positions into education & orgs, clean up end dates
 					_.each(positions,function(pos) {
+						// If no end date, assumed to be current
 						if (!pos['end_date']) pos['end_date'] = "Current";
 						
 						if (pos.type == 'education' || pos.title == 'Student') {
@@ -148,7 +151,6 @@
 							if (pos['start_date']) org_list.push(pos)
 						}
 						num_positions++
-						
 					}); 
 					
 					// Uniqify ed and pos lists using underscore
@@ -161,7 +163,6 @@
 
 					// A little bit of voodoo...
 					org_list = prepare_for_timeline(org_list)
-					console.log(org_list['total_time'])
 
 					// Reverse order so that render most recent first
 					ed_list = ed_list.reverse()
@@ -216,7 +217,7 @@
 					var compress_timeline = false
 					if (org_list.total_time > upper_timeline_limit) {
 						compress_timeline = true
-						console.log("Compressing timeline. Was: " + org_list.total_time + " is: " + org_list.total_time/2)
+						// console.log("Compressing timeline. Was: " + org_list.total_time + " is: " + org_list.total_time/2)
 						org_list.total_time = Math.ceil(org_list.total_time / 2)
 					}
 
@@ -233,7 +234,7 @@
 						} else upper_bound = org_list.total_time
 
 
-						console.log("upper bound: " + upper_bound + ", lower bound: " + lower_bound)
+						// console.log("upper bound: " + upper_bound + ", lower bound: " + lower_bound)
 
 						// Essentially, create a td for each month for each position. If the month was part of the position's
 						// lifespan, then it is colspanned.
@@ -243,11 +244,9 @@
 						for (var i=0; i<=org_list.total_time;i++) {
 							if (i == lower_bound) {
 								%>
-								<a id="popover" rel="popover" data-content="<%=org.title%>">
 								<td class="timeline-col-highlighted <%=id%>-timeline" title="<%=org.title%>" colspan="<%=upper_bound - lower_bound%>" onmouseover="timeline_hover(this, <%=pos_counter%>)" onmouseout="timeline_hover_out(this, <%=pos_counter%>)">
 									<%=org.co_name%>
 								</td>
-								</a>
 								<%
 								pass_counter = upper_bound - lower_bound
 							}

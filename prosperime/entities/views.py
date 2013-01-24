@@ -418,8 +418,176 @@ def path(request,user_id):
 	# return HttpResponse(simplejson.dumps(path),mimetype="application/json")
 	return render_to_response('entities/path_viz.html',{'path':path,'odd':odd,'even':even},context_instance=RequestContext(request))
 
+def career_filters(request):
+	
+	""" serves up JSON object of params for path searches """
+
+	# initialize array for all filters
+	filters = []
+
+	# get search filters
+	locationsSelected = request.GET.getlist('location')
+	sectorsSelected = request.GET.getlist('sector')
+	positionsSelected = request.GET.getlist('position')
+
+	# set base filters
+
+	# set location filters
+	locationsBase = User.objects.values("positions__entity__office__city").annotate(freq=Count('pk')).order_by('-freq').distinct()
+	locationsFiltered = locationsBase
+
+	if positionsSelected:
+		locationsFiltered = locationsFiltered.filter(positions__title__in=positionsSelected)
+	
+	if sectorsSelected:
+		locationsFiltered = locationsFiltered.filter(positions__entity__domains__name__in=sectorsSelected)
+
+	locationsBase = locationsBase[:10]
+
+	locationsFilteredDict = {}
+	for l in locationsFiltered:
+		locationsFilteredDict[l['positions__entity__office__city']] = l['freq']
+
+	for l in locationsBase:
+		# make sure it doesn't have a null value
+		if l['positions__entity__office__city']:
+			# get count from locationsFilteredDict
+			if l['positions__entity__office__city'] in locationsFilteredDict:
+				freq = locationsFilteredDict[l['positions__entity__office__city']]
+			else:
+				freq = 0
+			# check to see if the value should be selected
+			if l['positions__entity__office__city'] in locationsSelected:
+				filters.append({'name':l['positions__entity__office__city'],'value':l['positions__entity__office__city'],'category':'Location','count':freq,'selected':True})
+			else:
+				filters.append({'name':l['positions__entity__office__city'],'value':l['positions__entity__office__city'],'category':'Location','count':freq,'selected':None})
+
+	# get sector filters
+	sectorsBase = User.objects.values('positions__entity__domains__name').annotate(freq=Count('pk')).distinct()
+	sectorsFiltered = sectorsBase
+
+	if locationsSelected:
+		sectorsFiltered = sectorsFiltered.filter(positions__entity__office__city__in=locationsSelected)
+
+	if positionsSelected:
+		sectorsFiltered = sectorsFiltered.filter(positions__title__in=positionsSelected)
+
+	sectorsFilteredDict = {}
+	for s in sectorsFiltered:
+		sectorsFilteredDict[s['positions__entity__domains__name']] = s['freq']
+
+	for s in sectorsBase:
+		# make sure it doesn't have a null value
+		if s['positions__entity__domains__name']:
+			# get count from sectorsFilteredDict
+			if s['positions__entity__domains__name'] in sectorsFilteredDict:
+				freq = sectorsFilteredDict[s['positions__entity__domains__name']]
+			else:
+				freq = 0
+			name = " ".join(word.capitalize() for word in s['positions__entity__domains__name'].replace("_"," ").split())
+			# check to see if the value should be selected
+			if s['positions__entity__domains__name'] in sectorsSelected:
+				filters.append({'name':name,'value':s['positions__entity__domains__name'],'category':'Sector','count':freq,'selected':True})
+			else:
+				filters.append({'name':name,'value':s['positions__entity__domains__name'],'category':'Sector','count':freq,'selected':None})
+	
+	# get position filters
+	positionsBase = User.objects.values('positions__title').annotate(freq=Count('pk')).distinct()
+	positionsFiltered = positionsBase
+
+	if locationsSelected:
+		positionsFiltered = positionsFiltered.filter(positions__entity__office__city__in=locationsSelected)
+	if sectorsSelected:
+		positionsSelected = positionsFiltered.filter(positions__entity__domains__name__in=sectorsSelected)
+
+	positionsFilteredDict = {}
+	for p in positionsFiltered:
+		positionsFilteredDict[p['positions__title']] = p['freq']
+
+	for p in positionsBase:
+		# make sure it doesn't have a null value
+		if p['positions__title']:
+			# get count from positionsFilteredDict
+			if p['positions__title'] in positionsFilteredDict:
+				freq = positionsFilteredDict[p['positions__title']]
+			else:
+				freq = 0
+			# check to see if the value should be selected
+			if p['positions__title'] in positionsSelected:
+				selected = True
+			else:
+				selected = False
+			filters.append({'name':p['positions__title'],'value':p['positions__title'],'category':'Positions','count':freq,'selected':selected})
+
+	# render response
+	return HttpResponse(simplejson.dumps(filters), mimetype="application/json")
+
+def careers(request):
+	"""
+	returns HTML fragment for career views
+	"""
+	
+	# initialize parent array of careers
+	careers, overview = _get_careers_in_network(request.user)
+
+	return render_to_response('entities/careers.html',{'careers':careers,'overview':overview},context_instance=RequestContext(request))
 
 
+
+def _get_careers_in_network(user):
+	"""
+	returns array of all careers in user's network
+	"""
+	# get schools from user
+	schools = Entity.objects.filter(li_type="school",positions__person=user).distinct()
+	
+	# get all connected users and those from the same schools
+	# users = User.objects.select_related('profile','pictures').filter(Q(profile__in=user.profile.connections.all()) | Q(positions__entity__in=schools)).distinct()[:25]
+	users = User.objects.select_related('profile','pictures').values('pk','positions__entity__domains','profile__first_name','profile__last_name','profile__pictures__pic').filter(Q(profile__in=user.profile.connections.all()) | Q(positions__entity__in=schools)).distinct()
+	# users_list = [{'full_name':u.profile.full_name(),'profile_pic':u.profile.default_profile_pic(),'domains':u.profile.domains} for u in users]	
+	users_list = [{'id':u['pk'],'first_name':u['profile__first_name'],'last_name':u['profile__last_name'],'profile_pic':u['profile__pictures__pic'],'domains':u['positions__entity__domains']} for u in users]	
+	user_ids = [u['id'] for u in users_list]
+	# fetch all positions in user's network
+	positions = Position.objects.select_related('entity','industries').values('title','entity__name','entity__domains').filter(person_id__in=user_ids)
+	# positions_list = [{'title':p.title,'org':p.entity.name,'industries':p.industries()} for p in positions]
+	positions_list = [{'title':p['title'],'org':p['entity__name'],'industries':p['entity__domains']} for p in positions]
+	
+	# get all related entities
+	# entities = Entity.objects.filter(positions__person_id__in=user_ids)
+	entities = Entity.objects.select_related('images','domains').values('pk','name','domains','images__logo').filter(positions__person_id__in=user_ids)
+	# entities_list = [{'name':e.name,'domains':e.domains.all(),'logo':e.default_logo()} for e in entities]
+	entities_list = [{'id':e['pk'],'name':e['name'],'domains':e['domains'],'logo':e['images__logo']} for e in entities]
+	entities_ids = [e['id'] for e in entities_list]
+	# get industries
+	industries = Industry.objects.filter(entity__in=entities_ids).annotate(freq=Count('entity__positions')).order_by('-freq').distinct()
+
+	# overview = {'users':'','positions':'','orgs':''}
+	overview = {}
+	overview['users'] = {'count':len(users_list)}
+	overview['positions'] = {'count':len(positions_list)}
+	overview['orgs'] = {'count':len(entities_list)}
+
+	# initialize master career array
+	careers = {}
+	o = 0
+	for i in industries:
+		
+		careers[i.name] = {
+					"order": o,
+					# "users": {'count':len(users_list),'values':[u for u in users_list if i.id == u['domains']]},
+					# "positions": {'count':len(positions_list),'values':[p for p in positions_list if i.id == p['industries']]},
+					# "orgs": {'count':len(entities_list),'values':[org for org in entities_list if i.id == org['domains']]}
+					"users": {'values':[u for u in users_list if i.id == u['domains']]},
+					"positions": {'values':[p for p in positions_list if i.id == p['industries']]},
+					"orgs": {'values':[org for org in entities_list if i.id == org['domains']]}
+				}
+		careers[i.name]['users']['count'] = len(careers[i.name]['users']['values'])
+		careers[i.name]['positions']['count'] = len(careers[i.name]['positions']['values'])
+		careers[i.name]['orgs']['count'] = len(careers[i.name]['orgs']['values'])
+		o += 1
+
+	# sorted_careers = sorted(careers.iteritems(),key=lambda x: x['order'],reverse=True)
+	return careers, overview
 
 def _get_size_filter(sizes):
 	# dictionary of ranges
@@ -487,52 +655,38 @@ def _get_positions_for_path(positions,anon=False):
 			# print p.id
 			# get first industry domain of company
 			domains = p.entity.domains.all()
-
-
+			print p
+			print domains
 			if domains:
 				domain = domains[0].name
 			else:
 				domain = None
-
 			
-			print p.type
 			# education or org
 			if p.type == "education":
-				if p.degree is not None:
-					if p.field is not None:
-						attribs = {
-							'domain':domain,
-							'duration':p.duration(),
-							'title':p.degree + ", " + p.field,
-							'type': "education"
-						}
-					else:
-						attribs = {
-							'domain':domain,
-							'duration':p.duration(),
-							'title':p.degree,
-							'type': "education"
-						}
+				if p.degree is not None and p.field is not None:
+					title = p.degree + ", " + p.field
+				elif p.degree is not None:
+					title = p.degree
+				elif p.field is not None:
+					title = p.field
 				else:
-					if p.field is not None:
-						attribs = {
-							'domain':domain,
-							'duration':p.duration(),
-							'title': p.field,
-							'type:': 'education'
-						}
-				# attribs = {
-				# 	'domain':domain,
-				# 	'duration':p.duration(),
-				# 	'title':p.degree + ", " + p.field
-				# }
-			else:
+					title = None
 				attribs = {
-					'type': 'org',
 					'domain':domain,
 					'duration':p.duration(),
-					'title':p.title
+					'title':title,
+					'type':'education'
 				}
+			else:
+				attribs = {
+					'type':'org',
+					'domain': domain,
+					'duration':p.duration(),
+					'title':p.title,
+				}
+
+
 			if p.start_date is not None:
 				attribs['start_date'] = p.start_date.strftime("%m/%Y")
 			if p.end_date is not None:

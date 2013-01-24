@@ -14,6 +14,7 @@ from bs4 import BeautifulSoup
 from utilities.helpers import retry
 import dateutil
 
+
 # from Django
 from django.utils import simplejson
 from django.contrib.auth.models import User
@@ -36,6 +37,156 @@ class LIBase():
 
 	# initialize variable for account
 	acct = None
+
+	industry_groups = {
+		47:'corp fin',
+		94:'man tech tran',
+		120:'leg org',
+		125:'hlth',
+		127:'art med',
+		19:'good',
+		50:'cons',
+		111:'art med rec',
+		53:'man	Automotive',
+		52:'gov man',
+		41:'fin',
+		12:'gov hlth tech',
+		36:'med rec',
+		49:'cons',
+		138:'corp man',
+		129:'fin',
+		54:'man',
+		90:'org serv',
+		51:'cons gov',
+		128:'cons corp fin',
+		118:'tech',
+		109:'med rec',
+		3:'tech',
+		5:'tech',
+		4:'tech',
+		48:'cons',
+		24:'good man',
+		25:'good man',
+		91:'org serv',
+		18:'good',
+		65:'agr',
+		1:'gov tech',
+		99:'art med',
+		69:'edu',
+		132:'edu org',
+		112:'good man',
+		28:'med rec',
+		86:'org serv',
+		110:'corp rec serv',
+		76:'gov',
+		122:'corp serv',
+		63:'agr',
+		43:'fin',
+		38:'art med rec',
+		66:'agr',
+		34:'rec serv',
+		23:'good man serv',
+		101:'org',
+		26:'good man',
+		29:'rec',
+		145:'cons man',
+		75:'gov',
+		148:'gov',
+		140:'art med',
+		124:'hlth rec',
+		68:'edu',
+		14:'hlth',
+		31:'rec serv tran',
+		137:'corp',
+		134:'corp good tran',
+		88:'org serv',
+		147:'cons man',
+		84:'med serv',
+		96:'tech',
+		42:'fin',
+		74:'gov',
+		141:'gov org tran',
+		6:'tech',
+		45:'fin',
+		46:'fin',
+		73:'gov leg',
+		77:'gov leg',
+		9:'leg',
+		10:'leg',
+		72:'gov leg',
+		30:'rec serv tran',
+		85:'med rec serv',
+		116:'corp tran',
+		143:'good',
+		55:'man',
+		11:'corp',
+		95:'tran',
+		97:'corp',
+		80:'corp med',
+		135:'cons gov man',
+		126:'med rec',
+		17:'hlth',
+		13:'hlth',
+		139:'hlth',
+		71:'gov',
+		56:'man',
+		35:'art med rec',
+		37:'art med rec',
+		115:'art rec',
+		114:'gov man tech',
+		81:'med rec',
+		100:'org',
+		57:'man',
+		113:'med',
+		123:'corp',
+		87:'serv tran',
+		146:'good man',
+		61:'man',
+		39:'art med rec',
+		15:'hlth tech',
+		131:'org',
+		136:'art med rec',
+		117:'man',
+		107:'gov org',
+		67:'edu',
+		83:'med rec',
+		105:'corp',
+		102:'corp org',
+		79:'gov',
+		98:'corp',
+		78:'gov',
+		82:'med rec',
+		62:'man',
+		64:'agr',
+		44:'cons fin good',
+		40:'rec serv',
+		89:'org serv',
+		144:'gov man org',
+		70:'edu gov',
+		32:'rec serv',
+		27:'good man',
+		121:'corp org serv',
+		7:'tech',
+		58:'man',
+		20:'good rec',
+		33:'rec',
+		104:'corp',
+		22:'good',
+		8:'gov tech',
+		60:'man',
+		130:'gov org',
+		21:'good',
+		108:'corp gov serv',
+		92:'tran',
+		59:'man',
+		106:'fin tech',
+		16:'hlth',
+		93:'tran',
+		133:'good',
+		142:'good man rec',
+		119:'tech',
+		103:'art med rec',
+		}
 
 	def get_access_token(self,acct_id=None):
 
@@ -169,9 +320,26 @@ class LIBase():
 					industry = Industry()
 					industry.name=i['name']
 					industry.li_code=i['code']
+					industry.li_group=self.industry_groups[i['code']]
+					# try:
+					# 	industry.name=i['name']
+					# except KeyError:
+					# 	industry.name=None
+
+					# try:
+					# 	industry.li_code=i['code']
+					# except KeyError:
+					# 	industry.li_code=None
+
+					# try:
+					# 	industry.li_group=self.industry_groups[i['code']]
+					# except KeyError:
+					# 	industry.li_group=None
+
 					industry.save()
 					# add to domain of company
 					co.domains.add(industry)
+					
 
 		# check to see if company has a logo url
 		if 'logoUrl' in data:
