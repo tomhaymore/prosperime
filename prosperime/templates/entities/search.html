@@ -325,7 +325,13 @@
 
 <script type="text/template" id="path-list-template">
 	<!--<div class="main-header pull-left">Career Paths</div><div class="pull-right btn-group disabled"><button class="btn-small">Paths</button><button class="btn-small">Companies</button></div>-->
-	<p class="main-header pull-left">Career Paths</p><p class="search-view pull-right"><a class="search-view-link">Search companies</a></p>
+	<div class="main-header pull-left">Career Paths</div>
+	<div class="search-view pull-right">Search: 
+		<ul class="search-view-links inline">
+			<li><a href="/search/#companies">companies</a></li>
+			<li><a href="/search/#careers">careers</a></li> 
+		</ul>
+	</div>
 	<div class="clearfix"></div>
 	<ul class="path-list"></ul>
 </script>
@@ -349,7 +355,14 @@
 </script>
 
 <script type="text/template" id="org-list-template">
-	<p class="main-header">Companies</p>
+	<div class="main-header pull-left">Companies</div>
+	<div class="search-view pull-right">Search: 
+		<ul class="search-view-links inline">
+			<li><a href="/search/#paths/">paths</a></li>
+			<li><a href="/search/#careers/">careers</a></li> 
+		</ul>
+	</div>
+	<div class="clear"></div>
 	<ul class="org-list"></ul>
 </script>
 

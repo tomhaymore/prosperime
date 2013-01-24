@@ -9,18 +9,11 @@
 {% block content %}
 
 <div id="splash-home">
-	<div class="span4 offset1">
+	<div class="span10 offset1">
 		<p class="splash-message-header">Don't just work, prosper!</p>
-		<p class="splash-message-subheader">Prosperime helps you build the perfect career and make the right education and job choices.</p>
-		
-	</div>
-	<div class="span4 offset1">
-		<p class="splash-message top-spacer">Connect with your colleagues, friends and associates</p>
-		<p class="splash-message">Learn from actual career paths</p>
-		<p class="splash-message">Start building the perfect career</p>
-		<p class="splash-message">Sign up now with LinkedIn.</p>
-		
-		<a class="btn btn-success" href="/account/authorize">Get started</a><a class="splash-message left-spacer" href="account/login">Already registered?</a>
+		<p class="splash-message-subheader">Prosperime helps you discover actual career paths from real people in your network.</p>
+		<p class="text-center"><a class="btn btn-success center" href="/account/authorize">Get started</a></p>
+		<p class="text-center splash-submessage"><a class="left-spacer center" href="account/login">Already registered?</a></p>
 		
 	</div>
 	<div class="clear"></div>
@@ -30,75 +23,49 @@
 
 {% block promo %}
 <div id="promo-message-container">
+	<div class="row-fluid">
+		<div class="span5">
+			<p class="promo-message-header">Discover career paths</p>
+			<p class="promo-message">Go beyond anecdotes and conjecture -- build off your own career based on what others have actually done before.</p>
+		</div>
+		<div class="span5 offset1">
+			<p class="promo-message-header">Evaluate yourself</p>
+			<p class="promo-message">Research, plan and compare multiple compare paths and see how your current education and jobs prepare you.</p>
+		</div>
+	</div>
 
-	<!-- <div class="span3 offset1">
-		<p class="promo-message-header">Search career paths</p>
-		<p class="promo-message">Go beyond anecdotes and conjecture -- build off your own career based on what others have actually done before.</p>
+	<div class="row-fluid">
+		<div class="span5">
+			<p class="promo-message-header">Connect with mentors</p>
+			<p class="promo-message">Find people who have already faced the same challenges as you and connect with them to do better.</p>
+		</div>
+		<div class="span5 offset1">
+			<p class="promo-message-header">Pivot between industries and locations</p>
+			<p class="promo-message">Don't limit yourself to one industry or region, see how career paths cross thse boundaries</p>
+		</div>
 	</div>
-	<div class="span3">
-		<p class="promo-message-header">Evaluate yourself</p>
-		<p class="promo-message">Research, plan and compare multiple compare paths and see how your current education and jobs prepare you.</p>
-	</div>
-	<div class="span3">
-		<p class="promo-message-header">Connect with mentors</p>
-		<p class="promo-message">Find people who have already faced the same challenges as you and connect with them to do better.</p>
-	</div>
-	<div class="clear"></div> -->
 </div>
 {% endblock %}
 
 {% block templates %}
-<script type="text/template" id="path-single-template">
-	<li class="list-preview">
-		<div class="left-list-preview">
 
-		</div>
-		<div class="right-list-preview">
-			<span class="path-header"><%= full_name %></span>
-		</div>
-	</li>
-</script>
+{% endblock %}
 
-<script type="text/template" id="org-single-template">
-	<li class="list-preview">			
-		<div class="left-list-preview">
-			<% if (image__logo != null) { %>
-			<div class="img-holder">
-				<img class="logo-preview" src="/media/<%= image__logo %>" />&nbsp;
-			</div>
-			<% } %>
-		</div>
-		
-		<div class="right-list-preview"
-			<span class="company-header"><%= name %></span><br/>
-			<p><%= summary %></p>
-		</div>
-		<div class="clear"></div>
-	</li>
-</script>
+{% block footer %}
 
-<script type="text/template" id="org-list-template">
-	<p class="main-header">Search Results</p>
-	<ul class="org-list"></ul>
-</script>
-
-<script type="text/template" id="search-header-template">
-	// <div class="search-form-header sidebar-header">
-	// 	Refine Your Search
-	// </div>
-</script>
-
-<script type="text/template" id="search-module-template">
-	<div class="search-form-module">
-		<p class="form-header"><%= category %></p>
-		<ul class="filters-list"></ul>
+<div class="container-fluid footer">
+	<div class="span10 offset1">
+		<ul class="footer-list pull-left flat">
+			<li>&copy; Prosperime</li>
+			
+		</ul>
+		<ul class="footer-list pull-right flat">
+			<li>Company</li>
+			<li>Contact</li>
+			<li>FAQ</li>
+		</ul>
 	</div>
-</script>
+</div>
 
-<script type="text/template" id="search-filters-template">
-	<label class="checkbox">
-		<input <% if (selected == true) { %> checked=checked <% } %> name="<%= category %>-filters" class="input-search-filter" type="checkbox" value="<%= value %>"><%= name %> <% if (count != null) {%> (<%= count %>) <% }%></option>
-	</label>
-</script>
 {% endblock %}
 

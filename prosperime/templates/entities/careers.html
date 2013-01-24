@@ -1,6 +1,15 @@
 
 <div id="careers-container">
-<div id="careers-header" class="main-header" data-userscount="{{overview.users.count}}" data-orgscount="{{overview.orgs.count}}" data-positionscount="{{overview.positions.count}}"><div class="pull-left">Career Paths</div><div class="clear"></div></div>
+<div id="careers-header" class="main-header" data-userscount="{{overview.users.count}}" data-orgscount="{{overview.orgs.count}}" data-positionscount="{{overview.positions.count}}">
+	<div class="pull-left">Career Paths</div>
+	<div class="search-view pull-right">Search: 
+		<ul class="search-view-links inline">
+			<li><a href="/search/#companies">companies</a></li>
+			<li><a href="/search/#paths">paths</a></li> 
+		</ul>
+	</div>
+	<div class="clear"></div>
+</div>
 <!-- <div class="clearfix"></div> -->
 {% for k,v in careers.items %}
 	<div class="careers-single" data-userscount="{{v.users.count}}" data-orgscount="{{v.orgs.count}}" data-positionscount="{{v.positions.count}}">
