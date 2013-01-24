@@ -427,7 +427,7 @@ def career_filters(request):
 
 	# get search filters
 	locationsSelected = request.GET.getlist('location')
-	sectorsSelected = request.GET.getlist('sector')
+	# sectorsSelected = request.GET.getlist('sector')
 	positionsSelected = request.GET.getlist('position')
 
 	# set base filters
@@ -439,8 +439,8 @@ def career_filters(request):
 	if positionsSelected:
 		locationsFiltered = locationsFiltered.filter(positions__title__in=positionsSelected)
 	
-	if sectorsSelected:
-		locationsFiltered = locationsFiltered.filter(positions__entity__domains__name__in=sectorsSelected)
+	# if sectorsSelected:
+	# 	locationsFiltered = locationsFiltered.filter(positions__entity__domains__name__in=sectorsSelected)
 
 	locationsBase = locationsBase[:10]
 
@@ -463,33 +463,33 @@ def career_filters(request):
 				filters.append({'name':l['positions__entity__office__city'],'value':l['positions__entity__office__city'],'category':'Location','count':freq,'selected':None})
 
 	# get sector filters
-	sectorsBase = User.objects.values('positions__entity__domains__name').annotate(freq=Count('pk')).distinct()
-	sectorsFiltered = sectorsBase
+	# sectorsBase = User.objects.values('positions__entity__domains__name').annotate(freq=Count('pk')).distinct()
+	# sectorsFiltered = sectorsBase
 
-	if locationsSelected:
-		sectorsFiltered = sectorsFiltered.filter(positions__entity__office__city__in=locationsSelected)
+	# if locationsSelected:
+	# 	sectorsFiltered = sectorsFiltered.filter(positions__entity__office__city__in=locationsSelected)
 
-	if positionsSelected:
-		sectorsFiltered = sectorsFiltered.filter(positions__title__in=positionsSelected)
+	# if positionsSelected:
+	# 	sectorsFiltered = sectorsFiltered.filter(positions__title__in=positionsSelected)
 
-	sectorsFilteredDict = {}
-	for s in sectorsFiltered:
-		sectorsFilteredDict[s['positions__entity__domains__name']] = s['freq']
+	# sectorsFilteredDict = {}
+	# for s in sectorsFiltered:
+	# 	sectorsFilteredDict[s['positions__entity__domains__name']] = s['freq']
 
-	for s in sectorsBase:
-		# make sure it doesn't have a null value
-		if s['positions__entity__domains__name']:
-			# get count from sectorsFilteredDict
-			if s['positions__entity__domains__name'] in sectorsFilteredDict:
-				freq = sectorsFilteredDict[s['positions__entity__domains__name']]
-			else:
-				freq = 0
-			name = " ".join(word.capitalize() for word in s['positions__entity__domains__name'].replace("_"," ").split())
-			# check to see if the value should be selected
-			if s['positions__entity__domains__name'] in sectorsSelected:
-				filters.append({'name':name,'value':s['positions__entity__domains__name'],'category':'Sector','count':freq,'selected':True})
-			else:
-				filters.append({'name':name,'value':s['positions__entity__domains__name'],'category':'Sector','count':freq,'selected':None})
+	# for s in sectorsBase:
+	# 	# make sure it doesn't have a null value
+	# 	if s['positions__entity__domains__name']:
+	# 		# get count from sectorsFilteredDict
+	# 		if s['positions__entity__domains__name'] in sectorsFilteredDict:
+	# 			freq = sectorsFilteredDict[s['positions__entity__domains__name']]
+	# 		else:
+	# 			freq = 0
+	# 		name = " ".join(word.capitalize() for word in s['positions__entity__domains__name'].replace("_"," ").split())
+	# 		# check to see if the value should be selected
+	# 		if s['positions__entity__domains__name'] in sectorsSelected:
+	# 			filters.append({'name':name,'value':s['positions__entity__domains__name'],'category':'Sector','count':freq,'selected':True})
+	# 		else:
+	# 			filters.append({'name':name,'value':s['positions__entity__domains__name'],'category':'Sector','count':freq,'selected':None})
 	
 	# get position filters
 	positionsBase = User.objects.values('positions__title').annotate(freq=Count('pk')).distinct()
@@ -497,8 +497,10 @@ def career_filters(request):
 
 	if locationsSelected:
 		positionsFiltered = positionsFiltered.filter(positions__entity__office__city__in=locationsSelected)
-	if sectorsSelected:
-		positionsSelected = positionsFiltered.filter(positions__entity__domains__name__in=sectorsSelected)
+	# if sectorsSelected:
+	# 	positionsSelected = positionsFiltered.filter(positions__entity__domains__name__in=sectorsSelected)
+
+	positionsBase = positionsBase[:20]
 
 	positionsFilteredDict = {}
 	for p in positionsFiltered:
@@ -526,15 +528,18 @@ def careers(request):
 	"""
 	returns HTML fragment for career views
 	"""
-	
+	# get search filters
+	locationsSelected = request.GET.getlist('location')
+	positionsSelected = request.GET.getlist('position')
+
 	# initialize parent array of careers
-	careers, overview = _get_careers_in_network(request.user)
+	careers, overview = _get_careers_in_network(request.user,{'locations':locationsSelected,'positions':positionsSelected})
 
 	return render_to_response('entities/careers.html',{'careers':careers,'overview':overview},context_instance=RequestContext(request))
 
 
 
-def _get_careers_in_network(user):
+def _get_careers_in_network(user,filters):
 	"""
 	returns array of all careers in user's network
 	"""
@@ -543,18 +548,30 @@ def _get_careers_in_network(user):
 	
 	# get all connected users and those from the same schools
 	# users = User.objects.select_related('profile','pictures').filter(Q(profile__in=user.profile.connections.all()) | Q(positions__entity__in=schools)).distinct()[:25]
+	
 	users = User.objects.select_related('profile','pictures').values('pk','positions__entity__domains','profile__first_name','profile__last_name','profile__pictures__pic').filter(Q(profile__in=user.profile.connections.all()) | Q(positions__entity__in=schools)).distinct()
+	if filters['positions']:
+		users = users.filter(positions__title__in=filters['positions'])
+	if filters['locations']:
+		users = users.filter(positions__entity__office__city__in=filters['locations'])
 	# users_list = [{'full_name':u.profile.full_name(),'profile_pic':u.profile.default_profile_pic(),'domains':u.profile.domains} for u in users]	
 	users_list = [{'id':u['pk'],'first_name':u['profile__first_name'],'last_name':u['profile__last_name'],'profile_pic':u['profile__pictures__pic'],'domains':u['positions__entity__domains']} for u in users]	
 	user_ids = [u['id'] for u in users_list]
 	# fetch all positions in user's network
-	positions = Position.objects.select_related('entity','industries').values('title','entity__name','entity__domains').filter(person_id__in=user_ids)
+	positions = Position.objects.select_related('entity','industries').values('title','entity__name','entity__domains').filter(person_id__in=user_ids).exclude(type="education").distinct()
+	# add positions filter
+	if filters['positions']:
+		positions = positions.filter(title__in=filters['positions'])
+	if filters['locations']:
+		positions = positions.filter(entity__office__city__in=filters['locations'])
 	# positions_list = [{'title':p.title,'org':p.entity.name,'industries':p.industries()} for p in positions]
 	positions_list = [{'title':p['title'],'org':p['entity__name'],'industries':p['entity__domains']} for p in positions]
-	
 	# get all related entities
 	# entities = Entity.objects.filter(positions__person_id__in=user_ids)
-	entities = Entity.objects.select_related('images','domains').values('pk','name','domains','images__logo').filter(positions__person_id__in=user_ids)
+	entities = Entity.objects.select_related('images','domains').values('pk','name','domains','images__logo').filter(positions__person_id__in=user_ids).distinct()
+	# add location filters
+	if filters['locations']:
+		entities = entities.filter(office__city__in=filters['locations'])
 	# entities_list = [{'name':e.name,'domains':e.domains.all(),'logo':e.default_logo()} for e in entities]
 	entities_list = [{'id':e['pk'],'name':e['name'],'domains':e['domains'],'logo':e['images__logo']} for e in entities]
 	entities_ids = [e['id'] for e in entities_list]
@@ -563,9 +580,9 @@ def _get_careers_in_network(user):
 
 	# overview = {'users':'','positions':'','orgs':''}
 	overview = {}
-	overview['users'] = {'count':len(users_list)}
-	overview['positions'] = {'count':len(positions_list)}
-	overview['orgs'] = {'count':len(entities_list)}
+	overview['users'] = {'count':len(users_list),'values':users_list}
+	overview['positions'] = {'count':len(positions_list),'values':positions_list}
+	overview['orgs'] = {'count':len(entities_list),'values':entities_list}
 
 	# initialize master career array
 	careers = {}

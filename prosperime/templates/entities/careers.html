@@ -1,10 +1,10 @@
 
 <div id="careers-container">
-<p class="main-header pull-left">Career Paths</p>
-<div class="clearfix"></div>
+<div id="careers-header" class="main-header" data-userscount="{{overview.users.count}}" data-orgscount="{{overview.orgs.count}}" data-positionscount="{{overview.positions.count}}"><div class="pull-left">Career Paths</div><div class="clear"></div></div>
+<!-- <div class="clearfix"></div> -->
 {% for k,v in careers.items %}
-	<div class="careers-single clearfix" data-userscount="{{v.users.count}}" data-orgscount="{{v.orgs.count}}" data-positionscount="{{v.positions.count}}">
-		<div class="clearfix">
+	<div class="careers-single" data-userscount="{{v.users.count}}" data-orgscount="{{v.orgs.count}}" data-positionscount="{{v.positions.count}}">
+		<div>
 			<div class="careers-intro pull-left">
 				<a class="careers-name" data-id="{{forloop.counter0}}">{{k}}</a>
 				<p class="career-description">{{k.description}}</p>
@@ -31,80 +31,99 @@
 				</div>
 			</div>
 		</div>
-		<!-- <div class="clearfix"></div> -->
-		<div class="careers-info clearfix" data-id="{{forloop.counter0}}">
+		<div class="clear"></div>
+		<div class="careers-info hidden" data-id="{{forloop.counter0}}">
 			
-			<div class="careers-stats pull-left">
+			<!-- <div class="careers-stats pull-left">
 				<div class="pull-left right-spacer careers-stats-holder" data-type="users" data-id="{{forloop.counter0}}"><span data-type="users" data-id="{{forloop.counter0}}" class="careers-stats-count">{{v.users.count}}</span> <br/>
 						<span>people</span></div>
 				<div class="pull-left right-spacer careers-stats-holder" data-type="positions" data-id="{{forloop.counter0}}"><span data-type="positions" data-id="{{forloop.counter0}}" class="careers-stats-count">{{v.positions.count}}</span><br/>
 						<span>positions</span></div>
 				<div class="pull-left right-spacer careers-stats-holder" data-type="orgs" data-id="{{forloop.counter0}}"><span data-type="orgs" data-id="{{forloop.counter0}}" class="careers-stats-count">{{v.orgs.count}}</span><br/>
 						<span>companies</span></div>
-				<div class="clearfix"></div>
-			</div>
+				<div class="clear"></div>
+			</div> -->
 			
+			<div class="clear"></div>
 
+			<div class="careers-preview-list pull-left">
+				
+				<ul>
+				{% for p in v.positions.values %}
+					<li>{{p.title}}</li>
+				{% endfor %}
+				</ul>
+				
+			</div>
+
+			<div class="careers-preview-list pull-right">
+				
+				<ul>
+				{% for o in v.orgs.values %}
+					<li>{{o.name}}</li>
+				{% endfor %}
+				</ul>
+				
+			</div>
 		</div>
 		
-		<!-- <div class="clearfix"></div> -->
+		<div class="clear"></div>
+
 	</div>
 {% endfor %}
 </div>
-<div id="network-containter">
-	<span class="title">Overview</span>
+<div id="network-container">
+	<span class="sidebar-header">Overview</span>
 	<div class="nav">
-		<a class="nav-people" data-cat="people">{{overview.users.count}} people</a>
-		<a class="nav-positions" data-cat="positions">{{overview.positions.count}} positions</a>
-		<a class="nav-orgs" data-cat="orgs">{{overview.orgs.count}} companies</a>
-		<div id="arc-container">
-		    
-		    
-		</div>
+		<ul class="careers-stats-list">
+			<li><span class="careers-stats-people" data-cat="people">{{overview.users.count}}</span> people</li>
+			<li><span class="careers-stats-positions" data-cat="positions">{{overview.positions.count}}</span> positions</li>
+			<li><span class="careers-stats-orgs" data-cat="orgs">{{overview.orgs.count}}</span> companies</li>
+		</ul>
 	</div>
 </div>
 <script>
-		window.archtype = Raphael("arc-container", 150, 150);
-		archtype.customAttributes.arc = function (xloc, yloc, value, total, R) {
-		    var alpha = 360 / total * value,
-		        a = (90 - alpha) * Math.PI / 180,
-		        x = xloc + R * Math.cos(a),
-		        y = yloc - R * Math.sin(a),
-		        path;
-		    if (total == value) {
-		        path = [
-		            ["M", xloc, yloc - R],
-		            ["A", R, R, 0, 1, 1, xloc - 0.01, yloc - R]
-		        ];
-		    } else {
-		        path = [
-		            ["M", xloc, yloc - R],
-		            ["A", R, R, 0, +(alpha > 180), 1, x, y]
-		        ];
-		    }
-		    return {
-		        path: path
-		    };
-		};
+		// window.archtype = Raphael("arc-container", 150, 150);
+		// archtype.customAttributes.arc = function (xloc, yloc, value, total, R) {
+		//     var alpha = 360 / total * value,
+		//         a = (90 - alpha) * Math.PI / 180,
+		//         x = xloc + R * Math.cos(a),
+		//         y = yloc - R * Math.sin(a),
+		//         path;
+		//     if (total == value) {
+		//         path = [
+		//             ["M", xloc, yloc - R],
+		//             ["A", R, R, 0, 1, 1, xloc - 0.01, yloc - R]
+		//         ];
+		//     } else {
+		//         path = [
+		//             ["M", xloc, yloc - R],
+		//             ["A", R, R, 0, +(alpha > 180), 1, x, y]
+		//         ];
+		//     }
+		//     return {
+		//         path: path
+		//     };
+		// };
 
-		//make an arc at 50,50 with a radius of 30 that grows from 0 to 40 of 100 with a bounce
-		var people_arc = archtype.path().attr({
-		    "stroke": "#f00",
-		    "stroke-width": 10,
-		    arc: [75, 60, 100, 100, 30]
-		});
+		// //make an arc at 50,50 with a radius of 30 that grows from 0 to 40 of 100 with a bounce
+		// var people_arc = archtype.path().attr({
+		//     "stroke": "#f00",
+		//     "stroke-width": 10,
+		//     arc: [75, 60, 100, 100, 30]
+		// });
 
-		var orgs_arc = archtype.path().attr({
-			"stroke": "#8c8c8c",
-			"stroke-width": 10,
-			arc: [75, 60,100,100,40]
-		})
+		// var orgs_arc = archtype.path().attr({
+		// 	"stroke": "#8c8c8c",
+		// 	"stroke-width": 10,
+		// 	arc: [75, 60,100,100,40]
+		// })
 
-		var positions_arc = archtype.path().attr({
-			"stroke": "#8c8c8c",
-			"stroke-width": 10,
-			arc: [75, 60,100,100,50]
-		})
+		// var positions_arc = archtype.path().attr({
+		// 	"stroke": "#8c8c8c",
+		// 	"stroke-width": 10,
+		// 	arc: [75, 60,100,100,50]
+		// })
 
 		// people_arc.animate({
 		//     arc: [50, 50, 50, 100, 30]
