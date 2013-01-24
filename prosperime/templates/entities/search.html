@@ -115,6 +115,175 @@
 		</div>
 	</li>
 </script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="../../static/js/viz.js"></script>
+<script type="text/template" id="path-single-template-clayton">
+ 
+	<li class="list-preview">
+		<div class="left-list-preview">
+			<% if (profile_pic != null) { %>
+			
+			<div class="profile-img-holder pull-left">
+				<img class="logo-preview" src="/media/<%= profile_pic %>" />&nbsp;
+			</div>
+			
+			<% } %>
+		</div>
+
+		<div class="right-list-preview pull-left">
+			<p class="path-name"><a class="path-name-link"><%= full_name %></a></p>
+			<p class="path-current-position"><%= current_position %></p>
+		</div>
+		<div class="clearfix"></div>
+		<div class="path-viz">
+				<div class="path-viz-short center">
+					<% if (positions != null) {  
+					var num_positions = 0;
+					var ed_list = []
+					var org_list = []
+
+					// Segment positions into education & orgs, clean up end dates
+					_.each(positions,function(pos) {
+						// If no end date, assumed to be current
+						if (!pos['end_date']) pos['end_date'] = "Current";
+						
+						if (pos.type == 'education' || pos.title == 'Student') {
+							ed_list.push(pos)
+						} else {
+							// Ignore positions w/ no start-date... crappy data
+							if (pos['start_date']) org_list.push(pos)
+						}
+						num_positions++
+					}); 
+					
+					// Uniqify ed and pos lists using underscore
+					ed_list = _.uniq(ed_list, false, function(current) {
+						return current.title + ' ' + current.co_name
+					});
+					org_list = _.uniq(org_list, false, function(current) {
+						return current.title + ' ' + current.co_name
+					});
+
+					// A little bit of voodoo...
+					org_list = prepare_for_timeline(org_list)
+
+					// Reverse order so that render most recent first
+					ed_list = ed_list.reverse()
+					org_list = org_list.reverse() 
+
+					// Education: 
+					if (ed_list.length > 0) {
+						%><h5>Education: </h5><ul class='ed_list'><%
+					}
+					_.each(ed_list, function(ed) {
+						%><li class="path-viz-pos"><a href="#"><%
+						if (ed.title && ed.start_date) {
+							%>
+							<%= ed.title %> @ <%= ed.co_name %>
+							<%= ed.start_date%> to <%= ed.end_date %>
+							<%
+						} else if (ed.title) {
+							%><%= ed.title %> @ <%= ed.co_name %><%
+						} else if(ed.start_date) {
+							%>
+							<%= ed.co_name %>
+							<%= ed.start_date%> to <%= ed.end_date %>
+							<%
+						} else {
+							%><%= ed.co_name %><%
+						}
+						%></a></li><%
+					});
+
+					// Experience: (orgs)
+					%></ul><h5>Experience: </h5><ul><%
+					_.each(org_list, function(org) {
+						%><li class="<%=id%>-list"><%
+						if(org.title && org.start_date) {
+							%>
+								<%= org.title %> @ <%= org.co_name %>
+								<%= org.start_date%> to <%= org.end_date %>
+							<%
+						} else if (org.title) {
+							%><%= org.title %> @ <%= org.co_name %><%
+						} else if (org.start_date) {
+							%>
+								<%= org.co_name %>
+								<%= org.start_date%> to <%= org.end_date %>
+							<%
+						} else %><%= org.co_name %><%
+						%></li><%
+					});		
+					%></ul><%
+
+					// Ensure timeline will fit
+					var compress_timeline = false
+					if (org_list.total_time > upper_timeline_limit) {
+						compress_timeline = true
+						// console.log("Compressing timeline. Was: " + org_list.total_time + " is: " + org_list.total_time/2)
+						org_list.total_time = Math.ceil(org_list.total_time / 2)
+					}
+
+					// Timeline View
+					%><table class='timeline'><%
+					var pos_counter = 0
+					_.each(org_list, function(org) {
+						%><tr class="timeline-row"><%
+
+						// console.log("mo1: " + org_list.start_mo + " yr1: " + org_list.start_yr + " m2: " + org.start_date.substring(0,2) + " y2: " + org.start_date.substring(3))
+						lower_bound = months_difference(org_list.start_mo, org_list.start_yr, parseInt(org.start_date.substring(0,2)), parseInt(org.start_date.substring(3)), compress_timeline, "lower")
+						if (org.end_date != "Current") {
+						upper_bound = months_difference(org_list.start_mo, org_list.start_yr, parseInt(org.end_date.substring(0,2)), parseInt(org.end_date.substring(3)), compress_timeline, "upper")
+						} else upper_bound = org_list.total_time
+
+
+						// console.log("upper bound: " + upper_bound + ", lower bound: " + lower_bound)
+
+						// Essentially, create a td for each month for each position. If the month was part of the position's
+						// lifespan, then it is colspanned.
+
+						// Note: this will break if org.title is empty
+						var pass_counter = 0
+						for (var i=0; i<=org_list.total_time;i++) {
+							if (i == lower_bound) {
+								%>
+								<td class="timeline-col-highlighted <%=id%>-timeline" title="<%=org.title%>" colspan="<%=upper_bound - lower_bound%>" onmouseover="timeline_hover(this, <%=pos_counter%>)" onmouseout="timeline_hover_out(this, <%=pos_counter%>)">
+									<%=org.co_name%>
+								</td>
+								<%
+								pass_counter = upper_bound - lower_bound
+							}
+							else if (pass_counter == 0){
+								%><td class="timeline-col"></td><%
+							} else {
+								pass_counter--;
+							}
+						}
+						%></tr><%
+						pos_counter++;
+					});
+					// Bottom row w/ start & end dates
+					// Note: don't knwo why giving each a colspan of the entire row works, but it does. Reducing
+					// colspan to 50% gives odd results
+					%>
+					<tr class="timeline-row-bottom">
+						<td class="timeline-col-start" colspan="<%=Math.floor(org_list.total_time / 2)%>"><%=org_list.start_mo%>/<%=org_list.start_yr%></td>
+						<td class="timeline-col-end" colspan="<%=Math.floor(org_list.total_time)%>">Present</td>
+					</tr>
+					</table>
+					<%
+					$('.timeline-row-highlighted').each(function() {
+						$(this).popover({trigger: "hover", placement:"top", delay: {show: 0, hide: 500}})
+					})
+
+				} %>
+				</div>
+				<div class="path-viz-long" style="display:none;">
+				</div>
+		</div>
+	</li>
+
+</script>
 
 <script type="text/template" id="path-single-viz-template">
 	<div class="path-viz-timeline">

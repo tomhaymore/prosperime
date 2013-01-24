@@ -25,7 +25,7 @@ def home(request):
 		# user is logged in, display personalized information
 		return HttpResponseRedirect('search')
 	data = {}
-	return render_to_response('home.html',data,context_instance=RequestContext(request))
+	return render_to_response('home.html',data,context_instance=RequestContext(request)) ## Clay - change this
 
 def search(request):
 	
@@ -665,16 +665,21 @@ def _get_positions_for_path(positions,anon=False):
 		formatted_positions = []
 		# loop through each position
 		no_of_positions = len(positions)
+		# attribs['no_of_positions'] = no_of_positions
 		# print "# of pos: " + str(no_of_positions)
 		i = 0
 		for p in positions:
 			# print p.id
 			# get first industry domain of company
 			domains = p.entity.domains.all()
+			print p
+			print domains
 			if domains:
 				domain = domains[0].name
 			else:
-				domain = ''
+				domain = None
+			
+			# education or org
 			if p.type == "education":
 				if p.degree is not None and p.field is not None:
 					title = p.degree + ", " + p.field
@@ -687,14 +692,18 @@ def _get_positions_for_path(positions,anon=False):
 				attribs = {
 					'domain':domain,
 					'duration':p.duration(),
-					'title':title
+					'title':title,
+					'type':'education'
 				}
 			else:
 				attribs = {
-					'domain':domain,
+					'type':'org',
+					'domain': domain,
 					'duration':p.duration(),
-					'title':p.title
+					'title':p.title,
 				}
+
+
 			if p.start_date is not None:
 				attribs['start_date'] = p.start_date.strftime("%m/%Y")
 			if p.end_date is not None:
@@ -713,6 +722,8 @@ def _get_positions_for_path(positions,anon=False):
 				attribs['last_position'] = True
 			else:
 				attribs['last_position'] = False
+
+			attribs['no_of_positions'] = no_of_positions
 		return formatted_positions
 	# if no positions, return None
 	return None

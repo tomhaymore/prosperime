@@ -14,6 +14,7 @@ from bs4 import BeautifulSoup
 from utilities.helpers import retry
 import dateutil
 
+
 # from Django
 from django.utils import simplejson
 from django.contrib.auth.models import User
@@ -184,8 +185,8 @@ class LIBase():
 		133:'good',
 		142:'good man rec',
 		119:'tech',
-		103:'art med rec'
-	}
+		103:'art med rec',
+		}
 
 	def get_access_token(self,acct_id=None):
 
@@ -249,6 +250,7 @@ class LIBase():
 		return content
 
 	def get_company(self,id=None,name=None):
+		co = None
 		if id:
 			try:
 				co = Entity.objects.get(li_uniq_id=id)
@@ -319,9 +321,25 @@ class LIBase():
 					industry.name=i['name']
 					industry.li_code=i['code']
 					industry.li_group=self.industry_groups[i['code']]
+					# try:
+					# 	industry.name=i['name']
+					# except KeyError:
+					# 	industry.name=None
+
+					# try:
+					# 	industry.li_code=i['code']
+					# except KeyError:
+					# 	industry.li_code=None
+
+					# try:
+					# 	industry.li_group=self.industry_groups[i['code']]
+					# except KeyError:
+					# 	industry.li_group=None
+
 					industry.save()
 					# add to domain of company
 					co.domains.add(industry)
+					
 
 		# check to see if company has a logo url
 		if 'logoUrl' in data:
@@ -688,7 +706,6 @@ class LIProfile(LIBase):
 
 		client = oauth.Client(self.consumer, token)
 
-		# fetch results
 		resp, content = client.request(api_url)
 
 		return simplejson.loads(content)
