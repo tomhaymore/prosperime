@@ -637,7 +637,7 @@ $(function(){
 			this.filters = window.filters;
 			this.paths = window.paths;
 			// show paths and path filters by default
-			// this.orgsView = new OrgListView({ collection: this.orgs});
+			this.orgsView = new OrgListView({ collection: this.orgs});
 			this.filtersView = new FilterListView({ collection: this.filters});
 			this.pathsView = new PathListView({ collection: this.paths});
 			this.careersView = new CareersView();
@@ -671,10 +671,17 @@ $(function(){
 		},
 
 		emptySearch: function() {
-			console.log("stay home -- empty search");
-			// this.orgs.fetch();
-			this.filters.fetch();
-			this.paths.fetch();
+			console.log("careers search");
+			this.filters.meta('view','careers');
+			this.filters.meta('query','');
+			this.filters.fetch()
+			
+			this.careersView.render();
+			
+			// console.log("stay home -- empty search");
+			// // this.orgs.fetch();
+			// this.filters.fetch();
+			// this.paths.fetch();
 		},
 
 		emptyPathSearch: function() {

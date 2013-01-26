@@ -56,7 +56,7 @@ def companies(request):
 
 	# print locationsSelected
 
-	companies = Entity.objects.values("name","summary","image__logo").filter(type="organization").annotate(freq=Count('financing__pk')).order_by('-freq')
+	companies = Entity.objects.values("name","summary","images__logo").filter(type="organization").annotate(freq=Count('financing__pk')).order_by('-freq')
 
 	# companies = Entity.objects.values("name","summary")
 
@@ -711,7 +711,7 @@ def _get_positions_for_path(positions,anon=False):
 			
 			# check to see if anonymous
 			if anon:
-				attribs['co_name'] = domain + " company",
+				attribs['co_name'] = str(domain) + " company",
 			else:
 				attribs['co_name'] = p.entity.name
 
