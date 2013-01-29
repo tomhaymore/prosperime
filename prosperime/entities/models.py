@@ -133,7 +133,7 @@ class Career(models.Model):
 	updated = models.DateTimeField(auto_now=True)
 
 	def __unicode__(self):
-		return short_name
+		return self.short_name
 
 	def get_pos_titles(self):
 		"""
