@@ -240,14 +240,20 @@ def finish_link(request):
 	access_token = request.session['access_token']
 
 	# add profile if it doesn't exit (for superadmin after reset)
-	try:
-		request.user.profile
-	except:
-		request.user.profile = Profile()
-		request.user.profile.first_name = linkedin_user_info['firstName']
-		request.user.profile.last_name = linkedin_user_info['lastName']
-		request.user.profile.headline = linkedin_user_info['headline']
-		request.user.profile.save()
+	# try:
+	# 	request.user.profile
+	# except:
+	# 	request.user.profile = Profile()
+	# 	request.user.profile.first_name = linkedin_user_info['firstName']
+	# 	request.user.profile.last_name = linkedin_user_info['lastName']
+	# 	request.user.profile.headline = linkedin_user_info['headline']
+	# 	request.user.profile.save()
+
+	request.user.profile = Profile()
+	request.user.profile.first_name = linkedin_user_info['firstName']
+	request.user.profile.last_name = linkedin_user_info['lastName']
+	request.user.profile.headline = linkedin_user_info['headline']
+	request.user.profile.save()
 
 	# create LinkedIn account
 	acct = Account()
@@ -266,10 +272,16 @@ def finish_link(request):
 		# _add_profile_pic(request.user,linkedin_user_info['pictureUrl'])
 
 	# finish processing LI profile
-	process_li_profile.delay(request.user.id,acct.id)
+	profile_task_id = process_li_profile.delay(request.user.id,acct.id)
 
 	# start processing connections
-	process_li_connections.delay(request.user.id,acct.id)
+	connections_task_id = process_li_connections.delay(request.user.id,acct.id)
+
+	# save task ids to session
+	request.session['tasks'] = {
+		'profile': profile_task_id,
+		'connections': connections_task_id
+	}
 
 	messages.success(request, 'Your LinkedIn account has been successfully linked.')
 
