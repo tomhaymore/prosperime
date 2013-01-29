@@ -36,15 +36,25 @@
 		return list
 	};
 
-	var timeline_hover = function(elem, index) {
+	var timeline_hover_in = function(elem, index) {
 		timeline_class = $(elem).attr("class")
 		u_id = timeline_class.match(/\d+/g);
-		document.getElementsByClassName(u_id + '-list')[index].style.fontWeight="bold"
+		document.getElementsByClassName(u_id + '-timeline')[index].style.border="1px solid blue"
 	}
 
 	var timeline_hover_out = function(elem, index) {
 		u_id = $(elem).attr('class').match(/\d+/g);
-		document.getElementsByClassName(u_id + '-list')[index].style.fontWeight="normal"
+		document.getElementsByClassName(u_id + '-timeline')[index].style.border="none"
+	}
+
+	var positionClicked = function(classname, index) {
+		// Grab the description element
+		description = document.getElementsByClassName(classname)[index].getElementsByClassName('timeline-description')[0];
+		console.log("Position clicked && " + description.style.display)
+
+		// If hidden, show; if shown, hide
+		if (description.style.display == "none") description.style.display="inherit";
+		else description.style.display="none";
 	}
 
 
