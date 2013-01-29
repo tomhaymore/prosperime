@@ -20,6 +20,8 @@ class LinkedinBackend:
         except User.DoesNotExist:
             return None
 
+
+# Clay: NOT USED
 class EmailOrUsernameModelBackend(object):
     def authenticate(self, username=None, password=None):
         if '@' in username:

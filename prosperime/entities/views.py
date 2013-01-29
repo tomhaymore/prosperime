@@ -746,14 +746,13 @@ def _get_positions_for_path(positions,anon=False):
 			# print p.id
 			# get first industry domain of company
 			domains = p.entity.domains.all()
-			print p
-			print domains
+
 			if domains:
 				domain = domains[0].name
 			else:
 				domain = None
 			
-			# education or org
+			# Education
 			if p.type == "education":
 				if p.degree is not None and p.field is not None:
 					title = p.degree + ", " + p.field
@@ -769,6 +768,7 @@ def _get_positions_for_path(positions,anon=False):
 					'title':title,
 					'type':'education'
 				}
+			# Organization
 			else:
 				attribs = {
 					'type':'org',
@@ -777,6 +777,11 @@ def _get_positions_for_path(positions,anon=False):
 					'title':p.title,
 				}
 
+			# Clay: addition of description if avail
+			if (p.description):
+				attribs['description'] = p.description
+			else:
+				attribs['description'] = None
 
 			if p.start_date is not None:
 				attribs['start_date'] = p.start_date.strftime("%m/%Y")
@@ -784,8 +789,10 @@ def _get_positions_for_path(positions,anon=False):
 				attribs['end_date'] = p.end_date.strftime("%m/%Y")
 			
 			# check to see if anonymous
-			if anon:
-				attribs['co_name'] = str(domain) + " company",
+
+			# Clay: extra line fixes case in which domain==None
+			if anon and domain:
+				attribs['co_name'] = domain + " company"
 			else:
 				attribs['co_name'] = p.entity.name
 

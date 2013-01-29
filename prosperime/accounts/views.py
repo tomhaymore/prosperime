@@ -71,16 +71,13 @@ def linkedin_authorize(request):
 	# 	raise Exception(content)
 	
 	liparser = LIProfile()
-
 	redirect_url, request_token = liparser.authorize()
 
 	# parse out request token
 
 	# request.session['request_token'] = dict(cgi.parse_qsl(content))
 	request.session['request_token'] = request_token
-
 	# redirect_url = "%s?oauth_token=%s" % (authorize_url, request.session['request_token']['oauth_token'], )
-
 	# print url
 
 	return HttpResponseRedirect(redirect_url)
@@ -120,12 +117,12 @@ def linkedin_authenticate(request):
 	# print linkedin_user_info
 	
 	# check if user is already logged on
-
 	request.session['linkedin_user_info'] = linkedin_user_info
 	request.session['access_token'] = access_token
 
 	if request.user.is_authenticated():
-		# if loged in, link accounts and return
+		# if logged in, link accounts and return
+		print ("@ accounts/authenticate, request.user.is_authenticated = true")
 		return HttpResponseRedirect('/account/link')
 
 	request.session['_auth_user_backend'] = 'prosperime.accounts.backends.LinkedinBackend'
@@ -154,8 +151,8 @@ def finish_login(request):
 	# TODO: redirect if not not authenticated through LinkedIn already
 	
 	if request.POST:
-		# form submitted
 
+		# form submitted
 		linkedin_user_info = request.session['linkedin_user_info']
 		access_token = request.session['access_token']
 
@@ -190,8 +187,7 @@ def finish_login(request):
 
 
 			# update user profile
-			# user.profile.full_name = request.session['linkedin_user_info']['firstName'] + " " + request.session['linkedin_user_info']['lastName']
-			
+			# user.profile.full_name = request.session['linkedin_user_info']['firstName'] + " " + request.session['linkedin_user_info']['lastName']		
 			user.profile.first_name = linkedin_user_info['firstName']
 			user.profile.last_name = linkedin_user_info['lastName']
 			user.profile.headline = linkedin_user_info['headline']
@@ -203,8 +199,6 @@ def finish_login(request):
 				li_parser = LIProfile()
 				li_parser.add_profile_pic(user,linkedin_user_info['pictureUrl'])
 
-
-			
 			if existing:
 				# get existing LI account
 				acct = Account.objects.get(owner=user,service="linkedin")

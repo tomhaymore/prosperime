@@ -7,22 +7,6 @@
 			<ul>
 				{% for pos in v %}
 					{% if pos.title %}
-	
-					<ul>
-					<li>Render Position for: ' {{pos.entity.name}}</li>
-						<li>Title: ' + {{pos.title}}</li>
-						<li>Summary: ' + {{pos.summary}}</li>
-						<li>Description: ' + {{pos.descrption}}</li>
-						<li>Current: ' + {{pos.current}}</li>
-						<li>Start Date: ' + {{pos.start_date}}</li>
-						<li>End Date: '+ {{pos.end_date}}</li>
-						<li>Type: ' + {{pos.type}}</li>
-						<li>Degree: ' + {{pos.degree}}</li>
-						<li>Field: ' + {{pos.field}}</li>
-						<li>Status: ' + {{	pos.status}}</li>
-					</ul>
-
-
 				
 					<li> {{pos.title}} {% if pos.start_date %}, {{pos.start_date}} {% if pos.end_date %} - {{pos.end_date}} {% endif %} {% endif %}</li>
 					{% endif %}

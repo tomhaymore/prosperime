@@ -333,29 +333,13 @@ class LIBase():
 				if industry:
 					# add industry to domain of company
 					co.domains.add(industry)
-				else:
+				# else:
 					# create new industry
 					industry = Industry()
 					industry.name=i['name']
-					industry.li_code=i['code']
-					if int(i['code']) in self.industry_groups:
-						industry.li_group=self.industry_groups[int(i['code'])]
-			
-					# try:
-					# 	industry.name=i['name']
-					# except KeyError:
-					# 	industry.name=None
-
-					# try:
-					# 	industry.li_code=i['code']
-					# except KeyError:
-					# 	industry.li_code=None
-
-					# try:
-					# 	industry.li_group=self.industry_groups[i['code']]
-					# except KeyError:
-					# 	industry.li_group=None
-
+					industry.li_code=int(i['code'])
+					if industry.li_code in self.industry_groups:
+						industry.li_group=self.industry_groups[industry.li_code]
 					industry.save()
 					# add to domain of company
 					co.domains.add(industry)
@@ -852,8 +836,8 @@ class LIConnections(LIBase):
 		if total_count > 500:
 			# need to paginate
 			pages = ceil((total_count - 500)/ 500)
-			
-			for i in range(1,pages+1):
+			raise Exception({pages})
+			for i in range(1,int(pages)+1):
 				# construct url with pagination
 				start_num = i*500+1
 				page_api_url = api_url + "start=%i&count=500" % (start_num,)
