@@ -500,15 +500,15 @@ class LIBase():
 
 	def add_careers_to_position(self,pos):
 		pos_title = pos.title
-		pos_co = "(" + pos.entity.name + ")"
+		# pos_co = "(" + pos.entity.name + ")"
 
 		pos1 = pos_title
-		pos2 = " ".join([pos_title,pos_co])
+		# pos2 = " ".join([pos_title,pos_co])
 
-		careers = {}
+		careers = []
 
-		for k,v in self.careers_to_positions_map.iteritems():
-			if pos1 in v or pos2 in v:
+		for k,v in self.careers_to_positions_map.items():
+			if pos1 in v:
 				careers.append(k)
 		
 		for c_id in careers:
