@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from accounts.models import Picture
-from entities.models import Entity, Office, Financing, Industry, Position
+from entities.models import Entity, Office, Financing, Industry, Position, Career
 from django.db.models import Count, Q
 from django.utils import simplejson
 from django.contrib import messages
@@ -538,13 +538,87 @@ def careers(request):
 	return render_to_response('entities/careers.html',{'careers':careers,'overview':overview},context_instance=RequestContext(request))
 
 
-
 def _get_careers_in_network(user,filters):
 	"""
 	returns array of all careers in user's network
 	"""
 	# get schools from user
-	schools = Entity.objects.filter(li_type="school",positions__person=user).distinct()
+	schools = Entity.objects.filter(li_type="school",positions__person=user,positions__type="education").distinct()
+	
+	# get all connected users and those from the same schools
+	
+	users = User.objects.select_related('profile','pictures').values('pk','positions__careers','profile__first_name','profile__last_name','profile__pictures__pic').filter(Q(profile__in=user.profile.connections.all()) | (Q(positions__entity__in=schools))).distinct()
+	if filters['positions']:
+		users = users.filter(positions__title__in=filters['positions'])
+	if filters['locations']:
+		users = users.filter(positions__entity__office__city__in=filters['locations'])
+	
+	users_list = [{'id':u['pk'],'first_name':u['profile__first_name'],'last_name':u['profile__last_name'],'profile_pic':u['profile__pictures__pic'],'careers':u['positions__careers']} for u in users]	
+	user_ids = [u['id'] for u in users_list]
+	
+	# fetch all positions in user's network
+	positions = Position.objects.select_related('entity','industries').values('pk','title','entity__name','careers').filter(person_id__in=user_ids).exclude(type="education").distinct()
+	# add positions filter
+	if filters['positions']:
+		positions = positions.filter(title__in=filters['positions'])
+	if filters['locations']:
+		positions = positions.filter(entity__office__city__in=filters['locations'])
+	# positions_list = [{'title':p.title,'org':p.entity.name,'industries':p.industries()} for p in positions]
+	positions_list = [{'id':p['pk'],'title':p['title'],'org':p['entity__name'],'careers':p['careers']} for p in positions]
+	positions_ids = [p['id'] for p in positions_list]
+	# get all related entities
+	# entities = Entity.objects.filter(positions__person_id__in=user_ids)
+	entities = Entity.objects.select_related('images','domains').values('pk','name','positions__careers','images__logo').filter(positions__person_id__in=user_ids).distinct()
+	# add location filters
+	if filters['locations']:
+		entities = entities.filter(office__city__in=filters['locations'])
+	# entities_list = [{'name':e.name,'domains':e.domains.all(),'logo':e.default_logo()} for e in entities]
+	entities_list = [{'id':e['pk'],'name':e['name'],'careers':e['positions__careers'],'logo':e['images__logo']} for e in entities]
+	entities_ids = [e['id'] for e in entities_list]
+	# get industries
+	# industries = Industry.objects.filter(entity__in=entities_ids).annotate(freq=Count('entity__positions')).order_by('-freq').distinct()
+	careers = Career.objects.values('id','short_name','long_name').filter(positions__id__in=positions_ids).distinct()
+
+	# overview = {'users':'','positions':'','orgs':''}
+	overview = {}
+	overview['users'] = {'count':len(users_list),'values':users_list}
+	overview['positions'] = {'count':len(positions_list),'values':positions_list}
+	overview['orgs'] = {'count':len(entities_list),'values':entities_list}
+
+	# initialize master career array
+	careers_dict = {}
+	o = 0
+	for c in careers:
+		
+		if c['short_name']:
+			c['name'] = c['short_name']
+		else:
+			c['name'] = c['long_name']
+
+		careers_dict[c['name']] = {
+					"order": o,
+					# "users": {'count':len(users_list),'values':[u for u in users_list if i.id == u['domains']]},
+					# "positions": {'count':len(positions_list),'values':[p for p in positions_list if i.id == p['industries']]},
+					# "orgs": {'count':len(entities_list),'values':[org for org in entities_list if i.id == org['domains']]}
+					"users": {'values':[u for u in users_list if c['id'] == u['careers']]},
+					"positions": {'values':[p for p in positions_list if c['id'] == p['careers']]},
+					"orgs": {'values':[org for org in entities_list if c['id'] == org['careers']]}
+				}
+		careers_dict[c['name']]['users']['count'] = len(careers_dict[c['name']]['users']['values'])
+		careers_dict[c['name']]['positions']['count'] = len(careers_dict[c['name']]['positions']['values'])
+		careers_dict[c['name']]['orgs']['count'] = len(careers_dict[c['name']]['orgs']['values'])
+		o += 1
+
+	# sorted_careers = sorted(careers_dict.iteritems(),key=lambda x: x[1]['order'],reverse=True)
+	return careers_dict, overview
+
+
+def _get_careers_in_network_old(user,filters):
+	"""
+	returns array of all careers in user's network
+	"""
+	# get schools from user
+	schools = Entity.objects.filter(li_type="school",positions__person=user,positions__type="education").distinct()
 	
 	# get all connected users and those from the same schools
 	# users = User.objects.select_related('profile','pictures').filter(Q(profile__in=user.profile.connections.all()) | Q(positions__entity__in=schools)).distinct()[:25]
