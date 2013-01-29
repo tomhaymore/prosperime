@@ -19,7 +19,7 @@ import dateutil
 from django.utils import simplejson
 from django.contrib.auth.models import User
 from accounts.models import Account, Profile, Connection, Picture
-from entities.models import Position, Entity, Image, Industry, Office
+from entities.models import Position, Entity, Image, Industry, Office, Career
 from django.core.files import File
 from django.conf import settings
 
@@ -37,6 +37,10 @@ class LIBase():
 
 	# initialize variable for account
 	acct = None
+
+	# initialize variable for career / positions map
+
+	careers_to_positions_map = {}
 
 	industry_groups = {
 		47:'corp fin',
@@ -188,6 +192,20 @@ class LIBase():
 		103:'art med rec',
 		}
 
+	def __init__(self):
+		self.careers_to_positions_map = self.get_career_positions_map()
+
+	def get_career_positions_map(self):
+		careers = Career.objects.filter(status="active")
+
+		career_map = {}
+
+		for c in careers:
+			titles = c.get_pos_titles()
+			career_map[c.id] = titles
+
+		self.careers_to_positions_map = career_map
+
 	def get_access_token(self,acct_id=None):
 
 		if self.acct is None:
@@ -320,7 +338,9 @@ class LIBase():
 					industry = Industry()
 					industry.name=i['name']
 					industry.li_code=i['code']
-					industry.li_group=self.industry_groups[i['code']]
+					if int(i['code']) in self.industry_groups:
+						industry.li_group=self.industry_groups[int(i['code'])]
+			
 					# try:
 					# 	industry.name=i['name']
 					# except KeyError:
@@ -449,6 +469,8 @@ class LIBase():
 		if 'endDate' in data:
 			pos.end_date = self.format_dates(data['endDate'])
 		pos.save()
+		career = self.add_careers_to_position(pos)
+		
 
 	def get_position(self,user,co,data,**kwargs):
 		if kwargs.get('type') == 'ed':
@@ -475,6 +497,24 @@ class LIBase():
 		pos.save()
 
 		return pos
+
+	def add_careers_to_position(self,pos):
+		pos_title = pos.title
+		pos_co = "(" + pos.entity.name + ")"
+
+		pos1 = pos_title
+		pos2 = " ".join([pos_title,pos_co])
+
+		careers = {}
+
+		for k,v in self.careers_to_positions_map.iteritems():
+			if pos1 in v or pos2 in v:
+				careers.append(k)
+		
+		for c_id in careers:
+			c = Career.objects.get(pk=c_id)
+			pos.careers.add(c)
+		pos.save()
 
 	def get_institution(self,name=None,type="school"):
 		try:
