@@ -2,6 +2,12 @@
 
 {% block head %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+<script type="text/javascript">
+	{%load jsonify%}
+	var saved_path_list = {{saved_paths|jsonify}}
+	
+	console.log(saved_path_list)
+</script>
 {% endblock %}
 
 <!-- CLAY: START MESSAGES  -->
@@ -49,6 +55,7 @@
 		{% if user %}
 			<p class="sidebar-header">Want to see improvements?</p>
 			<p>We'd love to hear from you -- <a href="mailto:feedback@prosperime.com">please drop us a line</a></p>
+			
 		{% else %}
 			<!-- CLAY: ?? -->
 			<p class="sidebar-header">Want to see full career paths?</p>
@@ -67,6 +74,19 @@
 		{% endif %}
 	</div>
 	<!-- END SAVE SEARCH -->
+
+
+	<!-- BEGIN SAVED PATHS -->
+	{% if saved_paths %}
+	<div class="rounded">
+		<p class="sidebar-header">Your Saved Career Paths</p>
+		{% for title in saved_paths %}
+			<div><a href="/saved_paths/{{title}}"> {{title}} </a></div>
+		{%endfor%}
+	</div>
+	{%endif%}
+	<!-- END SAVED PATHS -->
+
 </div>
 
 
@@ -129,7 +149,7 @@
 		</div>
 	</li>
 </script>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js" type="text/javascript"></script>
+
 <script type="text/javascript" src="../../static/js/viz.js"></script>
 <script type="text/template" id="path-single-template-clayton">
  
@@ -150,8 +170,8 @@
 		</div>
 		<div class="clearfix"></div>
 		<div class="path-viz">
-				<div class="path-viz-short center">
-					<% if (positions != null) {  
+				<div class="path-viz-short">
+					<% if (positions != null) { 
 					var num_positions = 0;
 					var ed_list = []
 					var org_list = []
@@ -189,7 +209,7 @@
 					if (ed_list.length > 0) %><h5>Education: </h5><ul class='ed_list'><%
 					
 					_.each(ed_list, function(ed) {
-						%><li class="path-viz-pos"><a href="#"><%
+						%><li class="path-viz-pos indent"><a href="#"><%
 						if (ed.title && ed.start_date) {
 							%>
 							<%= ed.title %> at <%= ed.co_name %>
@@ -212,39 +232,43 @@
 					var counter = 0;
 					%></ul><h5>Experience: </h5><ul><%
 					_.each(org_list, function(org) {
-						%><li class="<%=id%>-list" onclick="positionClicked('<%=id%>-list', <%=counter%>)" onmouseover="timeline_hover_in(this, <%=counter%>)" onmouseout="timeline_hover_out(this, <%=counter%>)"><%
-						if(org.title && org.start_date) {
+						%><li class="<%=id%>-list indent"  onmouseover="timeline_hover_in(this, <%=counter%>)" onmouseout="timeline_hover_out(this, <%=counter%>)"><div onclick="positionClicked('<%=id%>-list', <%=counter%>)"><%
+						if(org.title) {
 							%>
+							<span class="timeline-header">
 							<span class="timeline-title"><%= org.title %></span>
 							at
 							<span class="timeline-co_name"><%= org.co_name %></span>
-							<span class="timeline-dates">
-								<%= org.start_date%> to <%= org.end_date %>
-							</span>
-							<%
-						} else if (org.title) {
+							</span><%
+						} else %><span class="timeline-header"><span class="timeline-co_name"><%= org.co_name %></span></span><%
+
+						// DESCRIPTION:
+						// Note that display:none needed for the js toggling to work. It's a hack
+						%></div><div class="timeline-description <%=id%>-description" style="display:none"><div onclick="positionClicked('<%=id%>-list', <%=counter%>)"><%
+							if (org.start_date) {
+								%>
+									<span class="timeline-description-header">Duration: </span>
+									<span class="timeline-dates"><%=org.start_date%> to <%=org.end_date%></span>
+								<%
+							}
+							%><br/><%
+
+							if (org.description) {
+								%>
+									<span class="timeline-description-header">More Information: </span>
+									<p><%=org.description%></p>
+								<%
+							}
 							%>
-							<span class="timeline-title"><%= org.title %></span>
-							at
-							<span class="timeline-co_name"><%= org.co_name %></span>
-							<%
-						} else if (org.start_date) {
-							%>
-								<span class="timeline-co_name"><%= org.co_name %></span>
-								<span class="timeline_dates">
-									<%= org.start_date%> to <%= org.end_date %>
-								</span>
-							<%
-						} else 
-						%><span class="timeline-co_name"><%= org.co_name %></span><%
-						if (org.description) {
-							// Note that display:none needed for the js toggling to work. It's a hack
-							%><p class="timeline-description <%=id%>-description" style="display:none"><%=org.description%></p><%
-						}
-						%></li><%
+							</div>
+								<div class="btn btn-small save-position-btn" onclick="open_saved_paths(saved_path_list, this.parentNode, <%=org.id%>)">
+									Save this position!
+								</div>
+							</div>
+						</li><%
 						counter++;
 					});		
-					%></ul><%
+					%></dl><%
 
 					// Ensure timeline will fit
 					var compress_timeline = false

@@ -156,8 +156,10 @@ INSTALLED_APPS = (
     'accounts',
     'kombu.transport.django',
     'djcelery',
+    'saved_paths',
     # 'debug_toolbar'
-    # 'south',
+    'south',
+    'jsonify',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
