@@ -49,8 +49,8 @@ class Command(BaseCommand):
 			positions.delete()
 
 			# reset all entities
-			cos = Entity.objects.all()
-			cos.delete()
+			# cos = Entity.objects.all()
+			# cos.delete()
 
 		elif options['users']:
 			# reset all users save admin

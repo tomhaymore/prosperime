@@ -432,17 +432,17 @@ $(function(){
 	});
 
 	
-	window.arcMeta = {
-		'peopleArc':null, 
-		'orgsArc':null, 
-		'positionsArc': null,
-		'usersCount': null,
-		'orgsCount': null,
-		'positionsCount': null,
-		'fullUsersCount': null,
-		'fullOrgsCount': null,
-		'fullPositionsCount': null,
-	};
+	// window.arcMeta = {
+	// 	'peopleArc':null, 
+	// 	'orgsArc':null, 
+	// 	'positionsArc': null,
+	// 	'usersCount': null,
+	// 	'orgsCount': null,
+	// 	'positionsCount': null,
+	// 	'fullUsersCount': null,
+	// 	'fullOrgsCount': null,
+	// 	'fullPositionsCount': null,
+	// };
 
 	window.CareersView = Backbone.View.extend({
 
@@ -637,7 +637,7 @@ $(function(){
 			this.filters = window.filters;
 			this.paths = window.paths;
 			// show paths and path filters by default
-			// this.orgsView = new OrgListView({ collection: this.orgs});
+			this.orgsView = new OrgListView({ collection: this.orgs});
 			this.filtersView = new FilterListView({ collection: this.filters});
 			this.pathsView = new PathListView({ collection: this.paths});
 			this.careersView = new CareersView();
@@ -648,7 +648,8 @@ $(function(){
 			this.filters.meta('view','careers');
 			this.filters.meta('query','');
 			this.filters.fetch()
-			
+
+			this.careersView.meta('query','');
 			this.careersView.render();
 
 		},
@@ -660,8 +661,8 @@ $(function(){
 			// test for empty search string, make sure to uncheck all filters
 			if (query === undefined) {
 				this.filtersView.uncheckAll();
-				this.careersView.meta('query',null);
-				this.filters.meta('query',null);
+				this.careersView.meta('query','');
+				this.filters.meta('query','');
 			} else {
 				this.careersView.meta('query',query);
 				this.filters.meta('query',query);	
@@ -671,10 +672,17 @@ $(function(){
 		},
 
 		emptySearch: function() {
-			console.log("stay home -- empty search");
-			// this.orgs.fetch();
-			this.filters.fetch();
-			this.paths.fetch();
+			console.log("careers search");
+			this.filters.meta('view','careers');
+			this.filters.meta('query','');
+			this.filters.fetch()
+			
+			this.careersView.render();
+
+			// console.log("stay home -- empty search");
+			// // this.orgs.fetch();
+			// this.filters.fetch();
+			// this.paths.fetch();
 		},
 
 		emptyPathSearch: function() {
