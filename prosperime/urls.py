@@ -8,6 +8,8 @@ from django.conf import settings
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'entities.views.home', name='home'),
+    url(r'^discover/','entities.views.discover'),
+    url(r'^discover/career/(\d+)/$','entities.views.discover_career'),
     url(r'^search/','entities.views.search'),
     url(r'^companies/','entities.views.companies'),
     url(r'^filters/','entities.views.filters'),

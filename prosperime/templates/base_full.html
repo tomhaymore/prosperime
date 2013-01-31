@@ -24,23 +24,19 @@
 						<!-- <a class="brand" href="/">Prosperime</a> -->
 						<img class="main-logo" src="{{STATIC_URL}}img/logo_1.png" />
 					</div>
-					<div class="span3 offset4 nav-collapse pull-right">
+					<div class="span5 offset2 nav-collapse pull-right">
 						<ul class="nav">
 							<!-- <li>
 								<a href="/">Home</a>
 							</li> -->
-	                		{% if user.is_authenticated %}
+                			{% if user.is_authenticated %}
 	                		<li>
-	                			<a href="/settings/">Account</a>
+	                			<a href="/settings/">{{user.profile.first_name}} {{user.profile.last_name}}</a>
 	                		</li>
-	                		
 	                		<li>
 	                			<a href="/account/logout/">Logout</a>
 	                		</li>
 	                		{% endif %}
-							<li>
-								<a href="/about">About</a>
-							</li>
 							<li>
 								<a href="/contact">Contact</a>
 							</li>

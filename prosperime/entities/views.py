@@ -27,6 +27,115 @@ def home(request):
 	data = {}
 	return render_to_response('home.html',data,context_instance=RequestContext(request)) ## Clay - change this
 
+def discover(request):
+
+	# data array for passing to template
+	data = {}
+	print request.user.id
+	if 'tasks' in request.session:
+		data = {
+			'profile_task_id':request.session['tasks']['profile'],
+			'connections_task_id':request.session['tasks']['connections'],
+		}
+
+	careers_network = _get_careers_brief_in_network(request.user)
+	careers_similar = _get_careers_brief_similar()
+
+	careers = {}
+
+	careers['network'] = 'hello'
+	careers['similar'] = careers_similar
+
+	return render_to_response('entities/discover.html',{'data':data,'careers':careers},context_instance=RequestContext(request))
+
+def discover_career(request,career_id):
+
+	# get career object
+	career = Career.objects.get(pk=career_id)
+
+	paths_in_career, overview = _get_paths_in_career(career)
+
+	return render_to_response('entities/discover_career.html',{'career':career,'paths':paths_in_career,'overview':overview},context_instance=RequestContext(request))
+
+def _get_paths_in_career(career):
+
+	cxns = user.profile.connections.all().values('user__id').select_related('user')
+
+	users = []
+
+	for c in cxns:
+		users.append(c['user__id'])
+
+	people = User.objects.filter(id__in=users)
+
+	overview = {
+		'people':0,
+		'positions':0,
+		'orgs':0
+	}
+
+	orgs = []
+	orgs_dict = {}
+
+	for p in people:
+		overview['network']['people'] += 1
+		for pos in p.positions.all():
+			overview['network']['positions'] += 1
+			orgs.append(pos.entity.name)
+			if pos.entity.name in orgs_dict:
+				orgs_dict[pos.entity.name]['count'] += 1
+			else:
+				orgs_dict[pos.entity.name] = {
+					'id':pos.entity.id,
+					'count':1
+				}
+
+	orgs = set(orgs)
+	
+	overview['network']['orgs'] = len(orgs)
+
+	orgs_dict = sorted(orgs_dict.iteritems(), key=lambda x: x[0],reverse=True)
+
+	overview['network']['bigplayers'] = all_orgs_dict
+
+	all_people = User.objects.filter(positions__careers=career)
+
+	all_overview = {
+		'people':0,
+		'positions':0,
+		'orgs':0
+	}
+
+	all_orgs = []
+	all_orgs_dict = {}
+
+	for p in all_people:
+		overview['all']['people'] += 1
+		for pos in p.positions.all():
+			overview['all']['positions'] += 1
+			all_orgs.append(pos.entity.name)
+			if pos.entity.name in all_orgs_dict:
+				all_orgs_dict[pos.entity.name]['count'] += 1
+			else:
+				all_orgs_dict[pos.entity.name] = {
+					'id':pos.entity.id,
+					'count':1
+				}
+
+	all_orgs = set(all_orgs)
+	
+	overview['all']['orgs'] = len(orgs)
+
+	all_orgs_dict = sorted(all_orgs_dict.iteritems(), key=lambda x: x[0],reverse=True)
+
+	overview['all']['bigplayers'] = all_orgs_dict
+
+	paths['network'] = people
+
+	paths['community'] = all_people
+
+	return paths, overview
+
 def search(request):
 	
 	# test if user is authenticated
@@ -536,6 +645,112 @@ def careers(request):
 	careers, overview = _get_careers_in_network(request.user,{'locations':locationsSelected,'positions':positionsSelected})
 
 	return render_to_response('entities/careers.html',{'careers':careers,'overview':overview},context_instance=RequestContext(request))
+
+def _get_careers_brief_similar(**filters):
+
+	return None
+
+def _get_careers_brief_all(**filters):
+
+	careers = Career.objects.annotate(num_people=Count('positions__person__pk'),num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk')).distinct()
+
+	return careers
+
+def _get_careers_brief_in_network(user,**filters):
+
+	cxns = user.profile.connections.all().values('user__id').select_related('user')
+
+	users = []
+
+	for c in cxns:
+		users.append(c['user__id'])
+
+	careers = Career.objects.filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk'),num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk')).distinct()
+
+	return careers
+
+def _get_careers_in_community(user,**filters):
+
+	"""
+	returns array of all careers in community, with out-of-network contacts anonymized
+	"""
+
+
+
+	# get all users
+	
+	users = User.objects.select_related('profile','pictures').values('pk','positions__careers','profile__first_name','profile__last_name','profile__pictures__pic').distinct()
+	if filters['positions']:
+		users = users.filter(positions__title__in=filters['positions'])
+	if filters['locations']:
+		users = users.filter(positions__entity__office__city__in=filters['locations'])
+	
+	# get focal user connections
+
+	cxns = user.connections.all().values('id')
+
+	# users_known_list = [{'id':u['pk'],'first_name':u['profile__first_name'],'last_name':u['profile__last_name'],'profile_pic':u['profile__pictures__pic'],'careers':u['positions__careers']} for u in users if u['pd'] in cxns]
+	# users_anon_list = [{'id':u['pk'],'first_name':u['profile__first_name'],'last_name':u['profile__last_name'],'profile_pic':u['profile__pictures__pic'],'careers':u['positions__careers']} for u in users if u['pd'] not in cxns]	
+	# users_list = users_known_list + users.anon_list
+	users_list = [{'id':u['pk'],'first_name':u['profile__first_name'],'last_name':u['profile__last_name'],'profile_pic':u['profile__pictures__pic'],'careers':u['positions__careers']} for u in users]
+	user_ids = [u['id'] for u in users_list]
+	
+	# fetch all positions
+	positions = Position.objects.select_related('entity','industries').values('pk','title','entity__name','careers').exclude(type="education").distinct()
+	# add positions filter
+	if filters['positions']:
+		positions = positions.filter(title__in=filters['positions'])
+	if filters['locations']:
+		positions = positions.filter(entity__office__city__in=filters['locations'])
+	
+	# positions_list = [{'title':p.title,'org':p.entity.name,'industries':p.industries()} for p in positions]
+	positions_list = [{'id':p['pk'],'title':p['title'],'org':p['entity__name'],'careers':p['careers']} for p in positions]
+	positions_ids = [p['id'] for p in positions_list]
+	# get all related entities
+	# entities = Entity.objects.filter(positions__person_id__in=user_ids)
+	entities = Entity.objects.select_related('images','domains').values('pk','name','positions__careers','images__logo').distinct()
+	# add location filters
+	if filters['locations']:
+		entities = entities.filter(office__city__in=filters['locations'])
+	# entities_list = [{'name':e.name,'domains':e.domains.all(),'logo':e.default_logo()} for e in entities]
+	entities_list = [{'id':e['pk'],'name':e['name'],'careers':e['positions__careers'],'logo':e['images__logo']} for e in entities]
+	entities_ids = [e['id'] for e in entities_list]
+	# get industries
+	# industries = Industry.objects.filter(entity__in=entities_ids).annotate(freq=Count('entity__positions')).order_by('-freq').distinct()
+	careers = Career.objects.values('id','short_name','long_name').filter(positions__id__in=positions_ids).distinct()
+
+	# overview = {'users':'','positions':'','orgs':''}
+	overview = {}
+	overview['users'] = {'count':len(users_list),'values':users_list}
+	overview['positions'] = {'count':len(positions_list),'values':positions_list}
+	overview['orgs'] = {'count':len(entities_list),'values':entities_list}
+
+	# initialize master career array
+	careers_dict = {}
+	o = 0
+	for c in careers:
+		
+		if c['short_name']:
+			c['name'] = c['short_name']
+		else:
+			c['name'] = c['long_name']
+
+		careers_dict[c['name']] = {
+					"order": o,
+					# "users": {'count':len(users_list),'values':[u for u in users_list if i.id == u['domains']]},
+					# "positions": {'count':len(positions_list),'values':[p for p in positions_list if i.id == p['industries']]},
+					# "orgs": {'count':len(entities_list),'values':[org for org in entities_list if i.id == org['domains']]}
+					"users": {'values':[u for u in users_list if c['id'] == u['careers']]},
+					"positions": {'values':[p for p in positions_list if c['id'] == p['careers']]},
+					"orgs": {'values':[org for org in entities_list if c['id'] == org['careers']]}
+				}
+		careers_dict[c['name']]['users']['count'] = len(careers_dict[c['name']]['users']['values'])
+		careers_dict[c['name']]['positions']['count'] = len(careers_dict[c['name']]['positions']['values'])
+		careers_dict[c['name']]['orgs']['count'] = len(careers_dict[c['name']]['orgs']['values'])
+		o += 1
+
+	# sorted_careers = sorted(careers_dict.iteritems(),key=lambda x: x[1]['order'],reverse=True)
+	return careers_dict, overview
 
 
 def _get_careers_in_network(user,filters):
