@@ -115,7 +115,6 @@ div#promo-message-container {
 ul {
 	margin:0px;
 	padding:0;
-
 }
 
 li {
@@ -791,11 +790,21 @@ ul.flat li {
 
 
 /*PATH VIZ - CLAYTON */
+
+.path-viz-short li {
+	padding-left:4px;
+}
+
 .center {
 	text-align:center;
 }
 
+.indent {
+	padding-left:8px;
+}
+
 .timeline {
+	text-align:center;
 	overflow: hidden;
 	width:100%;
 	border:1px solid #999;
@@ -857,21 +866,71 @@ ul.flat li {
 }
 
 .timeline-title {
-	color:#1e90ff;
+	/*color:#1e90ff;*/
 }
 
 .timeline-co_name {
-	color:#b22222;
+	/*color:#b22222;*/
 }
 
 .timeline-dates {
 
 }
 
+.timeline-description-header {
+	font-weight:bold;
+}
+
 .timeline-description {
+	padding:4px;
+	text-align:left;
 	display:none;
+	border-bottom:1px solid black;
+	border-left:1px solid black;
+	border-right:1px solid black;
+	border-radius:0px 0px 4px 4px;
+	/*background-color:#eee;
+	*background-color: #ddd;
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#eee),to(#ddd) );
+	background-image: -webkit-linear-gradient(top, #eee, #ddd);
+	background-image: -o-linear-gradient(top, #eee, #ddd);
+	background-image: linear-gradient(to bottom, #eee, #ddd);
+	background-image: -moz-linear-gradient(top, #eee, #ddd);
+	background-repeat: repeat-x;*/
 }
 
 .timeline td .timeline-title-span {
 	/*display:none;*/
+}
+
+.timeline-header {
+	width:100%;
+}
+
+/*CLAYTON -- SAVING BOX*/
+.save_path_box {
+	z-index:10;
+	padding:4px;
+	border:1px solid #333;
+	margin-top:8px;
+	border-radius:4px;
+}
+
+.save_path_box_header {
+	font-weight:bold;
+}
+
+.save_path_box li {
+	list-style-type: circle;
+	padding-left:4px;
+	margin-left:16px;
+}
+
+/*CLAYTON SAVED PATHS PAGES*/
+.saved-path-title {
+	font-weight:bold;
+}
+
+.saved-path-position {
+	padding-left:16px;
 }

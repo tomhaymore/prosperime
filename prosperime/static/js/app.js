@@ -49,6 +49,8 @@ $(function(){
 		// none
 	});
 
+
+
 	//-------------------//
 	// ** Collections ** //
 	//-------------------//
@@ -158,6 +160,8 @@ $(function(){
 		}
 	});
 
+	
+
 	// Instantiate Collections
 	window.orgs = new Orgs;
 	window.filters = new Filters;
@@ -166,6 +170,7 @@ $(function(){
 	//-------------//
 	// ** Views ** //
 	//-------------//
+
 	// View: PathSingleView
 	window.PathSingleView = Backbone.View.extend({
 
@@ -182,6 +187,7 @@ $(function(){
 		},
 
 		render: function() {
+			console.log('path single view')
 			var renderedContent = this.template(this.model.toJSON());
 			$(this.el).html(renderedContent);
 			return this;
@@ -218,6 +224,7 @@ $(function(){
 		},
 
 		render: function() {
+			console.log('org single view')
 			// var renderedContent = $(this.el).html(this.template(this.model.toJSON()));
 			var renderedContent = this.template(this.model.toJSON());
 			$(this.el).html(renderedContent);
@@ -239,6 +246,7 @@ $(function(){
 		},
 
 		render: function() {
+			console.log('path list view')
 			var $paths,
 				collection = this.collection;
 
@@ -265,7 +273,9 @@ $(function(){
 		},
 
 		render: function() {
+			console.log('filter single view')
 			var renderedContent = this.template(this.model.toJSON());
+			// console.log(renderedContent)
 			$(this.el).html(renderedContent);
 			return this;
 		},
@@ -317,8 +327,9 @@ $(function(){
 			}
 
 			// trigger router to navigate
+			console.log('filter single view')
 			console.log("trying to trigger search");
-			console.log(filterUrl);
+			// console.log(filterUrl);
 			//Backbone.history.navigate(filterUrl,{trigger:true});
 			App.navigate(filterUrl,{trigger:true});
 		}
@@ -339,6 +350,7 @@ $(function(){
 		},
 
 		render: function() {
+			console.log('rendering orglist view')
 			var $orgs,
 				collection = this.collection;
 
@@ -373,6 +385,7 @@ $(function(){
 		},
 
 		render: function() {
+			console.log('rendering filter list view')
 			var $filters,
 				filterCategories,
 				collection = this.collection;
@@ -385,11 +398,14 @@ $(function(){
 			categories = _.uniq(categories);
 			for (var i = 0; i < categories.length; i++) { 
 				category = categories[i];
-				//console.log(category);
+				// console.log(category);
+
 				// render collection view with appropriate category variable
 				$(this.el).append(this.template({'category':category}));
+				
 				// assign comtainer for models to a jQuery object
 				$filters = this.$(".filters-list:last");
+
 				// loop through each model in the collection
 				this.collection.each(function(filter) {
 					// only render filters from this category
@@ -496,6 +512,7 @@ $(function(){
 		},
 
 		render: function() {
+			console.log('attempting to render careers view')
 			$(this.el).empty();
 			
 			var _this = this;
@@ -629,7 +646,7 @@ $(function(){
 			"companies/" : "emptyCompanySearch",
 			"companies/:query" : "companySearch",
 			"careers/" : "emptyCareerSearch",
-			"careers/:query" : "careerSearch"
+			"careers/:query" : "careerSearch",
 		},
 
 		initialize: function() {
@@ -644,14 +661,12 @@ $(function(){
 		},
 
 		emptyCareerSearch: function() {
-			console.log("careers search");
+			console.log("empty careers search");
 			this.filters.meta('view','careers');
 			this.filters.meta('query','');
 			this.filters.fetch()
-
 			this.careersView.meta('query','');
 			this.careersView.render();
-
 		},
 
 		careerSearch: function(query) {
@@ -672,17 +687,16 @@ $(function(){
 		},
 
 		emptySearch: function() {
-			console.log("careers search");
+			console.log("empty search");
 			this.filters.meta('view','careers');
 			this.filters.meta('query','');
 			this.filters.fetch()
-			
-			this.careersView.render();
+			console.log('after filters')
+			//this.careersView.render();
 
-			// console.log("stay home -- empty search");
 			// // this.orgs.fetch();
-			// this.filters.fetch();
-			// this.paths.fetch();
+			this.filters.fetch();
+			this.paths.fetch();
 		},
 
 		emptyPathSearch: function() {
@@ -742,9 +756,9 @@ $(function(){
 			}
 			this.orgs.fetch();
 			this.filters.fetch();
-		}
-
+		},
 	});
+
 
 	// Custom functions
 	function generateUrl(params) {
@@ -770,8 +784,6 @@ $(function(){
 		}
 		return fullUrl;
 	}
-
-
 
 	window.App = new SearchRouter;
 	Backbone.history.start();

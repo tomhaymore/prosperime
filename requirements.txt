@@ -19,3 +19,4 @@ python-dateutil==1.5
 pytz==2012h
 wsgiref==0.1.2
 yolk==0.4.3
+django-jsonify==0.2.1

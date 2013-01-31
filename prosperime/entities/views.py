@@ -18,6 +18,10 @@ from django.utils import simplejson
 from django.contrib import messages
 # from django.core import serializers
 
+# Prosperime
+from accounts.models import Picture
+from entities.models import Entity, Office, Financing, Industry, Position
+from saved_paths.models import Saved_Path
 
 # @login_required
 def home(request):
@@ -146,24 +150,35 @@ def search(request):
 		data['msg'] = request.session['msg']
 	if request.user.is_authenticated():
 		data['user'] = request.user
+
+	# Clay: add saved paths here... not sure if this is where to do it
+	#	but hey, it works
+	# EDIT: add an array of path titles (we don't need the objects)
+	saved_paths = Saved_Path.objects.filter(owner=request.user)
+
+	if len(saved_paths) > 0:
+		path_titles = []
+		for path in saved_paths:
+			path_titles.append(path.title)
+
+		# Add path titles array
+		data['saved_paths'] = path_titles
+		print path_titles
+		
 	return render_to_response('entities/search.html',data,
 		context_instance=RequestContext(request))
 
 def companies(request):
 	""" serves up JSON file of company search results """
-	
+	print 'hits companies'
 	# initialize array of companies
-	
 	# companies = []
-
 	# get search filters
 	
 	locationsSelected = request.GET.getlist('location')
 	sectorsSelected = request.GET.getlist('sector')
 	sizesSelected = request.GET.getlist('size')
 	stagesSelected = request.GET.getlist('stage')
-
-	# print locationsSelected
 
 	companies = Entity.objects.values("name","summary","images__logo").filter(type="organization").annotate(freq=Count('financing__pk')).order_by('-freq')
 
@@ -191,12 +206,14 @@ def companies(request):
 		companies = companies.filter(financing__round__in=stagesSelected)
 
 	# companies =  list(Entity.objects.filter(cb_type="company").values("full_name","summary","logo")[:20])
-	# print companies.query
+	print companies.query
 	companies = list(companies[:20])
 	return HttpResponse(simplejson.dumps(companies), mimetype="application/json")
 
+
+# CLAY: json object of params for path search. NOT USED
 def path_filters(request):
-	
+	print 'hits path_filters'
 	""" serves up JSON object of params for path searches """
 
 	# initialize array for all filters
@@ -299,8 +316,10 @@ def path_filters(request):
 	# render response
 	return HttpResponse(simplejson.dumps(filters), mimetype="application/json")
 
-def filters(request):
 
+# CLAY: json dump of all filters
+def filters(request):
+	print 'hits filters'
 	""" serves up JSON file of params for searches """
 	# initialize array for all filters
 	filters = []
@@ -447,10 +466,11 @@ def filters(request):
 	# render response
 	return HttpResponse(simplejson.dumps(filters), mimetype="application/json")
 
+
+# CLAY: json dump of all paths, by user
 def paths(request):
 	# initialize array of paths
 	paths = []
-
 	# get search filters
 	locationsSelected = request.GET.getlist('location')
 	sectorsSelected = request.GET.getlist('sector')
@@ -491,10 +511,12 @@ def paths(request):
 
 		paths.append({'id':u.id,'profile_pic':profile_pic,'full_name':name,'current_position':current_position,'positions':positions,'connected':connected})
 		# paths.append({'full_name':name,'current_position':current_position,'connected':connected})
-
+	print paths
+	print '######################\n'
 	return HttpResponse(simplejson.dumps(paths), mimetype="application/json")
 
 def path(request,user_id):
+	print 'hits path'
 	# fetch path
 	positions = Position.objects.filter(person__id=user_id)
 	# initialize arrays
@@ -998,6 +1020,10 @@ def _get_positions_for_path(positions,anon=False):
 			else:
 				attribs['description'] = None
 
+			# Clay: also need the uniq id for saving
+			attribs['id'] = p.id
+
+			
 			if p.start_date is not None:
 				attribs['start_date'] = p.start_date.strftime("%m/%Y")
 			if p.end_date is not None:
