@@ -11,11 +11,8 @@ from django.template import RequestContext
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-<<<<<<< HEAD
-=======
 from accounts.models import Picture
 from entities.models import Entity, Office, Financing, Industry, Position, Career
->>>>>>> 15e476e4117ef7f55d1ddddcde61fa470ff29b7d
 from django.db.models import Count, Q
 from django.utils import simplejson
 from django.contrib import messages
@@ -64,7 +61,7 @@ def search(request):
 
 def companies(request):
 	""" serves up JSON file of company search results """
-	
+	print 'hits companies'
 	# initialize array of companies
 	# companies = []
 	# get search filters
@@ -107,7 +104,7 @@ def companies(request):
 
 # CLAY: json object of params for path search. NOT USED
 def path_filters(request):
-	
+	print 'hits path_filters'
 	""" serves up JSON object of params for path searches """
 
 	# initialize array for all filters
@@ -213,7 +210,7 @@ def path_filters(request):
 
 # CLAY: json dump of all filters
 def filters(request):
-
+	print 'hits filters'
 	""" serves up JSON file of params for searches """
 	# initialize array for all filters
 	filters = []
@@ -365,7 +362,6 @@ def filters(request):
 def paths(request):
 	# initialize array of paths
 	paths = []
-
 	# get search filters
 	locationsSelected = request.GET.getlist('location')
 	sectorsSelected = request.GET.getlist('sector')
@@ -406,11 +402,12 @@ def paths(request):
 
 		paths.append({'id':u.id,'profile_pic':profile_pic,'full_name':name,'current_position':current_position,'positions':positions,'connected':connected})
 		# paths.append({'full_name':name,'current_position':current_position,'connected':connected})
-
-	
+	print paths
+	print '######################\n'
 	return HttpResponse(simplejson.dumps(paths), mimetype="application/json")
 
 def path(request,user_id):
+	print 'hits path'
 	# fetch path
 	positions = Position.objects.filter(person__id=user_id)
 	# initialize arrays

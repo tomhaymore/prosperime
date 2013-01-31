@@ -82,8 +82,8 @@ class Position(models.Model):
 	degree = models.CharField(max_length=450,null=True)
 	field = models.CharField(max_length=450,null=True)
 	status = models.CharField(max_length=15,default="active")
-	created = models.DateTimeField(auto_now_add=True)
-	updated = models.DateTimeField(auto_now=True)
+	created = models.DateTimeField(auto_now_add=True, null=True)
+	updated = models.DateTimeField(auto_now=True, null=True)
 
 	def __unicode__(self):
 		if self.title is not None:
@@ -128,8 +128,8 @@ class Career(models.Model):
 	soc_code = models.CharField(max_length=15,null=True)
 	pos_titles = models.TextField(null=True)
 	status = models.CharField(max_length=15,default="active")
-	created = models.DateTimeField(auto_now_add=True)
-	updated = models.DateTimeField(auto_now=True)
+	created = models.DateTimeField(auto_now_add=True, null=True)
+	updated = models.DateTimeField(auto_now=True, null=True)
 
 	def __unicode__(self):
 		return self.short_name

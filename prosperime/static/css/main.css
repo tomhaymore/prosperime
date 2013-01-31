@@ -804,3 +804,12 @@ ul.flat li {
 	padding-left:4px;
 	margin-left:16px;
 }
+
+/*CLAYTON SAVED PATHS PAGES*/
+.saved-path-title {
+	font-weight:bold;
+}
+
+.saved-path-position {
+	padding-left:16px;
+}
