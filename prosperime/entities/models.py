@@ -124,6 +124,7 @@ class Position(models.Model):
 class Career(models.Model):	
 	short_name = models.CharField(max_length=450,null=True)
 	long_name = models.CharField(max_length=450,null=True)
+	description = models.TextField(null=True)
 	parent = models.ForeignKey('self',related_name="children",null=True)
 	census_code = models.CharField(max_length=10,null=True)
 	soc_code = models.CharField(max_length=15,null=True)
