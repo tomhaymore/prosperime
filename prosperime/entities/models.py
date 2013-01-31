@@ -166,6 +166,14 @@ class Career(models.Model):
 		children.remove(self)
 		return children
 
+	def name(self):
+		"""
+		returns short name or long name if no short name
+		"""
+		if self.short_name:
+			return self.short_name
+		return self.long_name
+
 class Financing(models.Model):
 	investors = models.ManyToManyField(Entity,through="Investment")
 	target = models.ForeignKey(Entity,related_name="target")
