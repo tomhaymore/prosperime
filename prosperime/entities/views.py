@@ -47,7 +47,7 @@ def discover(request):
 
 	careers = {}
 
-	careers['network'] = 'hello'
+	careers['network'] = careers_network
 	careers['similar'] = careers_similar
 
 	return render_to_response('entities/discover.html',{'data':data,'careers':careers},context_instance=RequestContext(request))
