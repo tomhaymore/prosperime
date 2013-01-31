@@ -47,74 +47,20 @@ def logout(request):
 	return HttpResponseRedirect('/')
 
 def linkedin_authorize(request):
-	
-	# # set scope
-	# scope = 'r_fullprofile+r_emailaddress+r_network'
-
-	# # set callback
-	# callback = 'http://127.0.0.1:8000/account/authenticate/'
-
-	# # set urls
-	# request_token_url	= 'https://api.linkedin.com/uas/oauth/requestToken'
-	# # access_token_url	= 'https://api.linkedin.com/uas/oauth/accessToken'
-	# authorize_url		= 'https://www.linkedin.com/uas/oauth/authenticate'
-
-	# # setup OAuth
-	# consumer = oauth.Consumer(linkedin_key, linkedin_secret)
-	# client = oauth.Client(consumer)
-
-	# request_token_url = "%s?scope=%s" % (request_token_url, scope, )
-
-	# # get request token
-	# resp, content = client.request(request_token_url,"POST")
-	# if resp['status'] != '200':
-	# 	raise Exception(content)
-	
+		
 	liparser = LIProfile()
 	redirect_url, request_token = liparser.authorize()
 
-	# parse out request token
-
-	# request.session['request_token'] = dict(cgi.parse_qsl(content))
 	request.session['request_token'] = request_token
-	# redirect_url = "%s?oauth_token=%s" % (authorize_url, request.session['request_token']['oauth_token'], )
-	# print url
 
 	return HttpResponseRedirect(redirect_url)
   
 # @login_required
 def linkedin_authenticate(request):  
-	# consumer = oauth.Consumer(linkedin_key, linkedin_secret)
 	
-	# access_token_url = 'https://api.linkedin.com/uas/oauth/accessToken'
-
-	# token = oauth.Token(request.session['request_token']['oauth_token'],request.session['request_token']['oauth_token_secret'])
-	# token.set_verifier(request.GET['oauth_verifier'])
-	# client = oauth.Client(consumer, token)
-
-	# resp, content = client.request(access_token_url, "POST")
-
-	# access_token = dict(cgi.parse_qsl(content))
-	
-	# # print access_token
-	
-	# fields = "(headline,id,first-name,last-name,picture-url)"
-
-	# api_url = "http://api.linkedin.com/v1/people/~:" + fields + "?format=json"
-	 
-	# token = oauth.Token(
-	# 	key=access_token['oauth_token'], 
-	# 	secret=access_token['oauth_token_secret'])
-
-	# client = oauth.Client(consumer, token)
-
-	# resp, content = client.request(api_url)
-
-	# linkedin_user_info = simplejson.loads(content)
 	liparser = LIProfile()
 
 	access_token, linkedin_user_info = liparser.authenticate(request.session['request_token'],request.GET['oauth_verifier'])
-	# print linkedin_user_info
 	
 	# check if user is already logged on
 	request.session['linkedin_user_info'] = linkedin_user_info
@@ -215,13 +161,20 @@ def finish_login(request):
 			acct.save()
 
 			# finish processing LI profile
-			process_li_profile.delay(user.id,acct.id)
+			profile_task = process_li_profile.delay(user.id,acct.id)
 
 			# start processing connections
-			process_li_connections.delay(user.id,acct.id)
+			connections_task = process_li_connections.delay(user.id,acct.id)
+
+			# save task ids to session
+			request.session['tasks'] = {
+				'profile': profile_task.id,
+				'connections': connections_task.id
+			}
 
 			#return HttpResponseRedirect('/account/success')
-			return HttpResponseRedirect('/search')
+			# return HttpResponseRedirect('/search')
+			return HttpResponseRedirect('/discover')
 	else:
 		form = FinishAuthForm()
 
@@ -266,15 +219,15 @@ def finish_link(request):
 		# _add_profile_pic(request.user,linkedin_user_info['pictureUrl'])
 
 	# finish processing LI profile
-	profile_task_id = process_li_profile.delay(request.user.id,acct.id)
+	profile_task = process_li_profile.delay(request.user.id,acct.id)
 
 	# start processing connections
-	connections_task_id = process_li_connections.delay(request.user.id,acct.id)
+	connections_task = process_li_connections.delay(request.user.id,acct.id)
 
 	# save task ids to session
 	request.session['tasks'] = {
-		'profile': profile_task_id,
-		'connections': connections_task_id
+		'profile': profile_task.id,
+		'connections': connections_task.id
 	}
 
 	messages.success(request, 'Your LinkedIn account has been successfully linked.')
@@ -284,26 +237,26 @@ def finish_link(request):
 def success(request):
 	return render_to_response('accounts/success.html',context_instance=RequestContext(request))
 
-def _add_profile_pic(user,img_url):
-	img = None
-	img_ext = urlparse.urlparse(img_url).path.split('/')[-1].split('.')[1]
-	img_filename = user.profile.std_name() + "." + img_ext
-	try:
-		img = urllib2.urlopen(img_url)
-	except urllib2.HTTPError, e:
-		self.stdout.write(str(e.code))
-	if img:
-		pic = Picture()
-		pic.person = user.profile
-		pic.source = 'linkedin'
-		pic.description = 'linkedin profile pic'
-		pic.save()
-		with open('tmp_img','wb') as f:
-			f.write(img.read())
-		with open('tmp_img','r') as f:
-			img_file = File(f)
-			pic.pic.save(img_filename,img_file,True)
-		os.remove('tmp_img')
+# def _add_profile_pic(user,img_url):
+# 	img = None
+# 	img_ext = urlparse.urlparse(img_url).path.split('/')[-1].split('.')[1]
+# 	img_filename = user.profile.std_name() + "." + img_ext
+# 	try:
+# 		img = urllib2.urlopen(img_url)
+# 	except urllib2.HTTPError, e:
+# 		self.stdout.write(str(e.code))
+# 	if img:
+# 		pic = Picture()
+# 		pic.person = user.profile
+# 		pic.source = 'linkedin'
+# 		pic.description = 'linkedin profile pic'
+# 		pic.save()
+# 		with open('tmp_img','wb') as f:
+# 			f.write(img.read())
+# 		with open('tmp_img','r') as f:
+# 			img_file = File(f)
+# 			pic.pic.save(img_filename,img_file,True)
+# 		os.remove('tmp_img')
 	
 
 	
