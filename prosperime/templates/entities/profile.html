@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block head %}
+<!-- Head -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/viz.js"></script>
+{% endblock %}
+
+<!-- Messages -->
+{% block message %}
+	{% if messages %}
+		<ul class="messages">
+    	{% for message in messages %}
+    		<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    	{% endfor %}
+		</ul>
+	{% endif %}
+{% endblock %}
+
+
+<!-- Left Sidebar -->
+{% block sidebar %}
+{% endblock %}
+
+
+
+<!-- Content -->
+{% block content %}
+
+<div class="page-header">
+	<div class="page-header-title">
+		<span class="blue">Profile: </span>{{profile.first_name}} {{profile.last_name}}
+	</div>
+
+	<div class="page-header-subtitle">
+		{{profile.headline}}
+	</div>
+</div>
+
+<!-- LEFT -->
+<div id="search-filters-container" class="pull-left">
+	<!-- dynamically populated search filters -->
+</div>
+
+
+<!-- CENTER -->
+<div id="profile-center" class="pull-left span5">
+	<div class="left-list-preview">
+		{% if profile_pic %}
+			<div class="profile-img-holder pull-left">
+				<img class="logo-preview" src="/media/{{profile_pic}}" />&nbsp;
+			</div>
+		{% endif %}
+	</div>
+
+	<div class="right-list-preview pull-left">
+		<p class="path-name"><a class="path-name-link">{{profile.first_name}} {{profile.last_name}}</a></p>
+		<p class="path-current-position">
+			{% if current %}
+				{{current.title}}
+			{% else %}
+				{{profile.headline}}
+			{% endif %}
+		</p>
+	</div>
+	
+	<div class="clearfix"></div>
+	
+	<div class="path-viz">
+		<div class="path-viz-short">
+
+			<!-- // A little bit of voodoo in viz.js...
+					org_list = prepare_for_timeline(org_list) -->
+
+			<!-- Education  -->
+			{% if ed|length > 0 %}
+				<h5>Education: </h5>
+				<div class='ed_list'>
+				{% for pos in ed %}
+					<div class="indent timeline-ed"> | 
+						{% if pos.title %}
+							{{pos.title}} at {{pos.co_name}}
+						{% else %}
+							{{pos.co_name}}
+						{% endif %}
+					</div> 			
+				{% endfor %}
+				</div>
+			{% endif %}
+
+			<!-- Experience -->
+			{% if orgs|length > 0 %}
+				<h5>Experience: </h5>
+				<div class='org_list'>
+				{% for pos in orgs %}
+					<div class="{{profile.id}}-list indent" onmouseover="timeline_hover_in(this, {{forloop.counter0}})" onmouseout="timeline_hover_out(this, {{forloop.counter0}})">
+						<!-- <span onclick="positionClicked('{{profile.id}}-list', {{forloop.counter0}})"> -->
+						
+						<span onclick="showDescription({{forloop.counter0}}, '{{pos.title}}', '{{pos.co_name}}', '{{pos.start_date}}', '{{pos.end_date}}')">	
+							<span class="timeline-header"> | 
+								{% if pos.title %}
+									<span class="timeline-title">
+										{{pos.title}}
+									</span> at 
+									<span class="timeline-co_name">
+										{{pos.co_name}}
+									</span>
+								{% else %}
+									<span class="timeline-co_name">
+										{{pos.co_name}}
+									</span>
+								{% endif %}
+							</span>	
+						</span>
+							
+
+						<div class="timeline-description timeline-description-float {{pos.id}}-description" style="display:none">
+							<span class="timeline-description-text">
+							{% if pos.description %}				
+								{{pos.description}}
+							{% endif %}
+							</span>
+						</div>
+					</div>
+				{% endfor %}
+				</div>
+			{% endif %}
+		</div>			
+	</div>
+</div>
+
+<!-- Float Screen -->
+<div id="middle-float-screen" class="span6 profile-right-sidebar pull-right">
+	<a>Click on a position to learn more!</a>
+</div>
+
+<!-- TIMELINE. DON'T. TOUCH. IT. -->
+<div class="span12">
+	<table class="timeline">
+
+		<!-- Row per Position -->
+		{% for p in orgs %}
+			<tr class="timeline-row">
+				{% load months_difference rangify subtract %}
+				{% for i in p.start_date|months_difference:start_date|rangify %}
+					<td class="timeline-col"></td>
+				{% endfor %}
+
+				<!-- Highlighted Segment -->
+				<td class="timeline-col-highlighted" colspan="{{p.duration}}">{{p.co_name}}</td>
+
+				{% for i in end_date|months_difference:p.end_date|rangify %}
+					<td class="timeline-col"></td>
+				{% endfor %}
+
+			</tr>
+		{% endfor %}
+
+		<!-- Bottom Row -->
+		<tr class="timeline-row-bottom">
+			<td class="timeline-col-start" colspan="{% widthratio total_time 2 1 %}">
+				{{start_date.month}}/{{start_date.year}}
+			</td>
+			<td class="timeline-col-end" colspan="{% widthratio total_time 2 1 %}">
+				Present
+			</td>
+		</tr>
+	</table>	
+</div>
+{% endblock %}
+
+
+{% block rightSidebar %}
+
+<!-- Right Sidebar -->
+
+<div id="search-right-sidebar" class="pull-right profile-right-sidebar">
+	<div class="rounded">
+		{% if user %}
+			<p class="sidebar-header">Want to see improvements?</p>
+			<p>We'd love to hear from you -- <a href="mailto:feedback@prosperime.com">please drop us a line</a></p>
+		{% endif %}
+	</div>
+
+	<div class="rounded">
+		<p class="sidebar-header">{{profile.first_name}}'s Saved Career Paths</p>
+
+		{% if saved_paths %}
+			{% for path in saved_paths %}
+				<div><a href="/saved_paths/#title/?t={{title}}"> {{path.title}} </a></div>
+			{%endfor%}
+		{% else %}
+			<p>{{profile.first_name}} hasn't saved any career paths yet.</p>
+	{% endif %}
+	</div>
+</div>
+{% endblock %}
+
+
+{% block templates %}
+
+
+
+{% endblock %}
+

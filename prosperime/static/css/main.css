@@ -789,8 +789,7 @@ ul.flat li {
 
 
 
-/*PATH VIZ - CLAYTON */
-
+/*CLAYTON's PATH VIZ */
 .path-viz-short li {
 	padding-left:4px;
 }
@@ -810,7 +809,9 @@ ul.flat li {
 	border:1px solid #999;
 	padding:4px;
 	border-collapse:separate;
-	border-radius:8px;
+	border-radius:4px;
+	margin-top:50px;
+	margin-bottom:50px;
 }
 
 .timeline tr {
@@ -881,6 +882,10 @@ ul.flat li {
 	font-weight:bold;
 }
 
+.timeline-ed {
+	padding-left:8px;
+}
+
 .timeline-description {
 	padding:4px;
 	text-align:left;
@@ -899,6 +904,13 @@ ul.flat li {
 	background-repeat: repeat-x;*/
 }
 
+.timeline-description-float {
+	position:relative;
+	left:350px;
+	width:400px;
+	border:1px solid black;
+}
+
 .timeline td .timeline-title-span {
 	/*display:none;*/
 }
@@ -907,7 +919,7 @@ ul.flat li {
 	width:100%;
 }
 
-/*CLAYTON -- SAVING BOX*/
+/*SEARCH - SAVING BOX*/
 .save_path_box {
 	z-index:10;
 	padding:4px;
@@ -926,7 +938,7 @@ ul.flat li {
 	margin-left:16px;
 }
 
-/*CLAYTON SAVED PATHS PAGES*/
+/*SAVED PATHS PAGES*/
 .saved-path-title {
 	font-weight:bold;
 }
@@ -934,3 +946,55 @@ ul.flat li {
 .saved-path-position {
 	padding-left:16px;
 }
+
+/*PROFILE PAGE*/
+.page-header {
+	padding:16px;
+	width:100%;
+	border-bottom:1px solid black;
+}
+
+.page-header-title {
+	font-weight:bold;
+	font-size:33px;
+	padding:8px;
+}
+
+.page-header-subtitle {
+	padding:8px;
+}
+
+#middle-column {
+	width:100%;
+}
+
+.blue {
+	color:midnightblue;
+}
+
+.profile-right-sidebar {
+	margin-top:150px;
+}
+
+#middle-float-screen {
+	border-radius:4px;
+	padding:2px;
+	margin-top:75px;
+	margin-left:0px;
+}
+
+.box-header {
+	font-size:12px;
+	font-weight:bold;
+}
+
+.box-description {
+	font-size:12px;
+}
+
+.box-dates {
+	font-size:12px;
+}
+
+
+

@@ -68,6 +68,30 @@ class Profile(models.Model):
 
     # domains = property(_industries)
 
+    # def get_top_career(self):
+
+    # returns a dictionary w/ frequencies of each career
+    def get_all_careers(self):
+        career_dict = {}
+
+        user = self.user
+        positions = Position.objects.filter(person=user)
+        for p in positions:
+            careers = p.careers.all()
+            for c in careers:
+                if career_dict.has_key(career):
+                    career_dict[c] = career_dict[c] + 1
+                else:
+                    career_dict[c] = 1
+
+        # test this beast
+        for item in career_dict:
+            print item + ': ' + career_dict.get(item)
+
+
+        return career_dict
+
+
 
 class Picture(models.Model):
 
