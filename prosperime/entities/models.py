@@ -166,13 +166,30 @@ class Career(models.Model):
 		children.remove(self)
 		return children
 
-	def name(self):
+	def _name(self):
 		"""
 		returns short name or long name if no short name
 		"""
 		if self.short_name:
 			return self.short_name
 		return self.long_name
+
+	# def num_people_new(self):
+	# 	users = [p.person.id for p in self.positions.all()]
+	# 	return len(set(users))
+
+	# def stats(self):
+	# 	people = []
+	# 	cos = []
+	# 	num_pos = len(self.positions.all())
+	# 	for p in self.positions.all():
+	# 		people.append(p.person.id)
+	# 		cos.append(p.entity.id)
+	# 	num_users = len(set(people))
+	# 	num_cos = len(set(cos))
+	# 	return {'num_people':num_users,'num_pos':num_pos,'num_cos':num_cos}
+
+	name = property(_name)
 
 class Financing(models.Model):
 	investors = models.ManyToManyField(Entity,through="Investment")
