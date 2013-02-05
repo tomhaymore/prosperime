@@ -35,7 +35,46 @@ class Profile(models.Model):
     headline = models.TextField(null=True)
     connections = models.ManyToManyField('self',through="Connection",symmetrical=False,related_name="connections+")
     status = models.CharField(max_length=15,default="active")
+    
+    # returns career w/ highest frequency among profile's positions
+    def get_top_career(self):
+        all_careers = get_all_careers(self)
+        top_career = None
+        top_frequency = 0
 
+        for career, frequency in all_careers.iteritems():
+            if frequency > top_frequency:
+                top_career = career
+            # note that this implementation will essentially throw out
+            #   any ties
+        return top_career
+
+    # returns a dictionary w/ frequencies of each career
+    def get_all_careers(self):
+        career_dict = {}
+
+        user = self.user
+        positions = Position.objects.filter(person=user)
+        for p in positions:
+            careers = p.careers.all()
+            for c in careers:
+                if career_dict.has_key(career):
+                    career_dict[c] = career_dict[c] + 1
+                else:
+                    career_dict[c] = 1
+        
+        ## to test this beast
+        # for item in career_dict:
+        #     print item + ': ' + career_dict.get(item)
+
+        return career_dict
+
+
+    # both functions properties of the Profile object
+    top_career = property(get_top_career)
+    all_careers = property(get_all_careers)
+
+    ### Helpers ###
     def full_name(self):
         full_name = self.first_name + " " + self.last_name
         return full_name
@@ -67,30 +106,12 @@ class Profile(models.Model):
             return self.pictures.all()[0].pic
 
     # domains = property(_industries)
+    
+    # Strategy: grab top career path, find others w/ same top career path
+    def get_similar_users(self):
+        top_career_path = get_top_career(self)
 
-    # def get_top_career(self):
-
-    # returns a dictionary w/ frequencies of each career
-    def get_all_careers(self):
-        career_dict = {}
-
-        user = self.user
-        positions = Position.objects.filter(person=user)
-        for p in positions:
-            careers = p.careers.all()
-            for c in careers:
-                if career_dict.has_key(career):
-                    career_dict[c] = career_dict[c] + 1
-                else:
-                    career_dict[c] = 1
-
-        # test this beast
-        for item in career_dict:
-            print item + ': ' + career_dict.get(item)
-
-
-        return career_dict
-
+        
 
 
 class Picture(models.Model):

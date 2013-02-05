@@ -74,6 +74,7 @@
 		}
 	}
 
+	/* DEPRECATED ALREADY... */
 	var create_path_and_add_position = function(parent) {
 		var title = parent.getElementsByClassName('save_path_box_form_title')[0].value
 		var pos_id = parent.getElementsByClassName('save_path_box_form_position')[0].value
@@ -134,6 +135,8 @@
 
 
 
+	/* Used in profile pages. Onmouseover event renders the description
+	   for a given element in the element id='middle-float-screen' */
 	var showDescription = function(index, title, co_name, start_date, end_date) {
 		var box = document.getElementById('middle-float-screen')
 		box.innerHTML = ""
@@ -148,7 +151,6 @@
 
 
 			if (start_date) {
-				console.log(start_date + ' - ' + end_date)
 				newText += "<div class='box-dates'>"
 				//newText += start_date.substring(0, start_date.indexOf(' ')) + ' ' + start_date.substring(start_date.indexOf(',') + 2)
 				newText += start_date.replace('1, ','')
@@ -161,8 +163,33 @@
 
 			if (description) newText += "<div class='box-description'>" + description + "</div>"
 		} catch (err) {
-			var newText = '<a>For more information, click on a position</a>'
+			var newText = '<a>For more information, hover over a position</a>'
 		}
+
+		// newText += '<div onclick="addPosition({{viwer_saved_paths|}}Add this position to your career path.'
+
 		box.innerHTML = newText;
 	};
+
+	var createNewPath = function() {
+
+		var table = document.getElementsByClassName('path-list')[0]
+		var lastRow = table.getElementsByClassName('saved-path-list-last')[0]
+		var newRow = document.createElement('tr')
+		newRow.id = 'new-path-box-row'
+		var newCol = document.createElement('td')
+
+		var newColText = '<div class="input-append">'
+		newColText += '<input type="text" maxlength="32" style="width:160px" id="new-path-box" onclick="clearContents(this)" />'
+		newColText += '<span class="add-on" onclick="newPathAjax()"><i class="icon-plus"></i></span>'
+		newColText += '</div>'
+		newCol.innerHTML = newColText;
+		
+		newRow.appendChild(newCol)
+		table.appendChild(newRow)
+	};
+
+	var clearContents = function(elem) {
+		elem.value = ("")
+	}
 

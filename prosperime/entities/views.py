@@ -69,6 +69,7 @@ def profile(request, user_id):
 	profile = Profile.objects.get(user=user)
 	saved_paths = Saved_Path.objects.filter(owner=user)
 	profile_pic = _get_profile_pic(profile)
+	viewer_saved_paths = Saved_Path.objects.filter(owner=request.user)
 
 	# Do position processing here!
 	positions = Position.objects.filter(person=user)
@@ -139,20 +140,24 @@ def profile(request, user_id):
 	# First, sort by start_date
 	## ?? org_list.sort(key=lambda x: (int(x.start_date)[:3] + int(x.start_date)[0:2]))
 
-	start_date = org_list[len(org_list)-1].start_date
-	total_time = _months_from_now(start_date)
-	end_date = datetime.datetime.now()
+	if len(org_list) == 0:
+		# then we have problem
+		start_date = total_time = end_date = compress = None
+	else:	
+		start_date = org_list[len(org_list)-1].start_date
+		total_time = _months_from_now(start_date)
+		end_date = datetime.datetime.now()
 
-	if total_time > 200: 
-	# 200 is an arbitrary constant that seems to fit my laptop screen well
-		total_time = int(math.ceil(total_time/2))
-		for pos in org_list:
-			pos.duration = int(math.ceil(pos.duration/2))
-		compress = True
-	else:
-		compress = False
+		if total_time > 200: 
+		# 200 is an arbitrary constant that seems to fit my laptop screen well
+			total_time = int(math.ceil(total_time/2))
+			for pos in org_list:
+				pos.duration = int(math.ceil(pos.duration/2))
+			compress = True
+		else:
+			compress = False
 
-	return render_to_response('entities/profile.html', {'profile':profile, 'saved_paths': saved_paths,'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress}, context_instance=RequestContext(request))
+	return render_to_response('entities/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress}, context_instance=RequestContext(request))
 
 def _get_paths_in_career(career):
 
