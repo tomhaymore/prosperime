@@ -138,7 +138,8 @@ label.checkbox {
 }
 
 img.logo-preview {
-	width:100px;
+	width:45px;
+	border:none;
 }
 
 .company-header {
@@ -226,105 +227,6 @@ div.message p {
 
 }
 
-/* Discover */
-
-p.splash-header {
-	font-size: 1.5em;
-	color: rgb(41,98,152);
-	font-weight: 500;
-}
-
-div#content-container {
-	width:1000px;
-	margin-right: auto;
-	margin-left: auto;
-	margin-top:15px;
-}
-
-div.discover-nav-container {
-	border-bottom: solid 1px rgb(41,98,152);
-	padding-bottom: 0px;
-}
-
-div.discover-nav-container div {
-	
-}	
-
-.discover-nav-selected {
-	padding: 5px 10px 5px 10px;
-	background-color: rgb(41,98,152);
-	/*margin-right: 15px;*/
-	width: 50px
-	transition: background 0.5s;
-	-moz-transition: background 0.5s;
-	-webkit-transition: background 0.5s;
-	-o-transition: background 0.5s;
-}
-
-.discover-nav-selected a {
-	text-decoration: none;
-	color: #fff;
-
-}
-
-.discover-nav-unselected {
-	background-color: #fff;
-	padding: 5px 10px 5px 10px;
-	/*margin-right: 15px;*/
-	width: 50px
-	transition: background 0.5s;
-	-moz-transition: background 0.5s;
-	-webkit-transition: background 0.5s;
-	-o-transition: background 0.5s;
-
-}
-
-.discover-nav-unselected a {
-	text-decoration: none;
-	color: rgb(41,98,152);
-	transition: background 0.5s;
-	-moz-transition: background 0.5s;
-	-webkit-transition: background 0.5s;
-	-o-transition: background 0.5s;
-}
-
-.discover-nav-unselected:hover {
-	background-color: rgb(41,98,152);
-	color: #fff;
-}
-
-.discover-nav-unselected a:hover {
-	color: #fff;
-}
-
-div.discover-careers-container {
-	padding-left: 5px;
-	padding-top: 10px;
-}
-
-div.careers-name-container {
-	padding-top:5px;
-	width:425px;
-	height:45px;
-}
-
-div.careers-name-container a.careers-name {
-	font-size:1.1em;
-}
-ul.careers-stats li {
-	display:inline-block;
-	text-align: center;
-	padding:0px;
-	margin-right: 10px;
-}
-
-ul.careers-stats li div.stats {
-	width:34px;
-	height:25px;
-	padding-top:2px;
-	/*padding: 2px 5px 2px 5px;*/
-	display:inline-block;
-}
 
 /* Path */
 
@@ -715,7 +617,6 @@ a.careers-expand:hover {
 }
 
 .careers-stats-positions div.stats {
-
 	background-color: rgb(50,121,202);
 }
 
