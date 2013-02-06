@@ -60,10 +60,6 @@ def discover_career(request,career_id):
 
 	return render_to_response('entities/discover_career.html',{'career':career,'paths':paths_in_career,'overview':overview},context_instance=RequestContext(request))
 
-<<<<<<< HEAD
-def _get_paths_in_career(user,career):
-=======
-
 # View for invidiual profiles
 def profile(request, user_id):
 
@@ -161,8 +157,7 @@ def profile(request, user_id):
 
 	return render_to_response('entities/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress}, context_instance=RequestContext(request))
 
-def _get_paths_in_career(career):
->>>>>>> 355cf3a401f046b51139963f7fda4db1acf23f9e
+def _get_paths_in_career(user,career):
 
 	# initialize overview array
 	overview = {}
@@ -230,11 +225,11 @@ def _get_paths_in_career(career):
 		'num_cos':num_cos
 	}
 
-	entities_dict = sorted(entities_dict.iteritems(), key=lambda x: x[0], reverse=True)
+	entities_dict = sorted(entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
 
 	overview['network']['bigplayers'] = entities_dict
 
-	all_entities_dict = sorted(all_entities_dict.iteritems(), key=lambda x: x[0], reverse=True)
+	all_entities_dict = sorted(all_entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
 
 	overview['all']['bigplayers'] = all_entities_dict
 
