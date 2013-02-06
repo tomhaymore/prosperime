@@ -26,7 +26,7 @@
 					<p class="main-header">Career Paths</p>
 					{% for p in paths.network %}
 						<div class="discover-path">
-							<div class="pull-left"><a href="/profile/{{p.id}}"><img class="logo-preview" src="/media/{{p.profile.default_profile_pic}}" /></a>/div>
+							<div class="pull-left"><a href="/profile/{{p.id}}"><img class="logo-preview" src="/media/{{p.profile.default_profile_pic}}" /></a></div>
 							<div class="pull-left discover-path-name">
 								<p><a class="path-name" href="/profile/{{p.id}}">{{p.profile.full_name}}</a></p>
 								{% if p.profile.latest_position %}

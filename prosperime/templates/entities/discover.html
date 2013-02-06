@@ -15,7 +15,7 @@
 	<div id="careers-container">
 		<div class="discover-nav-container">
 			<div class="pull-left discover-nav-selected"><a id="discover-nav-network" href="#network">Your Network</a></div>
-			<div class="pull-left discover-nav-unselected"><a id="discover-nav-justlikeyou" href="#justlikyou">Just Like You</a></div>
+			<div class="pull-left discover-nav-unselected"><a id="discover-nav-justlikeyou" href="#justlikeyou">Just Like You</a></div>
 			<div class="clear"></div>
 		</div>
 		<div class="discover-careers-container">
@@ -32,25 +32,46 @@
 				<div class="clear"></div>
 				{% for c in careers.network %}
 					
-					<div class="pull-left careers-name-container"><a href="career/{{c.id}}" class="careers-name">{{c.name}}</a></div>
+					<div class="pull-left careers-name-container">
+						<a href="career/{{c.0}}" class="careers-name">
+						{% if c.1.short_name %}
+							{{c.1.short_name}}
+						{% else %}
+							{{c.1.long_name}}
+						{% endif %}
+						</a>
+					</div>
 					<div class="pull-left careers-stats-container">
 						<ul class="careers-stats">
-							<li class="careers-stats-people"><div class="stats">{{c.num_people}}</div><div>people</div></li>
-							<li class="careers-stats-positions"><div class="stats">{{c.num_pos}}</div><div>positions</div></li>
-							<li class="careers-stats-orgs"><div class="stats">{{c.num_cos}}</div><div>companies</div></li>
+							<li class="careers-stats-people"><div class="stats">{{c.1.num_people}}</div></li>
+							<li class="careers-stats-positions"><div class="stats">{{c.1.num_pos}}</div></li>
+							<li class="careers-stats-orgs"><div class="stats">{{c.1.num_cos}}</div></li>
 						</ul>
 					</div>
 					<div class="clear"></div>
 				{% endfor %}
 			</div>
 			<div class="discover-careers-justlikeyou" style="display:none;">
-				{% for c in careers.community %}
-					<div class="pull-left"><a class="careers-name">{{c.name}}</a></div>
-					<div class="pull-right">
+				<!-- header row -->
+				<div class="pull-left careers-header-row"></div>
+				<div class="pull-left careers-stats-container">
+					<ul class="careers-stats">
+						<li>people</li>
+						<li>positions</li>
+						<li>companies</li>
+					</ul>
+				</div>
+				<div class="clear"></div>
+				{% for c in careers.similar %}
+					<div class="pull-left careers-name-container">
+						<a href="career/{{c.id}}" class="careers-name">{{c.name}}
+						</a>
+					</div>
+					<div class="pull-left careers-stats-container">
 						<ul class="careers-stats">
-							<li class="careers-stats-people">{{c.num_people}}</li>
-							<li class="careers-stats-positions">{{c.num_pos}}</li>
-							<li class="careers-stats-orgs">{{c.num_cos}}</li>
+							<li class="careers-stats-people"><div class="stats">{{c.num_people}}</div></li>
+							<li class="careers-stats-positions"><div class="stats">{{c.num_pos}}</div></li>
+							<li class="careers-stats-orgs"><div class="stats">{{c.num_cos}}</div></li>
 						</ul>
 					</div>
 					<div class="clear"></div>

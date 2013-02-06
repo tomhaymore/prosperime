@@ -22,6 +22,7 @@ from django.contrib import messages
 from accounts.models import Picture
 from entities.models import Entity, Office, Financing, Industry, Position
 from saved_paths.models import Saved_Path
+from entities.careerlib import CareerSimBase
 
 # @login_required
 def home(request):
@@ -31,6 +32,7 @@ def home(request):
 	data = {}
 	return render_to_response('home.html',data,context_instance=RequestContext(request)) ## Clay - change this
 
+@login_required
 def discover(request):
 
 	# data array for passing to template
@@ -43,7 +45,7 @@ def discover(request):
 		}
 
 	careers_network = _get_careers_brief_in_network(request.user)
-	careers_similar = _get_careers_brief_similar()
+	careers_similar = _get_careers_brief_similar(request.user.id)
 
 	careers = {}
 
@@ -671,28 +673,12 @@ def careers(request):
 
 	return render_to_response('entities/careers.html',{'careers':careers,'overview':overview},context_instance=RequestContext(request))
 
-def _get_careers_brief_similar(**filters):
+def _get_careers_brief_similar(user_id,**filters):
 
+	careers_sim = CareerSimBase()
 
+	users = careers_sim.find_similar_careers(user_id)
 	
-	return None
-
-def _get_careers_brief_all(**filters):
-
-	careers = Career.objects.annotate(num_people=Count('positions__person__pk'),num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk')).distinct()
-
-	return careers
-
-def _get_careers_brief_in_network(user,**filters):
-
-	cxns = user.profile.connections.all().values('user__id').select_related('user')
-
-	users = []
-
-	for c in cxns:
-		users.append(c['user__id'])
-
-	# careers = Career.objects.filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk'),num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk')).order_by('-num_people').distinct()
 	careers = Career.objects.prefetch_related('positions').filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk',num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk'))).order_by('-num_people').distinct()[:10]
 
 	for c in careers:
@@ -704,6 +690,71 @@ def _get_careers_brief_in_network(user,**filters):
 			cos.append(p.entity.id)
 		c.num_people = len(set(people))
 		c.num_cos = len(set(cos))
+
+	# careers = sorted(careers.iteritems(),key=lambda x:x[0], reverse=True)
+
+	return careers
+
+def _get_careers_brief_all(**filters):
+
+	careers = Career.objects.annotate(num_people=Count('positions__person__pk'),num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk')).distinct()
+
+	return careers
+
+def _get_careers_brief_in_network(user,**filters):
+
+	cxns = user.profile.connections.all().values('user__id').select_related('user')
+
+	users = [c['user__id'] for c in cxns]
+
+	# careers = Career.objects.filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk'),num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk')).order_by('-num_people').distinct()
+	# careers = Career.objects.prefetch_related('positions').filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk',num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk'))).order_by('-num_people').distinct()[:10]
+	careers_pos = Career.objects.filter(positions__person_id__in=users).values('id','short_name','long_name','positions__id')
+	careers_ppl = Career.objects.filter(positions__person_id__in=users).values('id','short_name','long_name','positions__person_id')
+	careers_orgs = Career.objects.filter(positions__person_id__in=users).values('id','short_name','long_name','positions__entity_id')
+
+	careers_dict = {}
+
+	for c in careers_pos:
+		if c['id'] in careers_dict and 'positions' in careers_dict[c['id']]:
+			careers_dict[c['id']]['positions'].append(c['positions__id'])
+		elif c['id'] in careers_dict:
+			careers_dict[c['id']]['positions'] = [c['positions_id']]
+		else:
+			careers_dict[c['id']] = {'positions':[c['positions__id']],'people':[],'orgs':[],'short_name':c['short_name'],'long_name':c['long_name']}
+
+	for c in careers_ppl:
+		if c['id'] in careers_dict and 'people' in careers_dict[c['id']]:
+			careers_dict[c['id']]['people'].append(c['positions__person_id'])
+		elif c['id'] in careers_dict:
+			careers_dict[c['id']]['people'] = [c['positions__person_id']]
+		else:
+			careers_dict[c['id']] = {'people':[c['positions__person_id']],'people':[],'orgs':[],'short_name':c['short_name'],'long_name':c['long_name']}
+
+	for c in careers_orgs:
+		if c['id'] in careers_dict and 'orgs' in careers_dict[c['id']]:
+			careers_dict[c['id']]['orgs'].append(c['positions__entity_id'])
+		elif c['id'] in careers_dict:
+			careers_dict[c['id']]['orgs'] = [c['positions__entity_id']]
+		else:
+			careers_dict[c['id']] = {'orgs':[c['positions__entity_id']],'people':[],'orgs':[],'short_name':c['short_name'],'long_name':c['long_name']}
+
+	for k,v in careers_dict.items():
+		v['num_pos'] = len(set(v['positions']))
+		v['num_people'] = len(set(v['people']))
+		v['num_cos'] = len(set(v['orgs']))
+
+	careers = sorted(careers_dict.iteritems(),key=lambda (k,v):v['num_people'],reverse=True)
+
+	# for c in careers:
+	# 	people = []
+	# 	cos = []
+	# 	c.num_pos = len(c.positions.all())
+	# 	for p in c.positions.all():
+	# 		people.append(p.person.id)
+	# 		cos.append(p.entity.id)
+	# 	c.num_people = len(set(people))
+	# 	c.num_cos = len(set(cos))
 
 	# careers = sorted(careers.iteritems(),key=lambda x:x[0], reverse=True)
 
