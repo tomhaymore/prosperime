@@ -2,7 +2,99 @@
 import json
 
 # from Django
-from entities.models import Career, Position
+from entities.models import Career, Position, User
+
+class CareerSimBase():
+
+	# fetch all users
+	# users = User.objects.prefetch_related('positions').exclude(profile__status="deleted")
+	users = {}
+
+	# initializes organizational map
+	users_orgs_map = {}
+
+	# initialize educational map
+	users_eds_map = {}
+
+	def __init__(self):
+		self.load_users()
+		self.load_maps()
+
+	def load_users(self):
+		users = User.objects.values('id','positions__type','positions__entity__id')
+		users_dict = {}
+		for u in users:
+			if u['id'] in users_dict:
+				users_dict[u['id']]['positions'].append({'type':u['positions__type'],'id':u['positions__entity__id']})
+			else:
+				users_dict[u['id']] = {'positions':[{'type':u['positions__type'],'id':u['positions__entity__id']}]}
+		self.users = users_dict
+		print self.users
+
+	def load_maps(self):
+		"""
+		loads set of orgs / eds for each user
+		"""
+		for k,v in self.users.items():
+			orgs = []
+			eds = []
+			for p in v['positions']:
+				if p['type'] == "education":
+					eds.append(p['id'])
+				else:
+					orgs.append(p['id'])
+			if orgs:
+				self.users_orgs_map[k] = set(orgs)
+			if eds:
+				self.users_eds_map[k] = set(eds)
+
+	def get_focal_orgs(self,id):
+		"""
+		gets set of orgs / eds for focal user
+		"""
+		# fetch focal user
+		user = User.objects.get(pk=id)
+		# initialize holding arrays
+		orgs = []
+		eds =[]
+		# loop through all positions to get unique entity ids
+		for p in user.positions.all():
+			if p.type == "education":
+				eds.append(p.entity.id)
+			else:
+				orgs.append(p.entity.id)
+		orgs_set = set(orgs)
+		eds_set = set(eds)
+		focal_orgs = {
+			'orgs': orgs_set,
+			'eds': eds_set
+		}
+		return focal_orgs
+
+	def find_similar_careers(self,id):
+		"""
+		measures intersection of sets between focal user and other users to find most similar
+		"""
+		focal_orgs = self.get_focal_orgs(id) 
+		orgs_sim = []
+		eds_sim = []
+		
+		for k,v in self.users_orgs_map.items():
+			intersect = focal_orgs['orgs'].intersection(v)
+			jaccard = len(intersect)/len(v)
+			orgs_sim.append((k,jaccard,))
+
+		for k,v in self.users_eds_map.items():
+			intersect = focal_orgs['eds'].intersection(v)
+			jaccard = len(intersect)/len(v)
+			eds_sim.append((k,jaccard,))	
+
+		sorted_orgs_sim = sorted(orgs_sim, key=lambda x:x[1],reverse=True)
+		sorted_eds_sim = sorted(eds_sim, key=lambda x:x[1],reverse=True)	
+
+		sorted_orgs_sim = [u[0] for u in sorted_orgs_sim]
+
+		return sorted_orgs_sim[:10]
 
 class CareerMapBase():
 
