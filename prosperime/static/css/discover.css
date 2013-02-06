@@ -70,7 +70,7 @@ div.discover-nav-container div {
 }
 
 
-div.discover-careers-container, div.discover-paths-network {
+div.discover-careers-container, div.discover-paths-network, div.discover-paths-all {
 	padding-left: 5px;
 	padding-top: 10px;
 }
@@ -150,7 +150,7 @@ ul.career-overview-stats li {
 }
 
 div.discover-paths-network-list {
-	width:75%;
+	width:70%;
 }
 
 div.careers-header-row {

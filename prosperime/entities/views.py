@@ -208,10 +208,10 @@ def _get_paths_in_career(user,career):
 			p.connected = False
 		num_pos += len(p.positions.all())
 		for pos in p.positions.all():
-			if pos.entity.name in entities_dict:
-				entities_dict[pos.entity.name]['count'] += 1
+			if pos.entity.name in all_entities_dict:
+				all_entities_dict[pos.entity.name]['count'] += 1
 			else:
-				entities_dict[pos.entity.name] = {
+				all_entities_dict[pos.entity.name] = {
 					'id':pos.entity.id,
 					'count':1
 				}
@@ -227,11 +227,11 @@ def _get_paths_in_career(user,career):
 
 	entities_dict = sorted(entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
 
-	overview['network']['bigplayers'] = entities_dict
+	overview['network']['bigplayers'] = entities_dict[:3]
 
 	all_entities_dict = sorted(all_entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
 
-	overview['all']['bigplayers'] = all_entities_dict
+	overview['all']['bigplayers'] = all_entities_dict[:3]
 
 	paths['network'] = network_people
 

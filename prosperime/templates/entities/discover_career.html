@@ -38,7 +38,7 @@
 						
 					{% endfor %}
 				</div>
-				<div class="discover-paths-network-overview pull-left">
+				<div class="discover-paths-network-overview pull-right">
 					<p class="main-header">Overview</p>
 					<ul class="career-overview-stats">
 						<li class="career-overview-stats-people"><span class="stats">{{overview.network.num_people}}</span> people</li>
@@ -46,7 +46,13 @@
 						<li class="career-overview-stats-orgs"><span class="stats">{{overview.network.num_cos}}</span> companies</li>
 					</ul>
 					<p class="main-header">Big Players</p>
-
+						{% if overview.network.bigplayers %}
+							<ul>
+							{% for b in overview.network.bigplayers %}
+								<li><a href="/profile/org/{{b.1.id}}">{{b.0}}</a></li>
+							{% endfor %}
+							</ul>
+						{% endif %}
 				</div>
 				<div class="clear"></div>
 			</div>
@@ -73,6 +79,14 @@
 						<li class="career-overview-stats-positions"><span class="stats">{{overview.all.num_pos}}</span> positions</li>
 						<li class="career-overview-stats-orgs"><span class="stats">{{overview.all.num_cos}}</span> ompanies</li>
 					</ul>
+					<p class="main-header">Big Players</p>
+						{% if overview.all.bigplayers %}
+							<ul>
+							{% for b in overview.all.bigplayers %}
+								<li><a href="/profile/org/{{b.1.id}}">{{b.0}}</a></li>
+							{% endfor %}
+							</ul>
+						{% endif %}
 				</div>
 				<div class="clear"></div>
 			</div>
