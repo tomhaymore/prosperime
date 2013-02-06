@@ -4,11 +4,14 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/app.js"></script>
 <script type="text/javascript">
-	
+
+	{%load jsonify%}
+	var saved_path_list = {{saved_paths|jsonify}}
+
 </script>
 {% endblock %}
 
-<!-- CLAY: START MESSAGES  -->
+<!-- Messages -->
 {% block message %}
 
 <!-- <div class="message">
@@ -24,31 +27,28 @@
 {% endif %}
 
 {% endblock %}
-<!-- CLAY: END MESSAGES -->
 
 
-<!-- CLAY: START RIGHT SIDEBAR -->
+<!-- Left Sidebar -->
 {% block sidebar %}
 <div id="search-filters-container" class="">
 	<!-- dynamically populated search filters -->
 </div>
 {% endblock %}
-<!-- CLAY: END RIGHT SIDEBAR -->
 
 
-<!-- CLAY: START CONTENT -->
+<!-- Content (center pane) -->
 {% block content %}
 <div id="search-results-list">
 	<!-- <p class="main-header">Search Results</p> -->
 </div>
 {% endblock %}
-<!-- CLAY: END CONTENT -->
 
 
-<!-- CLAY: START RIGHT SIDEBAR -->
+<!-- Right Sidebar -->
 {% block rightSidebar %}
 <div id="search-right-sidebar">
-	<!-- BEGIN FEEDBACK -->
+	<!-- Feedback -->
 	<div class="rounded">
 		{% if user %}
 			<p class="sidebar-header">Want to see improvements?</p>
@@ -60,9 +60,8 @@
 			<p>Drag and drop any company you'd like to keep track of here.</p>
 		{% endif %}
 	</div>
-	<!-- END FEEDBACK -->
 
-	<!-- BEGIN SAVE SEARCH -->
+	<!-- Save Search -->
 	<div class="rounded">
 		<p class="sidebar-header">Save Search</p>
 		{% if user %}
@@ -71,10 +70,8 @@
 			<p><a href="/login">Login</a> or <a href="/register">register</a> to save searches.</p>
 		{% endif %}
 	</div>
-	<!-- END SAVE SEARCH -->
 
-
-	<!-- BEGIN SAVED PATHS -->
+	<!-- Saved Paths -->
 	{% if saved_paths %}
 	<div class="rounded">
 		<p class="sidebar-header">Your Saved Career Paths</p>
@@ -83,21 +80,18 @@
 		{%endfor%}
 	</div>
 	{%endif%}
-	<!-- END SAVED PATHS -->
-
 </div>
 
 
 <div id="arc-container"></div>
 
-<!-- CLAY: START AUTHENTICATE -->
+<!-- Authenticate -->
 {% if not user.profile.li_linked %}
 {{ user.li_linked }}
 <div class="rounded">
 <a class="btn btn-primary left-spacer" href="/account/authorize">Authorize</a>
 	</div>
 {% endif %}
-<!-- CLAY: END AUTHENTICATE -->
 
 {% endblock %}
 

@@ -1,5 +1,6 @@
 # from Python
 import json
+import datetime
 
 # from Django
 from django.db import models
@@ -104,6 +105,15 @@ class Position(models.Model):
 	def duration(self):
 		if self.start_date is not None and self.end_date is not None:
 			return self.start_date.year - self.end_date.year
+		else:
+			return None
+
+	def duration_in_months(self):
+		if self.start_date is not None and self.end_date is not None:
+			return (12 * (self.end_date.year - self.start_date.year)) + (self.end_date.month - self.start_date.month)
+		elif self.start_date is not None:
+			now = datetime.datetime.now()
+			return (12 * (now.year - self.start_date.year)) + (now.month - self.start_date.month)
 		else:
 			return None
 

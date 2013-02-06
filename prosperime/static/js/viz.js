@@ -40,19 +40,21 @@
 	};
 
 	var timeline_hover_in = function(elem, index) {
-		var timeline_class = $(elem).attr("class")
-		var u_id = timeline_class.match(/\d+/g);
-		document.getElementsByClassName(u_id + '-timeline')[index].style.border="1px solid blue"
+		// console.log('hover in: ' + elem + ' ' + index)
+		// var timeline_class = $(elem).attr("class")
+		// var u_id = timeline_class.match(/\d+/g);
+		// document.getElementsByClassName(u_id + '-timeline')[index].style.border="1px solid blue"
 	}
 
 	var timeline_hover_out = function(elem, index) {
-		var u_id = $(elem).attr('class').match(/\d+/g);
-		document.getElementsByClassName(u_id + '-timeline')[index].style.border="none"
+	// 	var u_id = $(elem).attr('class').match(/\d+/g);
+	// 	document.getElementsByClassName(u_id + '-timeline')[index].style.border="none"
 	}
 
 	var positionClicked = function(classname, index) {
 		// Grab the description element
 		var parent = document.getElementsByClassName(classname)[index]
+		console.log('classname: ' + classname + ' index: ' + index + ' parent: ' + parent)
 		var description = parent.getElementsByClassName('timeline-description')[0]
 		var header = parent.getElementsByClassName('timeline-header')[0]
 
@@ -60,18 +62,19 @@
 		if (description.style.display == "none") {
 			description.style.display="inherit"
 			header.style.fontWeight="bold"
-			header.parentNode.style.borderTop="1px solid black"
-			header.parentNode.style.borderLeft="1px solid black"
-			header.parentNode.style.borderRight="1px solid black"
-			header.parentNode.style.borderRadius="4px 4px 0px 0px"
+			// header.parentNode.style.borderTop="1px solid black"
+			// header.parentNode.style.borderLeft="1px solid black"
+			// header.parentNode.style.borderRight="1px solid black"
+			// header.parentNode.style.borderRadius="4px 4px 0px 0px"
 		} else {
 			description.style.display="none"
 			header.style.fontWeight="normal"
-			header.parentNode.style.border="none"
-			header.parentNode.style.borderRadius="none"
+			// header.parentNode.style.border="none"
+			// header.parentNode.style.borderRadius="none"
 		}
 	}
 
+	/* DEPRECATED ALREADY... */
 	var create_path_and_add_position = function(parent) {
 		var title = parent.getElementsByClassName('save_path_box_form_title')[0].value
 		var pos_id = parent.getElementsByClassName('save_path_box_form_position')[0].value
@@ -130,4 +133,63 @@
 		elem.appendChild(path_box)
 	};
 
+
+
+	/* Used in profile pages. Onmouseover event renders the description
+	   for a given element in the element id='middle-float-screen' */
+	var showDescription = function(index, title, co_name, start_date, end_date) {
+		var box = document.getElementById('middle-float-screen')
+		box.innerHTML = ""
+
+		// If no description, will throw exception
+		try {
+			var description = document.getElementsByClassName('timeline-description-text')[index].innerHTML
+			var newText = "<div class='box-header'>"
+			if (title) newText += title
+			if (co_name) newText += ' at ' + co_name
+			newText += "</div>"
+
+
+			if (start_date) {
+				newText += "<div class='box-dates'>"
+				//newText += start_date.substring(0, start_date.indexOf(' ')) + ' ' + start_date.substring(start_date.indexOf(',') + 2)
+				newText += start_date.replace('1, ','')
+				newText += ' - '
+				if (end_date == "Current") newText += "Current"
+				else newText += end_date.replace('1, ', '')
+				newText += "</div>"
+			}
+
+
+			if (description) newText += "<div class='box-description'>" + description + "</div>"
+		} catch (err) {
+			var newText = '<a>For more information, hover over a position</a>'
+		}
+
+		// newText += '<div onclick="addPosition({{viwer_saved_paths|}}Add this position to your career path.'
+
+		box.innerHTML = newText;
+	};
+
+	var createNewPath = function() {
+
+		var table = document.getElementsByClassName('path-list')[0]
+		var lastRow = table.getElementsByClassName('saved-path-list-last')[0]
+		var newRow = document.createElement('tr')
+		newRow.id = 'new-path-box-row'
+		var newCol = document.createElement('td')
+
+		var newColText = '<div class="input-append">'
+		newColText += '<input type="text" maxlength="32" style="width:160px" id="new-path-box" onclick="clearContents(this)" />'
+		newColText += '<span class="add-on" onclick="newPathAjax()"><i class="icon-plus"></i></span>'
+		newColText += '</div>'
+		newCol.innerHTML = newColText;
+		
+		newRow.appendChild(newCol)
+		table.appendChild(newRow)
+	};
+
+	var clearContents = function(elem) {
+		elem.value = ("")
+	}
 

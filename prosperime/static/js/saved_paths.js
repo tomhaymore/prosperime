@@ -22,7 +22,7 @@ $(function(){
 		// seems to be setting the url based off the query in the router
 		url: function() {
 			if (this._meta['query'] === undefined) {
-				return '/saved';
+				return '/saved/';
 			} else {
 				return '/saved/'+ this._meta['query'];
 			}
@@ -40,8 +40,19 @@ $(function(){
 		}
 	});
 
+
+	// IDEA ???
+	window.AllPaths = Backbone.Collection.extend({
+		model:SavedPath,
+
+		url: function() {
+			return '/saved/';
+		},
+	});
+
 	// Instantiate Collections
 	window.savedPaths = new SavedPaths;
+	window.allPaths = new AllPaths;
 
 	//-------------//
 	// ** Views ** //
@@ -85,8 +96,27 @@ $(function(){
 					model: savedPath,
 					collection: collection
 				});
-				$savedPaths.append(view.render().el);
+			$savedPaths.append(view.render().el);
 			});
+			return this;
+		},
+	});
+
+	window.AllPathsView = Backbone.View.extend({
+		template: _.template($("#all-paths-template").html()),
+		el: $('#saved-paths-list'),
+
+		initialize: function() {
+			_.bindAll(this, 'render');
+			this.collection.bind('reset', this.render, this);
+		},
+
+		render:function() {
+			console.log('OY!')
+
+			var renderedContent = this.template(this.collection.toJSON())
+			console.log(this.collection.toJSON())
+			$(this.el).html(renderedContent);
 			return this;
 		},
 	});
@@ -105,17 +135,17 @@ $(function(){
 		initialize: function() {
 			this.savedPaths = window.savedPaths;
 			this.savedPathsView = new SavedPathListView({collection: this.savedPaths});
-			console.log('initalized')
+			this.allPaths = window.allPaths;
+			this.allPathsView = new AllPathsView({collection: this.allPaths});
 		},
 
 		emptySavedPathSearch: function() {
-			console.log('in backbone, show all paths')
-			// this.savedPaths.meta('query', '');
-			this.savedPaths.fetch();
+			this.savedPaths.meta('query', '');
+			this.allPaths.fetch();
+			console.log('empty')
 		},
 
 		savedPathSearch: function(query) {
-			console.log('in backbone, show single path: ' + query);
 			this.savedPaths.meta('query', query);
 			this.savedPaths.fetch();
 		},

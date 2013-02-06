@@ -1,0 +1,8 @@
+from django import template
+register = template.Library()
+
+import datetime
+
+@register.filter(name="months_difference")
+def months_difference(value, arg):
+    return (12 * (value.year - arg.year)) + (value.month - arg.month)

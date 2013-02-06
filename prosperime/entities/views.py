@@ -1,7 +1,7 @@
 # from Python
-# import pkg_resources
-# pkg_resources.require('simplejson') # not sure why this is necessary
-# import simplejson
+
+import datetime
+import math
 
 # from Django
 # from django.contrib.auth import authenticate, login as auth_login
@@ -11,16 +11,13 @@ from django.template import RequestContext
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from accounts.models import Picture
-from entities.models import Entity, Office, Financing, Industry, Position, Career
 from django.db.models import Count, Q
 from django.utils import simplejson
 from django.contrib import messages
-# from django.core import serializers
 
 # Prosperime
-from accounts.models import Picture
-from entities.models import Entity, Office, Financing, Industry, Position
+from entities.models import Entity, Office, Financing, Industry, Position, Career
+from accounts.models import Picture, Profile
 from saved_paths.models import Saved_Path
 from entities.careerlib import CareerSimBase
 
@@ -63,7 +60,109 @@ def discover_career(request,career_id):
 
 	return render_to_response('entities/discover_career.html',{'career':career,'paths':paths_in_career,'overview':overview},context_instance=RequestContext(request))
 
+<<<<<<< HEAD
 def _get_paths_in_career(user,career):
+=======
+
+# View for invidiual profiles
+def profile(request, user_id):
+
+	user = User.objects.get(id=user_id)
+	profile = Profile.objects.get(user=user)
+	saved_paths = Saved_Path.objects.filter(owner=user)
+	profile_pic = _get_profile_pic(profile)
+	viewer_saved_paths = Saved_Path.objects.filter(owner=request.user)
+
+	# Do position processing here!
+	positions = Position.objects.filter(person=user)
+	ed_list = []
+	org_list = []
+
+	for pos in positions:
+		pos.duration = pos.duration_in_months()
+
+		# if pos.title:
+		# 	print 'title: ' + pos.title
+		# if pos.summary:
+		# 	print 'summ ' + pos.summary
+		# if pos.description:
+		# 	print 'des ' + pos.description
+		# if pos.degree:
+		# 	print 'deg: ' + pos.degree
+		# if pos.field:
+		# 	print 'field: ' + pos.field
+
+
+		# Assumption: no end date = current
+		if not pos.end_date:
+			pos.end_date = "Current"
+
+		# Process domains
+		domains = pos.entity.domains.all()
+		if domains:
+			domain = domains[0].name
+			pos.co_name = domain + " company"
+		else:
+			domain = None
+			pos.co_name = pos.entity.name
+
+		pos.domain=domain
+		current = None
+
+		# Process education positions
+		if pos.type == 'education' or pos.title == 'Student':
+			if pos.degree is not None and pos.field is not None:
+				pos.title = pos.degree + ", " + pos.field
+			elif pos.degree is not None:
+				pos.title = pos.degree
+			elif pos.field is not None:
+				pos.title = pos.field
+			else:
+				pos.title = None
+			ed_list.insert(0, pos)
+		else:
+
+			if pos.title:
+				print pos.title + ', ' + pos.co_name
+
+			# Assumption: ignore if no start-date, crappy data
+			if pos.start_date:
+				org_list.insert(0, pos)
+			if pos.current:
+				current = pos
+			# else:
+			# 	print 'ignoring: ' + pos.type
+
+	# Still need to uniqify this data!
+	# will do so O(n2) but hey, these are small datasets
+	ed_list = _uniqify(ed_list)
+	org_list = _uniqify(org_list)
+
+	# Now, prepare for timeline
+	# First, sort by start_date
+	## ?? org_list.sort(key=lambda x: (int(x.start_date)[:3] + int(x.start_date)[0:2]))
+
+	if len(org_list) == 0:
+		# then we have problem
+		start_date = total_time = end_date = compress = None
+	else:	
+		start_date = org_list[len(org_list)-1].start_date
+		total_time = _months_from_now(start_date)
+		end_date = datetime.datetime.now()
+
+		if total_time > 200: 
+		# 200 is an arbitrary constant that seems to fit my laptop screen well
+			total_time = int(math.ceil(total_time/2))
+			for pos in org_list:
+				pos.duration = int(math.ceil(pos.duration/2))
+			compress = True
+		else:
+			compress = False
+
+	return render_to_response('entities/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress}, context_instance=RequestContext(request))
+
+def _get_paths_in_career(career):
+>>>>>>> 355cf3a401f046b51139963f7fda4db1acf23f9e
 
 	# initialize overview array
 	overview = {}
@@ -1154,4 +1253,47 @@ def _get_profile_pic(profile):
 	if pics.exists():
 		return pics[0].pic.__unicode__()
 	return None
+
+# Helper from StackOverflow to remove duplicates from list whilst preserving order
+def _uniqify(list):
+	tmp = set()
+	solution = []
+	for element in list:
+		# Hack city
+		if element.title == None:
+			element.title = ""
+		current = element.title + ', ' + element.co_name
+
+		if current in tmp:
+			continue
+		tmp.add(current)
+		solution.append(element)
+
+	return solution
+
+# Returns # months difference between start_date and now
+def _months_from_now(start_date):
+	now = datetime.datetime.now()
+	return (12 * (now.year - start_date.year)) + (now.month - start_date.month)
+
+# taken straight from viz.js
+def _months_difference(start_mo, start_yr, end_mo, end_yr, compress, round):
+	diff = 12 * (end_yr - start_yr)
+	diff += end_mo - start_mo
+
+	if compress:
+		diff /= 2
+		if round == 'upper':
+			diff = math.ceil(diff)
+		if round == 'lower':
+			diff = math.floor(diff)
+
+	return diff
+
+
+
+
+
+
+
 
