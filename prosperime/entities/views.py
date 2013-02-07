@@ -21,16 +21,18 @@ from accounts.models import Picture, Profile
 from saved_paths.models import Saved_Path
 from entities.careerlib import CareerSimBase
 
-@login_required
+# @login_required
 def home(request):
+	if not request.user.is_authenticated():
+		return HttpResponseRedirect('welcome')
 	data = {}
 	# return HttpResponseRedirect('welcome')
 	user = request.user
 
 	data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
-	data['saved_paths'] = Saved_Path.objects.filter(owner=user)
+	# data['saved_paths'] = Saved_Path.objects.filter(owner=user)
 	data['top_careers'] = []
-	
+
 	return render_to_response('home.html',data,context_instance=RequestContext(request))
 
 def welcome(request):
@@ -813,9 +815,9 @@ def _get_careers_brief_in_network(user,**filters):
 
 	# careers = Career.objects.filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk'),num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk')).order_by('-num_people').distinct()
 	# careers = Career.objects.prefetch_related('positions').filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk',num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk'))).order_by('-num_people').distinct()[:10]
-	careers_pos = Career.objects.filter(positions__person_id__in=users).values('id','short_name','long_name','positions__id')
-	careers_ppl = Career.objects.filter(positions__person_id__in=users).values('id','short_name','long_name','positions__person_id')
-	careers_orgs = Career.objects.filter(positions__person_id__in=users).values('id','short_name','long_name','positions__entity_id')
+	careers_pos = Career.objects.filter(positions__person__id__in=users).values('id','short_name','long_name','positions__id')
+	careers_ppl = Career.objects.filter(positions__person__id__in=users).values('id','short_name','long_name','positions__person_id')
+	careers_orgs = Career.objects.filter(positions__person__id__in=users).values('id','short_name','long_name','positions__entity_id')
 
 	careers_dict = {}
 
