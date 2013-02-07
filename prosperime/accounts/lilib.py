@@ -20,6 +20,7 @@ from django.utils import simplejson
 from django.contrib.auth.models import User
 from accounts.models import Account, Profile, Connection, Picture
 from entities.models import Position, Entity, Image, Industry, Office, Career
+from entities.careerlib import CareerMapBase
 from django.core.files import File
 from django.conf import settings
 
@@ -41,6 +42,8 @@ class LIBase():
 	# initialize variable for career / positions map
 
 	careers_to_positions_map = {}
+
+	career_mapper = CareerMapBase()
 
 	industry_groups = {
 		47:'corp fin',
@@ -193,7 +196,8 @@ class LIBase():
 		}
 
 	def __init__(self):
-		self.careers_to_positions_map = self.get_career_positions_map()
+		pass
+		# self.careers_to_positions_map = self.get_career_positions_map()
 
 	def get_career_positions_map(self):
 		careers = Career.objects.filter(status="active")
@@ -453,7 +457,8 @@ class LIBase():
 		if 'endDate' in data:
 			pos.end_date = self.format_dates(data['endDate'])
 		pos.save()
-		career = self.add_careers_to_position(pos)
+		self.career_mapper.match_careers_to_position(pos)
+		# career = self.add_careers_to_position(pos)
 		
 
 	def get_position(self,user,co,data,**kwargs):
@@ -1036,5 +1041,89 @@ class LIConnections(LIBase):
 			positions.append({'inst_uniq_id':inst_uniq_id,'inst_name':inst_name,'degree':degree,'fieldofStudy':major})
 		return positions
 
+class LITest(LIBase):
 
+	def process_public_page(self,url):
+		# fetch html and soup it
+		
+		# html = self.get_public_page(url)
+		html = urllib2.urlopen(url)
+		soup = BeautifulSoup(html)
+
+		# get all profile container divs
+		divs = soup.find_all("div","section",id=re.compile("^profile"))
+
+		# loop throuh each div
+		for d in divs:
+			# identify type
+			if d['id'] == 'profile-experience':
+				# extract position data
+				positions = self.extract_pos_from_public_page(d)
+				for p in positions:
+					print p
+							
+			elif d['id'] == 'profile-education':
+				ed_positions = self.extract_ed_pos_from_public_page(d)
+				for p in ed_positions:
+					print p
+
+	def extract_pos_from_public_page(self,data):
+		# initialize positions array
+		positions = []
+		# get all position divs
+		raw_positions = data.find_all("div","position")
+		# loop through each position
+		for p in raw_positions:
+			# get title of position
+			title = p.find("div","postitle").span.contents[0]
+			# get unique name of company
+			co_uniq_name = p.find("a","company-profile-public")
+			if co_uniq_name:
+				co_uniq_name = co_uniq_name.get('href')
+				m = re.search("(?<=\/company\/)([\w-]*)",co_uniq_name)
+				co_uniq_name = m.group(0).strip()
+				print co_uniq_name
+				# get start and end dates
+				start_date = p.find("abbr","dtstart")
+				if start_date is not None:
+					start_date = start_date.get('title')
+				try:
+					end_date = p.find('abbr','dtstamp').get('title')
+					current = True
+				except:
+					current = False
+
+				try:
+					end_date = p.find("abbr","dtend").get("title")
+				except:
+					end_date = None
+				# get descriptions
+				try:
+					descr = p.find("p","description").contents[0]
+				except:
+					descr = None
+				# append to main positions array
+				positions.append({'title':title,'co_uniq_name':co_uniq_name,'startDate':start_date,'endDate':end_date,'summary':descr,'isCurrent':current})
+		return positions
+
+	def extract_ed_pos_from_public_page(self,data):
+		# initialize positions array
+		positions = []
+		# get all position divs
+		raw_positions = data.find_all("div","position")
+		# loop through each position
+		for p in raw_positions:
+			inst_uniq_id = p.get('id')
+			inst_name = p.h3.contents[0].strip()
+			try:
+				degree = p.find("span","degree").contents[0]
+				
+			except:
+				degree = None
+			try:
+				major = p.find("span","major").contents[0]
+			except:
+				major = None
+			positions.append({'inst_uniq_id':inst_uniq_id,'inst_name':inst_name,'degree':degree,'fieldofStudy':major})
+		return positions
 
