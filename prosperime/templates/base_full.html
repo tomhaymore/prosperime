@@ -31,7 +31,7 @@
 							</li> -->
                 			{% if user.is_authenticated %}
 	                		<li>
-	                			<a href="/settings/">{{user.profile.first_name}} {{user.profile.last_name}}</a>
+	                			<a href="/home/">{{user.profile.full_name}}</a>
 	                		</li>
 	                		<li>
 	                			<a href="/account/logout/">Logout</a>

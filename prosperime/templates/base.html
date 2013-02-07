@@ -4,11 +4,6 @@
 	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css" />
 	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" />
 	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/main.css" />
-	<style>
-		body {
-			padding-top: 60px;
-		}
-	</style>
 	<link href="{{ STATIC_URL }}img/favicon.jpg" rel="icon"  />
 	<script type="text/javascript" src="{{ STATIC_URL }}js/json2.js"></script>
 	 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
@@ -21,23 +16,21 @@
 <head> <title>{% block title %}Prosperime: Don't work, prosper {% endblock %}</title> </head>
 
 <body>
-	<div class="navbar navbar-fixed-top">
-		<div class="navbar-inner">
-
-			<div class="row-fluid">
-				
+	<div class="navbar navbar-static-top">
+			<div class="navbar-inner">
+				<div class="row-fluid">
 					<div class="span2 offset1">
 						<!-- <a class="brand" href="/">Prosperime</a> -->
 						<a href="/"><img class="main-logo" src="{{STATIC_URL}}img/logo_1.png" /></a>
 					</div>
-					<div class="span6 offset3 nav-collapse">
-						<ul class="nav pull-right">
+					<div class="span5 offset2 nav-collapse pull-right">
+						<ul class="nav">
 							<!-- <li>
 								<a href="/">Home</a>
 							</li> -->
 	                		{% if user.is_authenticated %}
 	                		<li>
-	                			<a href="/settings/">{{user.profile.first_name}} {{user.profile.last_name}}</a>
+	                			<a href="/home/">{{user.profile.full_name}}</a>
 	                		</li>
 	                		<li>
 	                			<a href="/account/logout/">Logout</a>
