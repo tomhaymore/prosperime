@@ -849,10 +849,68 @@ ul.flat li {
 /*SAVED PATHS PAGES*/
 .saved-path-title {
 	font-weight:bold;
+	padding:8px;
+	font-size:1.2em;
 }
 
 .saved-path-position {
-	padding-left:16px;
+	border:1px solid black;
+	border-radius:4px;
+	display:inline-block;
+	padding:8px;
+	padding-right:24px;
+}
+
+.display-none {
+	display:none;
+}
+
+.hide {
+	visibility: hidden;
+	display:inline-block;
+}
+
+.saved-path-timeline {
+	text-align:center;
+	margin-bottom:50px;
+}
+
+#end {
+	font-weight:bold;
+}
+
+.saved-path-thumbnail-table {
+/*	border-collapse:separate;
+*/}
+
+.saved-path-thumbnail {
+	overflow:hidden;
+	border:1px solid black;
+	height:125px;
+	width:150px;
+	padding:25px;
+	margin-left:40px;
+	margin-bottom:25px;
+	display:inline-block;
+	text-align:center;
+	border-radius:8px;
+	vertical-align:middle;
+}
+
+.thumbnail-title {
+	color:midnightblue;
+	font-size:1.8em;
+	padding-bottom:8px;
+}
+
+.thumbnail-data {
+	text-align:left;
+	font-size:12px;
+	overflow:hidden;
+}
+
+.thumbnail-hover {
+	box-shadow:1px 1px 1px;
 }
 
 /*PROFILE PAGE*/

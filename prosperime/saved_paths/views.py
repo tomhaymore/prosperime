@@ -10,39 +10,23 @@ from django.utils import simplejson
 
 # Prosperime
 from entities.models import Position
-from saved_paths.models import Saved_Path
+from saved_paths.models import Saved_Path, Saved_Position
 
-# # will add a particular position to a particular path, then return
-# def save_position(request, title, pos_id):	
-# 	## TODO add a 'success message'
 
-# 	# need to know if career paths already exist or not
-# 	user = request.user
-# 	# Note: do not allow duplicate cp's, nor ''
-# 	career_path = Saved_Path.objects.get(owner=user, title=title)
-# 	print career_path.title
-# 	position = Position.objects.get(id=pos_id)
-
-# 	if not career_path:
-# 		# this should not happen
-# 		print "save_position called on non-existent path. error."
-# 	else: 
-# 		# add to existing career path
-# 		print 'Adding position to cp: '+title+', pos_id: ' + pos_id
-# 		career_path.positions.add(position)
-# 		career_path.save()
-
-# 	return HttpResponseRedirect('/search/')
+######################################################
+################## CORE VIEWS ########################
+######################################################
 
 
 # VIEW: display ALL user's paths
 def show_paths(request):
-	print 'show paths'
 
-	saved_paths = Saved_Path.objects.filter(owner=request.user)
+	paths = Saved_Path.objects.filter(owner=request.user)
+
 	data = {
-		'saved_paths':saved_paths,
+		'saved_paths': paths,
 	}
+
 	return render_to_response('saved_paths/saved_paths.html', data,
 		context_instance=RequestContext(request))
 
@@ -52,11 +36,15 @@ def get_paths(request):
 
 	# Check if get parameters or not
 	# If so, show a single path
-	if request.GET.getlist('t'):
-		path_requested = request.GET.getlist('t')[0]
-		path = Saved_Path.objects.get(title=path_requested)
-		positions = _get_positions_for_path(path.positions.all())
-		paths.append({'title': path.title, 'positions': positions})
+	if request.GET.getlist('id'):
+		path_requested = request.GET.getlist('id')[0]
+		path = Saved_Path.objects.get(id=path_requested)
+		path_owner = path.owner
+
+		saved_positions = Saved_Position.objects.filter(path=path)
+		positions = _get_positions_for_path(saved_positions)
+
+		paths.append({'title': path.title, 'positions': positions, 'id': path.id})
 
 	# If not, show all path_requested
 	else:
@@ -67,58 +55,44 @@ def get_paths(request):
 			for path in all_paths:
 
 				# delegate position formatting to helper
-				positions = _get_positions_for_path(path.positions.all())	
-				paths.append({'title': path.title, 'positions': positions})
+				saved_positions = Saved_Position.objects.filter(path=path)
+				positions = _get_positions_for_path(saved_positions)	
+				paths.append({'title': path.title, 'positions': positions, 'id': path.id})
 
 		# else do nothing
-	print simplejson.dumps(paths)
+
 	return HttpResponse(simplejson.dumps(paths), mimetype="application/json")
 	
 
-# VIEW: display a specific path, denoted by title
-def show_path(request, title):
-	print 'saved_paths.show_path : ' + title
-	data = []
-	# data['message'] = "delete.delete.i.eat.meat"
-	# pass the path as JSON here
+# AJAX POST requests only
+def remove(request):
 
+	path_id = request.POST.get('path_id', False)
+	pos_id = request.POST.get('pos_id', False)
+	response = {}
 
-
-	return HttpResponse(simplejson.dumps(data), mimetype="application/json")
-
-	# return render_to_response('saved_paths/saved_paths.html', data,
-	# 	context_instance=RequestContext(request))
-
-# VIEW: creates a path with positions
-def create_path(request, title):
-	print "saved_paths.create_path, creating path: " + title
-	_create_and_return_path(request.user, title)
-
-	return HttpResponseRedirect('/search/')
-
-# VIEW: creates a path and adds a position
-def create_path_add_position(request, title, pos_id):
-	print 'yahtzee'
-	new_path = _create_and_return_path(request.user, title)
-	position = Position.objects.get(id=pos_id)
-	new_path.positions.add(position)
-	new_path.save()
-
-	return HttpResponseRedirect('/search/')
-
-def delete(request, title, pos_id):
-
-	print 'delete request, '+title+', ' + str(pos_id)
-	path = Saved_Path.objects.get(owner=request.user, title=title)
-	position = Position.objects.get(id=pos_id)
-	path.positions.remove(position)
-	path.save()
+	# Error checking...
+	if not request.is_ajax or not request.POST or not path_id or not pos_id:
+		print 'Error @ saved_paths.create'
+		response.update({'success':False})
+		return HttpResponse(simplejson.dumps(response))
 	
-	return HttpResponseRedirect('/saved_paths/')
+	try:
+		path = Saved_Path.objects.get(id=path_id)
+		position = Position.objects.get(id=pos_id)
+		saved_position = Saved_Position.objects.get(path=path, position=position)
+		saved_position.delete()
+		response.update({'success': True})
+	except:
+		response.update({'success': False})
+
+	return HttpResponse(simplejson.dumps(response))
+
 
 # VIEW: responds to ajax POST request only 
 def save(request):
 
+	# Error checking
 	if not request.is_ajax:
 		print 'Error @ saved.paths.save - non ajax requested'
 		return render_to_response('/search/', context_instance=RequestContext(request))
@@ -142,21 +116,27 @@ def save(request):
 		response.update({'errors':['path could not be found']})
 	else:
 		position = Position.objects.get(id=pos_id)
-		path.positions.add(position)
+
+		saved_position = Saved_Position()
+		saved_position.position = position
+		saved_position.path = path
+		saved_position.index = path.get_next_index()
+		saved_position.save()	
+
+		# path.positions.add(position)
 
 	return HttpResponse(simplejson.dumps(response))
 
-def create(request):
 
+# VIEW: creates a path, responds to POST request via AJAX
+def create(request):
 	title = request.POST.get('title', False)
 
 	# Error checking... what to do with them??
 	if not request.is_ajax:
 		print 'Error @ saved_paths.create - non ajax requested'
-
 	if not request.POST:
 		print 'Error @ saved_paths.create - get request!'
-
 	if not title:
 		print 'Error @ saved_paths.create - no title'
 
@@ -166,36 +146,101 @@ def create(request):
 		new_path = Saved_Path()
 		new_path.title = title
 		new_path.owner = request.user
-		new_path.save()
-		response.update({'success': True})
+		new_path.last_index = 1
+
+		# automatically add current position to any new cp
+		print 'before before'
+		currentPos = Position.objects.filter(person=request.user, current=True).exclude(type='education')
+		print 'before'
+		if currentPos:
+			print 'after'
+			# need to test this
+			new_path.save()
+			first_position = Saved_Position()
+			first_position.position = currentPos[0]
+			first_position.path = new_path
+			first_position.index = 0
+			first_position.save()
+		else:
+			# this means we DON'T have a current position for them...
+			# think about this one
+			# add a "funemployment" position!
+			new_path.last_index = 0
+			new_path.save()
+
+		response.update({'success': True, 'id':new_path.id})
 
 	except:
 		response.update({'success': False})
 
+	return HttpResponse(simplejson.dumps(response))
+
+# AJAX POST only, changes the indexing of saved_positions
+def rearrange(request):
+
+	response = {}
+	pos_id = int(request.POST.get('pos_id'))
+	diff = int(request.POST.get('difference'))
+	pos_index = int(request.POST.get('pos_index'))
+	path_id = int(request.POST.get('path_id'))
+	
+	positions = Saved_Position.objects.filter(path=Saved_Path.objects.get(id=path_id))
+	print 'difference: ' + str(diff)
+	print 'before'
+	for p in positions:
+		print p.position.title + ' ' + str(p.index)
+
+	if diff > 0:
+		for p in positions:
+
+			if p.position.id == pos_id:
+				print 'match. old index = ' + str(p.index) + ' entered: ' + str(pos_index) + ' diff: ' + str(diff)
+				p.index = int(p.index) + diff
+				print 'new index = ' + str(p.index)
+				p.save()
+			elif int(p.index) > pos_index and int(p.index) <= (pos_index + diff):
+				p.index = int(p.index) - 1
+				p.save()
+				print 'in the middle range'
+
+	else: 
+		for p in positions:
+			if p.position.id == pos_id:
+				p.index = p.index + diff
+
+
+	print 'after'
+	positions = Saved_Position.objects.filter(path=Saved_Path.objects.get(id=path_id))
+	for p in positions:
+		print p.position.title + ' ' + str(p.index)
+
 
 	return HttpResponse(simplejson.dumps(response))
 
-# HELPER: to unify reused code
-def _create_and_return_path(user, title):
-	new_path = Saved_Path()
-	new_path.owner = user
-	new_path.title = title
-	new_path.save()
-	return new_path
+
+######################################################
+##################    HELPERS   ######################
+######################################################
 
 # code taken w/ few modifications from entities.views
-def _get_positions_for_path(positions):
+# Note: 'saved_positions' = saved_position objects
+def _get_positions_for_path(saved_positions):
 	"""
 	Returns JSON format of all user positions, with possible anonymity
 	"""
+
+	positions = []
+	index_list = []
+	for saved_pos in saved_positions:
+		positions.append(saved_pos.position)
+		index_list.append(saved_pos.index)
+
 	if positions:
 		formatted_positions = []
 		i = 0
 		for p in positions:
-			# print p.id
-			# get first industry domain of company
-			domains = p.entity.domains.all()
 
+			domains = p.entity.domains.all()
 			if domains:
 				domain = domains[0].name
 			else:
@@ -247,7 +292,10 @@ def _get_positions_for_path(positions):
 			else:
 				attribs['co_name'] = p.entity.name
 
+			attribs['index'] = index_list[i]
+
 			formatted_positions.append(attribs)
+			i += 1
 
 		return formatted_positions
 	# if no positions, return None

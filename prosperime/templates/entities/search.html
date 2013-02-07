@@ -270,8 +270,7 @@
 					_.each(org_list, function(org) {
 						%><tr class="timeline-row"><%
 
-						// console.log("mo1: " + org_list.start_mo + " yr1: " + org_list.start_yr + " m2: " + org.start_date.substring(0,2) + " y2: " + org.start_date.substring(3))
-						lower_bound = months_difference(org_list.start_mo, org_list.start_yr, parseInt(org.start_date.substring(0,2)), parseInt(org.start_date.substring(3)), compress_timeline, "lower")
+						lower_bound = months_difference(org_list.start_mo, org_list.start_yr, parse(org.start_date.substring(0,2)), parseInt(org.start_date.substring(3)), compress_timeline, "lower")
 						if (org.end_date != "Current") {
 						upper_bound = months_difference(org_list.start_mo, org_list.start_yr, parseInt(org.end_date.substring(0,2)), parseInt(org.end_date.substring(3)), compress_timeline, "upper")
 						} else upper_bound = org_list.total_time
