@@ -13,19 +13,19 @@ $(function(){
 	//-------------------//
 	window.SavedPaths = Backbone.Collection.extend({
 
-		// initializing the dst for the query?? 
+		urlRoot: '/saved/',
+		model: SavedPath, 
+
+		comparator: function(collection) {
+			return(collection.get('index'))
+		},
+
 		initialize: function() {
 			this._meta = {}
 		},
 
-		model: SavedPath,
-		// seems to be setting the url based off the query in the router
-		url: function() {
-			if (this._meta['query'] === undefined) {
-				return '/saved/';
-			} else {
-				return '/saved/'+ this._meta['query'];
-			}
+		url: function() {	
+			return '/saved/'+ this._meta['query'];
 		},
 
 		// no idea ??
@@ -41,39 +41,95 @@ $(function(){
 	});
 
 
-	// IDEA ???
-	window.AllPaths = Backbone.Collection.extend({
-		model:SavedPath,
-
-		url: function() {
-			return '/saved/';
-		},
-	});
-
 	// Instantiate Collections
 	window.savedPaths = new SavedPaths;
-	window.allPaths = new AllPaths;
 
 	//-------------//
 	// ** Views ** //
 	//-------------//
+
+	// Renders the title @ the top of the page
+	window.HeaderView = Backbone.View.extend({
+
+		// Ultimately, will want to get logic out of here, but this
+		// works for now
+		template: _.template("<span class='blue'>Career Path: </span><%= this.model.get('title')%>"),
+		model: SavedPath,
+		tagName: 'span',
+
+		render:function() {
+			var content = this.template(this.model.toJSON())
+			this.$el.empty();
+			this.$el.html(content);
+			return this;
+		},
+	});
+
+	// Single Saved Path List View
 	window.SavedPathSingleView = Backbone.View.extend({
-		tagname:"li",
 		template:_.template($('#saved-path-single-template').html()),
 
-		// no events
+		events: {
+			"click .saved-path-position":"positionClicked",	
+			"mouseenter .saved-path-position":"hoverOn",	
+			"mouseleave .saved-path-position":"hoverOut",
+			"click .icon-remove-circle":"remove",
+		},
 
 		initialize: function() {
-			this.model.on('change', this.render, this); // no idea
+			this.model.on('change', this.render, this); 
+			_.bindAll(this, 'render', 'remove')
+			this.model.bind('remove', this.remove)
 		},
 
 		render: function() {
+			// for (var i = 0; i < this.model.get('positions').length; i++) {
+			// 	console.log(this.model.get('positions')[i].title)
+			// 	console.log(this.model.get('positions')[i].index)
+			// }
+			console.log(this.model)
 			var renderedContent = this.template(this.model.toJSON());
 			$(this.el).html(renderedContent);
 			return this;
-		}
+		},
+
+		positionClicked: function(ev) {
+
+		},
+
+		hoverOn: function(ev) {
+			$(ev.target).children().each(function() {
+				$(this).css('visibility', 'inherit')
+			});
+		},
+
+		hoverOut: function(ev) {
+			$(ev.target).children().each(function() {
+				$(this).css('visibility', 'hidden')
+			});
+		},
+
+		remove: function(ev) {
+			var path_id = this.model.get('id')
+			var pos_id = $(ev.target).parent().attr('id')
+
+			pos_id = pos_id.split('-')[1].split(':')[1]
+
+			$.post('/saved_paths/remove/', {path_id: path_id, pos_id: pos_id, 
+				}, function(response) {
+					if (response['success']) {
+						// manually refresh?
+					} else {
+						console.log('removal failed...')
+					}
+				}, 'json');
+		},
+
+
 	});
 
+
+	// Path list view for single path search... necessary??
 	window.SavedPathListView = Backbone.View.extend ({
 
 		el: $("#saved-paths-list"),
@@ -82,46 +138,125 @@ $(function(){
 
 		initialize: function() {
 			_.bindAll(this,'render');
-			this.collection.bind('reset',this.render);
+			this.collection.on('reset',this.render, this, function() {
+				this.render()
+			});
+			this.collection.on('change', this.render, this);
 		},
 
 		render: function() {
-			var $savedPaths,
-				collection = this.collection;
+			var $savedPaths = this.collection;
 
 			$(this.el).html(this.template({}));
 			$savedPaths = this.$(".path-list");
+
+
+			// Single Path
+			this.collection.each(function(savedPath) {
+				var header = new HeaderView({
+					model: savedPath,
+				});
+				$('#path-header').empty()
+				$('#path-header').append(header.render().el)
+			});
+
 			this.collection.each(function(savedPath) {
 				var view = new SavedPathSingleView({
 					model: savedPath,
-					collection: collection
+					collection:this.collection,
 				});
 			$savedPaths.append(view.render().el);
 			});
+
+			
 			return this;
 		},
 	});
 
-	window.AllPathsView = Backbone.View.extend({
-		template: _.template($("#all-paths-template").html()),
-		el: $('#saved-paths-list'),
+	// Single thumbnail??
+	window.SavedPathThumbnailSingleView = Backbone.View.extend({
+		template:_.template($('#saved-path-thumbnail-single-template').html()),
+		className: 'saved-path-thumbnail',
 
 		initialize: function() {
-			_.bindAll(this, 'render');
-			this.collection.bind('reset', this.render, this);
+			this.model.on('change', this.render, this); 
 		},
 
-		render:function() {
-			console.log('OY!')
-
-			var renderedContent = this.template(this.collection.toJSON())
-			console.log(this.collection.toJSON())
+		render: function() {
+			var path_id = this.model.get('id')
+			$(this.el).attr('id', path_id)
+			var renderedContent = this.template(this.model.toJSON());
 			$(this.el).html(renderedContent);
 			return this;
 		},
+
 	});
 
-	
+
+
+	// Thumbnail List View for empty searches
+	window.SavedPathThumbnailListView = Backbone.View.extend({
+		
+		el: $("#saved-paths-list"),
+		template: _.template($("#saved-path-thumbnail-list-template").html()),
+
+
+		events: {
+			"click .saved-path-thumbnail": "goToPath",
+			"mouseenter .saved-path-thumbnail": "hoverIn",
+			"mouseleave .saved-path-thumbnail": "hoverOut",
+		},
+
+		initialize: function() {
+			_.bindAll(this,'render');
+			this.collection.on('reset',this.render, this, function() {
+				this.render()
+			});
+			this.collection.on('change', this.render, this);
+		},
+
+		render: function() {
+			var $savedPaths = this.collection;
+
+			$(this.el).html(this.template({}));
+			$savedPaths = this.$(".saved-path-thumbnail-table");
+
+			// Header
+			var header = new HeaderView();
+			$('#path-header').empty()
+			$('#path-header').append('<span class="blue">Saved Career Paths</span>');
+			
+
+			// Single Thumbnail
+			this.collection.each(function(savedPath) {
+				var view = new SavedPathThumbnailSingleView({
+					model:savedPath,
+					collection:this.collection,
+				});
+				$savedPaths.append(view.render().el);
+
+			});
+		},
+
+		goToPath: function(ev) {
+			if ($(ev.currentTarget).attr('id') === undefined) {
+				// then create a new path
+			} else {
+				var path_id = $(ev.currentTarget).attr('id')
+				window.App.navigate('id/?id=' + path_id, {trigger:true});
+			}
+		},
+
+		hoverIn: function(ev) {
+			$(ev.currentTarget).toggleClass('thumbnail-hover');
+		},
+
+		hoverOut: function(ev) {
+			$(ev.currentTarget).toggleClass('thumbnail-hover');
+		},
+ 
+	});
+
 
 	//---------------//
 	// ** Routers ** //
@@ -129,55 +264,32 @@ $(function(){
 	window.SavedPathRouter = Backbone.Router.extend({
 		routes: {
 			"" : "emptySavedPathSearch",
-			"title/:query" : "savedPathSearch",
+			"id/:query" : "savedPathSearch",
 		},
 
 		initialize: function() {
 			this.savedPaths = window.savedPaths;
-			this.savedPathsView = new SavedPathListView({collection: this.savedPaths});
-			this.allPaths = window.allPaths;
-			this.allPathsView = new AllPathsView({collection: this.allPaths});
+			this.savedPaths.bind('remove', this.remove)
+			this.headerView = new HeaderView()
 		},
 
 		emptySavedPathSearch: function() {
+			this.savedPathsView = new SavedPathThumbnailListView({collection: this.savedPaths});
 			this.savedPaths.meta('query', '');
-			this.allPaths.fetch();
-			console.log('empty')
+			this.savedPaths.fetch()
 		},
 
 		savedPathSearch: function(query) {
+			this.savedPathsView = new SavedPathListView({collection: this.savedPaths});
 			this.savedPaths.meta('query', query);
 			this.savedPaths.fetch();
 		},
 	});
 
 
-	// Custom functions
-	function generateUrl(params) {
-		var fullUrl = '';
-		c = 0;
-		for (var key in params) {
-			if (params.hasOwnProperty(key)) {
-				for (i=0;i<=params[key].length;i++) {
-					if(params[key][i] === undefined) {
-						continue;
-					} else {
-						if (i == 0 && c == 0) {
-							fullUrl += key + "=" + encodeURIComponent(params[key][i]);
-						} else if (i == 0) {
-							fullUrl += "&" + key + "=" + encodeURIComponent(params[key][i]);
-						 } // else {
-						// 	fullUrl += "+'" + encodeURIComponent(params[key][i]) + "'";
-						// }
-					}
-				}
-			}
-			c++;
-		}
-		return fullUrl;
-	}
-
-	window.App = new SavedPathRouter;
+	window.App = new SavedPathRouter();
+	// Eventually, change urls for pushState
+	// window.App = new SavedPathRouter({pushState:true});
 	Backbone.history.start();
 });
 
