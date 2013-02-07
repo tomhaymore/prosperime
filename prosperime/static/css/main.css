@@ -15,6 +15,7 @@ div.main-container {
 	-webkit-box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
 	-moz-box-shadow: 0 1px 10px rgba(0,0,0,0.1);
 	box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+	margin-top:15px;
 }
 
 div.navbar-inner {
@@ -188,6 +189,12 @@ img.logo-preview {
 .main-header {
 	font-weight: bold;
 	font-size:1.2em;
+}
+
+.sub-header {
+	margin-top:5px;
+	font-weight: normal;
+	font-size:0.9em;
 }
 
 #search-container {
@@ -902,5 +909,26 @@ ul.flat li {
 	font-size:12px;
 }
 
+/* Dashboard Module */
 
+.dashboard-module {
+	width:300px;
+	margin-right:20px;
+}
+
+.module-header {
+	font-weight: 500;
+	font-size:1.1em;
+	font-weight: bold;
+	border-bottom: 1px solid #000;
+}
+
+.module-list li {
+	display: inline;
+	margin-right: 10px;
+}
+
+.dashboard-header {
+	margin-bottom: 10px;
+}
 
