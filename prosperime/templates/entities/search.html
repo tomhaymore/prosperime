@@ -4,8 +4,10 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/app.js"></script>
 <script type="text/javascript">
+
 	{%load jsonify%}
 	var saved_path_list = {{saved_paths|jsonify}}
+
 </script>
 {% endblock %}
 

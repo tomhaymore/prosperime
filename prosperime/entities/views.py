@@ -1,7 +1,5 @@
 # from Python
-# import pkg_resources
-# pkg_resources.require('simplejson') # not sure why this is necessary
-# import simplejson
+
 import datetime
 import math
 
@@ -16,12 +14,12 @@ from django.contrib.auth.models import User
 from django.db.models import Count, Q
 from django.utils import simplejson
 from django.contrib import messages
-# from django.core import serializers
 
 # Prosperime
 from entities.models import Entity, Office, Financing, Industry, Position, Career
 from accounts.models import Picture, Profile
 from saved_paths.models import Saved_Path
+from entities.careerlib import CareerSimBase
 
 # @login_required
 def home(request):
@@ -31,6 +29,7 @@ def home(request):
 	data = {}
 	return render_to_response('home.html',data,context_instance=RequestContext(request)) ## Clay - change this
 
+@login_required
 def discover(request):
 
 	# data array for passing to template
@@ -43,7 +42,7 @@ def discover(request):
 		}
 
 	careers_network = _get_careers_brief_in_network(request.user)
-	careers_similar = _get_careers_brief_similar()
+	careers_similar = _get_careers_brief_similar(request.user.id)
 
 	careers = {}
 
@@ -57,10 +56,9 @@ def discover_career(request,career_id):
 	# get career object
 	career = Career.objects.get(pk=career_id)
 
-	paths_in_career, overview = _get_paths_in_career(career)
+	paths_in_career, overview = _get_paths_in_career(request.user,career)
 
 	return render_to_response('entities/discover_career.html',{'career':career,'paths':paths_in_career,'overview':overview},context_instance=RequestContext(request))
-
 
 # View for invidiual profiles
 def profile(request, user_id):
@@ -159,82 +157,85 @@ def profile(request, user_id):
 
 	return render_to_response('entities/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress}, context_instance=RequestContext(request))
 
-def _get_paths_in_career(career):
+def _get_paths_in_career(user,career):
 
-	cxns = user.profile.connections.all().values('user__id').select_related('user')
+	# initialize overview array
+	overview = {}
+	paths = {}
+	# get users in network
+	users_list, user_ids = _get_users_in_network(user)
 
-	users = []
+	network_people = User.objects.select_related('positions').filter(id__in=user_ids,positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos')
 
-	for c in cxns:
-		users.append(c['user__id'])
+	num_pos = 0
+	entities = []
+	entities_dict = {}
+	num_cos = 0
 
-	people = User.objects.filter(id__in=users)
-
-	overview = {
-		'people':0,
-		'positions':0,
-		'orgs':0
-	}
-
-	orgs = []
-	orgs_dict = {}
-
-	for p in people:
-		overview['network']['people'] += 1
+	for p in network_people:
+		num_pos += len(p.positions.all())
 		for pos in p.positions.all():
-			overview['network']['positions'] += 1
-			orgs.append(pos.entity.name)
-			if pos.entity.name in orgs_dict:
-				orgs_dict[pos.entity.name]['count'] += 1
+			entities.append(pos.entity.id)
+			if pos.entity.name in entities_dict:
+				entities_dict[pos.entity.name]['count'] += 1
 			else:
-				orgs_dict[pos.entity.name] = {
-					'id':pos.entity.id,
-					'count':1
+				entities_dict[pos.entity.name] = {
+					'count' : 1,
+					'id':pos.entity.id
 				}
 
-	orgs = set(orgs)
-	
-	overview['network']['orgs'] = len(orgs)
+	num_cos = len(set(entities))
 
-	orgs_dict = sorted(orgs_dict.iteritems(), key=lambda x: x[0],reverse=True)
-
-	overview['network']['bigplayers'] = all_orgs_dict
-
-	all_people = User.objects.filter(positions__careers=career)
-
-	all_overview = {
-		'people':0,
-		'positions':0,
-		'orgs':0
+	overview['network'] = {
+		'num_people':len(network_people),
+		'num_pos':num_pos,
+		'num_cos':num_cos
 	}
 
-	all_orgs = []
-	all_orgs_dict = {}
+	all_people = User.objects.select_related('positions').filter(positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos')
 
+	num_pos = 0
+	entities = []
+	all_entities_dict = {}
+	num_cos = 0
+
+	# loop through all positions, identify those that belong to connections
 	for p in all_people:
-		overview['all']['people'] += 1
+		# check if position held by 
+		if p.id in user_ids:
+			p.connected = True
+		else:
+			p.connected = False
+		num_pos += len(p.positions.all())
 		for pos in p.positions.all():
-			overview['all']['positions'] += 1
-			all_orgs.append(pos.entity.name)
-			if pos.entity.name in all_orgs_dict:
-				all_orgs_dict[pos.entity.name]['count'] += 1
+			if pos.entity.name in all_entities_dict:
+				all_entities_dict[pos.entity.name]['count'] += 1
 			else:
-				all_orgs_dict[pos.entity.name] = {
+				all_entities_dict[pos.entity.name] = {
 					'id':pos.entity.id,
 					'count':1
 				}
+			entities.append(pos.entity.id)
 
-	all_orgs = set(all_orgs)
-	
-	overview['all']['orgs'] = len(orgs)
+	num_cos = len(set(entities))
 
-	all_orgs_dict = sorted(all_orgs_dict.iteritems(), key=lambda x: x[0],reverse=True)
+	overview['all'] = {
+		'num_people':len(network_people),
+		'num_pos':num_pos,
+		'num_cos':num_cos
+	}
 
-	overview['all']['bigplayers'] = all_orgs_dict
+	entities_dict = sorted(entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
 
-	paths['network'] = people
+	overview['network']['bigplayers'] = entities_dict[:3]
 
-	paths['community'] = all_people
+	all_entities_dict = sorted(all_entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
+
+	overview['all']['bigplayers'] = all_entities_dict[:3]
+
+	paths['network'] = network_people
+
+	paths['all'] = all_people
 
 	return paths, overview
 
@@ -254,14 +255,14 @@ def search(request):
 	# EDIT: add an array of path titles (we don't need the objects)
 	saved_paths = Saved_Path.objects.filter(owner=request.user)
 
-	if len(saved_paths) > 0:
-		path_titles = []
-		for path in saved_paths:
-			path_titles.append(path.title)
+	# if len(saved_paths) > 0:
+	# 	path_titles = []
+	# 	for path in saved_paths:
+	# 		path_titles.append(path.title)
 
-		# Add path titles array
-		data['saved_paths'] = path_titles
-		print path_titles
+	# 	# Add path titles array
+	# 	data['saved_paths'] = path_titles
+	# 	print path_titles
 		
 	return render_to_response('entities/search.html',data,
 		context_instance=RequestContext(request))
@@ -766,9 +767,27 @@ def careers(request):
 
 	return render_to_response('entities/careers.html',{'careers':careers,'overview':overview},context_instance=RequestContext(request))
 
-def _get_careers_brief_similar(**filters):
+def _get_careers_brief_similar(user_id,**filters):
 
-	return None
+	careers_sim = CareerSimBase()
+
+	users = careers_sim.find_similar_careers(user_id)
+	
+	careers = Career.objects.prefetch_related('positions').filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk',num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk'))).order_by('-num_people').distinct()[:10]
+
+	for c in careers:
+		people = []
+		cos = []
+		c.num_pos = len(c.positions.all())
+		for p in c.positions.all():
+			people.append(p.person.id)
+			cos.append(p.entity.id)
+		c.num_people = len(set(people))
+		c.num_cos = len(set(cos))
+
+	# careers = sorted(careers.iteritems(),key=lambda x:x[0], reverse=True)
+
+	return careers
 
 def _get_careers_brief_all(**filters):
 
@@ -780,13 +799,58 @@ def _get_careers_brief_in_network(user,**filters):
 
 	cxns = user.profile.connections.all().values('user__id').select_related('user')
 
-	users = []
+	users = [c['user__id'] for c in cxns]
 
-	for c in cxns:
-		users.append(c['user__id'])
+	# careers = Career.objects.filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk'),num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk')).order_by('-num_people').distinct()
+	# careers = Career.objects.prefetch_related('positions').filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk',num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk'))).order_by('-num_people').distinct()[:10]
+	careers_pos = Career.objects.filter(positions__person_id__in=users).values('id','short_name','long_name','positions__id')
+	careers_ppl = Career.objects.filter(positions__person_id__in=users).values('id','short_name','long_name','positions__person_id')
+	careers_orgs = Career.objects.filter(positions__person_id__in=users).values('id','short_name','long_name','positions__entity_id')
 
-	## Clay added one _ after person to make validate ##
-	careers = Career.objects.filter(positions__person__id__in=users).annotate(num_people=Count('positions__person__pk'),num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk')).distinct()
+	careers_dict = {}
+
+	for c in careers_pos:
+		if c['id'] in careers_dict and 'positions' in careers_dict[c['id']]:
+			careers_dict[c['id']]['positions'].append(c['positions__id'])
+		elif c['id'] in careers_dict:
+			careers_dict[c['id']]['positions'] = [c['positions_id']]
+		else:
+			careers_dict[c['id']] = {'positions':[c['positions__id']],'people':[],'orgs':[],'short_name':c['short_name'],'long_name':c['long_name']}
+
+	for c in careers_ppl:
+		if c['id'] in careers_dict and 'people' in careers_dict[c['id']]:
+			careers_dict[c['id']]['people'].append(c['positions__person_id'])
+		elif c['id'] in careers_dict:
+			careers_dict[c['id']]['people'] = [c['positions__person_id']]
+		else:
+			careers_dict[c['id']] = {'people':[c['positions__person_id']],'people':[],'orgs':[],'short_name':c['short_name'],'long_name':c['long_name']}
+
+	for c in careers_orgs:
+		if c['id'] in careers_dict and 'orgs' in careers_dict[c['id']]:
+			careers_dict[c['id']]['orgs'].append(c['positions__entity_id'])
+		elif c['id'] in careers_dict:
+			careers_dict[c['id']]['orgs'] = [c['positions__entity_id']]
+		else:
+			careers_dict[c['id']] = {'orgs':[c['positions__entity_id']],'people':[],'orgs':[],'short_name':c['short_name'],'long_name':c['long_name']}
+
+	for k,v in careers_dict.items():
+		v['num_pos'] = len(set(v['positions']))
+		v['num_people'] = len(set(v['people']))
+		v['num_cos'] = len(set(v['orgs']))
+
+	careers = sorted(careers_dict.iteritems(),key=lambda (k,v):v['num_people'],reverse=True)
+
+	# for c in careers:
+	# 	people = []
+	# 	cos = []
+	# 	c.num_pos = len(c.positions.all())
+	# 	for p in c.positions.all():
+	# 		people.append(p.person.id)
+	# 		cos.append(p.entity.id)
+	# 	c.num_people = len(set(people))
+	# 	c.num_cos = len(set(cos))
+
+	# careers = sorted(careers.iteritems(),key=lambda x:x[0], reverse=True)
 
 	return careers
 
@@ -795,8 +859,6 @@ def _get_careers_in_community(user,**filters):
 	"""
 	returns array of all careers in community, with out-of-network contacts anonymized
 	"""
-
-
 
 	# get all users
 	
@@ -873,6 +935,38 @@ def _get_careers_in_community(user,**filters):
 	# sorted_careers = sorted(careers_dict.iteritems(),key=lambda x: x[1]['order'],reverse=True)
 	return careers_dict, overview
 
+def _get_users_in_network(user,**filters):
+
+	# get schools from user
+	schools = Entity.objects.filter(li_type="school",positions__person=user,positions__type="education").distinct()
+	
+	# get all connected users and those from the same schools
+	
+	users = User.objects.select_related('profile','pictures').values('pk','positions__careers','profile__first_name','profile__last_name','profile__pictures__pic').filter(Q(profile__in=user.profile.connections.all()) | (Q(positions__entity__in=schools))).distinct()
+	# if filters['positions']:
+	# 	users = users.filter(positions__title__in=filters['positions'])
+	# if filters['locations']:
+	# 	users = users.filter(positions__entity__office__city__in=filters['locations'])
+	
+	users_list = [{'id':u['pk'],'first_name':u['profile__first_name'],'last_name':u['profile__last_name'],'profile_pic':u['profile__pictures__pic'],'careers':u['positions__careers']} for u in users]	
+	user_ids = [u['id'] for u in users_list]
+
+	return (users_list, user_ids)
+
+def _get_positions_in_network(user_ids,**filters):
+	
+	# fetch all positions in user's network
+	positions = Position.objects.select_related('entity','industries').values('pk','title','entity__name','careers').filter(person_id__in=user_ids).exclude(type="education").distinct()
+	# add positions filter
+	if filters['positions']:
+		positions = positions.filter(title__in=filters['positions'])
+	if filters['locations']:
+		positions = positions.filter(entity__office__city__in=filters['locations'])
+	# positions_list = [{'title':p.title,'org':p.entity.name,'industries':p.industries()} for p in positions]
+	positions_list = [{'id':p['pk'],'title':p['title'],'org':p['entity__name'],'careers':p['careers']} for p in positions]
+	positions_ids = [p['id'] for p in positions_list]
+
+	return positions_list,positions_ids
 
 def _get_careers_in_network(user,filters):
 	"""

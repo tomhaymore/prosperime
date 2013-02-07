@@ -1,0 +1,95 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/discover.css" />
+<script type="text/javascript" src="{{ STATIC_URL }}js/discover.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div id="content-container" class="main-container">
+	<p class="splash-header">Discover: <span class="splash-slug">{{career.name}}</span></p>
+	<p class="main-sub-header">{{career.description}}</p>
+
+
+
+	<div id="careers-container">
+			<div class="discover-nav-container">
+				<div class="pull-left discover-nav-selected"><a id="discover-paths-show-network" href="#career-network">Your Network</a></div>
+					
+				<div class="pull-left discover-nav-unselected"><a id="discover-paths-show-all" href="#career-community">Prosperime Community</a></div>
+				<div class="clear"></div>
+			</div>
+			<div class="discover-paths-network">
+				<div class="discover-paths-network-list pull-left">
+					<p class="main-header">Career Paths</p>
+					{% for p in paths.network %}
+						<div class="discover-path">
+							<div class="pull-left"><a href="/profile/{{p.id}}"><img class="logo-preview" src="/media/{{p.profile.default_profile_pic}}" /></a></div>
+							<div class="pull-left discover-path-name">
+								<p><a class="path-name" href="/profile/{{p.id}}">{{p.profile.full_name}}</a></p>
+								{% if p.profile.latest_position %}
+									<p class="path-position">{{p.profile.latest_position}}</p>
+								{% endif %}
+							</div>
+							<div class="clear"></div>
+						</div>
+						
+					{% endfor %}
+				</div>
+				<div class="discover-paths-network-overview pull-right">
+					<p class="main-header">Overview</p>
+					<ul class="career-overview-stats">
+						<li class="career-overview-stats-people"><span class="stats">{{overview.network.num_people}}</span> people</li>
+						<li class="career-overview-stats-positions"><span class="stats">{{overview.network.num_pos}}</span> positions</li>
+						<li class="career-overview-stats-orgs"><span class="stats">{{overview.network.num_cos}}</span> companies</li>
+					</ul>
+					<p class="main-header">Big Players</p>
+						{% if overview.network.bigplayers %}
+							<ul>
+							{% for b in overview.network.bigplayers %}
+								<li><a href="/profile/org/{{b.1.id}}">{{b.0}}</a></li>
+							{% endfor %}
+							</ul>
+						{% endif %}
+				</div>
+				<div class="clear"></div>
+			</div>
+			<div class="discover-paths-all" style="display:none;">
+				<div class="discover-paths-network-list pull-left">
+					<p class="main-header">Career Paths</p>
+					{% for p in paths.all %}
+						<div class="discover-path">
+							<div class="pull-left"><a href="/profile/{{p.id}}"><img class="logo-preview" src="/media/{{p.profile.default_profile_pic}}" /></a></div>
+							<div class="pull-left discover-path-name">
+								<p><a class="path-name" href="/profile/{{p.id}}">{{p.profile.full_name}}</a></p>
+								{% if p.profile.latest_position %}
+									<p class="path-position">{{p.profile.latest_position}}</p>
+								{% endif %}
+							</div>
+							<div class="clear"></div>
+						</div>
+					{% endfor %}
+				</div>
+				<div class="discover-paths-network-overview pull-left">
+					<p class="main-header">Overview</p>
+					<ul class="career-overview-stats">
+						<li class="career-overview-stats-people"><span class="stats">{{overview.all.num_people}}</span> people</li>
+						<li class="career-overview-stats-positions"><span class="stats">{{overview.all.num_pos}}</span> positions</li>
+						<li class="career-overview-stats-orgs"><span class="stats">{{overview.all.num_cos}}</span> ompanies</li>
+					</ul>
+					<p class="main-header">Big Players</p>
+						{% if overview.all.bigplayers %}
+							<ul>
+							{% for b in overview.all.bigplayers %}
+								<li><a href="/profile/org/{{b.1.id}}">{{b.0}}</a></li>
+							{% endfor %}
+							</ul>
+						{% endif %}
+				</div>
+				<div class="clear"></div>
+			</div>
+	</div>
+</div>
+{% endblock %}

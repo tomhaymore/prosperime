@@ -1,0 +1,84 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/discover.css" />
+<script type="text/javascript" src="{{ STATIC_URL }}js/discover.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div id="content-container" class="main-container">
+	<p class="splash-header">Discover</p>
+	<p class="main-sub-header">Discover career paths from other individuals in <span class="calllout-text">your network</span> or browse the whole <span class="callout-text">prosperime</span> community to see career paths of people <span class="callout-text">just like you</span>.</p>
+
+	<div id="careers-container">
+		<div class="discover-nav-container">
+			<div class="pull-left discover-nav-selected"><a id="discover-nav-network" href="#network">Your Network</a></div>
+			<div class="pull-left discover-nav-unselected"><a id="discover-nav-justlikeyou" href="#justlikeyou">Just Like You</a></div>
+			<div class="clear"></div>
+		</div>
+		<div class="discover-careers-container">
+			<div class="discover-careers-network">
+				<!-- header row -->
+				<div class="pull-left careers-header-row"></div>
+				<div class="pull-left careers-stats-container">
+					<ul class="careers-stats">
+						<li>people</li>
+						<li>positions</li>
+						<li>companies</li>
+					</ul>
+				</div>
+				<div class="clear"></div>
+				{% for c in careers.network %}
+					
+					<div class="pull-left careers-name-container">
+						<a href="career/{{c.0}}" class="careers-name">
+						{% if c.1.short_name %}
+							{{c.1.short_name}}
+						{% else %}
+							{{c.1.long_name}}
+						{% endif %}
+						</a>
+					</div>
+					<div class="pull-left careers-stats-container">
+						<ul class="careers-stats">
+							<li class="careers-stats-people"><div class="stats">{{c.1.num_people}}</div></li>
+							<li class="careers-stats-positions"><div class="stats">{{c.1.num_pos}}</div></li>
+							<li class="careers-stats-orgs"><div class="stats">{{c.1.num_cos}}</div></li>
+						</ul>
+					</div>
+					<div class="clear"></div>
+				{% endfor %}
+			</div>
+			<div class="discover-careers-justlikeyou" style="display:none;">
+				<!-- header row -->
+				<div class="pull-left careers-header-row"></div>
+				<div class="pull-left careers-stats-container">
+					<ul class="careers-stats">
+						<li>people</li>
+						<li>positions</li>
+						<li>companies</li>
+					</ul>
+				</div>
+				<div class="clear"></div>
+				{% for c in careers.similar %}
+					<div class="pull-left careers-name-container">
+						<a href="career/{{c.id}}" class="careers-name">{{c.name}}
+						</a>
+					</div>
+					<div class="pull-left careers-stats-container">
+						<ul class="careers-stats">
+							<li class="careers-stats-people"><div class="stats">{{c.num_people}}</div></li>
+							<li class="careers-stats-positions"><div class="stats">{{c.num_pos}}</div></li>
+							<li class="careers-stats-orgs"><div class="stats">{{c.num_cos}}</div></li>
+						</ul>
+					</div>
+					<div class="clear"></div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

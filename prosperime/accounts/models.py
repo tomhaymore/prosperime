@@ -93,6 +93,14 @@ class Profile(models.Model):
         pos = Position.objects.filter(person=self.user)
         return len(pos)
 
+    def latest_position(self):
+        positions = self.user.positions.all().order_by('-start_date').exclude(type="education")
+        if positions:
+            latest_position = positions[0]
+            return latest_position.safe_title() + " at " + latest_position.entity.name
+        else:
+            return None
+
     def _industries(self):
         all_domains = []
         positions = self.user.positions
