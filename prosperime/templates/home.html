@@ -2,70 +2,59 @@
 
 {% block head %}
 
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/discover.css" />
+<script type="text/javascript" src="{{ STATIC_URL }}js/discover.js"></script>
 {% endblock %}
-
-
 
 {% block content %}
 
-<div id="splash-home">
-	<div class="span10 offset1">
-		<p class="splash-message-header">Don't just work, prosper!</p>
-		<p class="splash-message-subheader">Prosperime helps you discover actual career paths from real people in your network.</p>
-		<p class="text-center"><a class="btn btn-success center" href="/account/authorize">Get started</a></p>
-		<p class="text-center splash-submessage"><a class="left-spacer center" href="account/login">Already registered?</a></p>
-		
+<div id="content-container" class="main-container">
+	<!-- <div class="pull-left">
+		<img src="/media/{{user.profile.default_profile_pic}}">
+	</div> -->
+	<div class="pull-left dashboard-header">
+		<p class="splash-header">Dashboard</p>
+		<ul class="module-list main-sub-header">
+			<li><a href="/profile/{{user.id}}">View profile</a></li>
+			<li><a href="discover">Discover careers</a></li>
+		</ul>
 	</div>
 	<div class="clear"></div>
-
+	<div class="dashboard-module pull-left" data-name="dashboard-careers">
+		<p class="module-header">My Careers</p>
+			{% if user_careers %}
+				<ul>
+				{% for c in user_careers %}
+					<li><a href="/discover/career/{{c.id}}">{{c.name}}</a></li>
+				{% endfor %}
+				</ul>
+			{% endif %}
+		<p class="sub-header"><a href="/discover">Discover more careers</a></p>
+	</div>
+	<div class="dashboard-module pull-left" data-name="dashboard-saved-paths">
+		<p class="module-header">Saved Paths</p>
+		{% if saved_paths %} 
+			<ul data-name="saved-paths-list">
+			{% for s in saved_paths %}
+				<li><a href="#">{{s.title}}</a> <span class="badge">{{s.positions|length}}</span></li>
+			{% endfor %}
+			</ul>
+		{% else %}
+			<p>You don't have any saved paths. <a href="#">Add one now</a>.</p>
+		{% endif %}
+	</div>
+	<div class="dashboard-module pull-left" data-name="dashboard-top-careers">
+		<p class="module-header">Top Careers in Network</p>
+		{% if top_careers %} 
+			<ul data-name="top-careers-list">
+			{% for c in top_careers %}
+				<li><a href="/discover/career/{{c.id}}">{{c.name}}</a></li>
+			{% endfor %}
+			</ul>
+		{% else %}
+			<p>Coming soon</p>
+		{% endif %}
+	</div>
+	<div class="clear"></div>
 </div>
 {% endblock %}
-
-{% block promo %}
-<div id="promo-message-container">
-	<div class="row-fluid">
-		<div class="span5">
-			<p class="promo-message-header">Discover career paths</p>
-			<p class="promo-message">Go beyond anecdotes and conjecture -- build off your own career based on what others have actually done before.</p>
-		</div>
-		<div class="span5 offset1">
-			<p class="promo-message-header">Evaluate yourself</p>
-			<p class="promo-message">Research, plan and compare multiple compare paths and see how your current education and jobs prepare you.</p>
-		</div>
-	</div>
-
-	<div class="row-fluid">
-		<div class="span5">
-			<p class="promo-message-header">Connect with mentors</p>
-			<p class="promo-message">Find people who have already faced the same challenges as you and connect with them to do better.</p>
-		</div>
-		<div class="span5 offset1">
-			<p class="promo-message-header">Pivot between industries and locations</p>
-			<p class="promo-message">Don't limit yourself to one industry or region, see how career paths cross thse boundaries</p>
-		</div>
-	</div>
-</div>
-{% endblock %}
-
-{% block templates %}
-
-{% endblock %}
-
-{% block footer %}
-
-<div class="container-fluid footer">
-	<div class="span10 offset1">
-		<ul class="footer-list pull-left flat">
-			<li>&copy; Prosperime</li>
-			
-		</ul>
-		<ul class="footer-list pull-right flat">
-			<li>Company</li>
-			<li>Contact</li>
-			<li>FAQ</li>
-		</ul>
-	</div>
-</div>
-
-{% endblock %}
-

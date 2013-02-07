@@ -21,13 +21,23 @@ from accounts.models import Picture, Profile
 from saved_paths.models import Saved_Path
 from entities.careerlib import CareerSimBase
 
-# @login_required
+@login_required
 def home(request):
+	data = {}
+	# return HttpResponseRedirect('welcome')
+	user = request.user
+
+	data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
+	data['saved_paths'] = Saved_Path.objects.filter(owner=user)
+	data['top_careers'] = []
+	
+	return render_to_response('home.html',data,context_instance=RequestContext(request))
+
+def welcome(request):
 	if request.user.is_authenticated():
 		# user is logged in, display personalized information
-		return HttpResponseRedirect('search')
-	data = {}
-	return render_to_response('home.html',data,context_instance=RequestContext(request)) ## Clay - change this
+		return HttpResponseRedirect('home')
+	return render_to_response('welcome.html',data,context_instance=RequestContext(request))
 
 @login_required
 def discover(request):
