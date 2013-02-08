@@ -29,7 +29,7 @@ class CareerSimBase():
 			else:
 				users_dict[u['id']] = {'positions':[{'type':u['positions__type'],'id':u['positions__entity__id']}]}
 		self.users = users_dict
-		print self.users
+		# print self.users
 
 	def load_maps(self):
 		"""
