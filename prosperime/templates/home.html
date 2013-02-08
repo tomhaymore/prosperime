@@ -16,7 +16,10 @@
 		<p class="splash-header">Dashboard</p>
 		<ul class="module-list main-sub-header">
 			<li><a href="/profile/{{user.id}}">View profile</a></li>
-			<li><a href="discover">Discover careers</a></li>
+			<li><a href="/discover">Discover careers</a></li>
+			{% if not user.profile.li_linked %}
+				<li><a href="/account/authorize">Authorize</a></li>
+			{% endif %}
 		</ul>
 	</div>
 	<div class="clear"></div>
