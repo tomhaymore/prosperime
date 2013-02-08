@@ -40,7 +40,7 @@ def welcome(request):
 	if request.user.is_authenticated():
 		# user is logged in, display personalized information
 		return HttpResponseRedirect('home')
-	return render_to_response('welcome.html',data,context_instance=RequestContext(request))
+	return render_to_response('welcome.html',context_instance=RequestContext(request))
 
 @login_required
 def discover(request):
@@ -64,6 +64,7 @@ def discover(request):
 
 	return render_to_response('entities/discover.html',{'data':data,'careers':careers},context_instance=RequestContext(request))
 
+@login_required
 def discover_career(request,career_id):
 
 	# get career object
@@ -87,7 +88,14 @@ def discover_career(request,career_id):
 
 	return render_to_response('entities/discover_career.html',{'career':career,'paths':paths_in_career,'overview':overview},context_instance=RequestContext(request))
 
+# view for org profiles
+def org_profile(request,org_id):
+	org = Entity.objects.get(pk=org_id)
+
+	return render_to_response('entities/org_profile.html',{'org':org},context_instance=RequestContext(request))
+
 # View for invidiual profiles
+@login_required
 def profile(request, user_id):
 
 	user = User.objects.get(id=user_id)
