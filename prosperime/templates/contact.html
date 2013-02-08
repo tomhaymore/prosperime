@@ -1,0 +1,34 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/discover.css" />
+<script type="text/javascript" src="{{ STATIC_URL }}js/discover.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div id="content-container" class="main-container">
+	<div class="pull-left dashboard-header">
+		<p class="splash-header">Contact Us</p>
+	</div>
+	<div class="clear"></div>
+
+	<div class="contact-module">
+		<p class="module-header">About</p>
+		<p class="contact-module-info">
+			Information about us!
+		</p>				
+	</div>
+	<br/><br/><br/>
+
+	<div class="contact-module">
+		<p class="module-header">Contact Info</p>
+		<p class="contact-module-info">
+			Clayton's SS#: 634-18-6609
+		</p>
+	</div>
+
+	<div class="clear"></div>
+</div>
+{% endblock %}

@@ -80,11 +80,25 @@ def remove(request):
 	try:
 		path = Saved_Path.objects.get(id=path_id)
 		position = Position.objects.get(id=pos_id)
+
 		saved_position = Saved_Position.objects.get(path=path, position=position)
+		deleted_pos_index = int(saved_position.index)
 		saved_position.delete()
 		response.update({'success': True})
+
 	except:
 		response.update({'success': False})
+
+
+	# now, must cascade index changes and update path.last_index
+	path.last_index = int(path.last_index) - 1
+	path.save()
+
+	positions_in_path = Saved_Position.objects.filter(path=path)
+	for pos in positions_in_path:
+		if int(pos.index) > deleted_pos_index:
+			pos.index = int(pos.index) - 1
+			pos.save()
 
 	return HttpResponse(simplejson.dumps(response))
 
@@ -185,34 +199,48 @@ def rearrange(request):
 	path_id = int(request.POST.get('path_id'))
 	
 	positions = Saved_Position.objects.filter(path=Saved_Path.objects.get(id=path_id))
-	print 'difference: ' + str(diff)
-	print 'before'
-	for p in positions:
-		print p.position.title + ' ' + str(p.index)
-
+	
+	# Position being moved 'up'
 	if diff > 0:
 		for p in positions:
-
 			if p.position.id == pos_id:
-				print 'match. old index = ' + str(p.index) + ' entered: ' + str(pos_index) + ' diff: ' + str(diff)
 				p.index = int(p.index) + diff
-				print 'new index = ' + str(p.index)
 				p.save()
 			elif int(p.index) > pos_index and int(p.index) <= (pos_index + diff):
 				p.index = int(p.index) - 1
 				p.save()
-				print 'in the middle range'
 
+	# Position being moved 'down'
 	else: 
 		for p in positions:
 			if p.position.id == pos_id:
-				p.index = p.index + diff
+				p.index = int(p.index) + diff
+				p.save()
+			elif int(p.index) < pos_index and int(p.index) >= (pos_index + diff):
+				p.index = int(p.index) + 1
+				p.save()
+
+	response.update({'success':True})
+	return HttpResponse(simplejson.dumps(response))
 
 
-	print 'after'
-	positions = Saved_Position.objects.filter(path=Saved_Path.objects.get(id=path_id))
-	for p in positions:
-		print p.position.title + ' ' + str(p.index)
+def prototype(request):
+
+	response = []
+
+	all_positions = Position.objects.all()[:100]
+	for p in all_positions:
+		formatted_pos = _ready_position_for_proto(p)
+		if formatted_pos:
+			response.append(formatted_pos)
+
+	return HttpResponse(simplejson.dumps(response))
+
+def prototype_data(request):
+
+	resonse = []
+	print request.GET.getlist('pos')
+
 
 
 	return HttpResponse(simplejson.dumps(response))
@@ -300,5 +328,24 @@ def _get_positions_for_path(saved_positions):
 		return formatted_positions
 	# if no positions, return None
 	return None
+
+
+# Note, this uses the old school Position object, not Saved_Position
+def _ready_position_for_proto(p):
+		
+	array = []
+	if not p.title:
+		return None
+
+	if p.type == 'education':
+		return None
+
+	attribs = {
+		'title':p.title,
+		'id':p.id,
+	}
+
+	array.append(attribs)
+	return array
 
 
