@@ -1,5 +1,5 @@
 {% extends "base_full.html" %}
-
+{% load cache %}
 {% block head %}
 
 <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/discover.css" />
@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-
+{% cache 600 content user.id career.id %}
 <div id="content-container" class="main-container">
 	<p class="splash-header">Discover: <span class="splash-slug">{{career.name}}</span></p>
 	<p class="main-sub-header">{{career.description}}</p>
@@ -92,4 +92,5 @@
 			</div>
 	</div>
 </div>
+{% endcache %}
 {% endblock %}
