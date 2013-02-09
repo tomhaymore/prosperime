@@ -157,6 +157,7 @@ INSTALLED_APPS = (
     'kombu.transport.django',
     'djcelery',
     'saved_paths',
+    'careers',
     # 'debug_toolbar'
     'south',
     'jsonify',
