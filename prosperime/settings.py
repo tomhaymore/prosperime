@@ -21,7 +21,7 @@ ADMINS = (
 MANAGERS = ADMINS
 
 # LI callback
-LI_CALLBACK = "http://obscure-dawn-2353.herokuapp.com/account/authenticate"
+LI_CALLBACK = "http://www.prosperime.com/account/authenticate"
 
 DATABASES = {
     'default': {
