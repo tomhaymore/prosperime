@@ -196,7 +196,9 @@ def finish_link(request):
 	# 	request.user.profile.headline = linkedin_user_info['headline']
 	# 	request.user.profile.save()
 
-	request.user.profile = Profile()
+	if not request.user.profile:
+		request.user.profile = Profile()
+	
 	request.user.profile.first_name = linkedin_user_info['firstName']
 	request.user.profile.last_name = linkedin_user_info['lastName']
 	request.user.profile.headline = linkedin_user_info['headline']
