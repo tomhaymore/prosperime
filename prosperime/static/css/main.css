@@ -18,6 +18,20 @@ div.main-container {
 	margin-top:15px;
 }
 
+div#main-container {
+	background-color:#fff;
+	padding:5px;
+	-webkit-box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow: 0 1px 10px rgba(0,0,0,0.1);
+	box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+	margin-top:15px;
+	height:100%;
+}
+
+div.full-height {
+	height:1000px;
+}
+
 div.navbar-inner {
 	background-color: #fff;
 	background-image: none;
@@ -720,6 +734,8 @@ ul.flat li {
 	border-radius:4px;
 	margin-top:50px;
 	margin-bottom:50px;
+	margin-left: 0px auto;
+	margin-right: 0px auto;
 }
 
 .timeline tr {
@@ -914,6 +930,15 @@ ul.flat li {
 }
 
 /*PROFILE PAGE*/
+.header-container {
+	border-bottom: solid 1px rgb(41,98,152);
+	padding:16px;
+}
+
+#profile-center {
+	padding-left:12px;
+}
+
 .page-header {
 	padding:16px;
 	width:100%;
@@ -921,13 +946,19 @@ ul.flat li {
 }
 
 .page-header-title {
-	font-weight:bold;
-	font-size:33px;
+	font-size: 1.5em;
+	font-weight: 500;
 	padding:8px;
+	padding-top:4px;
+}
+
+.pad-down {
+	margin-top:24px;
 }
 
 .page-header-subtitle {
-	padding:8px;
+	padding-left:8px;
+	font-weight:500;
 }
 
 #middle-column {
@@ -935,18 +966,31 @@ ul.flat li {
 }
 
 .blue {
-	color:midnightblue;
+	color: rgb(41,98,152);
 }
 
-.profile-right-sidebar {
-	margin-top:135px;
+div .timeline-container {
+	padding-left:0px;
+	margin-left:0px;
+	margin-top:0px;
 }
+
+div.content-container{
+	width:1000px;
+	margin-right:auto;
+	margin-left:auto;
+	margin-top:15px;
+}
+
+#profile-right {
+	margin-top:24px;
+}
+
 
 #middle-float-screen {
 	border-radius:4px;
 	padding-right:0px;
 	padding-left:12px;
-	margin-top:25px;
 	margin-left:0px;
 }
 
@@ -995,3 +1039,10 @@ p.splash-header {
 	color: rgb(41,98,152);
 	font-weight: 500;
 }
+
+.link-to-all-paths {
+	font-weight:bold;
+}
+
+/* Contact Page */
+

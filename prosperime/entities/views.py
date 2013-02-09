@@ -1,5 +1,4 @@
 # from Python
-
 import datetime
 import math
 
@@ -15,6 +14,7 @@ from django.db.models import Count, Q
 from django.utils import simplejson
 from django.contrib import messages
 from django.core.cache import cache
+
 
 # Prosperime
 from entities.models import Entity, Office, Financing, Industry, Position, Career
@@ -34,7 +34,16 @@ def home(request):
 	data['saved_paths'] = Saved_Path.objects.filter(owner=user)
 	data['top_careers'] = []
 
+	data['saved_paths'] = Saved_Path.objects.filter(owner=request.user)
+
 	return render_to_response('home.html',data,context_instance=RequestContext(request))
+
+def contact(request):
+
+	data = {}
+
+	return render_to_response('contact.html', data, context_instance=RequestContext(request))
+
 
 def welcome(request):
 	if request.user.is_authenticated():
@@ -109,6 +118,9 @@ def profile(request, user_id):
 	ed_list = []
 	org_list = []
 
+	# declare vars before in case no positions
+	current = None
+
 	for pos in positions:
 		pos.duration = pos.duration_in_months()
 
@@ -138,7 +150,6 @@ def profile(request, user_id):
 			pos.co_name = pos.entity.name
 
 		pos.domain=domain
-		current = None
 
 		# Process education positions
 		if pos.type == 'education' or pos.title == 'Student':

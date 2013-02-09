@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_full.html" %}
 
 {% block head %}
 <!-- Head -->
@@ -6,71 +6,58 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/drag_and_drop.js"></script>
 {% endblock %}
 
-<!-- Messages -->
-{% block message %}
-	{% if messages %}
-		<ul class="messages">
-    	{% for message in messages %}
-    		<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    	{% endfor %}
-		</ul>
-	{% endif %}
-{% endblock %}
-
-
-<!-- Left Sidebar -->
-{% block sidebar %}
-{% endblock %}
-
 
 
 <!-- Content -->
 {% block content %}
 
-<div class="page-header">
-	<div class="page-header-title">
-		<span class="blue">Profile: </span>{{profile.first_name}} {{profile.last_name}}
-	</div>
 
-	<div class="page-header-subtitle">
-		{{profile.headline}}
+<!-- Header -->
+<div class="main-container content-container full-height">
+
+<div class="content-container">
+	<div id="profile-center">
+		<div class="header-container">
+			<p class="page-header-title">
+				<span class="blue">Profile:</span>
+				{{profile.first_name}} {{profile.last_name}}
+			<p>
+			<p class="page-header-subtitle">
+				{{profile.headline}} (careers info will go here)
+			</p>
+		</div>
 	</div>
 </div>
 
-<!-- LEFT -->
-<div id="search-filters-container" class="pull-left">
-	<!-- dynamically populated search filters -->
-</div>
+<!-- Center --> 
+<div class="content-container">
+	<div id="profile-center" class="span9">
 
-
-<!-- CENTER -->
-<div id="profile-center" class="pull-left span6">
-	<div class="left-list-preview">
-		{% if profile_pic %}
-			<div class="profile-img-holder pull-left">
-				<img class="logo-preview" src="/media/{{profile_pic}}" />&nbsp;
+		<div class="pull-left span6 pad-down">
+			<div class="left-list-preview">
+				{% if profile_pic %}
+					<div class="profile-img-holder pull-left">
+						<img class="logo-preview" src="/media/{{profile_pic}}" />&nbsp;
+					</div>
+				{% endif %}
 			</div>
-		{% endif %}
-	</div>
 
-	<div class="right-list-preview pull-left">
-		<p class="path-name"><a class="path-name-link">{{profile.first_name}} {{profile.last_name}}</a></p>
-		<p class="path-current-position">
-			{% if current %}
-				{{current.title}}
-			{% else %}
-				{{profile.headline}}
-			{% endif %}
-		</p>
-	</div>
+			<div class="right-list-preview pull-left">
+				<p class="path-name">
+					{{profile.first_name}} {{profile.last_name}}</p>
+				<p class="path-current-position">
+					{% if current %}
+						{{current.title}}
+					{% else %}
+						{{profile.headline}}
+					{% endif %}
+				</p>
+			</div>
 	
-	<div class="clearfix"></div>
+		<div class="clearfix"></div>
 	
-	<div class="path-viz" ondragover='allowDrop(event)'>
+		<div class="path-viz" ondragover='allowDrop(event)'>
 		<div class="path-viz-short">
-
-			<!-- // A little bit of voodoo in viz.js...
-					org_list = prepare_for_timeline(org_list) -->
 
 			<!-- Education  -->
 			{% if ed|length > 0 %}
@@ -121,68 +108,66 @@
 				</table>
 				</div>
 			{% endif %}
-		</div>			
+			</div>			
+		</div>
 	</div>
-</div>
 
-<!-- Float Screen -->
-<div id="middle-float-screen" class="span6 profile-right-sidebar pull-right" ondragover='allowDrop(event)'>
-	<a>For more information, hover over a position!</a>
-</div>
+	<!-- Float Screen -->
+	<div id="middle-float-screen" class="span6 pull-left pad-down" ondragover='allowDrop(event)'>
+		<a>For more information, hover over a position!</a>
+	</div>
 
-<!-- TIMELINE. DON'T. TOUCH. IT. -->
-{% if orgs|length > 0 %}
-<div class="span12">
-	<table class="timeline">
-		<!-- Row per Position -->
-		{% for p in orgs %}
-			<tr class="timeline-row">
-				{% load months_difference rangify subtract divide %}
 
-				{% if compress %}
-					{% for i in start_date|months_difference:start_date|divide:2|rangify %}
-						<td class="timeline-col"></td>
-					{% endfor %}
-				{% else %}
-					{% for i in p.start_date|months_difference:start_date|rangify %}
-						<td class="timeline-col"></td>
-					{% endfor %}
-				{% endif %}
+	<!-- TIMELINE. DON'T. TOUCH. IT. -->
+	{% if orgs|length > 0 %}
+	<div class="timeline-container span12">
+		<table class="timeline">
+			<!-- Row per Position -->
+			{% for p in orgs %}
+				<tr class="timeline-row">
+					{% load months_difference rangify subtract divide %}
 
-				<!-- Highlighted Segment -->
-				<td class="timeline-col-highlighted" colspan="{{p.duration}}">{{p.co_name}}</td>
+					{% if compress %}
+						{% for i in start_date|months_difference:start_date|divide:2|rangify %}
+							<td class="timeline-col"></td>
+						{% endfor %}
+					{% else %}
+						{% for i in p.start_date|months_difference:start_date|rangify %}
+							<td class="timeline-col"></td>
+						{% endfor %}
+					{% endif %}
 
-				{% if compress %}
-					{% for i in end_date|months_difference:p.end_date|divide:2|rangify %}
-						<td class="timeline-col"></td>
-					{% endfor %}
-				{% else %}
-					{% for i in end_date|months_difference:p.end_date|rangify %}
-						<td class="timeline-col"></td>
-					{% endfor %}
-				{% endif %}
+					<!-- Highlighted Segment -->
+					<td class="timeline-col-highlighted" colspan="{{p.duration}}">{{p.co_name}}</td>
+
+					{% if compress %}
+						{% for i in end_date|months_difference:p.end_date|divide:2|rangify %}
+							<td class="timeline-col"></td>
+						{% endfor %}
+					{% else %}
+						{% for i in end_date|months_difference:p.end_date|rangify %}
+							<td class="timeline-col"></td>
+						{% endfor %}
+					{% endif %}
+				</tr>
+			{% endfor %}
+
+			<!-- Bottom Row -->
+			<tr class="timeline-row-bottom">
+				<td class="timeline-col-start" colspan="{% widthratio total_time 2 1 %}">
+					{{start_date.month}}/{{start_date.year}}
+				</td>
+				<td class="timeline-col-end" colspan="{% widthratio total_time 2 1 %}">
+					Present
+				</td>
 			</tr>
-		{% endfor %}
-
-		<!-- Bottom Row -->
-		<tr class="timeline-row-bottom">
-			<td class="timeline-col-start" colspan="{% widthratio total_time 2 1 %}">
-				{{start_date.month}}/{{start_date.year}}
-			</td>
-			<td class="timeline-col-end" colspan="{% widthratio total_time 2 1 %}">
-				Present
-			</td>
-		</tr>
-	</table>	
+		</table>	
+	</div>
+	{% endif %}
 </div>
-{% endif %}
-{% endblock %}
-
-
-{% block rightSidebar %}
 
 <!-- Right Sidebar -->
-<div id="search-right-sidebar" class="pull-right profile-right-sidebar">
+<div id="profile-right" class="span3 pad-down pull-right">
 	<div class="rounded">
 		{% if user %}
 			<p class="sidebar-header">Want to see improvements?</p>
@@ -221,11 +206,12 @@
 					<td ondragover='allowDrop(event)' ondrop='dropPosition(event, "{{saved_path.title|escape}}", this)'><a href="/saved_paths/#id/?id={{saved_path.id}}">{{saved_path.title}}</a></td>
 					</tr>
 			{% endfor %}
-			</table>
-		
+			</table>	
 	</div>
 </div>
 
+</div>
+</div> <!-- Final Div --> 	
 <script type="text/javascript">
 
 
@@ -289,10 +275,4 @@
 
 {% endblock %}
 
-
-{% block templates %}
-
-
-
-{% endblock %}
 

@@ -1,13 +1,17 @@
-{% extends "base.html" %}
+{% extends "base_full.html" %}
 
 {% block head %}
 
 <script type="text/javascript" src="{{ STATIC_URL }}js/saved_paths.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/drag_and_drop.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/backbone.js"></script>
+
+
+<!-- 
+	This business taken from Django docs, adds CSRF header to Ajax
+	 requests automatically. Needed when making POST requests from Backbone
+-->
 <script type="text/javascript">
-
-	
-
 // using jQuery
 function getCookie(name) {
     var cookieValue = null;
@@ -43,86 +47,69 @@ $.ajaxSetup({
 
 {% endblock %}
 
-<!-- Messages -->
-{% block message %}
-	{% if messages %}
-	<ul class="messages">
-    	{% for message in messages %}
-    		<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    	{% endfor %}
-	</ul>
-	{% endif %}
-{% endblock %}
 
 
-<!-- Left Sidebar -->
-{% block sidebar %} 
-
-{% endblock %}
 
 
 <!-- Content -->
 {% block content %}
 
-<div class="page-header">
-	<div class="page-header-title">
-		<span id="path-header"></span>
-	</div>
+<!-- Header -->
+<div class="content-container main-container full-height">
 
-	<div class="page-header-subtitle">
-		Paths Tags{{profile.headline}}
-	</div>
-</div>	
-<!-- BACKBONE JUMPS IN HERE -->
-<div id="saved-paths-list"></div>
-{% endblock %}
+<div class="content-container">
+	<div class="header-container">
+		<div class="page-header-title">
+			<span id="path-header"></span>
+		</div>
 
-
-<!-- Right Sidebar -->
-{% block rightSidebar %}
-<div id="search-right-sidebar" class="profile-right-sidebar">
-	<div class="rounded">
-		{% if user %}
-			<p class="sidebar-header">Want to see improvements?</p>
-			<p>We'd love to hear from you -- <a href="mailto:feedback@prosperime.com">please drop us a line</a></p>	
-		{% else %}
-			<!-- CLAY: ?? -->
-			<p class="sidebar-header">Want to see full career paths?</p>
-			<p>Drag and drop any company you'd like to keep track of here.</p>
-		{% endif %}
-	</div>
-
-	<div class="rounded">
-		<p class="sidebar-header">Your Saved Career Paths</p>
-		
-		{% if saved_paths %}
-			<table class="table table-striped table-condensed table-bordered path-list" id='sidebar-path-list'>			
-				{% for saved_path in saved_paths %}
-					{% if forloop.last %}
-						<tr class="saved-path-list-last">
-					{% else %}
-						<tr>
-					{% endif %}
-						<td ondragover='allowDrop(event)' ondrop='dropPosition(event, "{{saved_path.title}}", this)'><a href="/saved_paths/#id/?id={{saved_path.id}}">{{saved_path.title}}</a></td>
-					</tr>
-			{% endfor %}
-			</table>
-		{% else %}
-			<p>You haven't saved any career paths yet. Start one <a href="/saved_paths/create/">here.</a></p>
-		{% endif %}
+		<div class="page-header-subtitle">
+			Paths Tags{{profile.headline}}
+		</div>
 	</div>
 </div>
 
-
-<!-- Authenticate-->
-{% if not user.profile.li_linked %}
-	{{ user.li_linked }}
-	<div class="rounded">
-		<a class="btn btn-primary left-spacer" href="/account/authorize">Authorize</a>
+<div class="content-container">
+	<div class="span9">
+		<!-- BACKBONE JUMPS IN HERE -->
+		<div id="saved-paths-list"></div>
 	</div>
-{% endif %}
 
+
+	<div class="span3">
+
+		<!-- Right Sidebar -->
+		<div id="search-right-sidebar" class="profile-right-sidebar">
+			<div class="rounded">
+				<p class="sidebar-header">Want to see improvements?</p>
+				<p>We'd love to hear from you -- <a href="mailto:feedback@prosperime.com">please drop us a line</a></p>	
+				
+			</div>
+
+			<div class="rounded">
+				<p class="sidebar-header">Your Saved Career Paths</p>
+		
+				{% if saved_paths %}
+					<table class="table table-striped table-condensed table-bordered path-list" id='sidebar-path-list'>
+						{% for saved_path in saved_paths %}
+							{% if forloop.last %}
+								<tr class="saved-path-list-last">
+							{% else %}
+								<tr>
+							{% endif %}
+							<td ondragover='allowDrop(event)' ondrop='dropPosition(event, "{{saved_path.title}}", this)'><a href="/saved_paths/#id/?id={{saved_path.id}}">{{saved_path.title}}</a></td>
+							</tr>
+						{% endfor %}
+					</table>
+				{% else %}
+				<p>You haven't saved any career paths yet. Start one <a href="/saved_paths/create/">here.</a></p>
+			{% endif %}
+		</div>
+	</div>
+</div>
+</div>
 {% endblock %}
+
 
 {% block templates %}
 <script type="text/template" id="saved-path-list-template">
@@ -147,13 +134,15 @@ $.ajaxSetup({
 	
 	<div class="saved-path-timeline">
 		<div id="end">GOAL</div>
-		<!-- Decreasing by index, current pos @ bottom, goal @ top -->
+
 		<% 
+		<!-- Sort positions by index -->
 		positions = _.sortBy(positions, function(pos) {
-			return pos.index
+			return pos.index * -1;
 		});
 
-		for (var i = positions.length - 1; i >= 0; i--) {
+		for (var i = 0; i < positions.length; i++) {
+
 			%>
 			<div class="up-arrow" ondragover="highlight(event, this)" ondrop='dropPosition(event, <%=positions[i].index%>, <%=id%>)'>
 				<img  draggable="false" src="/static/img/up-arrow.png"/>
@@ -163,7 +152,8 @@ $.ajaxSetup({
 
 				<i class="icon-remove-circle hide" title="Remove this position"></i>  
 
-				<%= positions[i].title %> at <%= positions[i].co_name%>  
+				<%= positions[i].title %> at <%= positions[i].co_name%>
+				 || <%=positions[i].index%>  
 			</div>
 			
 			<%
@@ -193,6 +183,17 @@ $.ajaxSetup({
 		</div>
 	-->
 	</div>
+</script>
+
+<script type="text/template" id="proto-single-template">
+	<h1>here</h1>
+</script>
+
+<script type="text/template" id="proto-template">
+	
+	<select id="proto-fill"> </select>
+
+
 </script>
 
 <!-- Auxilary Functions Go Here -->
@@ -229,12 +230,15 @@ $.ajaxSetup({
 	// AJAX POST
 	var changePositionOrder = function(difference, position_id, pos_index, path_id) {
 		$.post('/saved_paths/rearrange/', {difference: difference, pos_id:position_id, pos_index:pos_index, path_id:path_id}, function(response) {
-				console.log('response!')
-
+				console.log(response)
+				console.log(window.savedPaths.fetch())
+				
 		});
 
 
 	};
 </script>
+
+
 
 {% endblock %}

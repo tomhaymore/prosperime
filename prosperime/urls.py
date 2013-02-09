@@ -38,6 +38,8 @@ urlpatterns = patterns('',
     url(r'^saved_paths/create/$', 'saved_paths.views.create'),
     url(r'^saved_paths/remove/$', 'saved_paths.views.remove'),
     url(r'^saved_paths/(.+)', 'saved_paths.views.all_paths'),
+    url(r'^contact/$', 'entities.views.contact'),
+    url(r'^prototype/$', 'saved_paths.views.prototype'),
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     # url(r'^prosperime/', include('prosperime.foo.urls')),
 
