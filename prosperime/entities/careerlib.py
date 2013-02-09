@@ -226,7 +226,22 @@ class CareerMapBase():
 
 class CareerImportBase():
 
-	def import_careers(self,path):
+	def import_careers_from_file(self,path):
+
+		f = open(path,'rU')
+		c = csv.DictReader(f)
+		for row in c:
+			career = Career()
+			career.short_name = row['short_name']
+			career.long_name = row['long_name']
+			career.save()
+			if row['titles'] is not None and row['titles'] is not "":
+				new_titles = row['titles'].split(',')
+				for t in new_titles:
+					career.add_pos_title(t)
+			career.save()
+
+	def import_careers_from_url(self,path):
 
 		data = urllib2.urlopen(path).read()
 		c = csv.DictReader([data])
@@ -241,6 +256,8 @@ class CareerImportBase():
 					career.add_pos_title(t)
 			career.save()
 
+class CareerExportBase():
+
 	def export_careers(self):
 
 		file_name = 'careers_' + datetime.now().strftime('%Y%m%d%H%M') + '.csv'
@@ -248,9 +265,17 @@ class CareerImportBase():
 		f = open(file_name,'w')
 		c = csv.DictWriter(f,fieldnames=fieldnames)
 		careers = Career.objects.all()
+		c.writerow(fieldnames)
 		for career in careers:
 			c.writerow({'short_name':career.short_name,'long_name':career.long_name,'titles':career.get_pos_titles()})
 		f.close()
+
+	def export_careers_to_screen(self):
+
+		careers = Career.objects.values_list('id','short_name','long_name','soc_code','census_code','description','parent','pos_titles').all()
+
+		stdout.write(list(careers))
+
 
 
 
