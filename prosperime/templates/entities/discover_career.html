@@ -1,5 +1,5 @@
 {% extends "base_full.html" %}
-
+{% load cache %}
 {% block head %}
 
 <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/discover.css" />
@@ -7,9 +7,9 @@
 {% endblock %}
 
 {% block content %}
-
+{% cache 600 content user.id career.id %}
 <div id="content-container" class="main-container">
-	<p class="splash-header">Discover: <span class="splash-slug">{{career.name}}</span></p>
+	<p class="main-header">Discover: <span class="splash-slug">{{career.name}}</span></p>
 	<p class="main-sub-header">{{career.description}}</p>
 
 
@@ -77,7 +77,7 @@
 					<ul class="career-overview-stats">
 						<li class="career-overview-stats-people"><span class="stats">{{overview.all.num_people}}</span> people</li>
 						<li class="career-overview-stats-positions"><span class="stats">{{overview.all.num_pos}}</span> positions</li>
-						<li class="career-overview-stats-orgs"><span class="stats">{{overview.all.num_cos}}</span> ompanies</li>
+						<li class="career-overview-stats-orgs"><span class="stats">{{overview.all.num_cos}}</span> companies</li>
 					</ul>
 					<p class="main-header">Big Players</p>
 						{% if overview.all.bigplayers %}
@@ -92,4 +92,5 @@
 			</div>
 	</div>
 </div>
+{% endcache %}
 {% endblock %}

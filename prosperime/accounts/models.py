@@ -112,6 +112,8 @@ class Profile(models.Model):
     def default_profile_pic(self):
         if self.pictures.all():
             return self.pictures.all()[0].pic
+        else:
+            return "pictures/anon.jpg"
 
     # domains = property(_industries)
     

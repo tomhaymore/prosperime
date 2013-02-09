@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 from django.db.models import Count, Q
 from django.utils import simplejson
 from django.contrib import messages
+from django.core.cache import cache
 
 
 # Prosperime
@@ -30,7 +31,7 @@ def home(request):
 	user = request.user
 
 	data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
-	# data['saved_paths'] = Saved_Path.objects.filter(owner=user)
+	data['saved_paths'] = Saved_Path.objects.filter(owner=user)
 	data['top_careers'] = []
 
 	data['saved_paths'] = Saved_Path.objects.filter(owner=request.user)
@@ -48,14 +49,14 @@ def welcome(request):
 	if request.user.is_authenticated():
 		# user is logged in, display personalized information
 		return HttpResponseRedirect('home')
-	return render_to_response('welcome.html',data,context_instance=RequestContext(request))
+	return render_to_response('welcome.html',context_instance=RequestContext(request))
 
 @login_required
 def discover(request):
 
 	# data array for passing to template
 	data = {}
-	print request.user.id
+	# print request.user.id
 	if 'tasks' in request.session:
 		data = {
 			'profile_task_id':request.session['tasks']['profile'],
@@ -72,16 +73,38 @@ def discover(request):
 
 	return render_to_response('entities/discover.html',{'data':data,'careers':careers},context_instance=RequestContext(request))
 
+@login_required
 def discover_career(request,career_id):
 
 	# get career object
 	career = Career.objects.get(pk=career_id)
+	
+	paths_in_career = {}
+	overview = {}
 
-	paths_in_career, overview = _get_paths_in_career(request.user,career)
+	# set cache
+	
+	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+	if paths is None:
+		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),_get_paths_in_career(request.user,career),600)
+		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+
+	paths_in_career['network'] = paths['network']
+	paths_in_career['all'] = paths['all']
+
+	overview['network'] = paths['overview']['network']
+	overview['all'] = paths['overview']['all']
 
 	return render_to_response('entities/discover_career.html',{'career':career,'paths':paths_in_career,'overview':overview},context_instance=RequestContext(request))
 
+# view for org profiles
+def org_profile(request,org_id):
+	org = Entity.objects.get(pk=org_id)
+
+	return render_to_response('entities/org_profile.html',{'org':org},context_instance=RequestContext(request))
+
 # View for invidiual profiles
+@login_required
 def profile(request, user_id):
 
 	user = User.objects.get(id=user_id)
@@ -188,8 +211,11 @@ def _get_paths_in_career(user,career):
 	# get users in network
 	users_list, user_ids = _get_users_in_network(user)
 
-	network_people = User.objects.select_related('positions').filter(id__in=user_ids,positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos')
+	network_people = User.objects.prefetch_related().select_related('positions','entities','accounts').filter(id__in=user_ids,positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos')
+	# CAUTION--values() can return multiple records when requesting M2M values; make sure to reduce
+	# network_people = User.objects.values('id','profile__headline','profile__first_name','profile__last_name','profile__pictures__pic','positions__entity__id','positions__entity__name').annotate(no_of_pos=Count('positions__id')).order_by('-no_of_pos')
 
+	network_people_dict = {}
 	num_pos = 0
 	entities = []
 	entities_dict = {}
@@ -206,6 +232,28 @@ def _get_paths_in_career(user,career):
 					'count' : 1,
 					'id':pos.entity.id
 				}
+
+	# for p in network_people:
+	# 	# check to see if user is already in the dict
+	# 	if p['id'] not in network_people_dict:
+	# 		network_people_dict[p['id']] = {
+	# 			'full_name': p['profile__first_name'] + " " + p['profile__last_name'],
+	# 			'headline': p['profile__headline']
+	# 		}
+	# 	# check each record to make sure the profile pic gets picked up
+	# 	if 'profile__pictures__pic' in p:
+	# 		network_people_dict[p['id']]['pic'] = p['profile__pictures__pic']
+	# 	if 'positions__entity__id' in p:
+	# 	# increment the position counter
+	# 		num_pos += 1
+	# 		if p['positions__entity__name'] in entities_dict:
+	# 			entities_dict[p['positions__entity__name']]['count'] += 1
+	# 		else:
+	# 			entities_dict[p['positions__entity__name']] = {
+	# 				'count':1,
+	# 				'id':p['positions__entity__name']
+	# 			}
+
 
 	num_cos = len(set(entities))
 
@@ -243,7 +291,7 @@ def _get_paths_in_career(user,career):
 	num_cos = len(set(entities))
 
 	overview['all'] = {
-		'num_people':len(network_people),
+		'num_people':len(all_people),
 		'num_pos':num_pos,
 		'num_cos':num_cos
 	}
@@ -260,7 +308,14 @@ def _get_paths_in_career(user,career):
 
 	paths['all'] = all_people
 
-	return paths, overview
+
+	paths['overview'] = {
+		'network' : overview['network'],
+		'all':overview['all']
+		}
+
+	# return paths, overview
+	return paths
 
 def search(request):
 	

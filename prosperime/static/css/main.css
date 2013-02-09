@@ -58,6 +58,7 @@ div.footer {
 	padding-top:10px;
 }
 
+
 /* Home page */
 
 div#splash-home {
@@ -203,6 +204,9 @@ img.logo-preview {
 .main-header {
 	font-weight: bold;
 	font-size:1.2em;
+	font-size: 1.5em;
+	color: rgb(41,98,152);
+	font-weight: 500;
 }
 
 .sub-header {
@@ -1013,8 +1017,9 @@ div.content-container{
 #middle-float-screen {
 	border-radius:4px;
 	padding-right:0px;
-	padding-left:12px;
-	margin-left:0px;
+	padding-left:25px;
+	margin-left:15px;
+	font-size:0.9em;
 }
 
 .box-header {
@@ -1057,12 +1062,27 @@ div.content-container{
 	margin-bottom: 10px;
 }
 
+p.splash-header {
+	font-size: 1.5em;
+	color: rgb(41,98,152);
+	font-weight: 500;
+}
+
 .link-to-all-paths {
 	font-weight:bold;
 }
 
+.saved-paths-nav-container {
+	border-bottom: solid 1px rgb(41,98,152);
+	padding-bottom: 0px;
+}
+
+.saved-paths-container {
+	margin-top:10px;
+}
+
+.saved-paths-right-sidebar {
+	width: 240px;
+}
 /* Contact Page */
-
-
-
 

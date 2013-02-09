@@ -1,0 +1,16 @@
+div.profile-nav-container {
+	border-bottom: solid 1px rgb(41,98,152);
+	padding-bottom: 0px;
+}
+
+div.profile-info-top {
+	margin-top:10px;
+}
+
+div.profile-img-holder {
+	margin-left:15px;
+}
+
+div.profile-brief-info {
+	margin-left: 15px
+}
