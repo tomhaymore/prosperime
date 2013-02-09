@@ -24,8 +24,8 @@
 						<!-- <a class="brand" href="/">Prosperime</a> -->
 						<a href="/"><img class="main-logo" src="{{STATIC_URL}}img/logo_1.png" /></a>
 					</div>
-					<div class="span5 offset2 nav-collapse pull-right">
-						<ul class="nav">
+					<div class="span4 offset2 nav-collapse pull-right">
+						<ul class="nav pull-right">
 							<!-- <li>
 								<a href="/">Home</a>
 							</li> -->
@@ -46,7 +46,19 @@
 			</div>
 		</div>
         
-	
+	 <div class="offset1 span10">
+	  			{% block message %} 
+					
+					{% if messages %}
+					<ul class="messages">
+					    {% for message in messages %}
+					    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+					    {% endfor %}
+					</ul>
+					{% endif %}
+
+	  			{% endblock %}
+	  		</div>
    
     <div class="container-fluid splash-container">
         
