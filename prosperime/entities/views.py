@@ -98,6 +98,7 @@ def discover_career(request,career_id):
 	return render_to_response('entities/discover_career.html',{'career':career,'paths':paths_in_career,'overview':overview},context_instance=RequestContext(request))
 
 # view for org profiles
+@login_required
 def org_profile(request,org_id):
 	org = Entity.objects.get(pk=org_id)
 
