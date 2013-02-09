@@ -221,5 +221,21 @@ class CareerMapBase():
 								career = Career.objects.get(pk=k)
 								print t + ": " + career.name
 
+class CareerImportBase():
+
+	def map_titles_to_careers(self,file_path):
+
+		f = open(file_path,'rU')
+		c = csv.DictReader(f)
+		for row in c:
+			career = Career()
+			career.short_name = row['name']
+			career.long_name = row['name']
+			career.save()
+			if row['titles'] is not None and row['titles'] is not "":
+				new_titles = row['titles'].split(',')
+				for t in new_titles:
+					career.add_pos_title(t)
+			career.save()
 
 
