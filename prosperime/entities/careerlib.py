@@ -232,8 +232,8 @@ class CareerImportBase():
 		c = csv.DictReader([data])
 		for row in c:
 			career = Career()
-			career.short_name = row['name']
-			career.long_name = row['name']
+			career.short_name = row['short_name']
+			career.long_name = row['long_name']
 			career.save()
 			if row['titles'] is not None and row['titles'] is not "":
 				new_titles = row['titles'].split(',')
