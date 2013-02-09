@@ -47,21 +47,12 @@ $(function(){
 	window.PositionDataCollection = Backbone.Collection.extend({
 		model: PositionData,
 
-		url: function() {
-			return '/prototype/';
-		},
-
-	});
-
-	window.PositionData2 = Backbone.Collection.extend({
-		model: PositionData,
-
 		initialize: function() {
 			this._meta = {}
 		},
 
 		url: function() {
-			return '/prototype_data' + this.meta['query']
+			return '/prototype/' + this._meta['query']
 		},
 
 		meta: function(prop, value) {
@@ -73,15 +64,11 @@ $(function(){
 				this._meta[prop] = value;
 			}
 		},
-
-
-	})
-
+	});
 
 	// Instantiate Collections
 	window.savedPaths = new SavedPaths;
-	window.proto = new PositionDataCollection;
-	window.pdata = new PositionData2;
+	window.positionData = new PositionDataCollection;
 
 	//-------------//
 	// ** Views ** //
@@ -139,6 +126,20 @@ $(function(){
 			$(ev.target).children().each(function() {
 				$(this).css('visibility', 'inherit')
 			});
+			var elemId = $(ev.target).attr('id')
+			var index = elemId.split('-')[0].split(':')[1]
+			var infoId = 'description-' + elemId
+
+			// Clear other meta
+			$('.saved-path-timeline-info-item').each(function() {
+				if (!$(this).hasClass('hide')) {
+					$(this).toggleClass('hide')
+				}
+			});
+
+			// don't know why, but jquery won't grab this
+			var info_item = document.getElementById(infoId)
+			$(info_item).toggleClass('hide')
 		},
 
 		hoverOut: function(ev) {
@@ -249,8 +250,6 @@ $(function(){
 
 	});
 
-
-
 	// Thumbnail List View for empty searches
 	window.SavedPathThumbnailListView = Backbone.View.extend({
 		
@@ -314,6 +313,9 @@ $(function(){
  
 	});
 
+	/* ########################## */
+	/* ####### Proto Views ###### */
+	/* ########################## */
 
 	window.ProtoView = Backbone.View.extend({
 		el: $('#saved-paths-list'),
@@ -334,7 +336,7 @@ $(function(){
 		render: function() {
 
 			$(this.el).html(this.template({}));
-			
+			console.log('gets to initial list view')
 			// At some point, uniqify
 			// this.collection = _.uniq(this.collection, false, function(pos) {
 			// 	return pos.attributes[0]['title']
@@ -383,6 +385,37 @@ $(function(){
 	});
 
 
+	window.ProtoDataView = Backbone.View.extend({
+		el: $('#saved-paths-list'),
+		template:_.template($('#proto-single-template').html()),
+
+
+		initialize: function() {
+			_.bindAll(this,'render');
+			this.collection.on('reset',this.render, this, function() {
+				this.render()
+			});
+			this.collection.on('change', this.render, this);
+		},
+
+		render: function() {
+			console.log('gets to second list view')
+			// console.log(this.collection.toJSON())
+			//$(this.el).html(this.template(this.collection.toJSON()));
+			// console.log('gets 2 here')
+	
+			return this;
+
+			// this.collection.each(function(model) {
+			// 	var view = new ProtoSingleView({
+			// 		model:model,
+			// 		collection:this.collection,
+			// 	});
+			// 	this.$('#proto-fill').append(view.render().el);
+			// });
+		},
+	});
+
 	//---------------//
 	// ** Routers ** //
 	//---------------//
@@ -398,8 +431,7 @@ $(function(){
 			this.savedPaths = window.savedPaths;
 			this.savedPaths.bind('remove', this.remove)
 			this.headerView = new HeaderView()
-			this.proto = window.proto;
-			this.pdata = window.pdata;
+			this.proto = window.positionData;
 		},
 
 		emptySavedPathSearch: function() {
@@ -415,14 +447,16 @@ $(function(){
 		},
 
 		prototype: function(query) {
+			this.proto.meta('query', '')
 			this.protoView = new ProtoView({collection: this.proto});
 			this.proto.fetch()
 		},
 
 		getPositionData: function(query) {
-			this.pdata.meta('query', query);
-			console.log(query)
-			// this.pdata.fetch();
+			this.secondView = new ProtoDataView({collection: this.proto})
+			this.proto.meta('query', query);
+			this.proto.fetch();
+			console.log('after fetch')
 		},
 
 	});
