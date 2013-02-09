@@ -1,5 +1,8 @@
 # from Python
 import json
+import urllib2
+from datetime import datetime
+import csv
 
 # from Django
 from entities.models import Career, Position, User
@@ -223,8 +226,9 @@ class CareerMapBase():
 
 class CareerImportBase():
 
-	def import_careers(self,file_path):
+	def import_careers(self,path):
 
+		
 		f = open(file_path,'rU')
 		c = csv.DictReader(f)
 		for row in c:
@@ -237,5 +241,17 @@ class CareerImportBase():
 				for t in new_titles:
 					career.add_pos_title(t)
 			career.save()
+
+	def export_careers(self):
+
+		file_name = 'careers_' + datetime.now().strftime('%Y%m%d%H%M') + '.csv'
+		fieldnames = {'short_name':'short_name','long_name':'long_name','titles':'titles'}
+		f = open(file_name,'w')
+		c = csv.DictWriter(f,fieldnames=fieldnames)
+		careers = Career.objects.all()
+		for career in careers:
+			c.writerow({'short_name':career.short_name,'long_name':career.long_name,'titles':career.get_pos_titles()})
+		f.close()
+
 
 
