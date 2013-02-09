@@ -457,7 +457,8 @@ class LIBase():
 		if 'endDate' in data:
 			pos.end_date = self.format_dates(data['endDate'])
 		pos.save()
-		self.career_mapper.match_careers_to_position(pos)
+		if pos.title:
+			self.career_mapper.match_careers_to_position(pos)
 		# career = self.add_careers_to_position(pos)
 		
 
