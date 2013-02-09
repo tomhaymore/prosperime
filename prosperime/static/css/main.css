@@ -990,3 +990,8 @@ ul.flat li {
 	margin-bottom: 10px;
 }
 
+p.splash-header {
+	font-size: 1.5em;
+	color: rgb(41,98,152);
+	font-weight: 500;
+}
