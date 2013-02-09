@@ -223,7 +223,7 @@ class CareerMapBase():
 
 class CareerImportBase():
 
-	def map_titles_to_careers(self,file_path):
+	def import_careers(self,file_path):
 
 		f = open(file_path,'rU')
 		c = csv.DictReader(f)
