@@ -1049,5 +1049,17 @@ p.splash-header {
 	font-weight:bold;
 }
 
+.saved-paths-nav-container {
+	border-bottom: solid 1px rgb(41,98,152);
+	padding-bottom: 0px;
+}
+
+.saved-paths-container {
+	margin-top:10px;
+}
+
+.saved-paths-right-sidebar {
+	width: 240px;
+}
 /* Contact Page */
 
