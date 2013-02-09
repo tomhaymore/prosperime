@@ -2,8 +2,10 @@
 
 import os
 import django
+
 # for celery
-BROKER_BACKEND = 'django'
+# BROKER_BACKEND = 'amqp'
+BROKER_URL = 'amqp://bgretikc:lEmbbjnyf41b5bPT@owjmjbhe.rabbitmq-bigwig.lshift.net:16522/owjmjbhe'
 
 import djcelery
 djcelery.setup_loader()
