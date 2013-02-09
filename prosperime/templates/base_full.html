@@ -49,18 +49,16 @@
 		</div>
         
 	 <div class="offset1 span10">
-	  			{% block message %} 
-					
-					{% if messages %}
-					<ul class="messages">
-					    {% for message in messages %}
-					    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-					    {% endfor %}
-					</ul>
-					{% endif %}
-
-	  			{% endblock %}
-	  		</div>
+		{% block message %} 
+			{% if messages %}
+			<ul class="messages">
+			    {% for message in messages %}
+			    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+			    {% endfor %}
+			</ul>
+			{% endif %}
+		{% endblock %}
+	</div>
    
     <div class="container-fluid splash-container">
         

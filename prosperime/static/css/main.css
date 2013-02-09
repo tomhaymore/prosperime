@@ -58,6 +58,7 @@ div.footer {
 	padding-top:10px;
 }
 
+
 /* Home page */
 
 div#splash-home {
@@ -203,6 +204,9 @@ img.logo-preview {
 .main-header {
 	font-weight: bold;
 	font-size:1.2em;
+	font-size: 1.5em;
+	color: rgb(41,98,152);
+	font-weight: 500;
 }
 
 .sub-header {
@@ -990,8 +994,9 @@ div.content-container{
 #middle-float-screen {
 	border-radius:4px;
 	padding-right:0px;
-	padding-left:12px;
-	margin-left:0px;
+	padding-left:25px;
+	margin-left:15px;
+	font-size:0.9em;
 }
 
 .box-header {
