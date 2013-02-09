@@ -159,7 +159,7 @@ INSTALLED_APPS = (
     'saved_paths',
     'careers',
     # 'debug_toolbar'
-    'south',
+    # 'south',
     'jsonify',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
