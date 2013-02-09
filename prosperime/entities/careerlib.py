@@ -228,9 +228,8 @@ class CareerImportBase():
 
 	def import_careers(self,path):
 
-		
-		f = open(file_path,'rU')
-		c = csv.DictReader(f)
+		data = urllib2.urlopen(path).read()
+		c = csv.DictReader([data])
 		for row in c:
 			career = Career()
 			career.short_name = row['name']
