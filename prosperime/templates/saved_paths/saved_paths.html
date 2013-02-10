@@ -128,13 +128,15 @@ $.ajaxSetup({
 	<!--<div class="saved-path-title"><%=title%></div>-->
 	
 	<div class="saved-path-timeline">
-		<div id="end">GOAL</div>
 
 		<% 
 		<!-- Sort positions by index -->
 		positions = _.sortBy(positions, function(pos) {
 			return pos.index * -1;
 		});
+
+		%><div id="saved-path-timeline-positions" class="span7 pull-left"><%
+			%><div id="end">GOAL</div><%
 
 		for (var i = 0; i < positions.length; i++) {
 
@@ -148,11 +150,50 @@ $.ajaxSetup({
 				<i class="icon-remove-circle hide" title="Remove this position"></i>  
 
 				<%= positions[i].title %> at <%= positions[i].co_name%>
-				 || <%=positions[i].index%>  
+				 || <%=positions[i].index%>
+
 			</div>
 			
 			<%
 		} %>
+		</div>
+		<div id="saved-path-timeline-info" class="span5 pull-right">
+		<%
+		for (var i = 0; i < positions.length; i++) {
+			%>	
+			<div class="up-arrow hide">
+				<img src="/static/img/up-arrow.png">
+			</div>
+
+			<div id="description-index:<%=positions[i].index%>-id:<%=positions[i].id%>" class="saved-path-timeline-info-item hide">
+				<% if (positions[i]['metadata'].length > 0) {
+					%>
+						<span class="saved-path-timeline-info-item-header">Others who have worked at <%=positions[i].co_name%></span>
+						<ul class="saved-path-meta-list">
+					<%
+				
+					for (var j = 0; j < positions[i]['metadata'].length; j++) {
+					%>
+					<li>
+						<a href="/profile/<%=positions[i]['metadata'][j].person_id%>">
+							<%=positions[i]['metadata'][j].person_name%>
+						</a>, 
+						<%=positions[i]['metadata'][j].job_title%>
+
+					</li>
+					<%
+					}
+				}
+				%>
+				</ul>
+			</div>
+
+
+
+
+			<%
+		} %>
+		</div>
 	</div>
 </script>
 
@@ -181,12 +222,16 @@ $.ajaxSetup({
 </script>
 
 <script type="text/template" id="proto-single-template">
-	<h1>here</h1>
+	<ul><p>Other people who have worked at the same company</p>
+	<% for (var i = 0; i < same_company.length; i++) {
+		%><li><%=same_company[i].first_name%> <%=same_company[i].last_name%><%
+	} %>
+	</ul>
 </script>
 
 <script type="text/template" id="proto-template">
 	
-	<select id="proto-fill"> </select>
+	<p>What is your dream job? <select id="proto-fill"> </select> </p>
 
 
 </script>

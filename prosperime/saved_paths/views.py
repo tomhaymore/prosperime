@@ -11,6 +11,7 @@ from django.utils import simplejson
 # Prosperime
 from entities.models import Position
 from saved_paths.models import Saved_Path, Saved_Position
+from accounts.models import Profile
 
 
 ######################################################
@@ -42,7 +43,7 @@ def get_paths(request):
 		path_owner = path.owner
 
 		saved_positions = Saved_Position.objects.filter(path=path)
-		positions = _get_positions_for_path(saved_positions)
+		positions = _get_positions_for_path(saved_positions, True)
 
 		paths.append({'title': path.title, 'positions': positions, 'id': path.id})
 
@@ -55,8 +56,9 @@ def get_paths(request):
 			for path in all_paths:
 
 				# delegate position formatting to helper
+				# TODO: don't need path objects here! 
 				saved_positions = Saved_Position.objects.filter(path=path)
-				positions = _get_positions_for_path(saved_positions)	
+				positions = _get_positions_for_path(saved_positions, False)	
 				paths.append({'title': path.title, 'positions': positions, 'id': path.id})
 
 		# else do nothing
@@ -228,31 +230,75 @@ def prototype(request):
 
 	response = []
 
-	all_positions = Position.objects.all()[:100]
-	for p in all_positions:
-		formatted_pos = _ready_position_for_proto(p)
-		if formatted_pos:
-			response.append(formatted_pos)
+	if request.GET.getlist('pos', False):
+		pos_id = request.GET.getlist('pos', False)[0]
+		position = Position.objects.get(id=pos_id)
+		print 'Original Request: ' + position.title + " @ " + position.entity.name 
+
+		other_jobs_at_co = Position.objects.filter(entity__name=position.entity.name)
+		profiles_from_company = set()
+		for p in other_jobs_at_co:
+			profiles_from_company.add(Profile.objects.get(user=p.person))
+
+		profiles_same_job_title = set()
+		profiles_exact_same_job = set()
+
+		other_people_who_have_held_this_job = Position.objects.filter(title=position.title)
+		for pos in other_people_who_have_held_this_job:
+			profile = Profile.objects.get(user=pos.person)
+			if profile not in profiles_same_job_title:
+				profiles_same_job_title.add(profile)
+			if pos.entity.name == position.entity.name:
+				# don't want dupes. ok for now
+				profiles_exact_same_job.add(profile)
+
+		# now ready all elements for json...
+		json_profiles_from_company = _ready_profiles_for_json(profiles_from_company)
+		json_profiles_same_job_title = _ready_profiles_for_json(profiles_same_job_title)
+		json_profiles_exact_same_job = _ready_profiles_for_json(profiles_exact_same_job)
+
+		response = {
+			'same_company': json_profiles_from_company,
+			'same_job_title': json_profiles_same_job_title,
+			'same_job_exact': json_profiles_exact_same_job,
+		}
+
+
+	else:
+		response = []
+
+		all_positions = Position.objects.all()[:100]
+		for p in all_positions:
+			formatted_pos = _ready_position_for_proto(p)
+			if formatted_pos:
+				response.append(formatted_pos)
 
 	return HttpResponse(simplejson.dumps(response))
 
-def prototype_data(request):
-
-	resonse = []
-	print request.GET.getlist('pos')
-
-
-
-	return HttpResponse(simplejson.dumps(response))
 
 
 ######################################################
 ##################    HELPERS   ######################
 ######################################################
 
+
+def _ready_profiles_for_json(profiles):
+	formatted_profiles = []
+
+	for p in profiles:
+		attribs = {
+			'first_name': p.first_name,
+			'last_name:': p.last_name,
+		}
+		formatted_profiles.append(attribs)
+
+	return formatted_profiles
+
+
+
 # code taken w/ few modifications from entities.views
 # Note: 'saved_positions' = saved_position objects
-def _get_positions_for_path(saved_positions):
+def _get_positions_for_path(saved_positions, extra_info):
 	"""
 	Returns JSON format of all user positions, with possible anonymity
 	"""
@@ -321,6 +367,22 @@ def _get_positions_for_path(saved_positions):
 				attribs['co_name'] = p.entity.name
 
 			attribs['index'] = index_list[i]
+
+			# now, get interesting pos information
+			metadata = []
+			# other jobs at this company:
+			other_jobs = Position.objects.filter(entity__name=p.entity.name).exclude(person=p.person)
+			for job in other_jobs:
+				person = Profile.objects.get(user=job.person)
+				job_info = {
+					'person_name':person.first_name + ' ' + person.last_name,
+					'person_id':job.person.id,
+					'job_title':job.title,
+				}
+				metadata.append(job_info)
+
+			
+			attribs['metadata'] = metadata
 
 			formatted_positions.append(attribs)
 			i += 1

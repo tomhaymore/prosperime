@@ -875,7 +875,7 @@ ul.flat li {
 
 .saved-path-position {
 	border:1px solid black;
-	border-radius:4px;
+	border-radius:16px;
 	display:inline-block;
 	padding:8px;
 	padding-right:24px;
@@ -892,7 +892,30 @@ ul.flat li {
 
 .saved-path-timeline {
 	text-align:center;
-	margin-bottom:50px;
+/*	margin-bottom:50px;
+*/
+}
+
+#saved-path-timeline-position {
+/*	position:relative;
+	left:-100px;*/
+
+}
+
+#saved-path-timeline-info {
+	margin-top:24px;
+}
+
+.saved-path-timeline-info-item-header {
+	font-weight:600;
+}
+
+ .saved-path-meta-list {
+	text-align:left;
+}
+
+.saved-path-timeline-info-item {
+	margin:8px;
 }
 
 #end {
@@ -918,7 +941,7 @@ ul.flat li {
 }
 
 .thumbnail-title {
-	color:midnightblue;
+	color: rgb(41,98,152);
 	font-size:1.8em;
 	padding-bottom:8px;
 }
