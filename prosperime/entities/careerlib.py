@@ -84,12 +84,12 @@ class CareerSimBase():
 		
 		for k,v in self.users_orgs_map.items():
 			intersect = focal_orgs['orgs'].intersection(v)
-			jaccard = len(intersect)/len(v)
+			jaccard = float(len(intersect))/float(len(v))
 			orgs_sim.append((k,jaccard,))
 
 		for k,v in self.users_eds_map.items():
 			intersect = focal_orgs['eds'].intersection(v)
-			jaccard = len(intersect)/len(v)
+			jaccard = float(len(intersect))/float(len(v))
 			eds_sim.append((k,jaccard,))	
 
 		sorted_orgs_sim = sorted(orgs_sim, key=lambda x:x[1],reverse=True)
@@ -163,10 +163,11 @@ class CareerMapBase():
 		career_map = {}
 
 		for c in careers:
-			if c['pos_titles']:
+			if c['pos_titles'] is not None:
 				titles = json.loads(c['pos_titles'])
 				# add career-to-position title mapping, reduced to lower case
-				titles = [t.lower() for t in titles]
+				if titles is not None:
+					titles = [t.lower() for t in titles]
 				
 				career_map[c['id']] = titles
 
