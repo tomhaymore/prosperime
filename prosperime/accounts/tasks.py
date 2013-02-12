@@ -36,6 +36,7 @@ def process_li_connections(user_id,acct_id,**kwargs):
 def process_li_profile(user_id,acct_id,**kwargs):
 
 	# call LI parser object
+	# li_parser = LIProfile(career_mapper)
 	li_parser = LIProfile()
 	li_parser.process_profile(user_id,acct_id)
 

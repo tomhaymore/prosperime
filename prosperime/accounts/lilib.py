@@ -21,11 +21,12 @@ from django.utils import simplejson
 from django.contrib.auth.models import User
 from accounts.models import Account, Profile, Connection, Picture
 from entities.models import Position, Entity, Image, Industry, Office, Career
-from entities.careerlib import CareerMapBase
+import entities.careerlib as careerlib
 from django.core.files import File
 from django.conf import settings
 
-
+# initiate CareerMapBase class
+# career_mapper = CareerMapBase()
 
 class LIBase():
 
@@ -44,7 +45,9 @@ class LIBase():
 
 	careers_to_positions_map = {}
 
-	career_mapper = CareerMapBase()
+	# career_mapper = CareerMapBase()
+
+	career_mapper = None
 
 	industry_groups = {
 		47:'corp fin',
@@ -197,8 +200,8 @@ class LIBase():
 		}
 
 	def __init__(self):
-		pass
 		# self.careers_to_positions_map = self.get_career_positions_map()
+		pass
 
 	def get_career_positions_map(self):
 		careers = Career.objects.filter(status="active")
@@ -459,8 +462,16 @@ class LIBase():
 		if 'endDate' in data:
 			pos.end_date = self.format_dates(data['endDate'])
 		pos.save()
-		if pos.title:
-			self.career_mapper.match_careers_to_position(pos)
+		# if pos.title:
+		print "matching..."
+		careers = careerlib.match_careers_to_position(pos)
+		print careers
+		for c_id in careers:
+			c = Career.objects.get(pk=c_id)
+			print c
+			pos.careers.add(c)
+		pos.save()
+
 		# career = self.add_careers_to_position(pos)
 		
 
@@ -626,6 +637,9 @@ class LIProfile(LIBase):
 	user = None
 	acct = None
 
+	# def __init__(self,CareerMapBase):
+	# 	self.career_mapper = CareerMapBase()
+
 	def authorize(self):
 		# setup OAuth
 		consumer = oauth.Consumer(self.linkedin_key, self.linkedin_secret)
@@ -692,10 +706,12 @@ class LIProfile(LIBase):
 
 		# fetch profile data from LinkedIn
 		profile = self.fetch_profile()
-		stdout.write(profile)
+		# print profile
+		# self.stdout.write([profile])
 		# make sure positions are present
 		if 'positions' in profile:
 			for p in profile['positions']['values']:
+				# print p
 				# some LinkedIn positions do not have a company id value
 				if 'id' in p['company']:
 					# check to see if new company
