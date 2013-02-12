@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 # from _retry import retry
 from utilities.helpers import retry
 import dateutil
+from sys import stdout
 
 
 # from Django
@@ -357,8 +358,9 @@ class LIBase():
 		# check to see if locations in company profile
 		if 'locations' in data:
 			# add offices
-			for l in data['locations']['values']:
-				self.add_office(co,l)
+			if 'values' in data['locations']:
+				for l in data['locations']['values']:
+					self.add_office(co,l)
 
 		return co
 
@@ -372,7 +374,7 @@ class LIBase():
 		else:
 			co_api_url = self.co_api_url + str(co_id) + ":"  + self.co_fields + "?format=json"
 
-		print co_api_url
+		# print co_api_url
 
 		content = self.fetch_data_oauth(self.acct.id,co_api_url)
 
@@ -633,7 +635,7 @@ class LIProfile(LIBase):
 		# request_token_url = "%s?%s" % (self.request_token_url, scope,)
 
 		request_token_url = "%s?scope=%s" % (self.request_token_url, self.scope,)
-		print request_token_url
+		# print request_token_url
 		# get request token
 		resp, content = client.request(self.request_token_url,"POST",body=urllib.urlencode({'oauth_callback':self.callback,'scope':'r_fullprofile r_emailaddress r_network'}))
 		# resp, content = client.request(self.request_token_url,"POST")
@@ -642,7 +644,7 @@ class LIProfile(LIBase):
 
 		request_token = dict(cgi.parse_qsl(content))
 
-		print request_token
+		# print request_token
 		redirect_url = "%s?oauth_token=%s" % (self.authorize_url, request_token['oauth_token'], )
 
 		return (redirect_url, request_token,)
@@ -675,19 +677,22 @@ class LIProfile(LIBase):
 
 		return (access_token,simplejson.loads(content),)
 
-	def process_profile(self,user_id=None,acct_id=None):
+	def process_profile(self,user_id,acct_id):
 
 		# get user and account objects
-		if user_id is not None:
-			self.user = User.objects.get(pk=user_id)
-			self.acct = Account.objects.get(owner=self.user,service="linkedin")
-		elif acct_id is not None:
-			self.acct = Account.objects.get(pk=acct_id,service="linkedin")
-			self.user = self.acct.owner
+		# if user_id is not None:
+		# 	self.user = User.objects.get(pk=user_id)
+		# 	self.acct = Account.objects.get(owner=self.user,service="linkedin")
+		# elif acct_id is not None:
+		# 	self.acct = Account.objects.get(pk=acct_id,service="linkedin")
+		# 	self.user = self.acct.owner
+
+		self.user = User.objects.get(pk=user_id)
+		self.acct = Account.objects.get(owner=self.user,service="linkedin")
 
 		# fetch profile data from LinkedIn
 		profile = self.fetch_profile()
-
+		stdout.write(profile)
 		# make sure positions are present
 		if 'positions' in profile:
 			for p in profile['positions']['values']:
@@ -707,24 +712,28 @@ class LIProfile(LIBase):
 						if pos is None:
 							self.add_position(self.user,co,p)
 		if 'educations' in profile:
-			for e in profile['educations']['values']:
+			for p in profile['educations']['values']:
 				inst = self.get_institution(name=p['schoolName'])
 				if inst is None:
-					# add new company
-					inst = self.add_institution(p)
+					# add new institusion
+					
+					inst = self.add_institution({
+						'inst_name':p['schoolName']
+					})
+
 					# if it's a new company, position must be new as well
 					if inst is not None:
 						self.add_position(self.user,inst,p)
 				else:
 					# TODO update company
-					pos = self.get_position(self.user,inst,p)
+					pos = self.get_position(self.user,inst,p,type="ed")
 					if pos is None:
 						self.add_ed_position(self.user,inst,p)
 
 	def fetch_profile(self):
 
 		# set fields to fetch from API
-		fields = "(headline,id,first-name,last-name,picture-url,positions:(start-date,end-date,title,is-current,summary,company:(id)),public-profile-url),educations:(school-name,field-of-study,degree,start-date,end-date))"
+		fields = "(headline,id,first-name,last-name,picture-url,positions:(start-date,end-date,title,is-current,summary,company:(id)),public-profile-url,educations:(school-name,field-of-study,degree,start-date,end-date))"
 		
 		# construct url
 		api_url = "http://api.linkedin.com/v1/people/id=%s:%s?format=json" % (self.acct.uniq_id,fields,)
@@ -830,7 +839,7 @@ class LIConnections(LIBase):
 		
 		# fetch connections data		
 		content = self.fetch_data_oauth(self.acct.id,self.api_url)
-		print content
+		# print content
 
 		# parse out connections from returned data
 		connections = content['values']
@@ -997,7 +1006,7 @@ class LIConnections(LIBase):
 				co_uniq_name = co_uniq_name.get('href')
 				m = re.search("(?<=\/company\/)([\w-]*)",co_uniq_name)
 				co_uniq_name = m.group(0).strip()
-				print co_uniq_name
+				# print co_uniq_name
 				# get start and end dates
 				start_date = p.find("abbr","dtstart")
 				if start_date is not None:
@@ -1065,8 +1074,8 @@ class LITest(LIBase):
 							
 			elif d['id'] == 'profile-education':
 				ed_positions = self.extract_ed_pos_from_public_page(d)
-				for p in ed_positions:
-					print p
+				# for p in ed_positions:
+					# print p
 
 	def extract_pos_from_public_page(self,data):
 		# initialize positions array
@@ -1083,7 +1092,7 @@ class LITest(LIBase):
 				co_uniq_name = co_uniq_name.get('href')
 				m = re.search("(?<=\/company\/)([\w-]*)",co_uniq_name)
 				co_uniq_name = m.group(0).strip()
-				print co_uniq_name
+				# print co_uniq_name
 				# get start and end dates
 				start_date = p.find("abbr","dtstart")
 				if start_date is not None:

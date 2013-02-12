@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 # from accounts.models import Account
 
 class Entity(models.Model):
+	
 	name = models.CharField(max_length=450)
 	type = models.CharField(max_length=25) # org or person
 	subtype = models.CharField(max_length=50,blank=True,null=True) # firm, professional services, etc.

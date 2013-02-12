@@ -178,17 +178,19 @@ class CareerMapBase():
 	
 		careers = []
 
-		for t in title_ngrams:
-			# make sure position title is not in stop list, e.g., "Manager" or "Director" or something equally generic
-			if t not in self.STOP_LIST:
-				for k,v in self.careers_to_positions_map.items():
-					if t in v and k not in careers:
-						careers.append(k)
+		if title_ngrams is not None:
+			for t in title_ngrams:
+				if t is not None:
+					# make sure position title is not in stop list, e.g., "Manager" or "Director" or something equally generic
+					if t not in self.STOP_LIST:
+						for k,v in self.careers_to_positions_map.items():
+							if t in v and k not in careers:
+								careers.append(k)
 
-		for c_id in careers:
-			c = Career.objects.get(pk=c_id)
-			pos.careers.add(c)
-		pos.save()
+			for c_id in careers:
+				c = Career.objects.get(pk=c_id)
+				pos.careers.add(c)
+			pos.save()
 
 	def test_position(self,title):
 
