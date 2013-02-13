@@ -7,6 +7,9 @@ from django.contrib.auth.models import User
 # from entities.models import Position
 from django.db.models.signals import post_save
 
+# Prosperime
+from entities.models import Position
+
 class Account(models.Model):
     
     service = models.CharField(max_length=45)
@@ -36,6 +39,27 @@ class Profile(models.Model):
     connections = models.ManyToManyField('self',through="Connection",symmetrical=False,related_name="connections+")
     status = models.CharField(max_length=15,default="active")
     
+
+    # returns a dictionary w/ frequencies of each career
+    def get_all_careers(self):
+        career_dict = {}
+
+        user = self.user
+        positions = Position.objects.filter(person=user)
+        for p in positions:
+            careers = p.careers.all()
+            for c in careers:
+                if career_dict.has_key(c):
+                    career_dict[c] = career_dict[c] + 1
+                else:
+                    career_dict[c] = 1
+        
+        ## to test this beast
+        for item in career_dict:
+             print item.short_name + ': ' + str(career_dict.get(item))
+
+        return career_dict
+
     # returns career w/ highest frequency among profile's positions
     def get_top_career(self):
         all_careers = get_all_careers(self)
@@ -49,28 +73,8 @@ class Profile(models.Model):
             #   any ties
         return top_career
 
-    # returns a dictionary w/ frequencies of each career
-    def get_all_careers(self):
-        career_dict = {}
 
-        user = self.user
-        positions = Position.objects.filter(person=user)
-        for p in positions:
-            careers = p.careers.all()
-            for c in careers:
-                if career_dict.has_key(career):
-                    career_dict[c] = career_dict[c] + 1
-                else:
-                    career_dict[c] = 1
-        
-        ## to test this beast
-        # for item in career_dict:
-        #     print item + ': ' + career_dict.get(item)
-
-        return career_dict
-
-
-    # both functions properties of the Profile object
+    # Properties of the Profile object
     top_career = property(get_top_career)
     all_careers = property(get_all_careers)
 
@@ -95,9 +99,12 @@ class Profile(models.Model):
 
     def latest_position(self):
         positions = self.user.positions.all().order_by('-start_date').exclude(type="education")
-        if positions:
-            latest_position = positions[0]
-            return latest_position.safe_title() + " at " + latest_position.entity.name
+        counter = 0
+        for p in positions:
+            if p.start_date is not None:
+                latest_position = positions[counter]
+                return latest_position.safe_title() + " at " + latest_position.entity.name
+            counter += 1
         else:
             return None
 

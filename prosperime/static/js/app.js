@@ -80,13 +80,9 @@ $(function(){
 
 			// add queries if they exist
 			if (this._meta['query'] === undefined) {
-				// return '/filters';
-				console.log("In Collections.Filters, returning " + init_path)
 				return init_path
 			} else {
 				path = init_path + this._meta['query'];
-				console.log("In Collections.Filters, returning " + path);
-				// return '/filters/' + this._meta['query'];
 				return path;
 			}
 		},
@@ -139,12 +135,11 @@ $(function(){
 		},
 
 		model: Path,
+
 		url: function() {
 			if (this._meta['query'] === undefined) {
-				console.log("In Collections.Paths, returning /paths")
 				return '/paths';
 			} else {
-				console.log("In Collections.Paths, returning /paths" + this._meta['query'])
 				return '/paths'+this._meta['query'];
 			}
 		},
@@ -179,7 +174,7 @@ $(function(){
 		template:_.template($('#path-single-template-clayton').html()),
 
 		events: {
-			"click a.path-name-link" : "renderViz"
+			"click a.path-name-link" : "renderViz",
 		},
 
 		initialize: function() {
@@ -187,8 +182,10 @@ $(function(){
 		},
 
 		render: function() {
-			console.log('path single view')
+			console.log('path single view: ' + this.model.toJSON())
+
 			var renderedContent = this.template(this.model.toJSON());
+			console.log('here')
 			$(this.el).html(renderedContent);
 			return this;
 		},
@@ -215,7 +212,6 @@ $(function(){
 	// View: OrgSingleView
 	window.OrgSingleView = Backbone.View.extend({
 
-		// tag: "div",
 		template:_.template($('#org-single-template').html()),
 
 		initialize: function() {
@@ -273,9 +269,8 @@ $(function(){
 		},
 
 		render: function() {
-			console.log('filter single view')
+			// console.log('filter single view')
 			var renderedContent = this.template(this.model.toJSON());
-			// console.log(renderedContent)
 			$(this.el).html(renderedContent);
 			return this;
 		},
@@ -327,8 +322,6 @@ $(function(){
 			}
 
 			// trigger router to navigate
-			console.log('filter single view')
-			console.log("trying to trigger search");
 			// console.log(filterUrl);
 			//Backbone.history.navigate(filterUrl,{trigger:true});
 			App.navigate(filterUrl,{trigger:true});
@@ -346,7 +339,6 @@ $(function(){
 		initialize: function() {
 			_.bindAll(this,'render');
 			this.collection.bind('reset',this.render);
-			// this.template = _.template($('#org-list-template').html());
 		},
 
 		render: function() {
@@ -385,7 +377,6 @@ $(function(){
 		},
 
 		render: function() {
-			console.log('rendering filter list view')
 			var $filters,
 				filterCategories,
 				collection = this.collection;
@@ -650,9 +641,13 @@ $(function(){
 		},
 
 		initialize: function() {
+
+			// set collections
 			this.orgs = window.orgs;
 			this.filters = window.filters;
 			this.paths = window.paths;
+
+			// set views
 			// show paths and path filters by default
 			this.orgsView = new OrgListView({ collection: this.orgs});
 			this.filtersView = new FilterListView({ collection: this.filters});
@@ -687,15 +682,12 @@ $(function(){
 		},
 
 		emptySearch: function() {
-			console.log("empty search");
-			this.filters.meta('view','careers');
+			// this.filters.meta('view','careers');
 			this.filters.meta('query','');
 			this.filters.fetch()
-			console.log('after filters')
 			//this.careersView.render();
 
 			// // this.orgs.fetch();
-			this.filters.fetch();
 			this.paths.fetch();
 		},
 

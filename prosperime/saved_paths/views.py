@@ -44,8 +44,8 @@ def get_paths(request):
 
 		saved_positions = Saved_Position.objects.filter(path=path)
 		positions = _get_positions_for_path(saved_positions, True)
-
-		paths.append({'title': path.title, 'positions': positions, 'id': path.id})
+		count = 0
+		paths.append({'title': path.title, 'positions': positions, 'count': count, 'id': path.id})
 
 	# If not, show all path_requested
 	else:
@@ -57,9 +57,12 @@ def get_paths(request):
 
 				# delegate position formatting to helper
 				# TODO: don't need path objects here! 
-				saved_positions = Saved_Position.objects.filter(path=path)
-				positions = _get_positions_for_path(saved_positions, False)	
-				paths.append({'title': path.title, 'positions': positions, 'id': path.id})
+				# saved_positions = Saved_Position.objects.filter(path=path)
+				# positions = _get_positions_for_path(saved_positions, False)	
+				positions = []
+				count = Saved_Position.objects.filter(path=path).count()
+				paths.append({'title': path.title, 'positions': positions, 'id': path.id, 'count':count})
+
 
 		# else do nothing
 
@@ -68,39 +71,60 @@ def get_paths(request):
 
 # AJAX POST requests only
 def remove(request):
-
-	path_id = request.POST.get('path_id', False)
-	pos_id = request.POST.get('pos_id', False)
 	response = {}
-
-	# Error checking...
-	if not request.is_ajax or not request.POST or not path_id or not pos_id:
-		print 'Error @ saved_paths.create'
+	if not request.is_ajax or not request.POST:
+		print 'Error @ saved_paths.remove'
 		response.update({'success':False})
 		return HttpResponse(simplejson.dumps(response))
-	
-	try:
+
+	if request.POST.get('type') == 'path':
+		# then delete a path
+		path_id = request.POST.get('path_id')
+
+		# Error Checking
+		if not path_id:
+			print 'Error @ saved_paths.remove'
+			response.update({'success':False})
+			return HttpResponse(simplejson.dumps(response))
+
 		path = Saved_Path.objects.get(id=path_id)
-		position = Position.objects.get(id=pos_id)
+		path.delete()
+		response.update({'success':True})
 
-		saved_position = Saved_Position.objects.get(path=path, position=position)
-		deleted_pos_index = int(saved_position.index)
-		saved_position.delete()
-		response.update({'success': True})
+	else:
 
-	except:
-		response.update({'success': False})
+		# delete a position from a path
+		path_id = request.POST.get('path_id', False)
+		pos_id = request.POST.get('pos_id', False)
+
+		# Error checking...
+		if not path_id or not pos_id:
+			print 'Error @ saved_paths.remove'
+			response.update({'success':False})
+			return HttpResponse(simplejson.dumps(response))
+	
+		try:
+			path = Saved_Path.objects.get(id=path_id)
+			position = Position.objects.get(id=pos_id)
+
+			saved_position = Saved_Position.objects.get(path=path, position=position)
+			deleted_pos_index = int(saved_position.index)
+			saved_position.delete()
+			response.update({'success': True})
+
+		except:
+			response.update({'success': False})
 
 
-	# now, must cascade index changes and update path.last_index
-	path.last_index = int(path.last_index) - 1
-	path.save()
+		# now, must cascade index changes and update path.last_index
+		path.last_index = int(path.last_index) - 1
+		path.save()
 
-	positions_in_path = Saved_Position.objects.filter(path=path)
-	for pos in positions_in_path:
-		if int(pos.index) > deleted_pos_index:
-			pos.index = int(pos.index) - 1
-			pos.save()
+		positions_in_path = Saved_Position.objects.filter(path=path)
+		for pos in positions_in_path:
+			if int(pos.index) > deleted_pos_index:
+				pos.index = int(pos.index) - 1
+				pos.save()
 
 	return HttpResponse(simplejson.dumps(response))
 

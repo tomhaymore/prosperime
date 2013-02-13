@@ -928,28 +928,36 @@ ul.flat li {
 
 .saved-path-thumbnail {
 	overflow:hidden;
-	border:1px solid black;
-	height:125px;
-	width:150px;
-	padding:25px;
-	margin-left:40px;
-	margin-bottom:25px;
-	display:inline-block;
-	text-align:center;
-	border-radius:8px;
-	vertical-align:middle;
+/*	border-radius:8px;
+*/	margin-bottom:10px;
+	height:35px;
+	vertical-align: middle;
 }
 
 .thumbnail-title {
-	color: rgb(41,98,152);
-	font-size:1.8em;
-	padding-bottom:8px;
+	display:inline-block;
+	background-color: rgb(41, 98, 152);
+	padding:8px;
+	width:275px;
+	color: whitesmoke;
+	font-size:1.2em;
+	text-align:center;
+	height:100%;
+/*	border-radius:8px 8px 8px 8px;
+*/	vertical-align: middle;
 }
 
 .thumbnail-data {
 	text-align:left;
-	font-size:12px;
 	overflow:hidden;
+	display:inline;
+}
+
+.thumbnail-delete-icon {
+	display:inline;
+	text-align:right;
+	width:100%;
+	margin-left:275px;
 }
 
 .thumbnail-hover {
@@ -1068,6 +1076,10 @@ p.splash-header {
 	font-weight: 500;
 }
 
+.bolder {
+	font-weight:bold;
+}
+
 .link-to-all-paths {
 	font-weight:bold;
 }
@@ -1084,5 +1096,14 @@ p.splash-header {
 .saved-paths-right-sidebar {
 	width: 240px;
 }
+
+.module-whats-this {
+	text-align:right;
+	font-size:0.8em;
+	position:relative;
+	left:100px;
+}
+
+
 /* Contact Page */
 
