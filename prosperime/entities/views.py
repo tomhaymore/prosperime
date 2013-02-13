@@ -27,14 +27,11 @@ def home(request):
 	if not request.user.is_authenticated():
 		return HttpResponseRedirect('welcome')
 	data = {}
-	# return HttpResponseRedirect('welcome')
 	user = request.user
 
 	data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
 	data['saved_paths'] = Saved_Path.objects.filter(owner=user)
 	data['top_careers'] = []
-
-	data['saved_paths'] = Saved_Path.objects.filter(owner=request.user)
 
 	return render_to_response('home.html',data,context_instance=RequestContext(request))
 
@@ -82,12 +79,17 @@ def discover_career(request,career_id):
 	paths_in_career = {}
 	overview = {}
 
-	# set cache
-	
+	# Cache
 	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
 	if paths is None:
+		print 'discover.people missed cache'
 		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),_get_paths_in_career(request.user,career),600)
 		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+	else:
+		print 'discover.people hit cache'
+
+	## Don't Cache, for dev
+	# paths = _get_paths_in_career(request.user, career)
 
 	paths_in_career['network'] = paths['network']
 	paths_in_career['all'] = paths['all']
@@ -95,7 +97,75 @@ def discover_career(request,career_id):
 	overview['network'] = paths['overview']['network']
 	overview['all'] = paths['overview']['all']
 
-	return render_to_response('entities/discover_career.html',{'career':career,'paths':paths_in_career,'overview':overview},context_instance=RequestContext(request))
+	request_type = 'people'
+	print 'gets to end of disco people, request_type: ' + request_type
+
+	return render_to_response('entities/discover_career.html',{'career':career,'paths':paths_in_career,'overview':overview, 'request_type':request_type, 'career_id':career_id},context_instance=RequestContext(request))
+
+@login_required
+def discover_career_orgs(request, career_id):
+
+	career = Career.objects.get(pk=career_id)
+	entities_in_career = {}
+	overview = {}
+
+	# Cache
+	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+	if paths is None:
+		print 'discover.career.orgs missed cache'
+		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),_get_paths_in_career(request.user,career),600)
+		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+
+	else:
+		print 'discover.career.orgs hit cache'
+
+	## Don't Cache, for development
+	#paths = _get_paths_in_career(request.user, career)
+
+	entities_in_career['network'] = paths['networkOrgs']
+	entities_in_career['all'] = paths['allOrgs']
+
+	overview['network'] = paths['overview']['network']
+	overview['all'] = paths['overview']['all']
+
+	request_type = 'orgs'
+	print 'gets to end of disco orgs, request_type: ' + request_type
+
+	return render_to_response('entities/discover_career.html', {'career': career, 'entities':entities_in_career, 'overview':overview, 'request_type':request_type, 'career_id':career_id}, context_instance=RequestContext(request))
+
+@login_required
+def discover_career_positions(request, career_id):
+
+	career = Career.objects.get(pk=career_id)
+	positions_in_career = {}
+	overview = {}
+
+	# Cache
+	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+	if paths is None:
+		print 'discover.career.pos missed cache'
+		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),_get_paths_in_career(request.user,career),600)
+		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+
+	else:
+		print 'discover.career.pos hit cache'
+
+	## Don't use cache, for dev
+	# paths = _get_paths_in_career(request.user, career)
+
+
+	positions_in_career['network'] = paths['networkPositions']
+	positions_in_career['all'] = paths['allOrgs']
+
+	overview['network'] = paths['overview']['network']
+	overview['all'] = paths['overview']['all']
+
+	request_type = 'positions'
+	print 'gets to end of disco positions, request_type: ' + request_type
+
+
+	return render_to_response('entities/discover_career.html', {'career': career, 'positions':positions_in_career, 'overview':overview, 'request_type':request_type, 'career_id':career_id}, context_instance=RequestContext(request))
+
 
 # view for org profiles
 @login_required
@@ -125,32 +195,23 @@ def profile(request, user_id):
 	for pos in positions:
 		pos.duration = pos.duration_in_months()
 
-		# if pos.title:
-		# 	print 'title: ' + pos.title
-		# if pos.summary:
-		# 	print 'summ ' + pos.summary
-		# if pos.description:
-		# 	print 'des ' + pos.description
-		# if pos.degree:
-		# 	print 'deg: ' + pos.degree
-		# if pos.field:
-		# 	print 'field: ' + pos.field
-
-
+	
 		# Assumption: no end date = current
 		if not pos.end_date:
 			pos.end_date = "Current"
 
 		# Process domains
-		domains = pos.entity.domains.all()
-		if domains:
-			domain = domains[0].name
-			pos.co_name = domain + " company"
-		else:
-			domain = None
-			pos.co_name = pos.entity.name
+		## NO DOMAINS RIGHT NOW -- UNUSED
+		# domains = pos.entity.domains.all()
+		# if domains:
+		# 	domain = domains[0].name
+		# 	pos.co_name = domain + " company"
+		# else:
+		# 	domain = None
+		# 	pos.co_name = pos.entity.name
 
-		pos.domain=domain
+		pos.co_name = pos.entity.name
+		pos.domain=None
 
 		# Process education positions
 		if pos.type == 'education' or pos.title == 'Student':
@@ -202,13 +263,17 @@ def profile(request, user_id):
 		else:
 			compress = False
 
-	return render_to_response('entities/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress}, context_instance=RequestContext(request))
+	# we have this data... but what to do with it?
+	career_map = profile.all_careers
+
+	return render_to_response('entities/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress, 'career_map': career_map}, context_instance=RequestContext(request))
 
 def _get_paths_in_career(user,career):
 
 	# initialize overview array
 	overview = {}
 	paths = {}
+
 	# get users in network
 	users_list, user_ids = _get_users_in_network(user)
 
@@ -216,22 +281,68 @@ def _get_paths_in_career(user,career):
 	# CAUTION--values() can return multiple records when requesting M2M values; make sure to reduce
 	# network_people = User.objects.values('id','profile__headline','profile__first_name','profile__last_name','profile__pictures__pic','positions__entity__id','positions__entity__name').annotate(no_of_pos=Count('positions__id')).order_by('-no_of_pos')
 
+	# Clayton -- need to uniqify this list, b/c lots of wasted time
+	#	parsing duplicate people ... EDIT: not the problem, problem is
+	#	duplicate positions!
+	# network_people = _order_preserving_uniquify(network_people)
+
 	network_people_dict = {}
 	num_pos = 0
 	entities = []
 	entities_dict = {}
 	num_cos = 0
+	network_positions = []
 
 	for p in network_people:
 		num_pos += len(p.positions.all())
+		people_seen = []
+		positions_seen = []
+
 		for pos in p.positions.all():
 			entities.append(pos.entity.id)
+
+			# if pos in career, add to positions
+			# 	additionally, impose 30 position cap
+			if career in pos.careers.all() and len(network_positions) < 30:
+				# check if seen already (avoid duplicates)
+				if pos.id not in positions_seen:
+					positions_seen.append(pos.id)
+					network_positions.append({
+						'id':pos.id,
+						'title':pos.title,
+						'co_name':pos.entity.name,
+						'owner':pos.person.profile.full_name(),
+						'owner_id':pos.person.id,
+						'logo_path':pos.entity.default_logo(),
+					})
+
+		
 			if pos.entity.name in entities_dict:
 				entities_dict[pos.entity.name]['count'] += 1
+
+				# check if person seen already (avoid duplicates)
+				# 	additionally, cap people @ 5 for now
+				if p.id not in people_seen and len(entities_dict[pos.entity.name]['people']) < 6:
+					
+					person_dict = {
+						'name':p.profile.full_name(),
+						'id':p.id,
+					}
+					entities_dict[pos.entity.name]['people'].append(person_dict)
+					people_seen.append(p.id)
+
 			else:
+				
+				people_list = [{
+					'name':p.profile.full_name(),
+					'id':p.id,
+				}]
+				
 				entities_dict[pos.entity.name] = {
 					'count' : 1,
-					'id':pos.entity.id
+					'id':pos.entity.id,
+					'logo':pos.entity.default_logo(),
+					'people':people_list,	
 				}
 
 	# for p in network_people:
@@ -297,22 +408,29 @@ def _get_paths_in_career(user,career):
 		'num_cos':num_cos
 	}
 
+	# Network Entities Top 3
 	entities_dict = sorted(entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
-
 	overview['network']['bigplayers'] = entities_dict[:3]
 
+	# All Entities Top 3
 	all_entities_dict = sorted(all_entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
-
 	overview['all']['bigplayers'] = all_entities_dict[:3]
 
+	# People in Network, All
 	paths['network'] = network_people
-
 	paths['all'] = all_people
 
+	# TRIAL - adding entities information
+	paths['networkOrgs'] = entities_dict
+	paths['allOrgs'] = all_entities_dict
 
+	# TRIAL - adding positions information
+	paths['networkPositions'] = network_positions
+
+	# Returns nested dict
 	paths['overview'] = {
 		'network' : overview['network'],
-		'all':overview['all']
+		'all':overview['all'],
 		}
 
 	# return paths, overview
@@ -389,9 +507,8 @@ def companies(request):
 	return HttpResponse(simplejson.dumps(companies), mimetype="application/json")
 
 
-# CLAY: json object of params for path search. NOT USED
+# JSON dump - filters
 def path_filters(request):
-	print 'hits path_filters'
 	""" serves up JSON object of params for path searches """
 
 	# initialize array for all filters
@@ -645,7 +762,7 @@ def filters(request):
 	return HttpResponse(simplejson.dumps(filters), mimetype="application/json")
 
 
-# CLAY: json dump of all paths, by user
+# JSON dump
 def paths(request):
 	# initialize array of paths
 	paths = []
@@ -689,9 +806,8 @@ def paths(request):
 
 		paths.append({'id':u.id,'profile_pic':profile_pic,'full_name':name,'current_position':current_position,'positions':positions,'connected':connected})
 		# paths.append({'full_name':name,'current_position':current_position,'connected':connected})
-	print paths
-	print '######################\n'
-	return HttpResponse(simplejson.dumps(paths), mimetype="application/json")
+
+	return HttpResponse(simplejson.dumps(paths))
 
 def path(request,user_id):
 	print 'hits path'
@@ -1365,9 +1481,27 @@ def _months_difference(start_mo, start_yr, end_mo, end_yr, compress, round):
 	return diff
 
 
+def _order_preserving_uniquify(seq):
+	checked = []
+	return_seq = []
 
+	print 'before ' + str(len(seq))
+    
+	for e in seq:
+		print e.profile.full_name()
 
+	for e in seq:
+		if e.id not in checked:
+			checked.append(e.id)
+			return_seq.append(e)
 
+	print 'after ' + str(len(return_seq))
+
+	for e in seq:
+		print e.profile.full_name()
+
+	return return_seq 
+  
 
 
 

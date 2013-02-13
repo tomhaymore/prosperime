@@ -20,12 +20,12 @@
 
 
 <!-- Center --> 
-	<div class="profile-container">
+	<div class="profile-container"  ondragover='allowDrop(event)'>
 		<div class="profile-nav-container">&nbsp;</div>
 		<div class="profile-info-container">
-			<div class="profile-info-left pull-left">
+			<div class="profile-info-left pull-left span9">
 				<div class="profile-info-top">
-					<div class="pull-left">	
+					<div class="pull-left span6">	
 						<div class="profile-img-holder pull-left">
 							<img class="logo-preview" src="/media/{{profile.default_profile_pic}}" />
 						</div>
@@ -102,7 +102,7 @@
 					</div>
 
 					<!-- Float Screen -->
-					<div id="middle-float-screen" class="pull-left" ondragover='allowDrop(event)'>
+					<div id="middle-float-screen" class="pull-left span6" ondragover='allowDrop(event)'>
 						<a>For more information, hover over a position!</a>
 					</div>	
 					<div class="clear"></div>
@@ -189,6 +189,9 @@
 					<p class="sidebar-header">Your Saved Career Paths</p>
 					<p> Like what {{profile.first_name}} has done? Drag any of the positions shown into your desired career path or <a onclick='createNewPath()'>create a new one.</a></p>
 						<table class="table table-striped table-condensed table-bordered path-list" id='sidebar-path-list'>			
+							<tr><td class="timeline-description-header">
+								<a href="/saved_paths/">View All</a>
+							</td></tr>
 						{% for saved_path in viewer_saved_paths %}
 							{% if forloop.last %}
 								<tr class="saved-path-list-last">
@@ -244,7 +247,7 @@
 					$('#sidebar-path-list > tbody:last').append(newRow)
 					
 					// Clear text field
-					$('#new-path-box').val('')
+					$('#new-path-box-row').remove()
 				} else {
 					errorCreatingPath('db')
 				}
