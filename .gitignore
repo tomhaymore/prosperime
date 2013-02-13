@@ -4,4 +4,5 @@
 local_settings.py
 django14_env/*
 prosperime/media/logos/*
-prosperime/media*
+prosperime/media/pictures/*
+!prosperime/media/pictures/anon.jpg
