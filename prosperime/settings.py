@@ -2,8 +2,10 @@
 
 import os
 import django
+
 # for celery
-BROKER_BACKEND = 'django'
+# BROKER_BACKEND = 'amqp'
+BROKER_URL = 'amqp://bgretikc:lEmbbjnyf41b5bPT@owjmjbhe.rabbitmq-bigwig.lshift.net:16522/owjmjbhe'
 
 import djcelery
 djcelery.setup_loader()
@@ -154,12 +156,12 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'entities',
     'accounts',
-    'kombu.transport.django',
+    # 'kombu.transport.django',
     'djcelery',
     'saved_paths',
     'careers',
     # 'debug_toolbar'
-    'south',
+    # 'south',
     'jsonify',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',

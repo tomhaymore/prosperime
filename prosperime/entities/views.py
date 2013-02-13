@@ -168,6 +168,7 @@ def discover_career_positions(request, career_id):
 
 
 # view for org profiles
+@login_required
 def org_profile(request,org_id):
 	org = Entity.objects.get(pk=org_id)
 

@@ -196,7 +196,11 @@ def finish_link(request):
 	# 	request.user.profile.headline = linkedin_user_info['headline']
 	# 	request.user.profile.save()
 
-	request.user.profile = Profile()
+	try:
+		request.user.profile
+	except:
+		request.user.profile = Profile()
+
 	request.user.profile.first_name = linkedin_user_info['firstName']
 	request.user.profile.last_name = linkedin_user_info['lastName']
 	request.user.profile.headline = linkedin_user_info['headline']
@@ -232,7 +236,7 @@ def finish_link(request):
 
 	messages.success(request, 'Your LinkedIn account has been successfully linked.')
 
-	return HttpResponseRedirect('/search')
+	return HttpResponseRedirect('/home')
 
 def success(request):
 	return render_to_response('accounts/success.html',context_instance=RequestContext(request))

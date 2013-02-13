@@ -3,6 +3,7 @@ div.profile-nav-container {
 	padding-bottom: 0px;
 }
 
+
 div.profile-info-top {
 	margin-top:10px;
 }
@@ -13,4 +14,8 @@ div.profile-img-holder {
 
 div.profile-brief-info {
 	margin-left: 15px
+}
+
+div#middle-float-screen {
+	width:380px;
 }
