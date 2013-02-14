@@ -47,7 +47,7 @@ class Entity(models.Model):
 	def default_logo(self):
 		if self.images.all():
 			return self.images.all()[0].logo
-		return None
+		return "logos/none/none1.jpeg"
 
 class Image(models.Model):
 	
