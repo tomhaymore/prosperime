@@ -1,8 +1,10 @@
 # from Python
 import oauth2 as oauth
 import cgi
-from datetime import datetime, timedelta
+# from datetime import datetime, timedelta
 import urlparse
+import math
+import datetime
 
 # from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, logout as auth_logout, login as auth_login
@@ -11,13 +13,17 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from accounts.models import Account, Profile
 from django.contrib.auth.models import User
 from django.utils import simplejson
 from accounts.forms import FinishAuthForm, AuthForm
 from django.contrib import messages
 from lilib import LIProfile
 from accounts.tasks import process_li_profile, process_li_connections
+
+# Prosperime
+from accounts.models import Account, Profile, Picture
+from saved_paths.models import Saved_Path
+from entities.models import Position, Entity
 
 def login(request):
 	
@@ -262,5 +268,183 @@ def success(request):
 # 			pic.pic.save(img_filename,img_file,True)
 # 		os.remove('tmp_img')
 	
+# View for invidiual profiles
+@login_required
+def profile(request, user_id):
+
+	user = User.objects.get(id=user_id)
+	profile = Profile.objects.get(user=user)
+	saved_paths = Saved_Path.objects.filter(owner=user)
+	profile_pic = _get_profile_pic(profile)
+	viewer_saved_paths = Saved_Path.objects.filter(owner=request.user)
+
+	# Do position processing here!
+	positions = Position.objects.filter(person=user)
+	ed_list = []
+	org_list = []
+
+	# declare vars before in case no positions
+	current = None
+
+	for pos in positions:
+		pos.duration = pos.duration_in_months()
 
 	
+		# Assumption: no end date = current
+		if not pos.end_date:
+			pos.end_date = "Current"
+
+		# Process domains
+		## NO DOMAINS RIGHT NOW -- UNUSED
+		# domains = pos.entity.domains.all()
+		# if domains:
+		# 	domain = domains[0].name
+		# 	pos.co_name = domain + " company"
+		# else:
+		# 	domain = None
+		# 	pos.co_name = pos.entity.name
+
+		pos.co_name = pos.entity.name
+		pos.domain=None
+
+		# Process education positions
+		if pos.type == 'education' or pos.title == 'Student':
+			if pos.degree is not None and pos.field is not None:
+				pos.title = pos.degree + ", " + pos.field
+			elif pos.degree is not None:
+				pos.title = pos.degree
+			elif pos.field is not None:
+				pos.title = pos.field
+			else:
+				pos.title = None
+			ed_list.insert(0, pos)
+		else:
+
+			if pos.title:
+				print pos.title + ', ' + pos.co_name
+
+			# Assumption: ignore if no start-date, crappy data
+			if pos.start_date:
+				org_list.insert(0, pos)
+			if pos.current:
+				current = pos
+			# else:
+			# 	print 'ignoring: ' + pos.type
+
+	# Still need to uniqify this data!
+	# will do so O(n2) but hey, these are small datasets
+	ed_list = _uniqify(ed_list)
+	org_list = _uniqify(org_list)
+
+	# Now, prepare for timeline
+	# First, sort by start_date
+	## ?? org_list.sort(key=lambda x: (int(x.start_date)[:3] + int(x.start_date)[0:2]))
+
+	if len(org_list) == 0:
+		# then we have problem
+		start_date = total_time = end_date = compress = None
+	else:	
+		start_date = org_list[len(org_list)-1].start_date
+		total_time = _months_from_now(start_date)
+		end_date = datetime.datetime.now()
+
+		if total_time > 200: 
+		# 200 is an arbitrary constant that seems to fit my laptop screen well
+			total_time = int(math.ceil(total_time/2))
+			for pos in org_list:
+				pos.duration = int(math.ceil(pos.duration/2))
+			compress = True
+		else:
+			compress = False
+
+	# we have this data... but what to do with it?
+	career_map = profile.all_careers
+
+	return render_to_response('accounts/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress, 'career_map': career_map}, context_instance=RequestContext(request))
+	
+@login_required
+def profile_org(request, org_id):
+
+	# saved_paths... always need this... better way?
+	saved_paths = Saved_Path.objects.filter(owner=request.user)
+
+	# nothing related to entities, so don't know if we can batch here
+	entity = Entity.objects.get(pk=org_id)
+
+	# Basic Entity Data
+	response = {
+		'id':org_id,
+		'name':entity.name,
+		'size':entity.size_range,
+		'description':entity.description,
+		'logo_path':entity.default_logo(),
+	}
+
+	# Related Jobs
+	# Should use entity object, but duplicates!
+	## jobs = Position.objects.filter(entity=entity).select_related('person__profile')
+	jobs = Position.objects.filter(entity__name=entity.name).select_related('person__profile')
+
+	related_jobs = []
+	for j in jobs:
+		jobs_data = {
+			'id':j.id,
+			'title':j.title,
+			'description':j.description,
+			'owner_name':j.person.profile.full_name(),
+			'owner_id':j.person.id,
+		}
+		related_jobs.append(jobs_data)
+
+
+	response['jobs'] = related_jobs
+	response['saved_paths'] = saved_paths
+
+	return render_to_response('accounts/profile_org.html', response, context_instance=RequestContext(request))
+
+#################
+#### HELPERS ####
+#################
+# Helper from StackOverflow to remove duplicates from list whilst preserving order
+def _uniqify(list):
+	tmp = set()
+	solution = []
+	for element in list:
+		# Hack city
+		if element.title == None:
+			element.title = ""
+		current = element.title + ', ' + element.co_name
+
+		if current in tmp:
+			continue
+		tmp.add(current)
+		solution.append(element)
+
+	return solution
+
+# Returns # months difference between start_date and now
+def _months_from_now(start_date):
+	now = datetime.datetime.now()
+	return (12 * (now.year - start_date.year)) + (now.month - start_date.month)
+
+# taken straight from viz.js
+def _months_difference(start_mo, start_yr, end_mo, end_yr, compress, round):
+	diff = 12 * (end_yr - start_yr)
+	diff += end_mo - start_mo
+
+	if compress:
+		diff /= 2
+		if round == 'upper':
+			diff = math.ceil(diff)
+		if round == 'lower':
+			diff = math.floor(diff)
+
+	return diff
+
+def _get_profile_pic(profile):
+	pics = Picture.objects.filter(person=profile,status="active").order_by("created")
+	if pics.exists():
+		return pics[0].pic.__unicode__()
+	return None
+
+

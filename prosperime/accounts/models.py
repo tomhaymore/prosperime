@@ -120,7 +120,7 @@ class Profile(models.Model):
         if self.pictures.all():
             return self.pictures.all()[0].pic
         else:
-            return "pictures/anon.jpg"
+            return "logos/none/none1.jpeg"
 
     # domains = property(_industries)
     
