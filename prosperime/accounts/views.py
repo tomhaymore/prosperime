@@ -22,7 +22,7 @@ from accounts.tasks import process_li_profile, process_li_connections
 
 # Prosperime
 from accounts.models import Account, Profile, Picture
-from saved_paths.models import Saved_Path
+from careers.models import SavedPath
 from entities.models import Position, Entity
 
 def login(request):
@@ -274,9 +274,9 @@ def profile(request, user_id):
 
 	user = User.objects.get(id=user_id)
 	profile = Profile.objects.get(user=user)
-	saved_paths = Saved_Path.objects.filter(owner=user)
+	saved_paths = SavedPath.objects.filter(owner=user)
 	profile_pic = _get_profile_pic(profile)
-	viewer_saved_paths = Saved_Path.objects.filter(owner=request.user)
+	viewer_saved_paths = SavedPath.objects.filter(owner=request.user)
 
 	# Do position processing here!
 	positions = Position.objects.filter(person=user)
@@ -366,7 +366,7 @@ def profile(request, user_id):
 def profile_org(request, org_id):
 
 	# saved_paths... always need this... better way?
-	saved_paths = Saved_Path.objects.filter(owner=request.user)
+	saved_paths = SavedPath.objects.filter(owner=request.user)
 
 	# nothing related to entities, so don't know if we can batch here
 	entity = Entity.objects.get(pk=org_id)

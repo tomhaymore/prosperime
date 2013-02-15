@@ -10,7 +10,7 @@ from django.utils import simplejson
 
 # Prosperime
 from entities.models import Position
-from saved_paths.models import Saved_Path, Saved_Position
+from careers.models import SavedPath, SavedPosition
 from accounts.models import Profile
 
 
@@ -22,7 +22,7 @@ from accounts.models import Profile
 # VIEW: display ALL user's paths
 def show_paths(request):
 
-	paths = Saved_Path.objects.filter(owner=request.user)
+	paths = SavedPath.objects.filter(owner=request.user)
 
 	data = {
 		'saved_paths': paths,
@@ -39,17 +39,17 @@ def get_paths(request):
 	# If so, show a single path
 	if request.GET.getlist('id'):
 		path_requested = request.GET.getlist('id')[0]
-		path = Saved_Path.objects.get(id=path_requested)
+		path = SavedPath.objects.get(id=path_requested)
 		path_owner = path.owner
 
-		saved_positions = Saved_Position.objects.filter(path=path)
+		saved_positions = SavedPosition.objects.filter(path=path)
 		positions = _get_positions_for_path(saved_positions, True)
-
-		paths.append({'title': path.title, 'positions': positions, 'id': path.id})
+		count = 0
+		paths.append({'title': path.title, 'positions': positions, 'count': count, 'id': path.id, 'type':'single'})
 
 	# If not, show all path_requested
 	else:
-		all_paths = Saved_Path.objects.filter(owner=request.user)
+		all_paths = SavedPath.objects.filter(owner=request.user)
 
 		if all_paths is not None:
 			# then add to data
@@ -57,10 +57,12 @@ def get_paths(request):
 
 				# delegate position formatting to helper
 				# TODO: don't need path objects here! 
-				saved_positions = Saved_Position.objects.filter(path=path)
-				#positions = _get_positions_for_path(saved_positions, False)	
-				positions=[]
-				paths.append({'title': path.title, 'positions': positions, 'id': path.id})
+				# saved_positions = Saved_Position.objects.filter(path=path)
+				# positions = _get_positions_for_path(saved_positions, False)	
+				positions = []
+				count = SavedPosition.objects.filter(path=path).count()
+				paths.append({'title': path.title, 'positions': positions, 'id': path.id, 'count':count, 'type':'all'})
+
 
 		# else do nothing
 
@@ -69,39 +71,60 @@ def get_paths(request):
 
 # AJAX POST requests only
 def remove(request):
-
-	path_id = request.POST.get('path_id', False)
-	pos_id = request.POST.get('pos_id', False)
 	response = {}
-
-	# Error checking...
-	if not request.is_ajax or not request.POST or not path_id or not pos_id:
-		print 'Error @ saved_paths.create'
+	if not request.is_ajax or not request.POST:
+		print 'Error @ saved_paths.remove'
 		response.update({'success':False})
 		return HttpResponse(simplejson.dumps(response))
+
+	if request.POST.get('type') == 'path':
+		# then delete a path
+		path_id = request.POST.get('path_id')
+
+		# Error Checking
+		if not path_id:
+			print 'Error @ saved_paths.remove'
+			response.update({'success':False})
+			return HttpResponse(simplejson.dumps(response))
+
+		path = SavedPath.objects.get(id=path_id)
+		path.delete()
+		response.update({'success':True})
+
+	else:
+
+		# delete a position from a path
+		path_id = request.POST.get('path_id', False)
+		pos_id = request.POST.get('pos_id', False)
+
+		# Error checking...
+		if not path_id or not pos_id:
+			print 'Error @ saved_paths.remove'
+			response.update({'success':False})
+			return HttpResponse(simplejson.dumps(response))
 	
-	try:
-		path = Saved_Path.objects.get(id=path_id)
-		position = Position.objects.get(id=pos_id)
+		try:
+			path = SavedPath.objects.get(id=path_id)
+			position = Position.objects.get(id=pos_id)
 
-		saved_position = Saved_Position.objects.get(path=path, position=position)
-		deleted_pos_index = int(saved_position.index)
-		saved_position.delete()
-		response.update({'success': True})
+			saved_position = SavedPosition.objects.get(path=path, position=position)
+			deleted_pos_index = int(saved_position.index)
+			saved_position.delete()
+			response.update({'success': True})
 
-	except:
-		response.update({'success': False})
+		except:
+			response.update({'success': False})
 
 
-	# now, must cascade index changes and update path.last_index
-	path.last_index = int(path.last_index) - 1
-	path.save()
+		# now, must cascade index changes and update path.last_index
+		path.last_index = int(path.last_index) - 1
+		path.save()
 
-	positions_in_path = Saved_Position.objects.filter(path=path)
-	for pos in positions_in_path:
-		if int(pos.index) > deleted_pos_index:
-			pos.index = int(pos.index) - 1
-			pos.save()
+		positions_in_path = SavedPosition.objects.filter(path=path)
+		for pos in positions_in_path:
+			if int(pos.index) > deleted_pos_index:
+				pos.index = int(pos.index) - 1
+				pos.save()
 
 	return HttpResponse(simplejson.dumps(response))
 
@@ -128,13 +151,13 @@ def save(request):
 	else:
 		response.update({'errors':['Either title or pos_id missing']})
 
-	path = Saved_Path.objects.get(title=title, owner=request.user)
+	path = SavedPath.objects.get(title=title, owner=request.user)
 	if not path:
 		response.update({'errors':['path could not be found']})
 	else:
 		position = Position.objects.get(id=pos_id)
 
-		saved_position = Saved_Position()
+		saved_position = SavedPosition()
 		saved_position.position = position
 		saved_position.path = path
 		saved_position.index = path.get_next_index()
@@ -160,20 +183,17 @@ def create(request):
 	response = {}
 
 	try:
-		new_path = Saved_Path()
+		new_path = SavedPath()
 		new_path.title = title
 		new_path.owner = request.user
 		new_path.last_index = 1
 
 		# automatically add current position to any new cp
-		print 'before before'
 		currentPos = Position.objects.filter(person=request.user, current=True).exclude(type='education')
-		print 'before'
 		if currentPos:
-			print 'after'
 			# need to test this
 			new_path.save()
-			first_position = Saved_Position()
+			first_position = SavedPosition()
 			first_position.position = currentPos[0]
 			first_position.path = new_path
 			first_position.index = 0
@@ -201,7 +221,7 @@ def rearrange(request):
 	pos_index = int(request.POST.get('pos_index'))
 	path_id = int(request.POST.get('path_id'))
 	
-	positions = Saved_Position.objects.filter(path=Saved_Path.objects.get(id=path_id))
+	positions = SavedPosition.objects.filter(path=SavedPath.objects.get(id=path_id))
 	
 	# Position being moved 'up'
 	if diff > 0:
