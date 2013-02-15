@@ -6,6 +6,7 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/drag_and_drop.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>
 <link type="text/css" rel="stylesheet" src="{{ STATIC_URL }}js/font-awesome.min.css" />
+<link type="text/css" rel="stylesheet" src="{{ STATIC_URL }}js/discover.css"/>
 
 <!-- 
 	This business taken from Django docs, adds CSRF header to Ajax
@@ -59,10 +60,29 @@ $.ajaxSetup({
 	<div class="saved-paths-nav-container">&nbsp;</div>
 
 	<div class="saved-paths-container">
-		<div class="saved-paths-list pull-left span9">
-		<!-- BACKBONE JUMPS IN HERE -->
-		<div id="saved-paths-list"></div>
+	
 
+
+		<div class="saved-paths-list pull-left span9">
+
+			<div class='span4 pull-left'>
+				<ul class='careers-stats inline left-header'>
+					<li>path name</li>
+				</ul>
+			</div>
+
+			<div class='offset2 span6'>
+				<ul class="careers-stats inline">
+					<li>positions in path</li>
+					<li>some other stat</li>
+					<li>some other stat</li>
+				</ul>
+			</div>
+			<div class='clear'></div>
+			
+			<div id="saved-paths-list">
+				<!-- BACKBONE JUMPS IN HERE -->
+			</div>
 		</div>
 
 
@@ -161,13 +181,40 @@ $.ajaxSetup({
 
 <script type="text/template" id="saved-path-thumbnail-single-template">
 	
-	<div class="thumbnail-title"><%=title%></div>
-	<div class="thumbnail-data hide">Positions in path: <%=count%></div>
-
-	<div id="<%=id%>" class="thumbnail-delete-icon hide">
-		<i class="icon-remove icon-large"></i>
+	<div class="pull-left span4">
+		<a href='/saved_path/<%=id%>' class='careers-name'><%=title%></a>
+		
+		<div id="<%=id%>" class="thumbnail-delete-icon hide">
+			<i class="icon-remove icon-large"></i>
+		</div>
 	</div>
 
+	<div class="span1 saved-path-delete">
+		<a class="delete-path" id="<%=id%>">Delete</a>
+	</div>
+
+	<div class="offset1 span6">
+		<ul class="careers-stats">
+			<li class="careers-stats-people blue-box-container">
+				<div class="stats">
+					<%=count%><!-- # Positions in path -->
+				</div>
+			</li>
+
+			<li class="careers-stats-people blue-box-container saved-path-info-boxes">
+				<div class="stats">
+					0
+				</div>
+			</li>
+
+			<li class="careers-stats-orgs blue-box-container">
+				<div class="stats">
+					0
+				</div>
+			</li>
+		</ul>
+	</div>
+	<div class="clear">
 </script>
 
 <script type='text/template' id="saved-path-thumbnail-list-template">

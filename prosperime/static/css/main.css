@@ -918,6 +918,11 @@ ul.flat li {
 	margin:8px;
 }
 
+.left-header {
+	text-align:left;
+	padding-left:15px;
+}
+
 #end {
 	font-weight:bold;
 }
@@ -925,6 +930,11 @@ ul.flat li {
 .saved-path-thumbnail-table {
 /*	border-collapse:separate;
 */}
+
+.saved-path-info-boxes {
+	margin-left:60px;
+	margin-right:60px;
+}
 
 .saved-path-thumbnail {
 	overflow:hidden;
@@ -1025,8 +1035,8 @@ div.content-container{
 #middle-float-screen {
 	border-radius:4px;
 	padding-right:0px;
-	padding-left:25px;
-	margin-left:15px;
+	margin-left:0px;
+	padding-left:4px;
 	font-size:0.9em;
 }
 
@@ -1102,6 +1112,11 @@ p.splash-header {
 	font-size:0.8em;
 	position:relative;
 	left:100px;
+}
+
+#module-info-careers {
+	font-size:.9em;
+	padding:4px;
 }
 
 
