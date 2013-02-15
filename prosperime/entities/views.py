@@ -19,7 +19,7 @@ from django.core.cache import cache
 # Prosperime
 from entities.models import Entity, Office, Financing, Industry, Position, Career
 from accounts.models import Picture, Profile
-from saved_paths.models import Saved_Path
+from careers.models import SavedPath
 from entities.careerlib import CareerSimBase
 
 # @login_required
@@ -30,7 +30,7 @@ def home(request):
 	user = request.user
 
 	data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
-	data['saved_paths'] = Saved_Path.objects.filter(owner=user)
+	data['saved_paths'] = SavedPath.objects.filter(owner=user)
 	data['top_careers'] = []
 
 	return render_to_response('home.html',data,context_instance=RequestContext(request))
@@ -562,7 +562,7 @@ def search(request):
 	# Clay: add saved paths here... not sure if this is where to do it
 	#	but hey, it works
 	# EDIT: add an array of path titles (we don't need the objects)
-	saved_paths = Saved_Path.objects.filter(owner=request.user)
+	saved_paths = SavedPath.objects.filter(owner=request.user)
 
 	# if len(saved_paths) > 0:
 	# 	path_titles = []

@@ -158,7 +158,7 @@ INSTALLED_APPS = (
     'accounts',
     # 'kombu.transport.django',
     'djcelery',
-    'saved_paths',
+    # 'saved_paths',
     'careers',
     # 'debug_toolbar'
     # 'south',

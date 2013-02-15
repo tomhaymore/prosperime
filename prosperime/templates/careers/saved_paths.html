@@ -65,6 +65,7 @@ $.ajaxSetup({
 
 		<div class="saved-paths-list pull-left span9">
 
+			{% if type == 'all' %}
 			<div class='span4 pull-left'>
 				<ul class='careers-stats inline left-header'>
 					<li>path name</li>
@@ -79,6 +80,7 @@ $.ajaxSetup({
 				</ul>
 			</div>
 			<div class='clear'></div>
+			{% endif %}
 			
 			<div id="saved-paths-list">
 				<!-- BACKBONE JUMPS IN HERE -->
@@ -181,8 +183,8 @@ $.ajaxSetup({
 
 <script type="text/template" id="saved-path-thumbnail-single-template">
 	
-	<div class="pull-left span4">
-		<a href='/saved_path/<%=id%>' class='careers-name'><%=title%></a>
+	<div class="pull-left span4 left-headers">
+		<a href='/saved_path/#id/?id=<%=id%>/' class='careers-name'><%=title%></a>
 		
 		<div id="<%=id%>" class="thumbnail-delete-icon hide">
 			<i class="icon-remove icon-large"></i>
