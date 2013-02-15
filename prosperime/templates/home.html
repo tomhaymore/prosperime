@@ -81,7 +81,7 @@
 <script type="text/javascript">
 
 	var whatsThis = function(origin, elem) {
-		
+
 		if (origin == "careers") {
 			// If its already there, delete it
 			if ($('#module-info-careers').length > 0) {
@@ -94,7 +94,7 @@
 				$(this).remove()
 			});
 
-			$(elem).after("<p id='module-info-careers' class='module-info'>We've checked out your body of work as well that of the rest of Prosperime community. Using this data, we have selected the following as potential career fields for you. Because our goal is to help you find a meaningful career, we have collected information on the people, companies, and jobs within each.</p>")
+			$(elem).after("<table id='module-info-careers' class='module-info table table-condensed table-bordered table-striped'><tr><td>After analyzing your work and that of the Prosperime Community, we selected the following career paths as those of potential interest for you. We have collected information on jobs, companies, and people in the field, and we hope it will help you on your way to forging a meaningful, lasting career.</td></tr></table>")
 
 		}
 	};

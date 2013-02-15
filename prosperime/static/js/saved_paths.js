@@ -261,7 +261,7 @@ $(function(){
 			"click .saved-path-thumbnail": "goToPath",
 			"mouseenter .saved-path-thumbnail": "hoverIn",
 			"mouseleave .saved-path-thumbnail": "hoverOut",
-			"click .thumbnail-delete-icon": "deletePath",
+			"click a.delete-path": "deletePath",
 		},
 
 		initialize: function() {
@@ -306,23 +306,24 @@ $(function(){
 
 		hoverIn: function(ev) {
 			$(ev.currentTarget).toggleClass('thumbnail-hover');
-			$(ev.currentTarget).children().each( function() {
-				if(!$(this).hasClass('thumbnail-title')) {
-					$(this).toggleClass('hide');
-				}
-			});
+			// $(ev.currentTarget).children().each( function() {
+			// 	if(!$(this).hasClass('thumbnail-title')) {
+			// 		$(this).toggleClass('hide');
+			// 	}
+			// });
 		},
 
 		hoverOut: function(ev) {
 			$(ev.currentTarget).toggleClass('thumbnail-hover');
-			$(ev.currentTarget).children().each( function() {
-				if(!$(this).hasClass('thumbnail-title')) {
-					$(this).toggleClass('hide');
-				}
-			});
+			// $(ev.currentTarget).children().each( function() {
+			// 	if(!$(this).hasClass('thumbnail-title')) {
+			// 		$(this).toggleClass('hide');
+			// 	}
+			// });
 		},
 
 		deletePath: function(ev) {
+			ev.preventDefault();
 			console.log('delete: ' + ev.currentTarget.id)
 
 			$.post('/saved_paths/remove/', {type:'path', path_id:ev.currentTarget.id}, function(response) {
@@ -331,7 +332,6 @@ $(function(){
 				
 			});
 
-			event.preventDefault();
 			return false;
 		},
 
