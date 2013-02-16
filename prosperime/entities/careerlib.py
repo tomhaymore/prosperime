@@ -535,8 +535,15 @@ class CareerImportBase():
 class CareerExportBase():
 
 	def export_careers_fixtures(self):
+		"""
+		exports JSON fixtures for careers in current directory
+		"""
 		file_name = 'careers_fixture_' + datetime.now().strftime('%Y%m%d%H%M') + '.json'
-		os.system('django-admin.py dumpdata entities.Career > ' + file_name)
+		careers = Career.objects.all().values('id','short_name','long_name','description','parent','census_code','soc_code','pos_titles')
+		fixtures = json.dumps(list(careers))
+		f = open(file_name,'w')
+		f.write(fixtures)
+		f.close()
 
 	def export_careers(self):
 
