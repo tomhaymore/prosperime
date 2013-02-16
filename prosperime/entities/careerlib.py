@@ -272,8 +272,10 @@ class CareerMapBase():
 
 	def load_stop_list(self):
 		try:
+			print 'trying to open reader'
 			reader = (open('career_map_stop_list.csv','rU'))
 		except:
+			print 'reader dies'
 			return None
 		for row in reader:
 			self.STOP_LIST.append(row[0])

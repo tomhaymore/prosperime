@@ -173,15 +173,19 @@
 
 	var createNewPath = function() {
 
+		// first, make sure there isn't already a new path box out there
+		if ($('#new-path-box-row').length > 0) return
+
+		// If not, then create and add a last row
 		var table = document.getElementsByClassName('path-list')[0]
 		var lastRow = table.getElementsByClassName('saved-path-list-last')[0]
 		var newRow = document.createElement('tr')
 		newRow.id = 'new-path-box-row'
 		var newCol = document.createElement('td')
 
-		var newColText = '<div class="input-append">'
-		newColText += '<input type="text" maxlength="32" style="width:160px" id="new-path-box" onclick="clearContents(this)" />'
+		var newColText = '<div class="input-prepend">'
 		newColText += '<span class="add-on" onclick="newPathAjax()"><i class="icon-plus"></i></span>'
+		newColText += '<input type="text" maxlength="32" style="width:160px" id="new-path-box" onclick="clearContents(this)" />'
 		newColText += '</div>'
 		newCol.innerHTML = newColText;
 		

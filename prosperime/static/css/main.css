@@ -930,6 +930,11 @@ ul.flat li {
 	margin:8px;
 }
 
+.left-header {
+	text-align:left;
+	padding-left:15px;
+}
+
 #end {
 	font-weight:bold;
 }
@@ -938,30 +943,43 @@ ul.flat li {
 /*	border-collapse:separate;
 */}
 
+.saved-path-info-boxes {
+	margin-left:60px;
+	margin-right:60px;
+}
+
 .saved-path-thumbnail {
 	overflow:hidden;
-	border:1px solid black;
-	height:125px;
-	width:150px;
-	padding:25px;
-	margin-left:40px;
-	margin-bottom:25px;
-	display:inline-block;
-	text-align:center;
-	border-radius:8px;
-	vertical-align:middle;
+/*	border-radius:8px;
+*/	margin-bottom:10px;
+	height:35px;
+	vertical-align: middle;
 }
 
 .thumbnail-title {
-	color: rgb(41,98,152);
-	font-size:1.8em;
-	padding-bottom:8px;
+	display:inline-block;
+	background-color: rgb(41, 98, 152);
+	padding:8px;
+	width:275px;
+	color: whitesmoke;
+	font-size:1.2em;
+	text-align:center;
+	height:100%;
+/*	border-radius:8px 8px 8px 8px;
+*/	vertical-align: middle;
 }
 
 .thumbnail-data {
 	text-align:left;
-	font-size:12px;
 	overflow:hidden;
+	display:inline;
+}
+
+.thumbnail-delete-icon {
+	display:inline;
+	text-align:right;
+	width:100%;
+	margin-left:275px;
 }
 
 .thumbnail-hover {
@@ -1029,8 +1047,8 @@ div.content-container{
 #middle-float-screen {
 	border-radius:4px;
 	padding-right:0px;
-	padding-left:25px;
-	margin-left:15px;
+	margin-left:0px;
+	padding-left:4px;
 	font-size:0.9em;
 }
 
@@ -1080,6 +1098,10 @@ p.splash-header {
 	font-weight: 500;
 }
 
+.bolder {
+	font-weight:bold;
+}
+
 .link-to-all-paths {
 	font-weight:bold;
 }
@@ -1096,5 +1118,19 @@ p.splash-header {
 .saved-paths-right-sidebar {
 	width: 240px;
 }
+
+.module-whats-this {
+	text-align:right;
+	font-size:0.8em;
+	position:relative;
+	left:100px;
+}
+
+#module-info-careers {
+	font-size:.9em;
+	padding:4px;
+}
+
+
 /* Contact Page */
 

@@ -11,6 +11,7 @@ from django.utils import simplejson
 # Prosperime
 from entities.models import Position
 from careers.models import SavedPath, SavedPosition
+from accounts.models import Profile
 
 
 ######################################################
@@ -24,7 +25,7 @@ def show_paths(request):
 	paths = SavedPath.objects.filter(owner=request.user)
 
 	data = {
-		'SavedPaths': paths,
+		'saved_paths': paths,
 	}
 
 	return render_to_response('careers/saved_paths.html', data,
@@ -41,10 +42,10 @@ def get_paths(request):
 		path = SavedPath.objects.get(id=path_requested)
 		path_owner = path.owner
 
-		SavedPositions = SavedPosition.objects.filter(path=path)
-		positions = _get_positions_for_path(SavedPositions)
-
-		paths.append({'title': path.title, 'positions': positions, 'id': path.id})
+		saved_positions = SavedPosition.objects.filter(path=path)
+		positions = _get_positions_for_path(saved_positions, True)
+		count = 0
+		paths.append({'title': path.title, 'positions': positions, 'count': count, 'id': path.id, 'type':'single'})
 
 	# If not, show all path_requested
 	else:
@@ -55,9 +56,13 @@ def get_paths(request):
 			for path in all_paths:
 
 				# delegate position formatting to helper
-				SavedPositions = SavedPosition.objects.filter(path=path)
-				positions = _get_positions_for_path(SavedPositions)	
-				paths.append({'title': path.title, 'positions': positions, 'id': path.id})
+				# TODO: don't need path objects here! 
+				# saved_positions = Saved_Position.objects.filter(path=path)
+				# positions = _get_positions_for_path(saved_positions, False)	
+				positions = []
+				count = SavedPosition.objects.filter(path=path).count()
+				paths.append({'title': path.title, 'positions': positions, 'id': path.id, 'count':count, 'type':'all'})
+
 
 		# else do nothing
 
@@ -66,39 +71,60 @@ def get_paths(request):
 
 # AJAX POST requests only
 def remove(request):
-
-	path_id = request.POST.get('path_id', False)
-	pos_id = request.POST.get('pos_id', False)
 	response = {}
-
-	# Error checking...
-	if not request.is_ajax or not request.POST or not path_id or not pos_id:
-		print 'Error @ SavedPaths.create'
+	if not request.is_ajax or not request.POST:
+		print 'Error @ saved_paths.remove'
 		response.update({'success':False})
 		return HttpResponse(simplejson.dumps(response))
-	
-	try:
+
+	if request.POST.get('type') == 'path':
+		# then delete a path
+		path_id = request.POST.get('path_id')
+
+		# Error Checking
+		if not path_id:
+			print 'Error @ saved_paths.remove'
+			response.update({'success':False})
+			return HttpResponse(simplejson.dumps(response))
+
 		path = SavedPath.objects.get(id=path_id)
-		position = Position.objects.get(id=pos_id)
+		path.delete()
+		response.update({'success':True})
 
-		SavedPosition = SavedPosition.objects.get(path=path, position=position)
-		deleted_pos_index = int(SavedPosition.index)
-		SavedPosition.delete()
-		response.update({'success': True})
+	else:
 
-	except:
-		response.update({'success': False})
+		# delete a position from a path
+		path_id = request.POST.get('path_id', False)
+		pos_id = request.POST.get('pos_id', False)
+
+		# Error checking...
+		if not path_id or not pos_id:
+			print 'Error @ saved_paths.remove'
+			response.update({'success':False})
+			return HttpResponse(simplejson.dumps(response))
+	
+		try:
+			path = SavedPath.objects.get(id=path_id)
+			position = Position.objects.get(id=pos_id)
+
+			saved_position = SavedPosition.objects.get(path=path, position=position)
+			deleted_pos_index = int(saved_position.index)
+			saved_position.delete()
+			response.update({'success': True})
+
+		except:
+			response.update({'success': False})
 
 
-	# now, must cascade index changes and update path.last_index
-	path.last_index = int(path.last_index) - 1
-	path.save()
+		# now, must cascade index changes and update path.last_index
+		path.last_index = int(path.last_index) - 1
+		path.save()
 
-	positions_in_path = SavedPosition.objects.filter(path=path)
-	for pos in positions_in_path:
-		if int(pos.index) > deleted_pos_index:
-			pos.index = int(pos.index) - 1
-			pos.save()
+		positions_in_path = SavedPosition.objects.filter(path=path)
+		for pos in positions_in_path:
+			if int(pos.index) > deleted_pos_index:
+				pos.index = int(pos.index) - 1
+				pos.save()
 
 	return HttpResponse(simplejson.dumps(response))
 
@@ -112,7 +138,7 @@ def save(request):
 		return render_to_response('/search/', context_instance=RequestContext(request))
 
 	if not request.POST:
-		print 'Error @ SavedPaths.save - get request'
+		print 'Error @ saved_paths.save - get request'
 		return render_to_response('/search/', context_instance=RequestContext(request))
 
 	title = request.POST.get('title', False)
@@ -131,11 +157,11 @@ def save(request):
 	else:
 		position = Position.objects.get(id=pos_id)
 
-		SavedPosition = SavedPosition()
-		SavedPosition.position = position
-		SavedPosition.path = path
-		SavedPosition.index = path.get_next_index()
-		SavedPosition.save()	
+		saved_position = SavedPosition()
+		saved_position.position = position
+		saved_position.path = path
+		saved_position.index = path.get_next_index()
+		saved_position.save()	
 
 		# path.positions.add(position)
 
@@ -148,11 +174,11 @@ def create(request):
 
 	# Error checking... what to do with them??
 	if not request.is_ajax:
-		print 'Error @ SavedPaths.create - non ajax requested'
+		print 'Error @ saved_paths.create - non ajax requested'
 	if not request.POST:
-		print 'Error @ SavedPaths.create - get request!'
+		print 'Error @ saved_paths.create - get request!'
 	if not title:
-		print 'Error @ SavedPaths.create - no title'
+		print 'Error @ saved_paths.create - no title'
 
 	response = {}
 
@@ -163,11 +189,8 @@ def create(request):
 		new_path.last_index = 1
 
 		# automatically add current position to any new cp
-		print 'before before'
 		currentPos = Position.objects.filter(person=request.user, current=True).exclude(type='education')
-		print 'before'
 		if currentPos:
-			print 'after'
 			# need to test this
 			new_path.save()
 			first_position = SavedPosition()
@@ -189,7 +212,7 @@ def create(request):
 
 	return HttpResponse(simplejson.dumps(response))
 
-# AJAX POST only, changes the indexing of SavedPositions
+# AJAX POST only, changes the indexing of saved_positions
 def rearrange(request):
 
 	response = {}
@@ -228,38 +251,82 @@ def prototype(request):
 
 	response = []
 
-	all_positions = Position.objects.all()[:100]
-	for p in all_positions:
-		formatted_pos = _ready_position_for_proto(p)
-		if formatted_pos:
-			response.append(formatted_pos)
+	if request.GET.getlist('pos', False):
+		pos_id = request.GET.getlist('pos', False)[0]
+		position = Position.objects.get(id=pos_id)
+		print 'Original Request: ' + position.title + " @ " + position.entity.name 
+
+		other_jobs_at_co = Position.objects.filter(entity__name=position.entity.name)
+		profiles_from_company = set()
+		for p in other_jobs_at_co:
+			profiles_from_company.add(Profile.objects.get(user=p.person))
+
+		profiles_same_job_title = set()
+		profiles_exact_same_job = set()
+
+		other_people_who_have_held_this_job = Position.objects.filter(title=position.title)
+		for pos in other_people_who_have_held_this_job:
+			profile = Profile.objects.get(user=pos.person)
+			if profile not in profiles_same_job_title:
+				profiles_same_job_title.add(profile)
+			if pos.entity.name == position.entity.name:
+				# don't want dupes. ok for now
+				profiles_exact_same_job.add(profile)
+
+		# now ready all elements for json...
+		json_profiles_from_company = _ready_profiles_for_json(profiles_from_company)
+		json_profiles_same_job_title = _ready_profiles_for_json(profiles_same_job_title)
+		json_profiles_exact_same_job = _ready_profiles_for_json(profiles_exact_same_job)
+
+		response = {
+			'same_company': json_profiles_from_company,
+			'same_job_title': json_profiles_same_job_title,
+			'same_job_exact': json_profiles_exact_same_job,
+		}
+
+
+	else:
+		response = []
+
+		all_positions = Position.objects.all()[:100]
+		for p in all_positions:
+			formatted_pos = _ready_position_for_proto(p)
+			if formatted_pos:
+				response.append(formatted_pos)
 
 	return HttpResponse(simplejson.dumps(response))
 
-def prototype_data(request):
-
-	resonse = []
-	print request.GET.getlist('pos')
-
-
-
-	return HttpResponse(simplejson.dumps(response))
 
 
 ######################################################
 ##################    HELPERS   ######################
 ######################################################
 
+
+def _ready_profiles_for_json(profiles):
+	formatted_profiles = []
+
+	for p in profiles:
+		attribs = {
+			'first_name': p.first_name,
+			'last_name:': p.last_name,
+		}
+		formatted_profiles.append(attribs)
+
+	return formatted_profiles
+
+
+
 # code taken w/ few modifications from entities.views
-# Note: 'SavedPositions' = SavedPosition objects
-def _get_positions_for_path(SavedPositions):
+# Note: 'saved_positions' = saved_position objects
+def _get_positions_for_path(saved_positions, extra_info):
 	"""
 	Returns JSON format of all user positions, with possible anonymity
 	"""
 
 	positions = []
 	index_list = []
-	for saved_pos in SavedPositions:
+	for saved_pos in saved_positions:
 		positions.append(saved_pos.position)
 		index_list.append(saved_pos.index)
 
@@ -322,6 +389,22 @@ def _get_positions_for_path(SavedPositions):
 
 			attribs['index'] = index_list[i]
 
+			# now, get interesting pos information
+			metadata = []
+			# other jobs at this company:
+			other_jobs = Position.objects.filter(entity__name=p.entity.name).exclude(person=p.person)
+			for job in other_jobs:
+				person = Profile.objects.get(user=job.person)
+				job_info = {
+					'person_name':person.first_name + ' ' + person.last_name,
+					'person_id':job.person.id,
+					'job_title':job.title,
+				}
+				metadata.append(job_info)
+
+			
+			attribs['metadata'] = metadata
+
 			formatted_positions.append(attribs)
 			i += 1
 
@@ -330,7 +413,7 @@ def _get_positions_for_path(SavedPositions):
 	return None
 
 
-# Note, this uses the old school Position object, not SavedPosition
+# Note, this uses the old school Position object, not Saved_Position
 def _ready_position_for_proto(p):
 		
 	array = []

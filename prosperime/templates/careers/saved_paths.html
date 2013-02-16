@@ -5,7 +5,8 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/saved_paths.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/drag_and_drop.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>
-
+<link type="text/css" rel="stylesheet" src="{{ STATIC_URL }}js/font-awesome.min.css" />
+<link type="text/css" rel="stylesheet" src="{{ STATIC_URL }}js/discover.css"/>
 
 <!-- 
 	This business taken from Django docs, adds CSRF header to Ajax
@@ -48,9 +49,6 @@ $.ajaxSetup({
 {% endblock %}
 
 
-
-
-
 <!-- Content -->
 {% block content %}
 
@@ -62,14 +60,35 @@ $.ajaxSetup({
 	<div class="saved-paths-nav-container">&nbsp;</div>
 
 	<div class="saved-paths-container">
-		<div class="saved-paths-list pull-left">
-		<!-- BACKBONE JUMPS IN HERE -->
-		<div id="saved-paths-list"></div>
+	
 
+
+		<div class="saved-paths-list pull-left span9">
+
+			{% if type == 'all' %}
+			<div class='span4 pull-left'>
+				<ul class='careers-stats inline left-header'>
+					<li>path name</li>
+				</ul>
+			</div>
+
+			<div class='offset2 span6'>
+				<ul class="careers-stats inline">
+					<li>positions in path</li>
+					<li>some other stat</li>
+					<li>some other stat</li>
+				</ul>
+			</div>
+			<div class='clear'></div>
+			{% endif %}
+			
+			<div id="saved-paths-list">
+				<!-- BACKBONE JUMPS IN HERE -->
+			</div>
 		</div>
 
 
-		<div class="saved-paths-right-sidebar pull-right">
+		<div class="saved-paths-right-sidebar pull-right span3">
 
 			<!-- Right Sidebar -->
 			<div id="search-right-sidebar" class="profile-right-sidebar">
@@ -81,9 +100,13 @@ $.ajaxSetup({
 
 				<div class="rounded">
 					<p class="sidebar-header">Your Saved Career Paths</p>
-			
+					<p><a onclick='createNewPath()'>Create a new one.</a></p>
+
 					{% if saved_paths %}
 						<table class="table table-striped table-condensed table-bordered path-list" id='sidebar-path-list'>
+							<tr><td class="timeline-description-header">
+								<a href="/saved_paths/">View All</a>
+							</td></tr>
 							{% for saved_path in saved_paths %}
 								{% if forloop.last %}
 									<tr class="saved-path-list-last">
@@ -94,9 +117,10 @@ $.ajaxSetup({
 								</tr>
 							{% endfor %}
 						</table>
+
 					{% else %}
-					<p>You haven't saved any career paths yet. Start one <a href="/saved_paths/create/">here.</a></p>
-				{% endif %}
+						<p>Start your dream career <a onclick='createNewPath()'> now.</a></p>
+					{% endif %}
 				</div>
 			</div>
 		</div>
@@ -107,6 +131,7 @@ $.ajaxSetup({
 
 
 {% block templates %}
+
 <script type="text/template" id="saved-path-list-template">
 
 	<!-- /* Headers */ -->
@@ -158,25 +183,47 @@ $.ajaxSetup({
 
 <script type="text/template" id="saved-path-thumbnail-single-template">
 	
-	<div class="thumbnail-title"><%=title%></div>
-	<div class="thumbnail-data">
-		<% if (positions) {
-			%><%=positions.length%><%
-		} else {
-			%>Currently, no<%
-		} %>
-		positions, covering career paths such as (career paths), with the end goal of being a (goal)
+	<div class="pull-left span4 left-headers">
+		<a href='/saved_path/#id/?id=<%=id%>/' class='careers-name'><%=title%></a>
+		
+		<div id="<%=id%>" class="thumbnail-delete-icon hide">
+			<i class="icon-remove icon-large"></i>
+		</div>
 	</div>
+
+	<div class="span1 saved-path-delete">
+		<a class="delete-path" id="<%=id%>">Delete</a>
+	</div>
+
+	<div class="offset1 span6">
+		<ul class="careers-stats">
+			<li class="careers-stats-people blue-box-container">
+				<div class="stats">
+					<%=count%><!-- # Positions in path -->
+				</div>
+			</li>
+
+			<li class="careers-stats-people blue-box-container saved-path-info-boxes">
+				<div class="stats">
+					0
+				</div>
+			</li>
+
+			<li class="careers-stats-orgs blue-box-container">
+				<div class="stats">
+					0
+				</div>
+			</li>
+		</ul>
+	</div>
+	<div class="clear">
 </script>
 
 <script type='text/template' id="saved-path-thumbnail-list-template">
+	
+	
 	<div class="saved-path-thumbnail-table">
-	<!--
-		<div class="saved-path-thumbnail">
-			<div class="thumbnail-title">Create a new path</div>
-			<div class="thumbnail-data">Click here</div>
-		</div>
-	-->
+
 	</div>
 </script>
 
@@ -226,12 +273,73 @@ $.ajaxSetup({
 	var changePositionOrder = function(difference, position_id, pos_index, path_id) {
 		$.post('/saved_paths/rearrange/', {difference: difference, pos_id:position_id, pos_index:pos_index, path_id:path_id}, function(response) {
 				console.log(response)
-				console.log(window.savedPaths.fetch())
-				
+				window.savedPaths.fetch()
 		});
-
-
 	};
+
+	/* Adds a create box to the bottom of the saved-path last */
+	var createNewPath = function() {
+
+		// First, make sure there isn't already a new path box out there
+		if ($('#new-path-box-row').length > 0) return
+
+		// If not, then create and add a last row
+		// Todo: the weird mix of jquery of javascript should be ammended
+		var table = $('#sidebar-path-list')
+		console.log(table)
+		var lastRow = $('.saved-path-list-last')[0]
+		var newRow = document.createElement('tr')
+		newRow.id = 'new-path-box-row'
+		var newCol = document.createElement('td')
+
+		var newColText = '<div class="input-prepend">'
+		newColText += '<span class="add-on" onclick="newPathAjax()"><i class="icon-plus"></i></span>'
+		newColText += '<input type="text" maxlength="32" style="width:160px" id="new-path-box" onclick="clearContents(this)" />'
+		newColText += '</div>'
+		newCol.innerHTML = newColText;
+		
+		newRow.appendChild(newCol)
+		table.append(newRow)
+	};
+
+	var newPathAjax = function() {
+		var title = $('#new-path-box').val()
+		if (title.length < 1) {
+			errorCreatingPath('title')
+			return
+		}
+
+		// Attempt POST request via AJAX to create path
+		$.post('/saved_paths/create/', {title: title, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
+				if (response['success']) {
+					console.log(response)
+					// Construct new table element for path
+					var newRow = "<tr><td ondragover='allowDrop(event)' ondrop='dropPosition(event," + title + ", this)'><a href='/saved_paths/#id/?id=" + response['id'] + "'>" + title + "</a></td></tr>"
+
+					// Add to DOM
+					$('#sidebar-path-list > tbody:last').append(newRow)
+					
+					// Clear text field
+					$('#new-path-box-row').remove()
+				} else {
+					errorCreatingPath('db')
+				}
+		}, 'json');
+	};
+
+	var errorCreatingPath = function(reason) {
+		var createBox = $('#new-path-box')
+		if (reason == "db") {
+			console.log("Error in the view creating new path...")
+			createBox.val("Please enter a title")
+		} else if (reason == "title") {
+			createBox.val("Please enter a title")
+		}
+
+		highlight(createBox)
+	};
+
+
 </script>
 
 

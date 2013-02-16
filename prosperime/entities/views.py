@@ -19,7 +19,7 @@ from django.core.cache import cache
 # Prosperime
 from entities.models import Entity, Office, Financing, Industry, Position, Career
 from accounts.models import Picture, Profile
-from saved_paths.models import Saved_Path
+from careers.models import SavedPath
 from entities.careerlib import CareerSimBase
 
 # @login_required
@@ -27,14 +27,11 @@ def home(request):
 	if not request.user.is_authenticated():
 		return HttpResponseRedirect('welcome')
 	data = {}
-	# return HttpResponseRedirect('welcome')
 	user = request.user
 
 	data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
-	data['saved_paths'] = Saved_Path.objects.filter(owner=user)
+	data['saved_paths'] = SavedPath.objects.filter(owner=user)
 	data['top_careers'] = []
-
-	data['saved_paths'] = Saved_Path.objects.filter(owner=request.user)
 
 	return render_to_response('home.html',data,context_instance=RequestContext(request))
 
@@ -82,20 +79,89 @@ def discover_career(request,career_id):
 	paths_in_career = {}
 	overview = {}
 
-	# set cache
-	
+	# Cache
 	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
 	if paths is None:
-		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),_get_paths_in_career(request.user,career),600)
+		print 'discover.people missed cache'
+		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),_get_paths_in_career_alt(request.user,career),600)
 		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+	else:
+		print 'discover.people hit cache'
 
-	paths_in_career['network'] = paths['network']
-	paths_in_career['all'] = paths['all']
+	## Don't Cache, for dev
+	# paths = _get_paths_in_career_alt(request.user, career)
+
+	paths_in_career['network'] = paths['networkPeople']
+	paths_in_career['all'] = paths['allPeople']
 
 	overview['network'] = paths['overview']['network']
 	overview['all'] = paths['overview']['all']
 
-	return render_to_response('entities/discover_career.html',{'career':career,'paths':paths_in_career,'overview':overview},context_instance=RequestContext(request))
+	request_type = 'people'
+
+	return render_to_response('entities/discover_career.html',{'career':career,'people':paths_in_career,'overview':overview, 'request_type':request_type, 'career_id':career_id},context_instance=RequestContext(request))
+
+@login_required
+def discover_career_orgs(request, career_id):
+
+	career = Career.objects.get(pk=career_id)
+	entities_in_career = {}
+	overview = {}
+
+	# Cache
+	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+	if paths is None:
+		print 'discover.career.orgs missed cache'
+		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),_get_paths_in_career_alt(request.user,career),600)
+		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+
+	else:
+		print 'discover.career.orgs hit cache'
+
+	## Don't Cache, for development
+	# paths = _get_paths_in_career_alt(request.user, career)
+
+	entities_in_career['network'] = paths['networkCompanies']
+	entities_in_career['all'] = paths['allCompanies']
+
+	overview['network'] = paths['overview']['network']
+	overview['all'] = paths['overview']['all']
+
+	request_type = 'orgs'
+
+	return render_to_response('entities/discover_career.html', {'career': career, 'entities':entities_in_career, 'overview':overview, 'request_type':request_type, 'career_id':career_id}, context_instance=RequestContext(request))
+
+@login_required
+def discover_career_positions(request, career_id):
+
+	career = Career.objects.get(pk=career_id)
+	positions_in_career = {}
+	overview = {}
+
+	# # Cache
+	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+	if paths is None:
+		print 'discover.career.pos missed cache'
+		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),_get_paths_in_career_alt(request.user,career),600)
+		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+
+	else:
+		print 'discover.career.pos hit cache'
+
+	## Don't use cache, for dev
+	# paths = _get_paths_in_career_alt(request.user, career)
+
+
+	positions_in_career['network'] = paths['networkPositions']
+	positions_in_career['all'] = paths['allPositions']
+
+	overview['network'] = paths['overview']['network']
+	overview['all'] = paths['overview']['all']
+
+	request_type = 'positions'
+
+	return render_to_response('entities/discover_career.html', {'career': career, 'positions':positions_in_career, 'overview':overview, 'request_type':request_type, 'career_id':career_id}, context_instance=RequestContext(request))
+
 
 # view for org profiles
 @login_required
@@ -104,111 +170,14 @@ def org_profile(request,org_id):
 
 	return render_to_response('entities/org_profile.html',{'org':org},context_instance=RequestContext(request))
 
-# View for invidiual profiles
-@login_required
-def profile(request, user_id):
 
-	user = User.objects.get(id=user_id)
-	profile = Profile.objects.get(user=user)
-	saved_paths = Saved_Path.objects.filter(owner=user)
-	profile_pic = _get_profile_pic(profile)
-	viewer_saved_paths = Saved_Path.objects.filter(owner=request.user)
-
-	# Do position processing here!
-	positions = Position.objects.filter(person=user)
-	ed_list = []
-	org_list = []
-
-	# declare vars before in case no positions
-	current = None
-
-	for pos in positions:
-		pos.duration = pos.duration_in_months()
-
-		# if pos.title:
-		# 	print 'title: ' + pos.title
-		# if pos.summary:
-		# 	print 'summ ' + pos.summary
-		# if pos.description:
-		# 	print 'des ' + pos.description
-		# if pos.degree:
-		# 	print 'deg: ' + pos.degree
-		# if pos.field:
-		# 	print 'field: ' + pos.field
-
-
-		# Assumption: no end date = current
-		if not pos.end_date:
-			pos.end_date = "Current"
-
-		# Process domains
-		domains = pos.entity.domains.all()
-		if domains:
-			domain = domains[0].name
-			pos.co_name = domain + " company"
-		else:
-			domain = None
-			pos.co_name = pos.entity.name
-
-		pos.domain=domain
-
-		# Process education positions
-		if pos.type == 'education' or pos.title == 'Student':
-			if pos.degree is not None and pos.field is not None:
-				pos.title = pos.degree + ", " + pos.field
-			elif pos.degree is not None:
-				pos.title = pos.degree
-			elif pos.field is not None:
-				pos.title = pos.field
-			else:
-				pos.title = None
-			ed_list.insert(0, pos)
-		else:
-
-			if pos.title:
-				print pos.title + ', ' + pos.co_name
-
-			# Assumption: ignore if no start-date, crappy data
-			if pos.start_date:
-				org_list.insert(0, pos)
-			if pos.current:
-				current = pos
-			# else:
-			# 	print 'ignoring: ' + pos.type
-
-	# Still need to uniqify this data!
-	# will do so O(n2) but hey, these are small datasets
-	ed_list = _uniqify(ed_list)
-	org_list = _uniqify(org_list)
-
-	# Now, prepare for timeline
-	# First, sort by start_date
-	## ?? org_list.sort(key=lambda x: (int(x.start_date)[:3] + int(x.start_date)[0:2]))
-
-	if len(org_list) == 0:
-		# then we have problem
-		start_date = total_time = end_date = compress = None
-	else:	
-		start_date = org_list[len(org_list)-1].start_date
-		total_time = _months_from_now(start_date)
-		end_date = datetime.datetime.now()
-
-		if total_time > 200: 
-		# 200 is an arbitrary constant that seems to fit my laptop screen well
-			total_time = int(math.ceil(total_time/2))
-			for pos in org_list:
-				pos.duration = int(math.ceil(pos.duration/2))
-			compress = True
-		else:
-			compress = False
-
-	return render_to_response('entities/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress}, context_instance=RequestContext(request))
 
 def _get_paths_in_career(user,career):
 
 	# initialize overview array
 	overview = {}
 	paths = {}
+
 	# get users in network
 	users_list, user_ids = _get_users_in_network(user)
 
@@ -216,22 +185,76 @@ def _get_paths_in_career(user,career):
 	# CAUTION--values() can return multiple records when requesting M2M values; make sure to reduce
 	# network_people = User.objects.values('id','profile__headline','profile__first_name','profile__last_name','profile__pictures__pic','positions__entity__id','positions__entity__name').annotate(no_of_pos=Count('positions__id')).order_by('-no_of_pos')
 
+	# Clayton -- need to uniqify this list, b/c lots of wasted time
+	#	parsing duplicate people ... EDIT: not the problem, problem is
+	#	duplicate positions!
+	# network_people = _order_preserving_uniquify(network_people)
+
 	network_people_dict = {}
 	num_pos = 0
-	entities = []
+	# entities = []
+	entities = set()
 	entities_dict = {}
 	num_cos = 0
+	network_positions = []
+	counter = 0
 
+	## Network
 	for p in network_people:
-		num_pos += len(p.positions.all())
+		# num_pos += len(p.positions.all())
+		people_seen = set()
+		positions_seen = set()
+
 		for pos in p.positions.all():
-			entities.append(pos.entity.id)
+			num_pos += 1
+			# entities.append(pos.entity.id)
+			entities.add(pos.entity.id)
+
+			# if pos in career, add to positions
+			# 	additionally, impose 30 position cap
+			
+			if career in pos.careers.all():
+				counter += 1
+				print counter
+			 	if len(network_positions) < 30:
+					# check if seen already (avoid duplicates)
+					if pos.id not in positions_seen:
+						positions_seen.add(pos.id)
+						network_positions.append({
+							'id':pos.id,
+							'title':pos.title,
+							'co_name':pos.entity.name,
+							'owner':pos.person.profile.full_name(),
+							'owner_id':pos.person.id,
+							'logo_path':pos.entity.default_logo(),
+						})
+
+		
 			if pos.entity.name in entities_dict:
 				entities_dict[pos.entity.name]['count'] += 1
+
+				# check if person seen already (avoid duplicates)
+				# 	additionally, cap people @ 5 for now
+				if p.id not in people_seen and len(entities_dict[pos.entity.name]['people']) < 6:
+					
+					person_dict = {
+						'name':p.profile.full_name(),
+						'id':p.id,
+					}
+					entities_dict[pos.entity.name]['people'].append(person_dict)
+					people_seen.add(p.id)
+
 			else:
+				people_list = [{
+					'name':p.profile.full_name(),
+					'id':p.id,
+				}]
+				
 				entities_dict[pos.entity.name] = {
 					'count' : 1,
-					'id':pos.entity.id
+					'id':pos.entity.id,
+					'logo':pos.entity.default_logo(),
+					'people':people_list,	
 				}
 
 	# for p in network_people:
@@ -256,7 +279,8 @@ def _get_paths_in_career(user,career):
 	# 			}
 
 
-	num_cos = len(set(entities))
+	# num_cos = len(set(entities))
+	num_cos = len(entities)
 
 	overview['network'] = {
 		'num_people':len(network_people),
@@ -267,10 +291,13 @@ def _get_paths_in_career(user,career):
 	all_people = User.objects.select_related('positions').filter(positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos')
 
 	num_pos = 0
-	entities = []
+	#entities = []
+	entities = set()
 	all_entities_dict = {}
+	all_positions = []
 	num_cos = 0
 
+	## ALL
 	# loop through all positions, identify those that belong to connections
 	for p in all_people:
 		# check if position held by 
@@ -278,8 +305,10 @@ def _get_paths_in_career(user,career):
 			p.connected = True
 		else:
 			p.connected = False
-		num_pos += len(p.positions.all())
+
+		#num_pos += len(p.positions.all())
 		for pos in p.positions.all():
+			num_pos += 1
 			if pos.entity.name in all_entities_dict:
 				all_entities_dict[pos.entity.name]['count'] += 1
 			else:
@@ -287,9 +316,12 @@ def _get_paths_in_career(user,career):
 					'id':pos.entity.id,
 					'count':1
 				}
-			entities.append(pos.entity.id)
+			# entities.append(pos.entity.id)
+			entities.add(pos.entity.id)
 
-	num_cos = len(set(entities))
+
+	#num_cos = len(set(entities))
+	num_cos = len(entities)
 
 	overview['all'] = {
 		'num_people':len(all_people),
@@ -297,25 +329,223 @@ def _get_paths_in_career(user,career):
 		'num_cos':num_cos
 	}
 
+	# Network Entities Top 3
 	entities_dict = sorted(entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
-
 	overview['network']['bigplayers'] = entities_dict[:3]
 
+	# All Entities Top 3
 	all_entities_dict = sorted(all_entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
-
 	overview['all']['bigplayers'] = all_entities_dict[:3]
 
+	# People in Network, All
 	paths['network'] = network_people
-
 	paths['all'] = all_people
 
+	# TRIAL - adding entities information
+	paths['networkOrgs'] = entities_dict
+	paths['allOrgs'] = all_entities_dict
 
+	# TRIAL - adding positions information
+	paths['networkPositions'] = network_positions
+	paths['allPositions'] = all_positions
+
+	# Returns nested dict
 	paths['overview'] = {
 		'network' : overview['network'],
-		'all':overview['all']
+		'all':overview['all'],
 		}
 
 	# return paths, overview
+	return paths
+
+
+def _get_paths_in_career_alt(user, career):
+
+	paths = {}
+	overview = {}
+
+	# Need: positions related to query
+	career_singleton_array = [career] #needed to make this query work
+	positions_in_career = Position.objects.filter(careers__in=career_singleton_array).select_related('entity', 'person', 'person__profile')
+
+	# Check this fxn to see how it works
+	users_list, user_ids = _get_users_in_network(user)
+
+	## ** DST's ** ##
+
+	# Used to get length of sets
+	all_user_set = set()
+	all_co_set = set()
+	network_user_set = set()
+	network_pos_counter = 0
+	network_co_set = set()
+
+	# Return DST's for 'Network'
+	network_people = []
+	network_cos = []
+	network_pos = []
+
+	# Return DST's for 'Prosperime Community'
+	all_people = []
+	all_cos = []
+	all_pos = []
+
+	# Used for Big Players
+	network_entities_dict = {}
+	all_entities_dict = {}
+
+	for pos in positions_in_career:
+
+		pos_data = {
+			'id':pos.id,
+			'title':pos.title,
+			'co_name':pos.entity.name,
+			'owner':pos.person.profile.full_name(),
+			'owner_id':pos.person.id,
+			'logo_path':pos.entity.default_logo(),
+		}
+
+		co_data = {
+			# count logo id people name
+			'name':pos.entity.name,
+			'id':pos.entity.id,
+			'logo_path':pos.entity.default_logo(),
+			'people':None,
+		}
+
+		# Format End Dates for person_data object
+		if pos.start_date is not None:
+			start_date = pos.start_date.strftime("%m/%Y")
+		else:
+			start_date = None
+
+		if pos.end_date is not None:
+			end_date = pos.end_date.strftime("%m/%Y")
+		else:
+			end_date = "Current"
+
+		person_data = {
+			'name':pos.person.profile.full_name(),
+			'id':pos.person.id,
+			#'latest_position':pos.person.profile.latest_position(),
+			'pos_title':pos.title,
+			'pos_co_name':pos.entity.name,
+			'pos_id':pos.id,
+			'pos_start_date':start_date,
+			'pos_end_date':end_date,
+			'profile_pic':pos.person.profile.default_profile_pic(),
+		}
+
+		# Network & All
+		if pos.person.id in user_ids:
+			
+			# Positions
+			network_pos_counter += 1
+			network_pos.append(pos_data)
+			all_pos.append(pos_data)
+
+			# People
+			network_user_set.add(pos.person.id) 
+			all_user_set.add(pos.person.id)
+			network_people.append(person_data)
+			all_people.append(person_data)
+
+			# Companies
+			
+			# No Duplicates
+			if pos.entity.name not in network_co_set:
+				network_cos.append(co_data)
+			if pos.entity.name not in all_co_set:
+				all_cos.append(co_data)
+			
+			# network_co_set.add(pos.entity.id) # should be id, but crappy db data
+			#all_co_set.add(pos.entity.id) # should be id, but crappy db data
+			network_co_set.add(pos.entity.name)
+			all_co_set.add(pos.entity.name)
+
+			# Entities Dict for BigPlayers
+			## Could rearrange this loop structure for minor boost
+			if pos.entity.id in network_entities_dict:
+				network_entities_dict[pos.entity.id]['count'] += 1
+			else:
+				network_entities_dict[pos.entity.id] = {
+					'count':1,
+					'name':pos.entity.name,
+					'id':pos.entity.id,
+				}
+
+			if pos.entity.id in all_entities_dict:
+				all_entities_dict[pos.entity.id]['count'] += 1
+			else:
+				all_entities_dict[pos.entity.id] = {
+					'count':1,
+					'name':pos.entity.name,
+					'id':pos.entity.id,
+				}
+
+		# Only All
+		else:
+
+			# Positions
+			all_pos.append(pos_data)
+
+			# People
+			all_user_set.add(pos.person.id)
+			all_people.append(person_data)
+
+			# Companies
+			if pos.entity.name not in all_co_set:
+				all_cos.append(co_data)
+
+			# all_co_set.add(pos.entity.id) # should be id, but crappy db data
+			all_co_set.add(pos.entity.name)
+
+			# Entities Dict for BigPlayers
+			if pos.entity.id in all_entities_dict:
+				all_entities_dict[pos.entity.id]['count'] += 1
+			else:
+				all_entities_dict[pos.entity.id] = {
+					'count':1,
+				}
+
+	# People
+	paths['networkPeople'] = network_people
+	paths['allPeople'] = all_people
+
+	# Positions
+	paths['networkPositions'] = network_pos
+	paths['allPositions'] = all_pos
+ 
+	# Companies
+	paths['networkCompanies'] = network_cos
+	paths['allCompanies'] = all_cos	
+
+	## Overview
+	overview['network'] = {
+		'num_people': len(network_user_set),
+		'num_pos': network_pos_counter,
+		'num_cos': len(network_co_set),
+	}
+
+	overview['all'] = {
+		'num_people':len(all_user_set),
+		'num_pos':len(positions_in_career),
+		'num_cos':len(all_co_set),
+	}
+
+	# Big Players
+	network_entities_dict = sorted(network_entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
+	overview['network']['bigplayers'] = network_entities_dict[:3]
+
+	all_entities_dict = sorted(all_entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
+	overview['all']['bigplayers'] = all_entities_dict[:3]
+
+	# Add Overview to Paths
+	paths['overview'] = {
+		'network' : overview['network'],
+		'all': overview['all'],
+	}
+
 	return paths
 
 def search(request):
@@ -332,7 +562,7 @@ def search(request):
 	# Clay: add saved paths here... not sure if this is where to do it
 	#	but hey, it works
 	# EDIT: add an array of path titles (we don't need the objects)
-	saved_paths = Saved_Path.objects.filter(owner=request.user)
+	saved_paths = SavedPath.objects.filter(owner=request.user)
 
 	# if len(saved_paths) > 0:
 	# 	path_titles = []
@@ -389,9 +619,8 @@ def companies(request):
 	return HttpResponse(simplejson.dumps(companies), mimetype="application/json")
 
 
-# CLAY: json object of params for path search. NOT USED
+# JSON dump - filters
 def path_filters(request):
-	print 'hits path_filters'
 	""" serves up JSON object of params for path searches """
 
 	# initialize array for all filters
@@ -645,7 +874,7 @@ def filters(request):
 	return HttpResponse(simplejson.dumps(filters), mimetype="application/json")
 
 
-# CLAY: json dump of all paths, by user
+# JSON dump
 def paths(request):
 	# initialize array of paths
 	paths = []
@@ -689,9 +918,8 @@ def paths(request):
 
 		paths.append({'id':u.id,'profile_pic':profile_pic,'full_name':name,'current_position':current_position,'positions':positions,'connected':connected})
 		# paths.append({'full_name':name,'current_position':current_position,'connected':connected})
-	print paths
-	print '######################\n'
-	return HttpResponse(simplejson.dumps(paths), mimetype="application/json")
+
+	return HttpResponse(simplejson.dumps(paths))
 
 def path(request,user_id):
 	print 'hits path'
@@ -1328,46 +1556,29 @@ def _get_profile_pic(profile):
 		return pics[0].pic.__unicode__()
 	return None
 
-# Helper from StackOverflow to remove duplicates from list whilst preserving order
-def _uniqify(list):
-	tmp = set()
-	solution = []
-	for element in list:
-		# Hack city
-		if element.title == None:
-			element.title = ""
-		current = element.title + ', ' + element.co_name
-
-		if current in tmp:
-			continue
-		tmp.add(current)
-		solution.append(element)
-
-	return solution
-
-# Returns # months difference between start_date and now
-def _months_from_now(start_date):
-	now = datetime.datetime.now()
-	return (12 * (now.year - start_date.year)) + (now.month - start_date.month)
-
-# taken straight from viz.js
-def _months_difference(start_mo, start_yr, end_mo, end_yr, compress, round):
-	diff = 12 * (end_yr - start_yr)
-	diff += end_mo - start_mo
-
-	if compress:
-		diff /= 2
-		if round == 'upper':
-			diff = math.ceil(diff)
-		if round == 'lower':
-			diff = math.floor(diff)
-
-	return diff
 
 
+def _order_preserving_uniquify(seq):
+	checked = []
+	return_seq = []
 
+	print 'before ' + str(len(seq))
+    
+	for e in seq:
+		print e.profile.full_name()
 
+	for e in seq:
+		if e.id not in checked:
+			checked.append(e.id)
+			return_seq.append(e)
 
+	print 'after ' + str(len(return_seq))
+
+	for e in seq:
+		print e.profile.full_name()
+
+	return return_seq 
+  
 
 
 

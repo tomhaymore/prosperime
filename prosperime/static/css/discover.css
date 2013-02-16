@@ -13,7 +13,10 @@ div#content-container {
 	margin-top:15px;
 }
 
-
+div .blue-box-container a {
+	color:whitesmoke;
+	text-decoration:none;
+}
 
 div.discover-nav-container {
 	border-bottom: solid 1px rgb(41,98,152);
@@ -118,7 +121,8 @@ span.stats {
 }
 
 div.discover-path {
-	margin-left: 15px
+	margin-left: 15px;
+	margin-bottom:15px;
 }
 
 div.discover-path-name {

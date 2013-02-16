@@ -10,7 +10,7 @@
 
 <div id="content-container" class="main-container">
 	<p class="splash-header">Discover</p>
-	<p class="main-sub-header">Discover career paths from other individuals in <span class="calllout-text">your network</span> or browse the whole <span class="callout-text">prosperime</span> community to see career paths of people <span class="callout-text">just like you</span>.</p>
+	<p class="main-sub-header">Discover career paths from other individuals in <span class="callout-text">your network</span> or browse the whole <span class="callout-text">prosperime</span> community to see career paths of people <span class="callout-text">just like you</span>.</p>
 
 	<div id="careers-container">
 		<div class="discover-nav-container">
@@ -43,9 +43,21 @@
 					</div>
 					<div class="pull-left careers-stats-container">
 						<ul class="careers-stats">
-							<li class="careers-stats-people"><div class="stats">{{c.1.num_people}}</div></li>
-							<li class="careers-stats-positions"><div class="stats">{{c.1.num_pos}}</div></li>
-							<li class="careers-stats-orgs"><div class="stats">{{c.1.num_cos}}</div></li>
+							<li class="careers-stats-people blue-box-container">
+								<a href="career/{{c.0}}/">
+								<div class="stats">{{c.1.num_people}}</div>
+								</a>
+							</li>
+							<li class="careers-stats-positions blue-box-container">
+								<a href="career/{{c.0}}/positions/">
+								<div class="stats">{{c.1.num_pos}}</div>
+								</a>
+							</li>
+							<li class="careers-stats-orgs blue-box-container">
+								<a href="career/{{c.0}}/orgs/">
+								<div class="stats">{{c.1.num_cos}}</div>
+								</a>
+							</li>
 						</ul>
 					</div>
 					<div class="clear"></div>
