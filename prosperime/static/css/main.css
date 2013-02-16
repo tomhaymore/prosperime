@@ -216,7 +216,7 @@ img.logo-preview {
 .main-header {
 	font-weight: bold;
 	font-size:1.2em;
-	font-size: 1.5em;
+	/*font-size: 1.5em;*/
 	color: rgb(41,98,152);
 	font-weight: 500;
 }

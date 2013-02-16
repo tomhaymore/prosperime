@@ -23,12 +23,17 @@ NGRAM_MIN = 1
 careers_to_positions_map = {}
 
 # initilize array for stop words
-STOP_LIST = []
-
-# def __init__():
-# 	# fill in career to positions map
-# 	_init_career_to_positions_map()
-# 	_load_stop_list()
+STOP_LIST = [
+	'director',
+	'manager',
+	'intern',
+	'aide',
+	'clerk',
+	'consultant',
+	'program director',
+	'sales',
+	'founder'
+]
 
 def _load_stop_list():
 	global STOP_LIST
@@ -95,6 +100,7 @@ def init_careers_to_positions_map():
 	careers_to_positions_map = career_map
 
 def match_careers_to_position(pos):
+	global STOP_LIST
 	title_ngrams = _extract_ngrams(_tokenize_position(pos.title))
 
 	careers = []
@@ -106,7 +112,7 @@ def match_careers_to_position(pos):
 				if t not in STOP_LIST:
 					for k,v in careers_to_positions_map.items():
 						if t in v and k not in careers:
-							print 'hello'
+							# print 'hello'
 							careers.append(k)
 							# print t + ": " + career.name
 
@@ -135,31 +141,23 @@ def test_match_careers_to_position(title=None):
 		careers = []
 
 		if p.title:
-			print 'yes title'
+			# print 'yes title'
 			title_ngrams = _extract_ngrams(_tokenize_position(p.title))
 
-			print title_ngrams
+			# print title_ngrams
 
 			for t in title_ngrams:
 				# make sure position title is not in stop list, e.g., "Manager" or "Director" or something equally generic
 				if t not in STOP_LIST:
-					print 'not in stop list'
+					# print 'not in stop list'
 					for k,v in careers_to_positions_map.items():
-						print v
+						# print v
 						if t in v and k not in careers:
+							print t + " : " + str(v)
 							careers.append(k)
 							career = Career.objects.get(pk=k)
-							# print t + ": " + career.name
-		print careers
-
-def flatten_position_lists():
-	careers = Career.objects.all()
-	for c in careers:
-		titles = c.get_pos_titles()
-		if titles:
-			for t in titles:
-				if t is list:
-					print t
+							# print str(k) + ": " + t
+		# print str(p.title) + " : " + str(careers)
 
 class CareerSimBase():
 
@@ -385,6 +383,15 @@ class CareerMapBase():
 								# print t + ": " + career.name
 			print careers
 
+	def list_unmatched_positions(self):
+		'''
+		print list of all positions that are not matched to a career
+		'''
+		positions = Position.objects.filter(careers=None).exclude(type="education")
+		for p in positions:
+			if p.title:
+				print p.title
+
 class CareerImportBase():
 
 	# positions to never match, too general
@@ -394,7 +401,9 @@ class CareerImportBase():
 		'Assistant',
 		'Attendant',
 		'n.s.',
-		'\ specified not listed'
+		'\ specified not listed',
+		'Manager',
+		'Director'
 		]
 
 	# trigger words to truncate position titles from census
@@ -565,4 +574,4 @@ class CareerExportBase():
 
 
 init_careers_to_positions_map()
-_load_stop_list()
+# _load_stop_list()
