@@ -2,11 +2,16 @@
 import json
 import urllib2
 from datetime import datetime
-
-#import csv
+import csv
+import re
+import os
+import types
 
 # from Django
-from entities.models import Career, Position, User
+from entities.models import Career, Industry, Position, User
+# from careers.models import Career
+from django.core.exceptions import MultipleObjectsReturned
+from django.core import management
 
 # set max size of ngram
 NGRAM_MAX = 10
@@ -18,12 +23,17 @@ NGRAM_MIN = 1
 careers_to_positions_map = {}
 
 # initilize array for stop words
-STOP_LIST = []
-
-# def __init__():
-# 	# fill in career to positions map
-# 	_init_career_to_positions_map()
-# 	_load_stop_list()
+STOP_LIST = [
+	'director',
+	'manager',
+	'intern',
+	'aide',
+	'clerk',
+	'consultant',
+	'program director',
+	'sales',
+	'founder'
+]
 
 def _load_stop_list():
 	global STOP_LIST
@@ -76,7 +86,13 @@ def init_careers_to_positions_map():
 			titles = json.loads(c['pos_titles'])
 			# add career-to-position title mapping, reduced to lower case
 			if titles is not None:
-				titles = [t.lower() for t in titles]
+				# print title
+				# pass
+				try:
+					titles = [t.lower() for t in titles]
+				except AttributeError:
+					print titles
+					# pass
 			
 			career_map[c['id']] = titles
 			# print career_map
@@ -84,6 +100,7 @@ def init_careers_to_positions_map():
 	careers_to_positions_map = career_map
 
 def match_careers_to_position(pos):
+	global STOP_LIST
 	title_ngrams = _extract_ngrams(_tokenize_position(pos.title))
 
 	careers = []
@@ -95,7 +112,7 @@ def match_careers_to_position(pos):
 				if t not in STOP_LIST:
 					for k,v in careers_to_positions_map.items():
 						if t in v and k not in careers:
-							print 'hello'
+							# print 'hello'
 							careers.append(k)
 							# print t + ": " + career.name
 
@@ -124,22 +141,23 @@ def test_match_careers_to_position(title=None):
 		careers = []
 
 		if p.title:
-			print 'yes title'
+			# print 'yes title'
 			title_ngrams = _extract_ngrams(_tokenize_position(p.title))
 
-			print title_ngrams
+			# print title_ngrams
 
 			for t in title_ngrams:
 				# make sure position title is not in stop list, e.g., "Manager" or "Director" or something equally generic
 				if t not in STOP_LIST:
-					print 'not in stop list'
+					# print 'not in stop list'
 					for k,v in careers_to_positions_map.items():
-						print v
+						# print v
 						if t in v and k not in careers:
+							print t + " : " + str(v)
 							careers.append(k)
 							career = Career.objects.get(pk=k)
-							# print t + ": " + career.name
-		print careers
+							# print str(k) + ": " + t
+		# print str(p.title) + " : " + str(careers)
 
 class CareerSimBase():
 
@@ -367,7 +385,133 @@ class CareerMapBase():
 								# print t + ": " + career.name
 			print careers
 
+	def list_unmatched_positions(self):
+		'''
+		print list of all positions that are not matched to a career
+		'''
+		positions = Position.objects.filter(careers=None).exclude(type="education")
+		for p in positions:
+			if p.title:
+				print p.title
+
 class CareerImportBase():
+
+	# positions to never match, too general
+	CENSUS_STOP_LIST = [
+		'Intern',
+		'Aide',
+		'Assistant',
+		'Attendant',
+		'n.s.',
+		'\ specified not listed',
+		'Manager',
+		'Director'
+		]
+
+	# trigger words to truncate position titles from census
+	CENSUS_REMOVE_LIST = [
+		r' \\ n\.s\.',
+		r' \\ any activity',
+		r'n\.s\.',
+		r'--See',
+		r', associate degree',
+		r', less than associate degree',
+		r', exc',
+		r'\(.+\)',
+		r'\\',
+		r', specified',
+		r', other specified',
+		r', secretarial',
+		r', exc'
+	]
+
+	# matches strings that should be split into separate strings
+	CENSUS_SPLIT_LIST = [
+		'Host/Hostess',
+		'Waiter/Waitress'
+	]
+
+	def test_import_census_matching_data(self,path):
+		# initiate career dict
+		career_positions_dict = {}
+		# open file, conver to csv DictReader object
+		f = open(path,'rU')
+		c = csv.DictReader(f)
+		# loop through each row in the file
+		for row in c:
+			
+			title = row['2010 OCCUPATION TITLE']
+			code = row['2010 Census Occupation Code']
+			# make sure it's not a pointer row and has an actual occupation code
+			if row['2010 Census Occupation Code']:
+				# format position title
+				# remove all patterns from the remove list
+				for t in self.CENSUS_REMOVE_LIST:
+					m = re.search(t,title)
+					if m:
+						title = title[:m.start()]
+				# check to see if it's on stop list
+				if title not in self.CENSUS_STOP_LIST:
+					# check to see if the dictionary already has an entry for this
+					if code not in career_positions_dict:
+						# print title
+						career_positions_dict[code] = [title]
+					elif title not in career_positions_dict[code]:
+						# print title
+						career_positions_dict[code].append(title)
+						# print career_positions_dict[code]
+		for k,v in career_positions_dict.items():
+			for position in v:
+				if not isinstance(position,types.StringTypes):
+					print k, str(position)
+		f = open('careers_dump.txt','w')
+		f.write(json.dumps(career_positions_dict))
+		f.close()
+
+	def import_census_matching_data(self,path):
+		# initiate career dict
+		career_positions_dict = {}
+		# open file, conver to csv DictReader object
+		f = open(path,'rU')
+		c = csv.DictReader(f)
+		# loop through each row in the file
+		for row in c:
+			title = row['2010 OCCUPATION TITLE']
+			code = row['2010 Census Occupation Code']
+			if row['2010 Census Occupation Code']:
+				
+				# format position title
+				
+				for t in self.CENSUS_REMOVE_LIST:
+					m = re.search(t,title)
+					if m:
+						title = title[:m.start()]
+				# check to see if it's on stop list
+				if title not in self.CENSUS_STOP_LIST:
+					if code not in career_positions_dict:
+						# print title
+						career_positions_dict[code] = [title]
+					elif title not in career_positions_dict[code]:
+						# print title
+						career_positions_dict[code].append(title)
+						# print career_positions_dict[code]
+		# add each title to career
+		for k,v in career_positions_dict.items():
+			print k + ": " + str(v)
+			# check to see if career already exists
+			try:
+				career = Career.objects.get(census_code=k)
+			except MultipleObjectsReturned:	
+				mult_careers = Career.objects.filter(census_code=k)
+				career = mult_careers[0]
+			except:
+				career = Career()
+				career.census_code = k
+				career.save()
+			for pos in v:
+				career.add_pos_title(pos)
+			career.save()
+		# print career_positions_dict
 
 	def import_careers_from_file(self,path):
 
@@ -401,6 +545,17 @@ class CareerImportBase():
 
 class CareerExportBase():
 
+	def export_careers_fixtures(self):
+		"""
+		exports JSON fixtures for careers in current directory
+		"""
+		file_name = 'careers_fixture_' + datetime.now().strftime('%Y%m%d%H%M') + '.json'
+		careers = Career.objects.all().values('id','short_name','long_name','description','parent','census_code','soc_code','pos_titles')
+		fixtures = json.dumps(list(careers))
+		f = open(file_name,'w')
+		f.write(fixtures)
+		f.close()
+
 	def export_careers(self):
 
 		file_name = 'careers_' + datetime.now().strftime('%Y%m%d%H%M') + '.csv'
@@ -421,4 +576,4 @@ class CareerExportBase():
 
 
 init_careers_to_positions_map()
-_load_stop_list()
+# _load_stop_list()

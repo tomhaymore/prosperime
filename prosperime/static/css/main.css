@@ -58,6 +58,18 @@ div.footer {
 	padding-top:10px;
 }
 
+/* Messages */
+
+div#messages {
+	width: 1000px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 10px;
+	border: none;
+	border-radius: 5px;
+	background-color: #fff;
+	padding: 5px;
+}
 
 /* Home page */
 
@@ -204,7 +216,7 @@ img.logo-preview {
 .main-header {
 	font-weight: bold;
 	font-size:1.2em;
-	font-size: 1.5em;
+	/*font-size: 1.5em;*/
 	color: rgb(41,98,152);
 	font-weight: 500;
 }

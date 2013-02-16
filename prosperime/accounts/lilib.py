@@ -463,12 +463,12 @@ class LIBase():
 			pos.end_date = self.format_dates(data['endDate'])
 		pos.save()
 		# if pos.title:
-		print "matching..."
+		# print "matching..."
 		careers = careerlib.match_careers_to_position(pos)
-		print careers
+		# print careers
 		for c_id in careers:
 			c = Career.objects.get(pk=c_id)
-			print c
+			# print c
 			pos.careers.add(c)
 		pos.save()
 
