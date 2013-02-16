@@ -918,9 +918,12 @@ ul.flat li {
 	margin:8px;
 }
 
-.left-header {
+.left-headers {
 	text-align:left;
-	padding-left:15px;
+}
+
+.left-headers a {
+	margin-left:15px;
 }
 
 #end {

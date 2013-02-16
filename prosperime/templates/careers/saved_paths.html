@@ -55,7 +55,7 @@ $.ajaxSetup({
 <!-- Header -->
 <div class="content-container main-container">
 	<p class="main-header"><span id="path-header"></span></p>
-	<p class="main-sub-header">Paths Tags{{profile.headline}}</p>
+	<p class="main-sub-header" id='saved-path-career-tags'></p>
 
 	<div class="saved-paths-nav-container">&nbsp;</div>
 
@@ -64,23 +64,11 @@ $.ajaxSetup({
 
 
 		<div class="saved-paths-list pull-left span9">
-
-			{% if type == 'all' %}
-			<div class='span4 pull-left'>
-				<ul class='careers-stats inline left-header'>
-					<li>path name</li>
-				</ul>
+			<div id='thumbnail-column-header'> 
+				<!-- BACKBONE JUMPS IN HERE -->
 			</div>
 
-			<div class='offset2 span6'>
-				<ul class="careers-stats inline">
-					<li>positions in path</li>
-					<li>some other stat</li>
-					<li>some other stat</li>
-				</ul>
-			</div>
 			<div class='clear'></div>
-			{% endif %}
 			
 			<div id="saved-paths-list">
 				<!-- BACKBONE JUMPS IN HERE -->
@@ -219,12 +207,27 @@ $.ajaxSetup({
 	<div class="clear">
 </script>
 
-<script type='text/template' id="saved-path-thumbnail-list-template">
-	
-	
-	<div class="saved-path-thumbnail-table">
+<script type='text/template' id="saved-path-thumbnail-list-template">	
+	<div class="saved-path-thumbnail-table"></div>
+</script>
 
-	</div>
+<!-- Adds column headers to all paths view -->
+<script type='text/template' id="thumbnail-column-header-template">
+
+		<div class='span4 pull-left'>
+			<ul class='careers-stats inline left-header pull-left'>
+				<li>path name</li>
+			</ul>
+		</div>
+
+
+		<div class='offset2 span6'>
+			<ul class="careers-stats inline">
+				<li>positions in path</li>
+				<li>some other stat</li>
+				<li>some other stat</li>
+			</ul>
+		</div>
 </script>
 
 <script type="text/template" id="proto-single-template">
@@ -237,6 +240,8 @@ $.ajaxSetup({
 
 
 </script>
+
+
 
 <!-- Auxilary Functions Go Here -->
 <script type="text/javascript">
@@ -271,6 +276,9 @@ $.ajaxSetup({
 
 	// AJAX POST
 	var changePositionOrder = function(difference, position_id, pos_index, path_id) {
+
+		_gaq.push(['_trackEvent', 'savedPaths', 'positionRearranged'])
+
 		$.post('/saved_paths/rearrange/', {difference: difference, pos_id:position_id, pos_index:pos_index, path_id:path_id}, function(response) {
 				console.log(response)
 				window.savedPaths.fetch()

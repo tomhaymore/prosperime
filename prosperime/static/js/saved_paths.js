@@ -119,6 +119,7 @@ $(function(){
 		},
 
 		positionClicked: function(ev) {
+			_gaq.push(['_trackEvent', 'savedPaths', 'positionClicked', 'single'])
 
 		},
 
@@ -147,8 +148,6 @@ $(function(){
 				$(this).css('visibility', 'hidden')
 			});
 		},
-
-	
 	});
 
 
@@ -161,7 +160,6 @@ $(function(){
 
 		events: {
 			"click .icon-remove-circle":"remove",
-
 		},
 
 		initialize: function() {
@@ -182,6 +180,11 @@ $(function(){
 
 			$(this.el).html(this.template({}));
 			$savedPaths = this.$(".path-list");
+
+			var type = window.savedPaths.models[0].attributes['type']
+			if (type == 'single') {
+				$('#thumbnail-column-header').empty()
+			} 
 
 
 			// Single Path
@@ -206,6 +209,8 @@ $(function(){
 		},
 
 		remove: function(ev) {
+			_gaq.push(['_trackEvent', 'savedPaths', 'removePosition', 'single'])
+
 			var self = this.collection
 
 			// Grab path_id from the url (route)
@@ -283,6 +288,13 @@ $(function(){
 			$('#path-header').empty()
 			$('#path-header').append('<span class="blue">Saved Career Paths</span>');
 			
+			// Admittedly, this is ghetto
+			var type = window.savedPaths.models[0].attributes['type']
+			if (type == 'all') {
+				console.log('here')
+				$('#thumbnail-column-header').empty();
+				$('#thumbnail-column-header').append($('#thumbnail-column-header-template').html())
+			} 
 
 			// Single Thumbnail
 			this.collection.each(function(savedPath) {
@@ -296,6 +308,8 @@ $(function(){
 		},
 
 		goToPath: function(ev) {
+			_gaq.push(['_trackEvent', 'savedPaths', 'goToPath', 'all'])
+
 			if ($(ev.currentTarget).attr('id') === undefined) {
 				// then create a new path
 			} else {
@@ -323,6 +337,7 @@ $(function(){
 		},
 
 		deletePath: function(ev) {
+			_gaq.push(['_trackEvent', 'savedPaths', 'deletePath', 'all'])
 			ev.preventDefault();
 			console.log('delete: ' + ev.currentTarget.id)
 

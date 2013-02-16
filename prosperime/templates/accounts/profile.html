@@ -75,7 +75,7 @@
 								<table class="table table-striped table-condensed table-bordered position-list">
 								{% for pos in orgs %}
 									<!-- <div class="{{profile.id}}-list indent"> -->
-									<tr onmouseover="showDescription({{forloop.counter0}}, '{{pos.title}}', '{{pos.co_name}}', '{{pos.start_date}}', '{{pos.end_date}}')" draggable='true' ondragstart='drag(event)' id="{{pos.id}}">	
+									<tr onmouseover="showDescription({{forloop.counter0}}, '{{pos.title}}', '{{pos.co_name}}', '{{pos.start_date}}', '{{pos.end_date}}')" draggable='true' ondragstart='dragPos(event)' id="{{pos.id}}">	
 										{% if pos.title %}
 											<td>{{pos.title}}</td>
 										{% endif %}	
@@ -209,9 +209,16 @@
 		
 <script type="text/javascript">
 
+	function dragPos(ev) {
+  		ev.dataTransfer.setData("pos_id", ev.target.id);
+    	_gaq.push(['_trackEvent', 'profile', 'positionDragged'])
+  	};
+
 
 	/* Need JQuery for the AJAX request, so put it here */
 	var dropPosition = function(ev, path_title, elem) {
+		_gaq.push(['_trackEvent', 'profile', 'positionDropped'])
+
 		ev.preventDefault();
 		var pos_id = ev.dataTransfer.getData("pos_id");
 
@@ -230,6 +237,8 @@
 	};
 
 	var newPathAjax = function() {
+		_gaq.push(['_trackEvent', 'profile', 'newPathCreated'])
+
 		var title = $('#new-path-box').val()
 		if (title.length < 1) {
 			errorCreatingPath('title')
@@ -255,6 +264,8 @@
 	};
 
 	var errorCreatingPath = function(reason) {
+		_gaq.push(['_trackEvent', 'profile', 'errorCreatingPath'])
+	
 		var createBox = $('#new-path-box')
 		if (reason == "db") {
 			console.log("Error in the view creating new path...")

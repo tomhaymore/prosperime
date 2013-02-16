@@ -30,7 +30,7 @@ def home(request):
 	user = request.user
 
 	data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
-	data['saved_paths'] = SavedPath.objects.filter(owner=user)
+	data['	aths'] = SavedPath.objects.filter(owner=user)
 	data['top_careers'] = []
 
 	return render_to_response('home.html',data,context_instance=RequestContext(request))
@@ -60,8 +60,20 @@ def discover(request):
 			'connections_task_id':request.session['tasks']['connections'],
 		}
 
-	careers_network = _get_careers_brief_in_network(request.user)
-	careers_similar = _get_careers_brief_similar(request.user.id)
+	# Check/Set Cache
+	careers_network = cache.get('discover_careers_network_data_'+str(request.user.id))
+	if careers_network is None:
+		cache.set('discover_careers_network_data_'+str(request.user.id),_get_careers_brief_in_network(request.user),600)
+		careers_network = cache.get('discover_careers_network_data_'+str(request.user.id))
+
+	careers_similar = cache.get('discover_careers_similar_data_'+str(request.user.id))
+	if careers_similar is None:
+		cache.set('discover_careers_similar_data_'+str(request.user.id),_get_careers_brief_similar(request.user.id),600)
+		careers_similar = cache.get('discover_careers_similar_data'+str(request.user.id))
+
+	# # Dev, don't cache
+	# careers_network = _get_careers_brief_in_network(request.user)
+	# careers_similar = _get_careers_brief_similar(request.user.id)
 
 	careers = {}
 
@@ -402,14 +414,16 @@ def _get_paths_in_career_alt(user, career):
 			'co_name':pos.entity.name,
 			'owner':pos.person.profile.full_name(),
 			'owner_id':pos.person.id,
-			'logo_path':pos.entity.default_logo(),
+			#'logo_path':pos.entity.default_logo(),
+			'logo_path':pos.entity.logo,
 		}
 
 		co_data = {
 			# count logo id people name
 			'name':pos.entity.name,
 			'id':pos.entity.id,
-			'logo_path':pos.entity.default_logo(),
+			#'logo_path':pos.entity.default_logo(),
+			'logo_path':pos.entity.logo,
 			'people':None,
 		}
 
@@ -433,7 +447,8 @@ def _get_paths_in_career_alt(user, career):
 			'pos_id':pos.id,
 			'pos_start_date':start_date,
 			'pos_end_date':end_date,
-			'profile_pic':pos.person.profile.default_profile_pic(),
+			#'profile_pic':pos.person.profile.default_profile_pic(),
+			'profile_pic':pos.person.profile.profile_pic,
 		}
 
 		# Network & All
@@ -1080,12 +1095,13 @@ def _get_careers_brief_similar(user_id,**filters):
 
 	users = careers_sim.find_similar_careers(user_id)
 	
-	careers = Career.objects.prefetch_related('positions').filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk',num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk'))).order_by('-num_people').distinct()[:10]
+	careers = Career.objects.prefetch_related('positions', 'positions__entity', 'positions__person').filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk',num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk'))).order_by('-num_people').distinct()[:10]
 
 	for c in careers:
 		people = []
 		cos = []
 		c.num_pos = len(c.positions.all())
+		c.num_pos = 0
 		for p in c.positions.all():
 			people.append(p.person.id)
 			cos.append(p.entity.id)
@@ -1106,7 +1122,12 @@ def _get_careers_brief_in_network(user,**filters):
 
 	cxns = user.profile.connections.all().values('user__id').select_related('user')
 
-	users = [c['user__id'] for c in cxns]
+	# sets avoid duplicates
+	users = set()
+	users = {c['user__id'] for c in cxns}
+	#users =[c['user__id'] for c in cxns]
+	# for u in users:
+	# 	print u
 
 	# careers = Career.objects.filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk'),num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk')).order_by('-num_people').distinct()
 	# careers = Career.objects.prefetch_related('positions').filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk',num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk'))).order_by('-num_people').distinct()[:10]
