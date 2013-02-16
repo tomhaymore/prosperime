@@ -1,15 +1,12 @@
 # from Python
 import json
-<<<<<<< HEAD
 import urllib2
 from datetime import datetime
 import csv
 import re
 import os
 import types
-=======
-import csv
->>>>>>> 5983dd2... Lots of little changes all over the place, but mainly work on adding two new views to discover career
+
 
 # from Django
 from entities.models import Career, Industry, Position, User
