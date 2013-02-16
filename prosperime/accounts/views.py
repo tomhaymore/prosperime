@@ -234,7 +234,7 @@ def finish_link(request):
 		'connections': connections_task.id
 	}
 
-	messages.success(request, 'Your LinkedIn account has been successfully linked.')
+	messages.success(request, 'Your LinkedIn account has been successfully linked. Please <a href="/home">refresh the page</a> to see changes.')
 
 	return HttpResponseRedirect('/home')
 
