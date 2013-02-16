@@ -165,7 +165,7 @@ class Career(models.Model):
 				titles.append(t.decode("utf8","ignore"))
 		else:
 			titles = [t.decode("utf8","ignore")]
-		print titles
+		# print titles
 		self.pos_titles = json.dumps(titles)
 		self.save()
 

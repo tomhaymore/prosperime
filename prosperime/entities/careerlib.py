@@ -3,9 +3,15 @@ import json
 import urllib2
 from datetime import datetime
 import csv
+import re
+import os
+import types
 
 # from Django
-from entities.models import Career, Position, User
+from entities.models import Career, Industry, Position, User
+# from careers.models import Career
+from django.core.exceptions import MultipleObjectsReturned
+from django.core import management
 
 # set max size of ngram
 NGRAM_MAX = 10
@@ -75,7 +81,13 @@ def init_careers_to_positions_map():
 			titles = json.loads(c['pos_titles'])
 			# add career-to-position title mapping, reduced to lower case
 			if titles is not None:
-				titles = [t.lower() for t in titles]
+				# print title
+				# pass
+				try:
+					titles = [t.lower() for t in titles]
+				except AttributeError:
+					print titles
+					# pass
 			
 			career_map[c['id']] = titles
 			# print career_map
@@ -139,6 +151,15 @@ def test_match_careers_to_position(title=None):
 							career = Career.objects.get(pk=k)
 							# print t + ": " + career.name
 		print careers
+
+def flatten_position_lists():
+	careers = Career.objects.all()
+	for c in careers:
+		titles = c.get_pos_titles()
+		if titles:
+			for t in titles:
+				if t is list:
+					print t
 
 class CareerSimBase():
 
@@ -366,6 +387,121 @@ class CareerMapBase():
 
 class CareerImportBase():
 
+	# positions to never match, too general
+	CENSUS_STOP_LIST = [
+		'Intern',
+		'Aide',
+		'Assistant',
+		'Attendant',
+		'n.s.',
+		'\ specified not listed'
+		]
+
+	# trigger words to truncate position titles from census
+	CENSUS_REMOVE_LIST = [
+		r' \\ n\.s\.',
+		r' \\ any activity',
+		r'n\.s\.',
+		r'--See',
+		r', associate degree',
+		r', less than associate degree',
+		r', exc',
+		r'\(.+\)',
+		r'\\',
+		r', specified',
+		r', other specified',
+		r', secretarial',
+		r', exc'
+	]
+
+	# matches strings that should be split into separate strings
+	CENSUS_SPLIT_LIST = [
+		'Host/Hostess',
+		'Waiter/Waitress'
+	]
+
+	def test_import_census_matching_data(self,path):
+		# initiate career dict
+		career_positions_dict = {}
+		# open file, conver to csv DictReader object
+		f = open(path,'rU')
+		c = csv.DictReader(f)
+		# loop through each row in the file
+		for row in c:
+			
+			title = row['2010 OCCUPATION TITLE']
+			code = row['2010 Census Occupation Code']
+			# make sure it's not a pointer row and has an actual occupation code
+			if row['2010 Census Occupation Code']:
+				# format position title
+				# remove all patterns from the remove list
+				for t in self.CENSUS_REMOVE_LIST:
+					m = re.search(t,title)
+					if m:
+						title = title[:m.start()]
+				# check to see if it's on stop list
+				if title not in self.CENSUS_STOP_LIST:
+					# check to see if the dictionary already has an entry for this
+					if code not in career_positions_dict:
+						# print title
+						career_positions_dict[code] = [title]
+					elif title not in career_positions_dict[code]:
+						# print title
+						career_positions_dict[code].append(title)
+						# print career_positions_dict[code]
+		for k,v in career_positions_dict.items():
+			for position in v:
+				if not isinstance(position,types.StringTypes):
+					print k, str(position)
+		f = open('careers_dump.txt','w')
+		f.write(json.dumps(career_positions_dict))
+		f.close()
+
+	def import_census_matching_data(self,path):
+		# initiate career dict
+		career_positions_dict = {}
+		# open file, conver to csv DictReader object
+		f = open(path,'rU')
+		c = csv.DictReader(f)
+		# loop through each row in the file
+		for row in c:
+			title = row['2010 OCCUPATION TITLE']
+			code = row['2010 Census Occupation Code']
+			if row['2010 Census Occupation Code']:
+				
+				# format position title
+				
+				for t in self.CENSUS_REMOVE_LIST:
+					m = re.search(t,title)
+					if m:
+						title = title[:m.start()]
+				# check to see if it's on stop list
+				if title not in self.CENSUS_STOP_LIST:
+					if code not in career_positions_dict:
+						# print title
+						career_positions_dict[code] = [title]
+					elif title not in career_positions_dict[code]:
+						# print title
+						career_positions_dict[code].append(title)
+						# print career_positions_dict[code]
+		# add each title to career
+		for k,v in career_positions_dict.items():
+			print k + ": " + str(v)
+			# check to see if career already exists
+			try:
+				career = Career.objects.get(census_code=k)
+			except MultipleObjectsReturned:	
+				mult_careers = Career.objects.filter(census_code=k)
+				career = mult_careers[0]
+			except:
+				career = Career()
+				career.census_code = k
+				career.save()
+			for pos in v:
+				career.add_pos_title(pos)
+			career.save()
+		# print career_positions_dict
+
 	def import_careers_from_file(self,path):
 
 		f = open(path,'rU')
@@ -397,6 +533,10 @@ class CareerImportBase():
 			career.save()
 
 class CareerExportBase():
+
+	def export_careers_fixtures(self):
+		file_name = 'careers_fixture_' + datetime.now().strftime('%Y%m%d%H%M') + '.json'
+		os.system('django-admin.py dumpdata entities.Career > ' + file_name)
 
 	def export_careers(self):
 
