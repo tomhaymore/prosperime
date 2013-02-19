@@ -9,8 +9,8 @@ import types
 
 
 # from Django
-from entities.models import Career, Industry, Position, User
-# from careers.models import Career
+from entities.models import Industry, User
+from careers.models import Career, Position
 from django.core.exceptions import MultipleObjectsReturned
 from django.core import management
 

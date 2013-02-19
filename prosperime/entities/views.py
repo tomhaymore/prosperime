@@ -17,9 +17,9 @@ from django.core.cache import cache
 
 
 # Prosperime
-from entities.models import Entity, Office, Financing, Industry, Position, Career
+from entities.models import Entity, Office, Financing, Industry
 from accounts.models import Picture, Profile
-from careers.models import SavedPath
+from careers.models import SavedPath, Position, Career
 from entities.careerlib import CareerSimBase
 
 # @login_required
