@@ -181,7 +181,7 @@ def _get_paths_in_career(user,career):
 	# get users in network
 	users_list, user_ids = _get_users_in_network(user)
 
-	network_people = User.objects.prefetch_related().select_related('positions','entities','accounts').filter(id__in=user_ids,positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos')
+	network_people = User.objects.prefetch_related().select_related('positions','entities','accounts').filter(id__in=user_ids,positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos').distinct()
 	# CAUTION--values() can return multiple records when requesting M2M values; make sure to reduce
 	# network_people = User.objects.values('id','profile__headline','profile__first_name','profile__last_name','profile__pictures__pic','positions__entity__id','positions__entity__name').annotate(no_of_pos=Count('positions__id')).order_by('-no_of_pos')
 
@@ -288,7 +288,7 @@ def _get_paths_in_career(user,career):
 		'num_cos':num_cos
 	}
 
-	all_people = User.objects.select_related('positions').filter(positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos')
+	all_people = User.objects.select_related('positions').filter(positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos').distinct()
 
 	num_pos = 0
 	#entities = []
