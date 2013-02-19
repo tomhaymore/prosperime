@@ -7,6 +7,7 @@
 {% endblock %}
 
 {% block content %}
+{% cache 500 content user.id career.id %}
 <div id="content-container" class="main-container">
 	<p class="main-header">Discover: <span class="splash-slug">{{career.name}}</span></p>
 	<p class="main-sub-header">{{career.description}}</p>
@@ -210,4 +211,6 @@
 			</div>
 	</div>
 </div>
+
+{% endcache %}
 {% endblock %}
