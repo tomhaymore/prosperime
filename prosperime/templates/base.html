@@ -17,30 +17,30 @@
 
 <body>
 	<div class="navbar navbar-static-top">
-			<div class="navbar-inner">
-				<div class="row-fluid">
-					<div class="span2 offset1">
-						<!-- <a class="brand" href="/">Prosperime</a> -->
-						<a href="/"><img class="main-logo" src="{{STATIC_URL}}img/logo_1.png" /></a>
-					</div>
-					<div class="span5 offset2 nav-collapse pull-right">
-						<ul class="nav">
-							<!-- <li>
-								<a href="/">Home</a>
-							</li> -->
-	                		{% if user.is_authenticated %}
-	                		<li>
-	                			<a href="/home/">{{user.profile.full_name}}</a>
-	                		</li>
-	                		<li>
-	                			<a href="/account/logout/">Logout</a>
-	                		</li>
-	                		{% endif %}
-							<li>
-								<a href="/contact">Contact</a>
-							</li>
-						</ul>
-					</div>
+		<div class="navbar-inner">
+			<div class="row-fluid">
+				<div class="span2 offset1">
+					<!-- <a class="brand" href="/">Prosperime</a> -->
+					<a href="/"><img class="main-logo" src="{{STATIC_URL}}img/logo_1.png" /></a>
+				</div>
+				<div class="span5 offset2 nav-collapse pull-right">
+					<ul class="nav">
+						<!-- <li>
+							<a href="/">Home</a>
+						</li> -->
+                		{% if user.is_authenticated %}
+                		<li>
+                			<a href="/home/">{{user.profile.full_name}}</a>
+                		</li>
+                		<li>
+                			<a href="/account/logout/">Logout</a>
+                		</li>
+                		{% endif %}
+						<li>
+							<a href="/contact">Contact</a>
+						</li>
+					</ul>
+				</div>
 				
 			</div>
 		</div>
