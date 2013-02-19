@@ -1,10 +1,10 @@
 # from Python
 import oauth2 as oauth
 import cgi
-# from datetime import datetime, timedelta
+from datetime import datetime, timedelta
 import urlparse
 import math
-import datetime
+# import datetime
 
 # from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, logout as auth_logout, login as auth_login
@@ -22,8 +22,8 @@ from accounts.tasks import process_li_profile, process_li_connections
 
 # Prosperime
 from accounts.models import Account, Profile, Picture
-from careers.models import SavedPath
-from entities.models import Position, Entity
+from careers.models import SavedPath, Career, Position
+from entities.models import Entity
 
 def login(request):
 	
@@ -240,7 +240,7 @@ def finish_link(request):
 		'connections': connections_task.id
 	}
 
-	messages.success(request, 'Your LinkedIn account has been successfully linked. Please <a href="/home">refresh the page</a> to see changes.')
+	messages.success(request, 'Your LinkedIn account has been successfully linked. Please refresh the page to see changes.')
 
 	return HttpResponseRedirect('/home')
 
