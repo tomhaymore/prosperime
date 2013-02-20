@@ -29,9 +29,9 @@ def home(request):
 	data = {}
 	user = request.user
 
-	data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
+	# data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
 	data['saved_paths'] = SavedPath.objects.filter(owner=user)
-	data['top_careers'] = []
+	data['user_careers'] = request.user.saved_careers.all()
 
 	return render_to_response('home.html',data,context_instance=RequestContext(request))
 
@@ -48,6 +48,8 @@ def welcome(request):
 		return HttpResponseRedirect('home')
 	return render_to_response('welcome.html',context_instance=RequestContext(request))
 
+
+
 @login_required
 def discover(request):
 
@@ -61,7 +63,9 @@ def discover(request):
 		}
 
 	careers_network = _get_careers_brief_in_network(request.user)
-	careers_similar = _get_careers_brief_similar(request.user.id)
+	careers_similar = _get_careers_brief_similar(request.user)
+
+
 
 	careers = {}
 
@@ -165,11 +169,44 @@ def discover_career_positions(request, career_id):
 
 # view for org profiles
 @login_required
-def org_profile(request,org_id):
-	org = Entity.objects.get(pk=org_id)
+def profile_org(request, org_id):
 
-	return render_to_response('entities/org_profile.html',{'org':org},context_instance=RequestContext(request))
+	# saved_paths... always need this... better way?
+	saved_paths = SavedPath.objects.filter(owner=request.user)
 
+	# nothing related to entities, so don't know if we can batch here
+	entity = Entity.objects.get(pk=org_id)
+
+	# Basic Entity Data
+	response = {
+		'id':org_id,
+		'name':entity.name,
+		'size':entity.size_range,
+		'description':entity.description,
+		'logo_path':entity.default_logo(),
+	}
+
+	# Related Jobs
+	# Should use entity object, but duplicates!
+	## jobs = Position.objects.filter(entity=entity).select_related('person__profile')
+	jobs = Position.objects.filter(entity__name=entity.name).select_related('person__profile')
+
+	related_jobs = []
+	for j in jobs:
+		jobs_data = {
+			'id':j.id,
+			'title':j.title,
+			'description':j.description,
+			'owner_name':j.person.profile.full_name(),
+			'owner_id':j.person.id,
+		}
+		related_jobs.append(jobs_data)
+
+
+	response['jobs'] = related_jobs
+	response['saved_paths'] = saved_paths
+
+	return render_to_response('accounts/profile_org.html', response, context_instance=RequestContext(request))
 
 
 def _get_paths_in_career(user,career):
@@ -1074,7 +1111,9 @@ def careers(request):
 
 	return render_to_response('entities/careers.html',{'careers':careers,'overview':overview},context_instance=RequestContext(request))
 
-def _get_careers_brief_similar(user_id,**filters):
+def _get_careers_brief_similar(user,**filters):
+
+	user_id = user.id
 
 	careers_sim = CareerSimBase()
 
