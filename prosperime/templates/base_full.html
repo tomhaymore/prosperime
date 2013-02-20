@@ -48,18 +48,21 @@
 			</div>
 		</div>
         
-	 <div class="">
+	 <div class="messages-container">
 		{% block message %} 
+
 			{% if messages %}
-			<div id="messages"
-			<ul class="messages">
-			    {% for message in messages %}
-			    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-			    {% endfor %}
-			</ul>
+				<div id="messages">
+					<ul class="messages">
+					    {% for message in messages %}
+					    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+					    {% endfor %}
+					</ul>
+				</div>
 			{% endif %}
-			</div>
+		
 		{% endblock %}
+
 	</div>
    
     <div class="container-fluid splash-container">
