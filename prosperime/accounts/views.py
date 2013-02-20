@@ -242,7 +242,7 @@ def finish_link(request):
 
 	messages.success(request, 'Your LinkedIn account has been successfully linked. Please refresh the page to see changes.')
 
-	return HttpResponseRedirect('/home')
+	return HttpResponseRedirect('/discover')
 
 def success(request):
 	return render_to_response('accounts/success.html',context_instance=RequestContext(request))
@@ -362,45 +362,7 @@ def profile(request, user_id):
 
 	return render_to_response('accounts/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress, 'career_map': career_map}, context_instance=RequestContext(request))
 	
-@login_required
-def profile_org(request, org_id):
 
-	# saved_paths... always need this... better way?
-	saved_paths = SavedPath.objects.filter(owner=request.user)
-
-	# nothing related to entities, so don't know if we can batch here
-	entity = Entity.objects.get(pk=org_id)
-
-	# Basic Entity Data
-	response = {
-		'id':org_id,
-		'name':entity.name,
-		'size':entity.size_range,
-		'description':entity.description,
-		'logo_path':entity.default_logo(),
-	}
-
-	# Related Jobs
-	# Should use entity object, but duplicates!
-	## jobs = Position.objects.filter(entity=entity).select_related('person__profile')
-	jobs = Position.objects.filter(entity__name=entity.name).select_related('person__profile')
-
-	related_jobs = []
-	for j in jobs:
-		jobs_data = {
-			'id':j.id,
-			'title':j.title,
-			'description':j.description,
-			'owner_name':j.person.profile.full_name(),
-			'owner_id':j.person.id,
-		}
-		related_jobs.append(jobs_data)
-
-
-	response['jobs'] = related_jobs
-	response['saved_paths'] = saved_paths
-
-	return render_to_response('accounts/profile_org.html', response, context_instance=RequestContext(request))
 
 #################
 #### HELPERS ####
