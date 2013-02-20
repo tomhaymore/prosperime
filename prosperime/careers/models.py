@@ -82,6 +82,7 @@ class Career(models.Model):
 	industry_code = models.CharField(max_length=15,null=True)
 	industry = models.ManyToManyField(Industry)
 	pos_titles = models.TextField(null=True)
+	saved_people = models.ManyToManyField(User,related_name="saved_careers",through="SavedCareer")
 	status = models.CharField(max_length=15,default="active")
 	created = models.DateTimeField(auto_now_add=True, null=True)
 	updated = models.DateTimeField(auto_now=True, null=True)
@@ -143,6 +144,32 @@ class Career(models.Model):
 
 	name = property(_name)
 
+class SavedCareer(models.Model):
+
+	career = models.ForeignKey(Career)
+	owner = models.ForeignKey(User)
+	title = models.CharField(max_length=150,null=True)
+	status = models.CharField(max_length=15,default="active")
+	created = models.DateTimeField(auto_now_add=True, null=True)
+	updated = models.DateTimeField(auto_now=True, null=True)
+
+class IdealPosition(models.Model):
+
+	title = models.CharField(max_length=450)
+	description = models.TextField(null=True)
+	careers = models.ManyToManyField(Career,related_name="ideal_positions")
+	people = models.ManyToManyField(User,through='GoalPosition')
+	status = models.CharField(max_length=15,default="active")
+	created = models.DateTimeField(auto_now_add=True, null=True)
+	updated = models.DateTimeField(auto_now=True, null=True)
+
+class GoalPosition(models.Model):
+
+	position = models.ForeignKey(IdealPosition)
+	owner = models.ForeignKey(User)
+	status = models.CharField(max_length=15,default="active")
+	created = models.DateTimeField(auto_now_add=True, null=True)
+	updated = models.DateTimeField(auto_now=True, null=True)
 
 class SavedPath(models.Model):
 
@@ -159,12 +186,11 @@ class SavedPath(models.Model):
 		self.save()
 		return return_val
 
-	# This bugs and dies and I don't know why
-	# def __unicode__(self):
-	# 	if date_created:
-	# 		return "Saved Path. " + str(date_created)
-	# 	else:
-	# 		return "Saved Path."
+	def __unicode__(self):
+		if self.date_created:
+			return "Saved Path. " + str(self.date_created)
+		else:
+			return "Saved Path."
 
 class SavedPosition(models.Model):
 
