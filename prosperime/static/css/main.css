@@ -32,6 +32,34 @@ div.full-height {
 	height:1000px;
 }
 
+div.topbar {
+	-webkit-box-shadow: 0 1px 10px rgba(0,0,0,0.1);
+	-moz-box-shadow: 0 1px 10px rgba(0,0,0,0.1);
+	box-shadow: 0 1px 10px rgba(0,0,0,0.1);
+	border-width: 0 0 1px;
+	background-color: #fff;
+	background-image: none;
+}
+
+div.topbar-inner {
+	width:1000px;
+	margin-left: auto;
+	margin-right:auto;
+	background-color: #fff;
+	background-image: none;
+	min-height: 40px;
+}
+
+ul.topbar-nav {
+	margin: 10px 0 0 0;
+	padding:0px;
+}
+
+ul.topbar-nav li {
+	display:inline;
+	margin-left:10px;
+}
+
 div.navbar-inner {
 	background-color: #fff;
 	background-image: none;
@@ -722,9 +750,24 @@ ul.flat li {
 
 .callout-text {
 	color: rgb(41,98,152);
-	font-weight: 500;
+	font-weight: 600;
 }
 
+button.general-add-button {
+	display:inline-block;
+	line-height: 24px;
+	background-color: rgb(41,98,152);
+	color:#fff;
+	border: none;
+	display: inline-block;
+	margin-bottom: 12px;
+	border-radius: 1px;
+}
+
+button.general-add-button:active {
+	/*color: rgb(41,98,152);*/
+	background-color:rgb(41,98,148);
+}
 
 
 /*CLAYTON's PATH VIZ */
@@ -1131,6 +1174,63 @@ p.splash-header {
 	padding:4px;
 }
 
+/* General styles */
+
+div.general-nav-container {
+	border-bottom: solid 1px rgb(41,98,152);
+	padding-bottom: 0px;
+}
+
+div.general-nav-container div {
+	
+}	
+
+.general-nav-selected {
+	padding: 5px 10px 5px 10px;
+	background-color: rgb(41,98,152);
+	/*margin-right: 15px;*/
+	width: 50px
+	transition: background 0.5s;
+	-moz-transition: background 0.5s;
+	-webkit-transition: background 0.5s;
+	-o-transition: background 0.5s;
+}
+
+.general-nav-selected a {
+	text-decoration: none;
+	color: #fff;
+
+}
+
+.general-nav-unselected {
+	background-color: #fff;
+	padding: 5px 10px 5px 10px;
+	/*margin-right: 15px;*/
+	width: 50px
+	transition: background 0.5s;
+	-moz-transition: background 0.5s;
+	-webkit-transition: background 0.5s;
+	-o-transition: background 0.5s;
+
+}
+
+.general-nav-unselected a {
+	text-decoration: none;
+	color: rgb(41,98,152);
+	transition: all 0.2s;
+	-moz-transition: all 0.2s;
+	-webkit-transition: all 0.2s;
+	-o-transition: all 0.2s;
+}
+
+.general-nav-unselected:hover {
+	background-color: rgb(41,98,152);
+	color: #fff;
+}
+
+.general-nav-unselected:hover a {
+	color: #fff;
+}
 
 /* Contact Page */
 
