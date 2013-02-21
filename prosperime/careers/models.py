@@ -1,8 +1,6 @@
 # Python
 import datetime
-
-# Python
-import datetime
+import json
 
 # Django
 from django.db import models
