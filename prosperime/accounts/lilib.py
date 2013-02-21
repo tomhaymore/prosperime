@@ -464,9 +464,9 @@ class LIBase():
 			pos.end_date = self.format_dates(data['endDate'])
 		pos.save()
 		# if pos.title:
-		# print "matching..."
+		print "matching..."
 		careers = careerlib.match_careers_to_position(pos)
-		# print careers
+		print careers
 		for c_id in careers:
 			c = Career.objects.get(pk=c_id)
 			# print c
@@ -929,7 +929,7 @@ class LIConnections(LIBase):
 		try:
 			img = urllib2.urlopen(img_url)
 		except urllib2.HTTPError, e:
-			self.stdout.write(str(e.code))
+			print str(e.code)
 		if img:
 			pic = Picture()
 			pic.person = user.profile
