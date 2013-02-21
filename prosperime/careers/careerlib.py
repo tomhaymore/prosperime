@@ -10,7 +10,7 @@ import types
 
 # from Django
 from entities.models import Industry, User
-from careers.models import Career, Position
+from careers.models import Career, Position, IdealPosition
 from django.core.exceptions import MultipleObjectsReturned
 from django.core import management
 from django.db.models import Count, Q
@@ -499,6 +499,21 @@ class CareerImportBase():
 		'Host/Hostess',
 		'Waiter/Waitress'
 	]
+
+	def convert_career_titles_to_positions(self):
+		careers = Career.objects.all()
+
+		for c in careers:
+			titles = c.get_pos_titles()
+			if titles:
+				for t in titles:
+					try:
+						ideal_pos = IdealPosition.objects.get(title=t)
+					except:
+						ideal_pos = IdealPosition(title=t)
+					ideal_pos.save()
+					ideal_pos.careers.add(c)
+					ideal_pos.save()
 
 	def test_import_census_matching_data(self,path):
 		# initiate career dict
