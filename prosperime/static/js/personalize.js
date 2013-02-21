@@ -33,7 +33,7 @@ $(document).ready(function() {
 		console.log(selected_jobs);
 		$.post('/add_personalization/',{'selected_careers':selected_careers,'selected_jobs':selected_jobs}, function(data) {
 			if (data == "success") {
-				window.location('/home');
+				window.location = '/home';
 			} else {
 				var warning = "<div id='messages'>";
 				warning += "<ul class='messages'>";

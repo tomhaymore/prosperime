@@ -7,17 +7,67 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.utils import simplejson
+from django.contrib.auth.decorators import login_required
 
 # Prosperime
-from entities.models import Position
-from careers.models import SavedPath, SavedPosition
+# from entities.models import Position
+from careers.models import SavedPath, SavedPosition, Position, Career, GoalPosition, SavedCareer
 from accounts.models import Profile
+import careers.careerlib as careerlib
 
 
 ######################################################
 ################## CORE VIEWS ########################
 ######################################################
 
+@login_required
+def personalize_careers_jobs(request):
+	'''
+	presents initial set of careers and jobs to user during onboarding for them to selected
+	'''
+	# initiate careerlib
+	career_sim = careerlib.CareerSimBase()
+	# data array for passing to template
+	data = {}
+	# check to see if tasks have been initiated
+	if 'tasks' in request.session:
+		data = {
+			'profile_task_id':request.session['tasks']['profile'],
+			'connections_task_id':request.session['tasks']['connections'],
+		}
+
+	careers_network = career_sim.get_careers_brief_in_network(request.user)
+	careers_similar = career_sim.get_careers_brief_similar(request.user)
+
+	# get list of ids of similar careers to avoid duplication in network
+	careers_similar_ids = []
+
+	for c in careers_similar:
+		careers_similar_ids.append(c.id)
+
+	careers = {}
+
+	careers['network'] = careers_network
+	careers['similar'] = careers_similar
+
+	return render_to_response('careers/personalize.html',{'data':data,'careers':careers},context_instance=RequestContext(request))
+
+@login_required
+def add_personalization(request):
+	# check to make sure POST data came through
+	if request.POST:
+		if 'selected_careers[]' in request.POST:
+			for career_id in request.POST['selected_careers[]']:
+				career = Career.objects.get(pk=career_id)
+				saved_career = SavedCareer(career=career,owner=request.user)
+				saved_career.save()
+		if 'selected_jobs[]' in request.POST:
+			for job in request.POST['selected_jobs[]']:
+				goal_pos = GoalPosition(title=job['name'],owner=request.user)
+				goal_pos.save()
+		return render_to_response('api_success.html')
+	else:
+		return render_to_response('api_fail.html')
 
 # VIEW: display ALL user's paths
 def show_paths(request):
