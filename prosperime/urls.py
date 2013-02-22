@@ -8,7 +8,7 @@ from django.conf import settings
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'entities.views.home', name='home'),
-    url(r'^home/$', 'entities.views.home'),
+    url(r'^home/$', 'careers.views.home'),
     url(r'^welcome/$','entities.views.welcome'),
     url(r'^personalize/$','careers.views.personalize_careers_jobs'),
     url(r'^add_personalization/$','careers.views.add_personalization'),
