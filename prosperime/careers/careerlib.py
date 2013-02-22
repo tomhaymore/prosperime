@@ -15,6 +15,13 @@ from django.core.exceptions import MultipleObjectsReturned
 from django.core import management
 from django.db.models import Count, Q
 
+# get focal careers
+def get_focal_careers(user,limit=10):
+	career_sim = CareerSimBase()
+	careers = career_sim.get_focal_careers(user,limit)
+	return careers
+
+
 # set max size of ngram
 NGRAM_MAX = 10
 
@@ -252,6 +259,12 @@ class CareerSimBase():
 		sorted_orgs_sim = [u[0] for u in sorted_orgs_sim]
 
 		return sorted_orgs_sim[:10]
+
+	def get_focal_careers(self,user,limit=5):
+
+		careers = Career.objects.prefetch_related('positions').annotate(num=Count('positions__pk')).order_by('-num').distinct()[:limit]
+
+		return careers
 
 	def get_careers_brief_similar(self,user,**filters):
 

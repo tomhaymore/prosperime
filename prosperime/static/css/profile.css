@@ -1,3 +1,31 @@
+
+div.profile-careers-container {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+ul.profile-careers-list {
+	margin-left: 0;
+	font-size:9pt;
+}
+
+ul.profile-careers-list li {
+	margin-left: 0;
+	margin-right:10px;
+}
+
+a.profile-button {
+	display:inline-block;
+	padding: 2px 4px 2px 4px;
+	background-color: rgb(41,98,152);
+	color:#fff;
+	cursor:pointer;
+}
+
+a.profile-button:hover {
+	text-decoration: none;
+}
+
 div.profile-nav-container {
 	border-bottom: solid 1px rgb(41,98,152);
 	padding-bottom: 0px;
@@ -17,5 +45,5 @@ div.profile-brief-info {
 }
 
 div#middle-float-screen {
-	width:380px;
+	width:350px;
 }

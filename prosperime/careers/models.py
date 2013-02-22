@@ -177,7 +177,7 @@ class SavedPath(models.Model):
 	title = models.CharField(max_length=50, null=True)
 	date_created = models.DateTimeField(auto_now_add=True,null=True)
 	date_modified = models.DateTimeField(auto_now=True,null=True)
-	owner = models.ForeignKey(User,related_name='savedpath')
+	owner = models.ForeignKey(User,related_name='saved_path')
 	positions = models.ManyToManyField(Position, through='SavedPosition')
 	last_index = models.CharField(max_length = 10, null=True)
 

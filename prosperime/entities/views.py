@@ -32,7 +32,7 @@ def contact(request):
 def welcome(request):
 	if request.user.is_authenticated():
 		# user is logged in, display personalized information
-		return HttpResponseRedirect('home')
+		return HttpResponseRedirect('/home')
 	return render_to_response('welcome.html',context_instance=RequestContext(request))
 
 
