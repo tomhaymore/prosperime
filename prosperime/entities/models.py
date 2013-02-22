@@ -8,6 +8,10 @@ from django.contrib.auth.models import User
 # from accounts.models import Account
 
 class Entity(models.Model):
+
+	# def _get_logo_entity_path(self, filename):
+	# 	path = "logos/" + self.entity.std_name() + "/" + filename
+	# 	return path
 	
 	name = models.CharField(max_length=450)
 	type = models.CharField(max_length=25) # org or person
@@ -36,7 +40,8 @@ class Entity(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 	status = models.CharField(max_length=15,default="active")
-	
+	# logo = models.ImageField(max_length=450, upload_to=_get_logo_entity_path, blank=True, null=True)
+
 	# returns name
 	def __unicode__(self):
 		return self.name

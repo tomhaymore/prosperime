@@ -104,9 +104,17 @@
 		
 <script type="text/javascript">
 
+	/* Page-specific drag for GA */
+	function dragPos(ev) {
+  		ev.dataTransfer.setData("pos_id", ev.target.id);
+    	_gaq.push(['_trackEvent', 'profile-org', 'positionDragged'])
+  	};
+
 
 	/* Need JQuery for the AJAX request, so put it here */
 	var dropPosition = function(ev, path_title, elem) {
+		_gaq.push(['_trackEvent', 'profile-org', 'positionDropped'])
+
 		ev.preventDefault();
 		var pos_id = ev.dataTransfer.getData("pos_id");
 
@@ -125,6 +133,8 @@
 	};
 
 	var newPathAjax = function() {
+		_gaq.push(['_trackEvent', 'profile-org', 'newPathCreated'])
+
 		var title = $('#new-path-box').val()
 		if (title.length < 1) {
 			errorCreatingPath('title')
@@ -150,6 +160,9 @@
 	};
 
 	var errorCreatingPath = function(reason) {
+
+		_gaq.push(['_trackEvent', 'profile-rg', 'errorCreatingPath'])
+
 		var createBox = $('#new-path-box')
 		if (reason == "db") {
 			console.log("Error in the view creating new path...")

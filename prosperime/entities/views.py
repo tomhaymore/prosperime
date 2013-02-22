@@ -20,7 +20,7 @@ from django.core.cache import cache
 from entities.models import Entity, Office, Financing, Industry
 from accounts.models import Picture, Profile
 from careers.models import SavedPath, Position, Career
-from entities.careerlib import CareerSimBase
+import careers.careerlib as careerlib
 
 def contact(request):
 
@@ -40,6 +40,9 @@ def welcome(request):
 @login_required
 def discover(request):
 
+	# initiate CarerSimBase
+	career_sim = careerlib.CareerSimBase()
+
 	# data array for passing to template
 	data = {}
 	# print request.user.id
@@ -49,10 +52,20 @@ def discover(request):
 			'connections_task_id':request.session['tasks']['connections'],
 		}
 
-	careers_network = _get_careers_brief_in_network(request.user)
-	careers_similar = _get_careers_brief_similar(request.user)
+	# Check/Set Cache
+	careers_network = cache.get('discover_careers_network_data_'+str(request.user.id))
+	if careers_network is None:
+		cache.set('discover_careers_network_data_'+str(request.user.id),career_sim.get_careers_brief_in_network(request.user),600)
+		careers_network = cache.get('discover_careers_network_data_'+str(request.user.id))
 
+	careers_similar = cache.get('discover_careers_similar_data_'+str(request.user.id))
+	if careers_similar is None:
+		cache.set('discover_careers_similar_data_'+str(request.user.id),career_sim.get_careers_brief_similar(request.user),600)
+		careers_similar = cache.get('discover_careers_similar_data'+str(request.user.id))
 
+	# # Dev, don't cache
+	# careers_network = _get_careers_brief_in_network(request.user)
+	# careers_similar = _get_careers_brief_similar(request.user.id)
 
 	careers = {}
 
@@ -63,6 +76,9 @@ def discover(request):
 
 @login_required
 def discover_career(request,career_id):
+
+	# initiate CarerSimBase
+	career_sim = careerlib.CareerSimBase()
 
 	# get career object
 	career = Career.objects.get(pk=career_id)
@@ -135,9 +151,14 @@ def discover_career_positions(request, career_id):
 		print 'discover.career.pos missed cache'
 		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),_get_paths_in_career_alt(request.user,career),600)
 		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
-
 	else:
-		print 'discover.career.pos hit cache'
+		print 'discover.people hit cache'
+
+	## Don't Cache, for dev
+	# paths = _get_paths_in_career_alt(request.user, career)
+
+	paths_in_career['network'] = paths['networkPeople']
+	paths_in_career['all'] = paths['allPeople']
 
 	## Don't use cache, for dev
 	# paths = _get_paths_in_career_alt(request.user, career)
@@ -152,7 +173,6 @@ def discover_career_positions(request, career_id):
 	request_type = 'positions'
 
 	return render_to_response('entities/discover_career.html', {'career': career, 'positions':positions_in_career, 'overview':overview, 'request_type':request_type, 'career_id':career_id}, context_instance=RequestContext(request))
-
 
 # view for org profiles
 @login_required
@@ -343,7 +363,6 @@ def _get_paths_in_career(user,career):
 			# entities.append(pos.entity.id)
 			entities.add(pos.entity.id)
 
-
 	#num_cos = len(set(entities))
 	num_cos = len(entities)
 
@@ -426,14 +445,16 @@ def _get_paths_in_career_alt(user, career):
 			'co_name':pos.entity.name,
 			'owner':pos.person.profile.full_name(),
 			'owner_id':pos.person.id,
-			'logo_path':pos.entity.default_logo(),
+			#'logo_path':pos.entity.default_logo(),
+			'logo_path':pos.entity.logo,
 		}
 
 		co_data = {
 			# count logo id people name
 			'name':pos.entity.name,
 			'id':pos.entity.id,
-			'logo_path':pos.entity.default_logo(),
+			#'logo_path':pos.entity.default_logo(),
+			'logo_path':pos.entity.logo,
 			'people':None,
 		}
 
@@ -457,7 +478,8 @@ def _get_paths_in_career_alt(user, career):
 			'pos_id':pos.id,
 			'pos_start_date':start_date,
 			'pos_end_date':end_date,
-			'profile_pic':pos.person.profile.default_profile_pic(),
+			#'profile_pic':pos.person.profile.default_profile_pic(),
+			'profile_pic':pos.person.profile.profile_pic,
 		}
 
 		# Network & All
@@ -1106,12 +1128,13 @@ def _get_careers_brief_similar(user,**filters):
 
 	users = careers_sim.find_similar_careers(user_id)
 	
-	careers = Career.objects.prefetch_related('positions').filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk',num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk'))).order_by('-num_people').distinct()[:10]
+	careers = Career.objects.prefetch_related('positions', 'positions__entity', 'positions__person').filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk',num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk'))).order_by('-num_people').distinct()[:10]
 
 	for c in careers:
 		people = []
 		cos = []
 		c.num_pos = len(c.positions.all())
+		c.num_pos = 0
 		for p in c.positions.all():
 			people.append(p.person.id)
 			cos.append(p.entity.id)
@@ -1132,7 +1155,11 @@ def _get_careers_brief_in_network(user,**filters):
 
 	cxns = user.profile.connections.all().values('user__id').select_related('user')
 
-	users = [c['user__id'] for c in cxns]
+	# sets avoid duplicates
+	users = set()
+	users =[c['user__id'] for c in cxns]
+	# for u in users:
+	# 	print u
 
 	# careers = Career.objects.filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk'),num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk')).order_by('-num_people').distinct()
 	# careers = Career.objects.prefetch_related('positions').filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk',num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk'))).order_by('-num_people').distinct()[:10]

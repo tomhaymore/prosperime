@@ -55,7 +55,7 @@ $.ajaxSetup({
 <!-- Header -->
 <div class="content-container main-container">
 	<p class="main-header"><span id="path-header"></span></p>
-	<p class="main-sub-header">Paths Tags{{profile.headline}}</p>
+	<p class="main-sub-header" id='saved-path-career-tags'></p>
 
 	<div class="saved-paths-nav-container">&nbsp;</div>
 
@@ -81,6 +81,13 @@ $.ajaxSetup({
 			</div>
 			<div class='clear'></div>
 			{% endif %}
+
+			<div id='thumbnail-column-header'> 
+				<!-- BACKBONE JUMPS IN HERE -->
+			</div>
+
+			<div class='clear'></div>
+
 			
 			<div id="saved-paths-list">
 				<!-- BACKBONE JUMPS IN HERE -->
@@ -193,6 +200,7 @@ $.ajaxSetup({
 
 	<div class="span1 saved-path-delete">
 		<a class="delete-path" id="<%=id%>">Delete</a>
+<<<<<<< HEAD
 	</div>
 
 	<div class="offset1 span6">
@@ -225,6 +233,55 @@ $.ajaxSetup({
 	<div class="saved-path-thumbnail-table">
 
 	</div>
+=======
+	</div>
+
+	<div class="offset1 span6">
+		<ul class="careers-stats">
+			<li class="careers-stats-people blue-box-container">
+				<div class="stats">
+					<%=count%><!-- # Positions in path -->
+				</div>
+			</li>
+
+			<li class="careers-stats-people blue-box-container saved-path-info-boxes">
+				<div class="stats">
+					0
+				</div>
+			</li>
+
+			<li class="careers-stats-orgs blue-box-container">
+				<div class="stats">
+					0
+				</div>
+			</li>
+		</ul>
+	</div>
+	<div class="clear">
+</script>
+
+<script type='text/template' id="saved-path-thumbnail-list-template">	
+	<div class="saved-path-thumbnail-table"></div>
+</script>
+
+<!-- Adds column headers to all paths view -->
+<script type='text/template' id="thumbnail-column-header-template">
+
+		<div class='span4 pull-left'>
+			<ul class='careers-stats inline left-header pull-left'>
+				<li>path name</li>
+			</ul>
+		</div>
+
+
+		<div class='offset2 span6'>
+			<ul class="careers-stats inline">
+				<li>positions in path</li>
+				<li>some other stat</li>
+				<li>some other stat</li>
+			</ul>
+		</div>
+>>>>>>> 4827f46fc653c5fbcba7f71f6bfccb766d516fee
 </script>
 
 <script type="text/template" id="proto-single-template">
@@ -237,6 +294,8 @@ $.ajaxSetup({
 
 
 </script>
+
+
 
 <!-- Auxilary Functions Go Here -->
 <script type="text/javascript">
@@ -271,11 +330,15 @@ $.ajaxSetup({
 
 	// AJAX POST
 	var changePositionOrder = function(difference, position_id, pos_index, path_id) {
+
+		_gaq.push(['_trackEvent', 'savedPaths', 'positionRearranged'])
+
 		$.post('/saved_paths/rearrange/', {difference: difference, pos_id:position_id, pos_index:pos_index, path_id:path_id}, function(response) {
 				console.log(response)
 				window.savedPaths.fetch()
 		});
 	};
+<<<<<<< HEAD
 
 	/* Adds a create box to the bottom of the saved-path last */
 	var createNewPath = function() {
@@ -339,6 +402,71 @@ $.ajaxSetup({
 		highlight(createBox)
 	};
 
+=======
+
+	/* Adds a create box to the bottom of the saved-path last */
+	var createNewPath = function() {
+
+		// First, make sure there isn't already a new path box out there
+		if ($('#new-path-box-row').length > 0) return
+
+		// If not, then create and add a last row
+		// Todo: the weird mix of jquery of javascript should be ammended
+		var table = $('#sidebar-path-list')
+		console.log(table)
+		var lastRow = $('.saved-path-list-last')[0]
+		var newRow = document.createElement('tr')
+		newRow.id = 'new-path-box-row'
+		var newCol = document.createElement('td')
+
+		var newColText = '<div class="input-prepend">'
+		newColText += '<span class="add-on" onclick="newPathAjax()"><i class="icon-plus"></i></span>'
+		newColText += '<input type="text" maxlength="32" style="width:160px" id="new-path-box" onclick="clearContents(this)" />'
+		newColText += '</div>'
+		newCol.innerHTML = newColText;
+		
+		newRow.appendChild(newCol)
+		table.append(newRow)
+	};
+
+	var newPathAjax = function() {
+		var title = $('#new-path-box').val()
+		if (title.length < 1) {
+			errorCreatingPath('title')
+			return
+		}
+
+		// Attempt POST request via AJAX to create path
+		$.post('/saved_paths/create/', {title: title, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
+				if (response['success']) {
+					console.log(response)
+					// Construct new table element for path
+					var newRow = "<tr><td ondragover='allowDrop(event)' ondrop='dropPosition(event," + title + ", this)'><a href='/saved_paths/#id/?id=" + response['id'] + "'>" + title + "</a></td></tr>"
+
+					// Add to DOM
+					$('#sidebar-path-list > tbody:last').append(newRow)
+					
+					// Clear text field
+					$('#new-path-box-row').remove()
+				} else {
+					errorCreatingPath('db')
+				}
+		}, 'json');
+	};
+
+	var errorCreatingPath = function(reason) {
+		var createBox = $('#new-path-box')
+		if (reason == "db") {
+			console.log("Error in the view creating new path...")
+			createBox.val("Please enter a title")
+		} else if (reason == "title") {
+			createBox.val("Please enter a title")
+		}
+
+		highlight(createBox)
+	};
+
+>>>>>>> 4827f46fc653c5fbcba7f71f6bfccb766d516fee
 
 </script>
 

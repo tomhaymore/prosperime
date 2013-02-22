@@ -11,11 +11,9 @@ from django.utils import simplejson
 from django.contrib.auth.decorators import login_required
 
 # Prosperime
-# from entities.models import Position
 from careers.models import SavedPath, SavedPosition, Position, Career, GoalPosition, SavedCareer, IdealPosition
 from accounts.models import Profile
 import careers.careerlib as careerlib
-
 
 ######################################################
 ################## CORE VIEWS ########################

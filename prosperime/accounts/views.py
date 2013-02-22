@@ -1,10 +1,10 @@
 # from Python
 import oauth2 as oauth
 import cgi
-from datetime import datetime, timedelta
+# from datetime import datetime, timedelta
 import urlparse
 import math
-# import datetime
+import datetime
 
 # from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, logout as auth_logout, login as auth_login
@@ -361,8 +361,6 @@ def profile(request, user_id):
 	career_map = profile.all_careers
 
 	return render_to_response('accounts/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress, 'career_map': career_map}, context_instance=RequestContext(request))
-	
-
 
 #################
 #### HELPERS ####
