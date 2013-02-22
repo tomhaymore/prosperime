@@ -2,8 +2,12 @@
 
 body {
 	/*padding-top:40px;*/
-	background-color:whitesmoke;
+	/*background-color:whitesmoke;*/
 	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+}
+
+div.background-container {
+	background-color:whitesmoke;
 }
 
 div.main-container {
@@ -16,6 +20,7 @@ div.main-container {
 	-moz-box-shadow: 0 1px 10px rgba(0,0,0,0.1);
 	box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
 	margin-top:15px;
+	min-height: 250px;
 }
 
 div#main-container {
@@ -79,6 +84,28 @@ img.main-logo {
 }
 
 /* Footer */
+
+div.footer-container {
+	width:100%;
+	background-color: #fff;
+	border-top: 1px solid #ccc;
+}
+
+div.footer-inner {
+	padding-top: 10px;
+	width: 1000px;
+	margin-left: auto;
+	margin-right: auto;
+	min-height: 35px;
+}
+
+ul.footer-links {
+
+}
+
+ul.footer-links li {
+	display:inline;
+}
 
 div.footer {
 	font-size: 0.9em;
