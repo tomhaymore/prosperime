@@ -13,10 +13,11 @@ $(document).ready(function() {
     });
     $("input#personalize-job-name").typeahead({
     	name: 'jobs',
-    	remote: '/careers/jobs',
+    	remote: '/careers/jobs?q=%QUERY',
     	limit: 10
     	})
 	$("div.personalize-career-entry").click(function() {
+		console.log($(this).data('career-id'))
 		$(this).toggleClass("personalize-unselected");
 		$(this).toggleClass("personalize-selected");
 	});
@@ -32,7 +33,7 @@ $(document).ready(function() {
 			}
 		});
 		$("ul#personalize-jobs-list li").each(function() {
-			selected_jobs.push({'name':$(this).data('job-name'),'id':$(this).data('job-id')});
+			selected_jobs.push($(this).data('job-name'));
 		});
 		console.log(selected_careers);
 		console.log(selected_jobs);

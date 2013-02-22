@@ -22,19 +22,6 @@ from accounts.models import Picture, Profile
 from careers.models import SavedPath, Position, Career
 from entities.careerlib import CareerSimBase
 
-# @login_required
-def home(request):
-	if not request.user.is_authenticated():
-		return HttpResponseRedirect('welcome')
-	data = {}
-	user = request.user
-
-	# data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
-	data['saved_paths'] = SavedPath.objects.filter(owner=user)
-	data['user_careers'] = request.user.saved_careers.all()
-
-	return render_to_response('home.html',data,context_instance=RequestContext(request))
-
 def contact(request):
 
 	data = {}

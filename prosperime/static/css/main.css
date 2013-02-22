@@ -769,6 +769,12 @@ button.general-add-button:active {
 	background-color:rgb(41,98,148);
 }
 
+/* Forms */
+
+.large-text-input {
+	width: 300px;
+}
+
 
 /*CLAYTON's PATH VIZ */
 .path-viz-short li {

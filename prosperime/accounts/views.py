@@ -180,7 +180,7 @@ def finish_login(request):
 
 			#return HttpResponseRedirect('/account/success')
 			# return HttpResponseRedirect('/search')
-			return HttpResponseRedirect('/discover')
+			return HttpResponseRedirect('/personalize')
 	else:
 		form = FinishAuthForm()
 
@@ -242,7 +242,7 @@ def finish_link(request):
 
 	messages.success(request, 'Your LinkedIn account has been successfully linked. Please refresh the page to see changes.')
 
-	return HttpResponseRedirect('/discover')
+	return HttpResponseRedirect('/personalize')
 
 def success(request):
 	return render_to_response('accounts/success.html',context_instance=RequestContext(request))

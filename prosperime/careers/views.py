@@ -22,6 +22,20 @@ import careers.careerlib as careerlib
 ######################################################
 
 @login_required
+def home(request):
+	if not request.user.is_authenticated():
+		return HttpResponseRedirect('welcome')
+	data = {}
+	user = request.user
+
+	# data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
+	data['saved_paths'] = SavedPath.objects.filter(owner=user)
+	data['saved_careers'] = request.user.saved_careers.all()
+	data['saved_jobs'] = GoalPosition.objects.filter(owner=user)
+
+	return render_to_response('home.html',data,context_instance=RequestContext(request))
+
+@login_required
 def personalize_careers_jobs(request):
 	'''
 	presents initial set of careers and jobs to user during onboarding for them to selected
@@ -57,18 +71,20 @@ def personalize_careers_jobs(request):
 def add_personalization(request):
 	# check to make sure POST data came through
 	if request.POST:
+		print request.POST
 		if 'selected_careers[]' in request.POST:
-			for career_id in request.POST['selected_careers[]']:
+			print request.POST.getlist('selected_careers[]')
+			for career_id in set(request.POST.getlist('selected_careers[]')):
 				career = Career.objects.get(pk=career_id)
 				saved_career = SavedCareer(career=career,owner=request.user)
 				saved_career.save()
 		if 'selected_jobs[]' in request.POST:
-			for job in request.POST['selected_jobs[]']:
+			for job_name in set(request.POST.getlist('selected_jobs[]')):
 				# get or create the ideal position
 				try:
-					ideal_pos = IdealPosition.objects.get(title=job['name'])
+					ideal_pos = IdealPosition.objects.get(title=job_name)
 				except:
-					ideal_pos = IdealPosition(title=job['name'])
+					ideal_pos = IdealPosition(title=job_name)
 					ideal_pos.save()
 				# make sure user hasn't already saved this one
 				try:
@@ -83,8 +99,9 @@ def add_personalization(request):
 @login_required
 def list_jobs(request):
 	if request.GET:
-		params = request.GET['key']
-		jobs = IdealPosition.objects.values('title','id').filter(title__contains=params)
+		params = request.GET['q']
+		print params
+		jobs = IdealPosition.objects.values('title','id').filter(title__icontains=params)
 	else:
 		jobs = IdealPosition.objects.values('title','id').all()
 
