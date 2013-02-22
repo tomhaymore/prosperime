@@ -1,5 +1,6 @@
 # Python
 import datetime
+import json
 
 # Django
 from django.http import HttpResponseRedirect, HttpResponse
@@ -11,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 
 # Prosperime
 # from entities.models import Position
-from careers.models import SavedPath, SavedPosition, Position, Career, GoalPosition, SavedCareer
+from careers.models import SavedPath, SavedPosition, Position, Career, GoalPosition, SavedCareer, IdealPosition
 from accounts.models import Profile
 import careers.careerlib as careerlib
 
@@ -63,11 +64,40 @@ def add_personalization(request):
 				saved_career.save()
 		if 'selected_jobs[]' in request.POST:
 			for job in request.POST['selected_jobs[]']:
-				goal_pos = GoalPosition(title=job['name'],owner=request.user)
-				goal_pos.save()
+				# get or create the ideal position
+				try:
+					ideal_pos = IdealPosition.objects.get(title=job['name'])
+				except:
+					ideal_pos = IdealPosition(title=job['name'])
+					ideal_pos.save()
+				# make sure user hasn't already saved this one
+				try:
+					goal_pos = GoalPosition.objects.get(owner=request.user,position=ideal_pos)
+				except:
+					goal_pos = GoalPosition(owner=request.user,position=ideal_pos)
+					goal_pos.save()
 		return render_to_response('api_success.html')
 	else:
 		return render_to_response('api_fail.html')
+
+@login_required
+def list_jobs(request):
+	if request.GET:
+		params = request.GET['key']
+		jobs = IdealPosition.objects.values('title','id').filter(title__contains=params)
+	else:
+		jobs = IdealPosition.objects.values('title','id').all()
+
+	jobs_list = []
+
+	for j in jobs:
+		jobs_list.append({'value':j['title'],'id':j['id']})
+
+	# jobs = json.dumps(list(jobs))
+	jobs = json.dumps(jobs_list)
+	return HttpResponse(jobs, mimetype="application/json")
+
+
 
 # VIEW: display ALL user's paths
 def show_paths(request):

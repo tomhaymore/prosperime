@@ -11,6 +11,11 @@ $(document).ready(function() {
             }
         }
     });
+    $("input#personalize-job-name").typeahead({
+    	name: 'jobs',
+    	remote: '/careers/jobs',
+    	limit: 10
+    	})
 	$("div.personalize-career-entry").click(function() {
 		$(this).toggleClass("personalize-unselected");
 		$(this).toggleClass("personalize-selected");
