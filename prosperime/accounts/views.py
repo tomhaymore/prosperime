@@ -1,10 +1,10 @@
 # from Python
 import oauth2 as oauth
 import cgi
-# from datetime import datetime, timedelta
+from datetime import datetime, timedelta
 import urlparse
 import math
-import datetime
+# import datetime
 
 # from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, logout as auth_logout, login as auth_login
@@ -109,6 +109,10 @@ def finish_login(request):
 		linkedin_user_info = request.session['linkedin_user_info']
 		access_token = request.session['access_token']
 
+		# remove LI info from session
+		del request.session['linkedin_user_info']
+		del request.session['access_token']
+
 		form = FinishAuthForm(request.POST)
 		
 		if form.is_valid():
@@ -192,6 +196,10 @@ def finish_link(request):
 	# get info for creating an account
 	linkedin_user_info = request.session['linkedin_user_info']
 	access_token = request.session['access_token']
+
+	# delete LI info from session
+	del request.session['linkedin_user_info']
+	del request.session['access_token']
 
 	# add profile if it doesn't exit (for superadmin after reset)
 	# try:
