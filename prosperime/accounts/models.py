@@ -49,7 +49,7 @@ class Profile(models.Model):
         career_dict = {}
 
         user = self.user
-        positions = Position.objects.filter(person=user)
+        positions = Position.objects.filter(person=user).prefetch_related('careers')
         for p in positions:
             careers = p.careers.all()
             for c in careers:
@@ -59,27 +59,29 @@ class Profile(models.Model):
                     career_dict[c] = 1
         
         ## to test this beast
-        for item in career_dict:
-             print item.short_name + ': ' + str(career_dict.get(item))
+        # for item in career_dict:
+        #      print item.short_name + ': ' + str(career_dict.get(item))
 
         return career_dict
 
-    # returns career w/ highest frequency among profile's positions
-    def get_top_career(self):
-        all_careers = get_all_careers(self)
-        top_career = None
+    # returns career(s) w/ highest frequency among profile's positions
+    def get_top_careers(self):
+        all_careers = self.all_careers
+        top_careers = []
         top_frequency = 0
 
         for career, frequency in all_careers.iteritems():
             if frequency > top_frequency:
-                top_career = career
-            # note that this implementation will essentially throw out
-            #   any ties
-        return top_career
+                del top_careers[:] # this just clears the list
+                top_frequency = frequency
+                top_careers.append(career)
+            if frequency == top_frequency:
+                top_careers.append(career)
+        return top_careers
 
 
     # Properties of the Profile object
-    top_career = property(get_top_career)
+    top_careers = property(get_top_careers)
     all_careers = property(get_all_careers)
 
     ### Helpers ###
