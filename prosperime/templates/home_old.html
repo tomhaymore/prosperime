@@ -4,12 +4,7 @@
 
 {% endblock %}
 
-<!-- Messages -->
-{% block message %}
 
-
-
-{% endblock %}
 
 {% block content %}
 
@@ -18,7 +13,7 @@
 		<p class="splash-message-header">Don't just work, prosper!</p>
 		<p class="splash-message-subheader">Prosperime helps you discover actual career paths from real people in your network.</p>
 		<p class="text-center"><a class="btn btn-success center" href="/account/authorize">Get started</a></p>
-		<p class="text-center splash-submessage"><a class="left-spacer center" href="/account/login">Already registered?</a></p>
+		<p class="text-center splash-submessage"><a class="left-spacer center" href="account/login">Already registered?</a></p>
 		
 	</div>
 	<div class="clear"></div>
@@ -57,6 +52,20 @@
 {% endblock %}
 
 {% block footer %}
+
+<div class="container-fluid footer">
+	<div class="span10 offset1">
+		<ul class="footer-list pull-left flat">
+			<li>&copy; Prosperime</li>
+			
+		</ul>
+		<ul class="footer-list pull-right flat">
+			<li>Company</li>
+			<li>Contact</li>
+			<li>FAQ</li>
+		</ul>
+	</div>
+</div>
 
 {% endblock %}
 

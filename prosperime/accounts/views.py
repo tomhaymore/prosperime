@@ -26,6 +26,9 @@ from accounts.models import Account, Profile, Picture
 from careers.models import SavedPath, CareerDecision
 from entities.models import Position, Entity
 
+import utilities.helpers as helpers
+
+
 def login(request):
 	
 	# print request.session['_auth_user_backend']
@@ -181,7 +184,7 @@ def finish_login(request):
 
 			#return HttpResponseRedirect('/account/success')
 			# return HttpResponseRedirect('/search')
-			return HttpResponseRedirect('/discover')
+			return HttpResponseRedirect('/personalize')
 	else:
 		form = FinishAuthForm()
 
@@ -241,9 +244,9 @@ def finish_link(request):
 		'connections': connections_task.id
 	}
 
-	messages.success(request, 'Your LinkedIn account has been successfully linked.')
+	messages.success(request, 'Your LinkedIn account has been successfully linked. Please refresh the page to see changes.')
 
-	return HttpResponseRedirect('/home')
+	return HttpResponseRedirect('/personalize')
 
 def success(request):
 	return render_to_response('accounts/success.html',context_instance=RequestContext(request))
@@ -283,14 +286,19 @@ def random_profile(request):
 def profile(request, user_id):
 
 	user = User.objects.get(id=user_id)
-	profile = Profile.objects.get(user=user)
-	saved_paths = SavedPath.objects.filter(owner=user)
-	profile_pic = _get_profile_pic(profile)
+	# profile = Profile.objects.get(user=user)
+	profile = user.profile
+	# saved_paths = SavedPath.objects.filter(owner=user)
+	saved_paths = user.saved_path.all()
+	# profile_pic = _get_profile_pic(profile)
+	profile_pic = user.profile.default_profile_pic()
 	viewer_saved_paths = SavedPath.objects.filter(owner=request.user)
 
 	# Do position processing here!
+
 	# CHECK THAT THIS WORKS
 	positions = Position.objects.filter(person=user).select_related('careerDecision')
+
 	ed_list = []
 	org_list = []
 
@@ -331,8 +339,8 @@ def profile(request, user_id):
 			ed_list.insert(0, pos)
 		else:
 
-			if pos.title:
-				print pos.title + ', ' + pos.co_name
+			# if pos.title:
+			# 	print pos.title + ', ' + pos.co_name
 
 			# Assumption: ignore if no start-date, crappy data
 			if pos.start_date:
@@ -356,7 +364,7 @@ def profile(request, user_id):
 		start_date = total_time = end_date = compress = None
 	else:	
 		start_date = org_list[len(org_list)-1].start_date
-		total_time = _months_from_now(start_date)
+		total_time = helpers._months_from_now(start_date)
 		end_date = datetime.datetime.now()
 
 		if total_time > 200: 
@@ -387,6 +395,7 @@ def profile(request, user_id):
 			}
 	else:
 		career_decision_position = None;
+
 
 
 
@@ -431,7 +440,11 @@ def profile_org(request, org_id):
 	response['jobs'] = related_jobs
 	response['saved_paths'] = saved_paths
 
-	return render_to_response('accounts/profile_org.html', response, context_instance=RequestContext(request))
+	
+	#return render_to_response('accounts/profile_org.html', response, context_instance=RequestContext(request))
+
+	return render_to_response('accounts/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress, 'career_map': career_map}, context_instance=RequestContext(request))
+
 
 def _test_career_prompt():
 
@@ -526,40 +539,22 @@ def _get_career_decision_prompt_position(top_careers, positions, profile):
 #### HELPERS ####
 #################
 # Helper from StackOverflow to remove duplicates from list whilst preserving order
+
 def _uniqify(list):
-	tmp = set()
-	solution = []
-	for element in list:
-		# Hack city
-		if element.title == None:
-			element.title = ""
-		current = element.title + ', ' + element.co_name
+    tmp = set()
+    solution = []
+    for element in list:
+        # Hack city
+        if element.title == None:
+            element.title = ""
+        current = element.title + ', ' + element.co_name
 
-		if current in tmp:
-			continue
-		tmp.add(current)
-		solution.append(element)
+        if current in tmp:
+            continue
+        tmp.add(current)
+        solution.append(element)
 
-	return solution
-
-# Returns # months difference between start_date and now
-def _months_from_now(start_date):
-	now = datetime.datetime.now()
-	return (12 * (now.year - start_date.year)) + (now.month - start_date.month)
-
-# taken straight from viz.js
-def _months_difference(start_mo, start_yr, end_mo, end_yr, compress, round):
-	diff = 12 * (end_yr - start_yr)
-	diff += end_mo - start_mo
-
-	if compress:
-		diff /= 2
-		if round == 'upper':
-			diff = math.ceil(diff)
-		if round == 'lower':
-			diff = math.floor(diff)
-
-	return diff
+    return solution
 
 def _get_profile_pic(profile):
 	pics = Picture.objects.filter(person=profile,status="active").order_by("created")

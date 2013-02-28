@@ -7,9 +7,14 @@
 {% endblock %}
 
 {% block content %}
+
+{% cache 500 content user.id career.id request_type %}
+
 <div id="content-container" class="main-container">
 	<p class="main-header">Discover: <span class="splash-slug">{{career.name}}</span></p>
+	{% if career.description %}
 	<p class="main-sub-header">{{career.description}}</p>
+	{% endif %}
 
 	<div id="careers-container">
 			<div class="discover-nav-container">
@@ -28,13 +33,13 @@
 					<p class="main-header">Related Companies</p>
 					{% for e in entities.network %}
 						<div class="discover-path">
-							<div class="pull-left"><a href="/profile/org/{{e.id}}/" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'companies-network', 'photoClicked'])">
+							<div class="pull-left"><a href="/profile/{{p.id}}">
 							{% if e.logo_path %}
 								<img class="logo-preview" src="/media/{{e.logo_path}}" />
 							{% endif %}
 							</a></div>
 							<div class="pull-left discover-path-name">
-								<p><a class="path-name" href="/profile/org/{{e.id}}/" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'companies-network', 'nameClicked'])">{{e.name}}</a></p>
+								<p><a class="path-name" href="/profile/org/{{e.id}}/">{{e.name}}</a></p>
 								{% if e.people %}
 									{% for person in e.people %}
 										<a href="/profile/{{person.id}}/"><span class="path-position">
@@ -45,6 +50,7 @@
 											{% endif %}
 										</span></a>
 									{% endfor %}
+
 								{% endif %}
 							</div>
 							<div class="clear"></div>
@@ -58,12 +64,16 @@
 					<p class="main-header">Related People</p>
 					{% for p in people.network %}
 						<div class="discover-path">
-							<div class="pull-left"><a href="/profile/{{p.id}}" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'people-network', 'photoClicked'])"><img class="logo-preview" src="/media/{{p.profile_pic}}" /></a></div>
+							<div class="pull-left"><a href="/profile/{{p.id}}" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'people-network', 'photoClicked'])"><img class="logo-preview" src="{{ MEDIA_URL }}{{p.profile.default_profile_pic}}" /></a></div>
 							<div class="pull-left discover-path-name">
-								<p><a class="path-name" href="/profile/{{p.id}}" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'people-network', 'nameClicked'])">{{p.name}}</a></p>
+								<p><a class="path-name" href="/profile/{{p.id}}" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'people-network', 'nameClicked'])">{{p.profile.full_name}}</a></p>
+								{% if p.profile.headline %}
+									<p class="path-position">{{p.profile.headline}}</p>
+								{% endif %}
 								{% if p.pos_title %}
 									<p class="path-position">{{p.pos_title}} at {{p.pos_co_name}}</p>
 									<p>{{p.pos_start_date}} to {{p.pos_end_date}}</p>
+
 								{% endif %}
 							</div>
 							<div class="clear"></div>
@@ -71,18 +81,21 @@
 						
 					{% endfor %}
 
+
 					<!-- View: Positions -->
 					{% elif request_type == 'positions' %}
 
 					<p class="main-header">Related Positions</p>
 					{% for p in positions.network %}
 						<div class="discover-path">
-							<div class="pull-left"><a href="#" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'positions-network', 'photoClicked'])"><img class="logo-preview" src="/media/{{p.logo_path}}" /></a></div>
+
+							<div class="pull-left"><a href="#"><img class="logo-preview" src="/media/{{p.logo_path}}" /></a></div>
 							<div class="pull-left discover-path-name">
-								<p><a class="path-name" href="/profile/{{p.id}}" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'positions-network', 'nameClicked'])">{{p.title}} at {{p.co_name}}</a></p>
+								<p><a class="path-name" href="/profile/{{p.id}}">{{p.title}} at {{p.co_name}}</a></p>
 								
 								<p class="path-position">
-									<a href="/profile/{{p.owner_id}}" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'positions-network', 'positionOwnerClicked'])">
+									<a href="/profile/{{p.owner_id}}">
+
 										{{p.owner}}
 									</a>
 								</p>
@@ -97,18 +110,20 @@
 				<div class="discover-paths-network-overview pull-left">
 					<p class="main-header">Overview</p>
 					<ul class="career-overview-stats">
-						<li class="career-overview-stats-people blue-box-container"><a href="/discover/career/{{career_id}}/" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'blueBoxPeopleClicked', 'network'])"
-><span class="stats">{{overview.network.num_people}}</span></a> people</li>
 
-						<li class="career-overview-stats-positions blue-box-container"><a href="/discover/career/{{career_id}}/positions/" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'blueBoxPositionsClicked', 'network'])"><span class="stats">{{overview.network.num_pos}}</span></a> positions</li>
+						<li class="career-overview-stats-people blue-box-container"><a href="/discover/career/{{career_id}}/"><span class="stats">{{overview.network.num_people}}</span></a> people</li>
 
-						<li class="career-overview-stats-orgs blue-box-container"><a href="/discover/career/{{career_id}}/orgs" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'blueBoxCompaniesClicked', 'network'])"><span class="stats">{{overview.network.num_cos}}</span></a> companies</li>
+						<li class="career-overview-stats-positions blue-box-container"><a href="/discover/career/{{career_id}}/positions/"><span class="stats">{{overview.network.num_pos}}</span></a> positions</li>
+
+						<li class="career-overview-stats-orgs blue-box-container"><a href="/discover/career/{{career_id}}/orgs"><span class="stats">{{overview.network.num_cos}}</span></a> companies</li>
 					</ul>
 					<p class="main-header">Big Players</p>
 						{% if overview.network.bigplayers %}
 							<ul>
 							{% for b in overview.network.bigplayers %}
-								<li><a href="/profile/org/{{b.0}}" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'bigPlayerClicked-network', '{{forloop.counter0}}'])">{{b.1.name}}</a></li>
+
+								<li><a href="/profile/org/{{b.1.id}}">{{b.0}}</a></li>
+
 							{% endfor %}
 							</ul>
 						{% endif %}
@@ -125,13 +140,15 @@
 					<p class="main-header">Related Companies</p>
 					{% for e in entities.all %}
 						<div class="discover-path">
-							<div class="pull-left"><a href="/profile/org/{{e.id}}/" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'companies-all', 'photoClicked'])">
+
+							<div class="pull-left"><a href="/profile/{{p.id}}">
 							{% if e.logo_path %}
-								<img class="logo-preview" src="/media/{{e.logo_path}}" />
+								<img class="logo-preview" src="/media/{{e.1.logo}}" />
 							{% endif %}
 							</a></div>
 							<div class="pull-left discover-path-name">
-								<p><a class="path-name" href="/profile/org/{{e.id}}/" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'companies-all', 'nameClicked'])">{{e.name}}</a></p>
+								<p><a class="path-name" href="/profile/org/{{p.id}}/">{{e.name}}</a></p>
+
 								{% if e.people %}
 									{% for person in e.people %}
 										<a href="/profile/{{person.id}}/"><span class="path-position">
@@ -155,9 +172,13 @@
 					<p class="main-header">Related People</p>
 					{% for p in people.all %}
 						<div class="discover-path">
-							<div class="pull-left"><a href="/profile/{{p.id}}" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'people-all', 'photoClicked'])"><img class="logo-preview" src="/media/{{p.rofile_pic}}" /></a></div>
+
+							<div class="pull-left"><a href="/profile/{{p.id}}"><img class="logo-preview" src="{{ MEDIA_URL }}{{p.profile.default_profile_pic}}" /></a></div>
 							<div class="pull-left discover-path-name">
-								<p><a class="path-name" href="/profile/{{p.id}}" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'people-all', 'nameClicked'])">{{p.name}}</a></p>
+								<p><a class="path-name" href="/profile/{{p.id}}">{{p.profile.full_name}}</a></p>
+								{% if p.profile.headline %}
+									<p class="path-position">{{p.profile.headline}}</p>
+								{% endif %}
 								{% if p.pos_title %}
 									<p class="path-position">{{p.pos_title}} at {{p.pos_co_name}}</p>
 									<p>{{p.pos_start_date}} to {{p.pos_end_date}}</p>
@@ -174,12 +195,14 @@
 					<p class="main-header">Related Positions</p>
 					{% for p in positions.all %}
 						<div class="discover-path">
-							<div class="pull-left"><a href="#" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'positions-all', 'photoClicked'])"><img class="logo-preview" src="/media/{{p.logo_path}}" /></a></div>
+
+							<div class="pull-left"><a href="#"><img class="logo-preview" src="/media/{{p.logo_path}}" /></a></div>
 							<div class="pull-left discover-path-name">
-								<p><a class="path-name" href="/profile/{{p.id}}" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'positions-all', 'nameClicked'])">{{p.title}} at {{p.co_name}}</a></p>
+								<p><a class="path-name" href="/profile/{{p.id}}">{{p.title}} at {{p.co_name}}</a></p>
 								
 								<p class="path-position">
-									<a href="/profile/{{p.owner_id}}" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'positions-all', 'positionOwnerClicked'])">
+									<a href="/profile/{{p.owner_id}}">
+
 										{{p.owner}}
 									</a>
 								</p>
@@ -193,16 +216,20 @@
 				<div class="discover-paths-network-overview pull-left">
 					<p class="main-header">Overview</p>
 					<ul class="career-overview-stats">
-						<li class="career-overview-stats-people blue-box-container"><a href="/discover/career/{{career_id}}/" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'blueBoxPeopleClicked', 'all'])"><span class="stats">{{overview.all.num_people}}</span></a>  people</li>
-						<li class="career-overview-stats-positions blue-box-container"><a href="/discover/career/{{career_id}}/positions/" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'blueBoxPositionsClicked', 'all'])"><span class="stats">{{overview.all.num_pos}}</span></a> positions</li>
-						<li class="career-overview-stats-orgs blue-box-container"><a href="/discover/career/{{career_id}}/orgs/" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'blueBoxCompaniesClicked', 'all'])"><span class="stats">{{overview.all.num_cos}}</span></a> companies</li>
+
+						<li class="career-overview-stats-people blue-box-container"><a href="/discover/career/{{career_id}}/"><span class="stats">{{overview.all.num_people}}</span></a>  people</li>
+						<li class="career-overview-stats-positions blue-box-container"><a href="/discover/career/{{career_id}}/positions/"><span class="stats">{{overview.all.num_pos}}</span></a> positions</li>
+						<li class="career-overview-stats-orgs blue-box-container"><a href="/discover/career/{{career_id}}/orgs/"><span class="stats">{{overview.all.num_cos}}</span></a> companies</li>
+
 					</ul>
 					<br/>
 					<p class="main-header">Big Players</p>
 						{% if overview.all.bigplayers %}
 							<ul>
 							{% for b in overview.all.bigplayers %}
-								<li><a href="/profile/org/{{b.0}}/" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'bigPlayerClicked-all', '{{forloop.counter0}}'])">{{b.1.name}}</a></li>
+
+								<li><a href="/profile/org/{{b.0}}/">{{b.1.name}}</a></li>
+
 							{% endfor %}
 							</ul>
 						{% endif %}
@@ -211,4 +238,8 @@
 			</div>
 	</div>
 </div>
+
+
+{% endcache %}
+
 {% endblock %}

@@ -1,5 +1,6 @@
 # Python
 import datetime
+import json
 
 # Django
 from django.http import HttpResponseRedirect, HttpResponse
@@ -7,16 +8,22 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.utils import simplejson
+from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 
 # Prosperime
 from entities.models import Position, Entity
 from careers.models import SavedPath, SavedPosition, CareerDecision
-from accounts.models import Profile
 
+#from careers.models import SavedPath, SavedPosition, Position, Career, GoalPosition, SavedCareer, IdealPosition
+
+from accounts.models import Profile
+import careers.careerlib as careerlib
 
 ######################################################
 ################## CORE VIEWS ########################
 ######################################################
+
 
 def addDecision(request):
 	print 'aqui'
@@ -90,6 +97,245 @@ def entityAutocomplete(request):
 
 
 	return HttpResponse(simplejson.dumps(response))
+
+
+@login_required
+def home(request):
+	if not request.user.is_authenticated():
+		return HttpResponseRedirect('welcome')
+	data = {}
+	user = request.user
+
+	# data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
+	data['saved_paths'] = SavedPath.objects.filter(owner=user)
+	data['saved_careers'] = request.user.saved_careers.all()
+	data['saved_jobs'] = GoalPosition.objects.filter(owner=user)
+
+	return render_to_response('home.html',data,context_instance=RequestContext(request))
+
+@login_required
+def discover(request):
+
+	# initiate CarerSimBase
+	career_sim = careerlib.CareerSimBase()
+
+	# data array for passing to template
+	data = {}
+	# print request.user.id
+	if 'tasks' in request.session:
+		data = {
+			'profile_task_id':request.session['tasks']['profile'],
+			'connections_task_id':request.session['tasks']['connections'],
+		}
+
+	# Check/Set Cache
+	careers_network = cache.get('discover_careers_network_data_'+str(request.user.id))
+	if careers_network is None:
+		cache.set('discover_careers_network_data_'+str(request.user.id),career_sim.get_careers_brief_in_network(request.user),600)
+		careers_network = cache.get('discover_careers_network_data_'+str(request.user.id))
+
+	careers_similar = cache.get('discover_careers_similar_data_'+str(request.user.id))
+	if careers_similar is None:
+		cache.set('discover_careers_similar_data_'+str(request.user.id),career_sim.get_careers_brief_similar(request.user),600)
+		careers_similar = cache.get('discover_careers_similar_data'+str(request.user.id))
+
+	# # Dev, don't cache
+	# careers_network = _get_careers_brief_in_network(request.user)
+	# careers_similar = _get_careers_brief_similar(request.user.id)
+
+	careers = {}
+
+	careers['network'] = careers_network
+	careers['similar'] = careers_similar
+
+	return render_to_response('entities/discover.html',{'data':data,'careers':careers},context_instance=RequestContext(request))
+
+@login_required
+def discover_career(request,career_id):
+
+	# initiate CarerSimBase
+	career_sim = careerlib.CareerSimBase()
+
+	# get career object
+	career = Career.objects.get(pk=career_id)
+	
+	paths_in_career = {}
+	overview = {}
+
+	# Cache
+	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+	if paths is None:
+		print 'discover.people missed cache'
+		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),career_sim.get_paths_in_career(request.user,career),600)
+		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+	else:
+		print 'discover.people hit cache'
+
+	## Don't Cache, for dev
+	# paths = _get_paths_in_career_alt(request.user, career)
+
+	paths_in_career['network'] = paths['network']
+	paths_in_career['all'] = paths['all']
+
+	overview['network'] = paths['overview']['network']
+	overview['all'] = paths['overview']['all']
+
+	request_type = 'people'
+
+	return render_to_response('entities/discover_career.html',{'career':career,'people':paths_in_career,'overview':overview, 'request_type':request_type},context_instance=RequestContext(request))
+
+
+@login_required
+def discover_career_orgs(request, career_id):
+
+	# initiate CarerSimBase
+	career_sim = careerlib.CareerSimBase()
+
+	career = Career.objects.get(pk=career_id)
+	entities_in_career = {}
+	overview = {}
+
+	# Cache
+	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+	if paths is None:
+		print 'discover.career.orgs missed cache'
+		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),career_sim.get_paths_in_career(request.user,career),600)
+		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+
+	else:
+		print 'discover.career.orgs hit cache'
+
+	## Don't Cache, for development
+	# paths = _get_paths_in_career_alt(request.user, career)
+
+	# entities_in_career['network'] = paths['networkCompanies']
+	# entities_in_career['all'] = paths['allCompanies']
+
+	overview['network'] = paths['overview']['network']
+	overview['all'] = paths['overview']['all']
+
+	request_type = 'orgs'
+
+	return render_to_response('entities/discover_career.html', {'career': career, 'entities':entities_in_career, 'overview':overview, 'request_type':request_type, 'career_id':career_id}, context_instance=RequestContext(request))
+
+@login_required
+def discover_career_positions(request, career_id):
+
+	# initiate CarerSimBase
+	career_sim = careerlib.CareerSimBase()
+
+	career = Career.objects.get(pk=career_id)
+	positions_in_career = {}
+	overview = {}
+
+	# # Cache
+	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+	if paths is None:
+		print 'discover.career.pos missed cache'
+		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),career_sim.get_paths_in_career(request.user,career),600)
+		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+	else:
+		print 'discover.people hit cache'
+
+	## Don't Cache, for dev
+	# paths = _get_paths_in_career_alt(request.user, career)
+
+	paths_in_career['network'] = paths['networkPeople']
+	paths_in_career['all'] = paths['allPeople']
+
+	## Don't use cache, for dev
+	# paths = _get_paths_in_career_alt(request.user, career)
+
+
+	positions_in_career['network'] = paths['networkPositions']
+	positions_in_career['all'] = paths['allPositions']
+
+	overview['network'] = paths['overview']['network']
+	overview['all'] = paths['overview']['all']
+
+	request_type = 'positions'
+
+	return render_to_response('entities/discover_career.html', {'career': career, 'positions':positions_in_career, 'overview':overview, 'request_type':request_type, 'career_id':career_id}, context_instance=RequestContext(request))
+
+@login_required
+def personalize_careers_jobs(request):
+	'''
+	presents initial set of careers and jobs to user during onboarding for them to selected
+	'''
+	# initiate careerlib
+	career_sim = careerlib.CareerSimBase()
+	# data array for passing to template
+	data = {}
+	# check to see if tasks have been initiated
+	if 'tasks' in request.session:
+		data = {
+			'profile_task_id':request.session['tasks']['profile'],
+			'connections_task_id':request.session['tasks']['connections'],
+		}
+
+	careers_network = career_sim.get_careers_brief_in_network(request.user)
+	careers_similar = career_sim.get_careers_brief_similar(request.user)
+
+	# get list of ids of similar careers to avoid duplication in network
+	careers_similar_ids = []
+
+	for c in careers_similar:
+		careers_similar_ids.append(c.id)
+
+	careers = {}
+
+	careers['network'] = careers_network
+	careers['similar'] = careers_similar
+
+	return render_to_response('careers/personalize.html',{'data':data,'careers':careers},context_instance=RequestContext(request))
+
+@login_required
+def add_personalization(request):
+	# check to make sure POST data came through
+	if request.POST:
+		print request.POST
+		if 'selected_careers[]' in request.POST:
+			print request.POST.getlist('selected_careers[]')
+			for career_id in set(request.POST.getlist('selected_careers[]')):
+				career = Career.objects.get(pk=career_id)
+				saved_career = SavedCareer(career=career,owner=request.user)
+				saved_career.save()
+		if 'selected_jobs[]' in request.POST:
+			for job_name in set(request.POST.getlist('selected_jobs[]')):
+				# get or create the ideal position
+				try:
+					ideal_pos = IdealPosition.objects.get(title=job_name)
+				except:
+					ideal_pos = IdealPosition(title=job_name)
+					ideal_pos.save()
+				# make sure user hasn't already saved this one
+				try:
+					goal_pos = GoalPosition.objects.get(owner=request.user,position=ideal_pos)
+				except:
+					goal_pos = GoalPosition(owner=request.user,position=ideal_pos)
+					goal_pos.save()
+		return render_to_response('api_success.html')
+	else:
+		return render_to_response('api_fail.html')
+
+@login_required
+def list_jobs(request):
+	if request.GET:
+		params = request.GET['q']
+		print params
+		jobs = IdealPosition.objects.values('title','id').filter(title__icontains=params)
+	else:
+		jobs = IdealPosition.objects.values('title','id').all()
+
+	jobs_list = []
+
+	for j in jobs:
+		jobs_list.append({'value':j['title'],'id':j['id']})
+
+	# jobs = json.dumps(list(jobs))
+	jobs = json.dumps(jobs_list)
+	return HttpResponse(jobs, mimetype="application/json")
+
 
 
 

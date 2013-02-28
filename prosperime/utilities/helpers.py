@@ -2,7 +2,27 @@ import time
 import urllib2
 # import simplejson
 from django.utils import simplejson
+import math
+import datetime
 
+# Returns # months difference between start_date and now
+def _months_from_now(start_date):
+    now = datetime.datetime.now()
+    return (12 * (now.year - start_date.year)) + (now.month - start_date.month)
+
+# taken straight from viz.js
+def _months_difference(start_mo, start_yr, end_mo, end_yr, compress, round):
+    diff = 12 * (end_yr - start_yr)
+    diff += end_mo - start_mo
+
+    if compress:
+        diff /= 2
+        if round == 'upper':
+            diff = math.ceil(diff)
+        if round == 'lower':
+            diff = math.floor(diff)
+
+    return diff
 
 def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
     """Retry calling the decorated function using an exponential backoff.

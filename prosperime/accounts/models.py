@@ -8,7 +8,8 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
 # Prosperime
-from entities.models import Position
+from careers.models import Position
+import careers.careerlib as careerlib
 
 class Account(models.Model):
     
@@ -43,6 +44,7 @@ class Profile(models.Model):
     connections = models.ManyToManyField('self',through="Connection",symmetrical=False,related_name="connections+")
     status = models.CharField(max_length=15,default="active")
     profile_pic = models.ImageField(max_length=450, upload_to=_get_profile_pic_path, blank=True, null=True)
+
 
     # returns a dictionary w/ frequencies of each career
     def get_all_careers(self):
@@ -79,6 +81,14 @@ class Profile(models.Model):
                 top_careers.append(career)
         return top_careers
 
+    def get_top_career(self,limit=1):
+       careers = careerlib.get_focal_careers(self.user,limit)
+       return careers
+
+
+    def get_all_careers(self,limit=5):
+       careers = careerlib.get_focal_careers(self.user,limit)
+       return careers
 
     # Properties of the Profile object
     top_careers = property(get_top_careers)
@@ -126,9 +136,9 @@ class Profile(models.Model):
         if self.pictures.all():
             return self.pictures.all()[0].pic
         else:
-            return "logos/none/none1.jpeg"
+            return "pictures/anon.jpg"
 
-    # domains = property(_industries)
+    domains = property(_industries)
     
     # Strategy: grab top career path, find others w/ same top career path
     def get_similar_users(self):

@@ -17,10 +17,11 @@ from django.core.cache import cache
 
 
 # Prosperime
-from entities.models import Entity, Office, Financing, Industry, Position, Career
+from entities.models import Entity, Office, Financing, Industry
 from accounts.models import Picture, Profile
 from careers.models import SavedPath, CareerDecision
-from entities.careerlib import CareerSimBase
+#from entities.careerlib import CareerSimBase
+import careers.careerilb as careerlib
 
 # @login_required
 def home(request):
@@ -37,6 +38,7 @@ def home(request):
 
 	return render_to_response('home.html',data,context_instance=RequestContext(request))
 
+
 def contact(request):
 
 	data = {}
@@ -48,143 +50,49 @@ def contact(request):
 def welcome(request):
 	if request.user.is_authenticated():
 		# user is logged in, display personalized information
-		return HttpResponseRedirect('home')
+		return HttpResponseRedirect('/home')
 	return render_to_response('welcome.html',context_instance=RequestContext(request))
-
-@login_required
-def discover(request):
-
-	# data array for passing to template
-	data = {}
-	# print request.user.id
-	if 'tasks' in request.session:
-		data = {
-			'profile_task_id':request.session['tasks']['profile'],
-			'connections_task_id':request.session['tasks']['connections'],
-		}
-
-	# Check/Set Cache
-	careers_network = cache.get('discover_careers_network_data_'+str(request.user.id))
-	if careers_network is None:
-		cache.set('discover_careers_network_data_'+str(request.user.id),_get_careers_brief_in_network(request.user),600)
-		careers_network = cache.get('discover_careers_network_data_'+str(request.user.id))
-
-	careers_similar = cache.get('discover_careers_similar_data_'+str(request.user.id))
-	if careers_similar is None:
-		cache.set('discover_careers_similar_data_'+str(request.user.id),_get_careers_brief_similar(request.user.id),600)
-		careers_similar = cache.get('discover_careers_similar_data'+str(request.user.id))
-
-	# # Dev, don't cache
-	# careers_network = _get_careers_brief_in_network(request.user)
-	# careers_similar = _get_careers_brief_similar(request.user.id)
-
-	careers = {}
-
-	careers['network'] = careers_network
-	careers['similar'] = careers_similar
-
-	return render_to_response('entities/discover.html',{'data':data,'careers':careers},context_instance=RequestContext(request))
-
-@login_required
-def discover_career(request,career_id):
-
-	# get career object
-	career = Career.objects.get(pk=career_id)
-	
-	paths_in_career = {}
-	overview = {}
-
-	# Cache
-	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
-	if paths is None:
-		print 'discover.people missed cache'
-		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),_get_paths_in_career_alt(request.user,career),600)
-		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
-	else:
-		print 'discover.people hit cache'
-
-	## Don't Cache, for dev
-	# paths = _get_paths_in_career_alt(request.user, career)
-
-	paths_in_career['network'] = paths['networkPeople']
-	paths_in_career['all'] = paths['allPeople']
-
-	overview['network'] = paths['overview']['network']
-	overview['all'] = paths['overview']['all']
-
-	request_type = 'people'
-
-	return render_to_response('entities/discover_career.html',{'career':career,'people':paths_in_career,'overview':overview, 'request_type':request_type, 'career_id':career_id},context_instance=RequestContext(request))
-
-@login_required
-def discover_career_orgs(request, career_id):
-
-	career = Career.objects.get(pk=career_id)
-	entities_in_career = {}
-	overview = {}
-
-	# Cache
-	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
-	if paths is None:
-		print 'discover.career.orgs missed cache'
-		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),_get_paths_in_career_alt(request.user,career),600)
-		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
-
-	else:
-		print 'discover.career.orgs hit cache'
-
-	## Don't Cache, for development
-	# paths = _get_paths_in_career_alt(request.user, career)
-
-	entities_in_career['network'] = paths['networkCompanies']
-	entities_in_career['all'] = paths['allCompanies']
-
-	overview['network'] = paths['overview']['network']
-	overview['all'] = paths['overview']['all']
-
-	request_type = 'orgs'
-
-	return render_to_response('entities/discover_career.html', {'career': career, 'entities':entities_in_career, 'overview':overview, 'request_type':request_type, 'career_id':career_id}, context_instance=RequestContext(request))
-
-@login_required
-def discover_career_positions(request, career_id):
-
-	career = Career.objects.get(pk=career_id)
-	positions_in_career = {}
-	overview = {}
-
-	# # Cache
-	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
-	if paths is None:
-		print 'discover.career.pos missed cache'
-		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),_get_paths_in_career_alt(request.user,career),600)
-		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
-
-	else:
-		print 'discover.career.pos hit cache'
-
-	## Don't use cache, for dev
-	# paths = _get_paths_in_career_alt(request.user, career)
-
-
-	positions_in_career['network'] = paths['networkPositions']
-	positions_in_career['all'] = paths['allPositions']
-
-	overview['network'] = paths['overview']['network']
-	overview['all'] = paths['overview']['all']
-
-	request_type = 'positions'
-
-	return render_to_response('entities/discover_career.html', {'career': career, 'positions':positions_in_career, 'overview':overview, 'request_type':request_type, 'career_id':career_id}, context_instance=RequestContext(request))
-
 
 # view for org profiles
 @login_required
-def org_profile(request,org_id):
-	org = Entity.objects.get(pk=org_id)
+def profile_org(request, org_id):
 
-	return render_to_response('entities/org_profile.html',{'org':org},context_instance=RequestContext(request))
+	# saved_paths... always need this... better way?
+	saved_paths = SavedPath.objects.filter(owner=request.user)
 
+	# nothing related to entities, so don't know if we can batch here
+	entity = Entity.objects.get(pk=org_id)
+
+	# Basic Entity Data
+	response = {
+		'id':org_id,
+		'name':entity.name,
+		'size':entity.size_range,
+		'description':entity.description,
+		'logo_path':entity.default_logo(),
+	}
+
+	# Related Jobs
+	# Should use entity object, but duplicates!
+	## jobs = Position.objects.filter(entity=entity).select_related('person__profile')
+	jobs = Position.objects.filter(entity__name=entity.name).select_related('person__profile')
+
+	related_jobs = []
+	for j in jobs:
+		jobs_data = {
+			'id':j.id,
+			'title':j.title,
+			'description':j.description,
+			'owner_name':j.person.profile.full_name(),
+			'owner_id':j.person.id,
+		}
+		related_jobs.append(jobs_data)
+
+
+	response['jobs'] = related_jobs
+	response['saved_paths'] = saved_paths
+
+	return render_to_response('accounts/profile_org.html', response, context_instance=RequestContext(request))
 
 
 def _get_paths_in_career(user,career):
@@ -196,7 +104,7 @@ def _get_paths_in_career(user,career):
 	# get users in network
 	users_list, user_ids = _get_users_in_network(user)
 
-	network_people = User.objects.prefetch_related().select_related('positions','entities','accounts').filter(id__in=user_ids,positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos')
+	network_people = User.objects.prefetch_related().select_related('positions','entities','accounts').filter(id__in=user_ids,positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos').distinct()
 	# CAUTION--values() can return multiple records when requesting M2M values; make sure to reduce
 	# network_people = User.objects.values('id','profile__headline','profile__first_name','profile__last_name','profile__pictures__pic','positions__entity__id','positions__entity__name').annotate(no_of_pos=Count('positions__id')).order_by('-no_of_pos')
 
@@ -303,7 +211,7 @@ def _get_paths_in_career(user,career):
 		'num_cos':num_cos
 	}
 
-	all_people = User.objects.select_related('positions').filter(positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos')
+	all_people = User.objects.select_related('positions').filter(positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos').distinct()
 
 	num_pos = 0
 	#entities = []
@@ -333,7 +241,6 @@ def _get_paths_in_career(user,career):
 				}
 			# entities.append(pos.entity.id)
 			entities.add(pos.entity.id)
-
 
 	#num_cos = len(set(entities))
 	num_cos = len(entities)
@@ -1092,7 +999,9 @@ def careers(request):
 
 	return render_to_response('entities/careers.html',{'careers':careers,'overview':overview},context_instance=RequestContext(request))
 
-def _get_careers_brief_similar(user_id,**filters):
+def _get_careers_brief_similar(user,**filters):
+
+	user_id = user.id
 
 	careers_sim = CareerSimBase()
 
@@ -1127,8 +1036,7 @@ def _get_careers_brief_in_network(user,**filters):
 
 	# sets avoid duplicates
 	users = set()
-	users = {c['user__id'] for c in cxns}
-	#users =[c['user__id'] for c in cxns]
+	users =[c['user__id'] for c in cxns]
 	# for u in users:
 	# 	print u
 

@@ -20,8 +20,9 @@ from sys import stdout
 from django.utils import simplejson
 from django.contrib.auth.models import User
 from accounts.models import Account, Profile, Connection, Picture
-from entities.models import Position, Entity, Image, Industry, Office, Career
-import entities.careerlib as careerlib
+from entities.models import Entity, Image, Industry, Office
+from careers.models import Career, Position
+import careers.careerlib as careerlib
 from django.core.files import File
 from django.conf import settings
 
@@ -463,9 +464,9 @@ class LIBase():
 			pos.end_date = self.format_dates(data['endDate'])
 		pos.save()
 		# if pos.title:
-		# print "matching..."
+		print "matching..."
 		careers = careerlib.match_careers_to_position(pos)
-		# print careers
+		print careers
 		for c_id in careers:
 			c = Career.objects.get(pk=c_id)
 			# print c
@@ -932,7 +933,7 @@ class LIConnections(LIBase):
 		try:
 			img = urllib2.urlopen(img_url)
 		except urllib2.HTTPError, e:
-			self.stdout.write(str(e.code))
+			print str(e.code)
 		if img:
 			pic = Picture()
 			pic.person = user.profile
