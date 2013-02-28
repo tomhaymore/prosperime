@@ -285,7 +285,7 @@ class LIBase():
 				return None
 		elif name:
 			try:
-				co = Entity.objects.get(li_univ_name=id)
+				co = Entity.objects.get(li_univ_name=name)
 			except:
 				# if company doesn't exist, return None
 				return None
@@ -477,6 +477,8 @@ class LIBase():
 
 	def get_position(self,user,co,data,**kwargs):
 		if kwargs.get('type') == 'ed':
+			# not sure I understand the logic here... if its the same degree
+			#	@ same insitution, don't add it? 
 			pos = Position.objects.filter(entity=co,person=user,degree=data['degree'])
 		else:
 			pos = Position.objects.filter(entity=co,person=user,title=data['title'])
@@ -532,8 +534,9 @@ class LIBase():
 		ed.name = data['inst_name']
 		# ed.li_uniq_id = data['inst_uniq_id']
 		ed.type = 'organization'
-		ed.sub_type = 'ed-institution'
+		ed.subtype = 'ed-institution'
 		ed.li_type = 'school'
+		ed.li_uniq_id = data['inst_uniq_id']
 		ed.save()
 		return ed
 
@@ -542,17 +545,18 @@ class LIBase():
 		pos.entity = ed
 		pos.person = user
 		pos.type = 'education'
+		pos.title = 'Student' # not necessary, but convenient
 		if 'degree' in data:
 			pos.degree = data['degree']
 		if 'fieldOfStudy' in data:
 			pos.field = data['fieldOfStudy']
 		
 		# check for start date
-		if 'startDate' in data:
-			pos.start_date = self.format_dates(data['startDate'])
+		if 'start_date' in data:
+			pos.start_date = self.format_dates(data['start_date'])
 		# check for end date
-		if 'endDate' in data:
-			pos.end_date = self.format_dates(data['endDate'])
+		if 'end_date' in data:
+			pos.end_date = self.format_dates(data['end_date'])
 		
 		pos.save()
 
@@ -624,7 +628,6 @@ class LIProfile(LIBase):
 	# set scope
 	scope = 'r_fullprofile+r_emailaddress+r_network'
 	# set callback
-	# callback = 'http://127.0.0.1:8000/account/authenticate/'
 	callback = settings.LI_CALLBACK
 
 	# set urls
@@ -816,6 +819,7 @@ class LIConnections(LIBase):
 				user = None
 			# check to see if privacy settings prohibit getting any useful information
 			if c['firstName'] == 'private' and c['lastName'] == 'private':
+				print '@ LI Parser, privacy settings set, passing on user'
 				pass
 			else:
 				
@@ -990,6 +994,7 @@ class LIConnections(LIBase):
 							if pos is None:
 								self.add_position(user,co,p)
 							
+			# handle Education
 			elif d['id'] == 'profile-education':
 				ed_positions = self.extract_ed_pos_from_public_page(d)
 				for p in ed_positions:
@@ -999,8 +1004,8 @@ class LIConnections(LIBase):
 						# add new company
 						inst = self.add_institution(p)
 						# if it's a new company, position must be new as well
-						if inst is not None:
-							self.add_position(user,inst,p)
+						# if inst is not None:
+						self.add_ed_position(user,inst,p)
 					else:
 						# TODO update company
 						pos = self.get_position(user,inst,p,type="ed")
@@ -1055,16 +1060,37 @@ class LIConnections(LIBase):
 		for p in raw_positions:
 			inst_uniq_id = p.get('id')
 			inst_name = p.h3.contents[0].strip()
+			
 			try:
-				degree = p.find("span","degree").contents[0]
-				
+				degree = p.find("span","degree").contents[0].strip()
 			except:
 				degree = None
 			try:
-				major = p.find("span","major").contents[0]
+				major = p.find("span","major").contents[0].strip()
 			except:
 				major = None
-			positions.append({'inst_uniq_id':inst_uniq_id,'inst_name':inst_name,'degree':degree,'fieldofStudy':major})
+
+			try:
+				dates = p.find('p','period')
+				dates = dates.find_all('abbr')
+				start_date = dates[0].get('title')
+				if not start_date:
+					start_date = None
+				end_date = dates[1].get('title')
+				if not end_date:
+					end_date = None
+			except:
+				start_date = None
+				end_date = None
+
+			positions.append({
+				'inst_uniq_id':inst_uniq_id,
+				'inst_name':inst_name,
+				'degree':degree,
+				'fieldOfStudy':major,
+				'start_date':start_date,
+				'end_date':end_date,
+			})
 		return positions
 
 class LITest(LIBase):

@@ -9,14 +9,88 @@ from django.contrib.auth.models import User
 from django.utils import simplejson
 
 # Prosperime
-from entities.models import Position
-from careers.models import SavedPath, SavedPosition
+from entities.models import Position, Entity
+from careers.models import SavedPath, SavedPosition, CareerDecision
 from accounts.models import Profile
 
 
 ######################################################
 ################## CORE VIEWS ########################
 ######################################################
+
+def addDecision(request):
+	print 'aqui'
+	response = {}
+
+	if not request.is_ajax or not request.POST:
+		response['success'] = 'incorrect request type'
+		return HttpResponse(simplejson.dumps(response))
+
+	position = Position.objects.get(id=request.POST.get('pos_id'))
+
+	decision = CareerDecision()
+	decision.owner = request.user
+	decision.position = position
+	decision.winner = decision.position.entity
+
+	if position.type == 'education':
+		decision.type = 'college'
+	elif 'Intern' in position.title:
+		decision.type = 'internshp'
+	elif position.current:
+		decision.type = 'currentJob'
+	else:
+		decision.type = None
+
+	privacy = request.POST.get('privacy')
+	if privacy:
+		decision.privacy = privacy
+
+
+	decision.reason = request.POST.get('reason')
+	decision.comments = request.POST.get('comments')
+	decision.mentorship = int(request.POST.get('mentorship'))
+	decision.social = int(request.POST.get('social'))
+	decision.skills = int(request.POST.get('skills'))
+	decision.overall = int(request.POST.get('overall'))
+
+	decision.save()
+	response['sucess'] = 'true'
+
+	alternates = request.POST.get('alternates')
+	alternates =  alternates.split(', ')
+	for alternate in alternates:
+		# get entity
+		entity = Entity.objects.filter(name=alternate)
+		if len(entity) > 1:
+			entity=entity[0]
+		decision.alternates.add(entity)
+
+	decision.save()
+	response['alternates'] = 'completed'
+
+	return HttpResponse(simplejson.dumps(response))
+
+
+def entityAutocomplete(request):
+	response = {}
+	query = request.GET.getlist('query')[0]
+	entities = Entity.objects.filter(name__istartswith=query).values('name')
+
+	suggestions = []
+	for e in entities:
+		suggestions.append(str(e['name']))
+
+	# suggestions = simplejson.dumps(suggestions)
+	print suggestions
+	response = {
+		'query': query,
+		'suggestions': suggestions,
+	}
+
+
+	return HttpResponse(simplejson.dumps(response))
+
 
 
 # VIEW: display ALL user's paths

@@ -19,3 +19,104 @@ div.profile-brief-info {
 div#middle-float-screen {
 	width:380px;
 }
+
+div#career-decision-module {
+
+}
+
+div#career-decision-prompt {
+	color:whitesmoke;
+	background-color: rgb(41,98,152);
+	padding:8px;
+	/*margin-top:50px;*/
+	font-size:14px;
+	line-height:200%;
+	border-radius:4px;
+
+}
+
+div#career-decision-form {
+	position:relative;
+	/*z-index:1000;*/
+
+}
+
+#career-decision-form textarea{
+	resize:none;
+}
+
+div.close {
+	color:whitesmoke;
+}
+
+div.display-none {
+	display:none;
+}
+
+div.career-decision-prompt-btn {
+
+}
+
+.full-width {
+	width:100%;
+}
+
+#worst{
+	display:inline-block;
+	width:55%;
+	text-align:right;
+	font-weight:bold;
+}
+
+#best {
+	display:inline-block;
+	width:40%;
+	font-weight:bold;
+	text-align:right;
+}
+
+.input-label {
+	display:inline-block;
+	width:33%;
+}
+
+.submitBtn {
+	margin-left:38%;
+}
+
+.callout-text {
+	color: rgb(41,98,152);
+	font-size:1.2em;
+}
+
+.radio {
+	font-size:.9em;
+}
+
+.autocomplete-suggestions {
+	border: 1px solid #999;
+	background: #FFF;
+	overflow: auto;
+	width:350px !important; /* normally, no, but this is a 3rd party library */ 
+}
+
+.autocomplete-suggestion { 
+	padding: 2px 5px; 
+	white-space: nowrap; 
+	overflow: hidden; 
+}
+
+.autocomplete-selected { 
+	background: #F0F0F0;
+}
+
+.autocomplete-suggestions strong { 
+	font-weight: normal; 
+	color: #3399FF; 
+}
+
+
+
+
+
+

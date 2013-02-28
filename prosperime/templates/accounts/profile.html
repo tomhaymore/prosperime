@@ -4,7 +4,10 @@
 <!-- Head -->
 <script type="text/javascript" src="{{ STATIC_URL }}js/viz.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/drag_and_drop.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.autocomplete.js"></script>
 <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/profile.css" />
+
 {% endblock %}
 
 
@@ -16,7 +19,7 @@
 <!-- Header -->
 <div class="main-container content-container">
 	<p class="main-header">Profile: <span class="splash-slug">{{profile.first_name}} {{profile.last_name}}</span></p>
-	<p class="main-sub-header">{{profile.headline}} (careers info will go here)</p>
+	<p class="main-sub-header">{{profile.headline}}</p>
 
 
 <!-- Center --> 
@@ -25,7 +28,7 @@
 		<div class="profile-info-container">
 			<div class="profile-info-left pull-left span9">
 				<div class="profile-info-top">
-					<div class="pull-left span6">	
+					<div id='profile-left' class="pull-left span6">	
 						<div class="profile-img-holder pull-left">
 							<img class="logo-preview" src="/media/{{profile.default_profile_pic}}" />
 						</div>
@@ -102,8 +105,151 @@
 					</div>
 
 					<!-- Float Screen -->
-					<div id="middle-float-screen" class="pull-right span6" ondragover='allowDrop(event)'>
-						<a style="text-align:center">For more information, hover over a position!</a>
+					<div id="middle-float-screen" class="pull-left span6" ondragover='allowDrop(event)'>
+						{% if career_decision_prompt %}
+							<div id='career-decision-module'>
+								<div id="career-decision-prompt">
+								<button class="close">&times;</button>
+								Would you provide a bit of information on your decision to 
+								{% if career_decision_prompt.type == 'education' %}
+									attend 
+								{% else %}
+									work as a {{career_decision_prompt.title}} at 
+								{% endif %}
+								{{career_decision_prompt.co_name}}? This information will go directly to others who are making the same important career decisions.  
+								<div class='btn career-decision-prompt-btn' onclick='revealPrompt()'>Sure</div>
+								</div>
+								<div id="career-decision-form" class="display-none">
+								<div class='callout-text'>Thanks you for sharing, this information will be invaluable to others just like you.</div>
+								<br/>
+								<form class='form'>
+									<input type='text' class='full-width' placeholder='Where else did you considering working?' name='alternates' id='alternatesTextBox'/><br/>
+									{% if career_decision_prompt.type == 'education' %}
+									<textarea rows='2' class="full-width" name='reason' placeholder='Why did you decide to attend {{career_decision_prompt.co_name}}'></textarea>
+									{% else %}
+									<textarea rows='2' class='full-width' name='reason' placeholder='Why did you decide to work at {{career_decision_prompt.co_name}}?'></textarea>
+									{% endif %}
+									<label>On a scale from 1-5, please rate the following elements of your experience at {{career_decision_prompt.co_name}}.</label>
+								<div id="mentorshipCheckboxes">
+									<div id='control-headers'>
+										<span id='worst'>Poor</span>
+										<span id='best'>Excellent</span>
+									</div>
+									<div id='radio-set-mentorship'>
+									<span class='input-label'>Mentorship:</span>
+									<label class="radio inline">
+  										<input type="radio" id="mentorshipNA" name='mentorship-radio' value="0"> n/a
+									</label>
+									<label class="radio inline">
+  										<input type="radio" id="mentorship1" name='mentorship-radio' value="1"> 1
+									</label>
+									<label class="radio inline">
+  										<input type="radio" id="mentorship2" name='mentorship-radio' value="2"> 2
+									</label>
+									<label class="radio inline">
+  										<input type="radio" id="mentorship3" name='mentorship-radio' value="3"> 3
+									</label>
+									<label class="radio inline">
+  										<input type="radio" id="mentorship4" name='mentorship-radio' value="4"> 4
+									</label>
+									<label class="radio inline">
+  										<input type="radio" id="mentorship5" name='mentorship-radio' value="5"> 5
+									</label>
+									
+									</div>
+
+									<div id='radio-set-skills'>
+									<span class='input-label'>Skills Gained:</span>
+									<label class="radio inline">
+  										<input type="radio" name='skills-radio' id="skillsNA" value="0"> n/a
+									</label>
+									<label class="radio inline">
+  										<input type="radio" name='skills-radio' id="skills1" value="1"> 1
+									</label>
+									<label class="radio inline">
+  										<input type="radio" name='skills-radio' id="skills2" value="2"> 2
+									</label>
+									<label class="radio inline">
+  										<input type="radio" name='skills-radio' id="skills3" value="3"> 3
+									</label>
+									<label class="radio inline">
+  										<input type="radio" name='skills-radio' id="skills4" value="4"> 4
+									</label>
+									<label class="radio inline">
+  										<input type="radio" name='skills-radio' id="skills5" value="5"> 5
+									</label>
+									</div>
+
+									<div id='radio-set-social'>
+									<span class='input-label'>
+									Social/Environment:</span>
+									<label class="radio inline">
+  										<input type="radio" name='social-radio' id="socialNA" value="0"> n/a
+									</label>
+									<label class="radio inline">
+  										<input type="radio" name='social-radio' id="social1" value="1"> 1
+									</label>
+									<label class="radio inline">
+  										<input type="radio" name='social-radio' id="social2" value="2"> 2
+									</label>
+									<label class="radio inline">
+  										<input type="radio" name='social-radio' id="social3" value="3"> 3
+									</label>
+									<label class="radio inline">
+  										<input type="radio" name='social-radio' id="social4" value="4"> 4
+									</label>
+									<label class="radio inline">
+  										<input type="radio" name='social-radio' id="social5" value="5"> 5
+									</label>
+									</div>
+
+									<div id='radio-set-overall'>	
+									<span class='input-label'>Overall:</span>
+									<label class="radio inline">
+  										<input type="radio" name='overall-radio' id="overallNA" value="0"> n/a
+									</label>
+									<label class="radio inline">
+  										<input type="radio" name='overall-radio' id="overall1" value="1"> 1
+									</label>
+									<label class="radio inline">
+  										<input type="radio" name='overall-radio' id="overall2" value="2"> 2
+									</label>
+									<label class="radio inline">
+  										<input type="radio" name='overall-radio' id="overall3" value="3"> 3
+									</label>
+									<label class="radio inline">
+  										<input type="radio" name='overall-radio' id="overall4" value="4"> 4
+									</label>
+									<label class="radio inline">
+  										<input type="radio" name='overall-radio' id="overall5" value="5"> 5
+									</label>
+									</div>
+								</div>
+								<br/>
+								{% if career_decision_prompt.type == 'education' %}
+								<textarea rows='2' class='full-width' name='comments' placeholder='Any additional comments for people considering attending {{career_decision_prompt.co_name}}?'</textarea>
+								{% else %}
+								<textarea rows='2' class='full-width' name='comments' placeholder='Any additional comments for people considering working at {{career_decision_prompt.co_name}}?'></textarea>
+								{% endif %}
+								<br/>
+								<div>Select how you want this information to be displayed:</div>
+								<div id='privacy-radio'>
+								<label class="radio inline">
+  									<input type="radio" name='privacy-radio' value="anonymous"/ > Anonymous
+								</label>
+								<label class='radio inline'>
+									<input type='radio' name='privacy-radio' value='public' />Public
+								</label>
+								</div>
+								<br/>
+								<div class='btn submitBtn' onclick='submitCareerDecision({{career_decision_prompt.id}})'>Done</div>
+
+								</form>
+								</div>
+							</div>
+						{% else %}
+						<a>For more information, hover over a position</a>
+						{% endif %}
 					</div>	
 					<div class="clear"></div>
 				</div>
@@ -112,7 +258,7 @@
 					<!-- TIMELINE. DON'T. TOUCH. IT. -->
 					{% if orgs|length > 0 %}
 					<div class="timeline-container span12">
-						<table class="timeline">
+						<table id='timeline' class="timeline">
 							<!-- Row per Position -->
 							{% for p in orgs %}
 								<tr class="timeline-row">
@@ -209,6 +355,7 @@
 		
 <script type="text/javascript">
 
+	/* Page-specific drag for GA */
 	function dragPos(ev) {
   		ev.dataTransfer.setData("pos_id", ev.target.id);
     	_gaq.push(['_trackEvent', 'profile', 'positionDragged'])
@@ -276,6 +423,101 @@
 
 		highlight(createBox)
 	};
+
+	/* Used in profile pages. Onmouseover event renders the description
+	   for a given element in the element id='middle-float-screen' */
+	var showDescription = function(index, title, co_name, start_date, end_date) {
+		// Don't override the prompt!
+		if ($('#career-decision-module').length > 0) {
+			console.log('got in here')
+			return false;
+		}
+
+		// Empty what's in the float screen
+		$('#middle-float-screen').empty()
+		// If no description, will throw exception
+		try {
+			// Couldn't get this to work in JQ so stopped trying
+			var description = document.getElementsByClassName('timeline-description-text')[index].innerHTML
+			var newText = "<div class='box-header'>"
+			if (title) newText += title
+			if (co_name) newText += ' at ' + co_name
+			newText += "</div>"
+			if (start_date) {
+				newText += "<div class='box-dates'>"
+				newText += start_date.replace('1, ','')
+				newText += ' - '
+				if (end_date == "Current") newText += "Current"
+				else newText += end_date.replace('1, ', '')
+				newText += "</div>"
+			}
+
+			if (description) newText += "<div class='box-description'>" + description + "</div>"
+		} catch (err) {
+			var newText = '<a>For more information, hover over a position</a>'
+		}
+		$('#middle-float-screen').html(newText);
+	};
+
+
+	var revealPrompt = function() {
+		$('#career-decision-prompt').hide()
+		$('#career-decision-form').toggleClass('display-none')
+		$('#profile-left').css('opacity','.4')
+		$('#profile-right').css('opacity','.4')
+		$('#timeline').css('opacity', '.4')
+	}
+
+	var submitCareerDecision = function(pos_id) { 
+
+		var alternates = $('input[name="alternates"]', '#career-decision-form').val()
+		if (alternates === undefined) alternates = null
+		var reason = $('textarea[name="reason"]', '#career-decision-form').val()
+		if (reason === undefined) reason = null
+		var mentorship = $('input[name="mentorship-radio"]:checked').val()	
+		if (mentorship === undefined) mentorship = 0
+		var skills = $('input[name="skills-radio"]:checked').val()
+		if (skills === undefined) skills = 0
+		var social = $('input[name="social-radio"]:checked').val()
+		if (social === undefined) social = 0
+		var overall = $('input[name="overall-radio"]:checked').val()
+		if (overall === undefined) overall = 0
+
+
+		var comments = $('textarea[name="comments"]','#career-decision-form').val()
+		if (comments === undefined) comments=null
+		var privacy = $('input[name="privacy-radio"]:checked').val()
+
+		$.post('/careers/addDecision/', {pos_id: pos_id, alternates: alternates, reason: reason, mentorship: mentorship, skills: skills, social:social, overall: overall, comments: comments, privacy: privacy, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
+				console.log(response)
+		}, 'json');
+
+		$('#middle-float-screen').empty()
+		$('#middle-float-screen').append('<a>For more information, hover over a position</a>')
+		$('#profile-left').css('opacity','1')
+		$('#profile-right').css('opacity','1')
+		$('#timeline').css('opacity', '1')
+
+	}
+
+
+	/* Adds autocomplete to 'Alternates' textbox */
+	$('#alternatesTextBox').autocomplete({
+    	serviceUrl: '/careers/entityAutocomplete/',
+    	delimiter: ', ',
+    });
+
+	/* Prevents submitting the form when 'Enter' is pressed */
+    $('#career-decision-form').bind("keyup", function(e) {
+  		var code = e.keyCode || e.which; 
+  		if (code  == 13) {     
+    		e.preventDefault();
+    		return false;
+  		}
+	});
+
+
+
 
 </script>
 

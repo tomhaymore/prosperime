@@ -103,7 +103,25 @@
 
 					<!-- Float Screen -->
 					<div id="middle-float-screen" class="pull-left span6" ondragover='allowDrop(event)'>
-						<a>For more information, hover over a position!</a>
+						<h1>{{career_decision_prompt}}</h1>
+						{% if career_decision_prompt %}
+						<div id='career-decision-module'>
+							<div id="career-decision-prompt">
+								Would you provide a bit of information on your decision to 
+								{% if career_decision_prompt.type == 'education' %}
+									attend 
+								{% else %}
+									work at 
+								{% endif %}
+								{{career_decision_prompt.co_name}}? This information will go directly to others who are making the same import career decisions!
+							</div>
+							<div id="career-decision-form"
+
+
+						</div>
+						{% else %}
+						<a>Hover over a position for more information!</a>
+						{% endif %}
 					</div>	
 					<div class="clear"></div>
 				</div>

@@ -19,7 +19,7 @@ from django.core.cache import cache
 # Prosperime
 from entities.models import Entity, Office, Financing, Industry, Position, Career
 from accounts.models import Picture, Profile
-from careers.models import SavedPath
+from careers.models import SavedPath, CareerDecision
 from entities.careerlib import CareerSimBase
 
 # @login_required
@@ -30,8 +30,10 @@ def home(request):
 	user = request.user
 
 	data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
-	data['	aths'] = SavedPath.objects.filter(owner=user)
+	data['saved_paths'] = SavedPath.objects.filter(owner=user)
 	data['top_careers'] = []
+	data['career_decisions'] = CareerDecision.objects.all()
+
 
 	return render_to_response('home.html',data,context_instance=RequestContext(request))
 
@@ -40,6 +42,7 @@ def contact(request):
 	data = {}
 
 	return render_to_response('contact.html', data, context_instance=RequestContext(request))
+
 
 
 def welcome(request):
