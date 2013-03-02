@@ -6,13 +6,6 @@ p.splash-header {
 	font-weight: 500;
 }
 
-div#content-container {
-	width:1000px;
-	margin-right: auto;
-	margin-left: auto;
-	margin-top:15px;
-}
-
 div .blue-box-container a {
 	color:whitesmoke;
 	text-decoration:none;

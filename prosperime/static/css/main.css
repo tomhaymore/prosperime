@@ -10,6 +10,13 @@ div.background-container {
 	background-color:whitesmoke;
 }
 
+div#content-container {
+	width:1000px;
+	margin-right: auto;
+	margin-left: auto;
+	margin-top:15px;
+}
+
 div.main-container {
 	/*margin-left:auto;
 	margin-right:auto;
@@ -116,11 +123,15 @@ div.footer {
 
 /* Messages */
 
+div.messages-container {
+	padding-top:5px;
+}
+
 div#messages {
 	width: 1000px;
 	margin-left: auto;
 	margin-right: auto;
-	margin-top: 10px;
+	/*margin-top: 10px;*/
 	border: none;
 	border-radius: 5px;
 	background-color: #fff;
@@ -524,41 +535,6 @@ div.path-viz-timeline-center {
 	height:400px;
 }
 
-/* Search filters */
-
-
-div.max-filters{
-	width:25%;
-	overflow: hidden;
-	margin-right:5px;
-}
-
-div.min-filters{
-	width:2%;
-	/*overflow: hidden;*/
-	margin-right:5px;
-}
-
-div.min-results {
-	width:73%;
-}
-
-div.max-results {
-	width:95%;
-}
-
-input.input-search-filter {
-	font-size: 0.8em;
-}
-
-a.search-control-close:hover, a.search-control-open:hover {
-	cursor: pointer;
-}
-
-div.profile-img-holder img {
-	width:45px;
-}
-
 /* Careers API */
 
 .careers-single{
@@ -788,7 +764,7 @@ button.general-add-button {
 	color:#fff;
 	border: none;
 	display: inline-block;
-	margin-bottom: 12px;
+	margin-bottom: 0px;
 	border-radius: 1px;
 }
 
@@ -1096,10 +1072,6 @@ button.general-add-button:active {
 .page-header-subtitle {
 	padding-left:8px;
 	font-weight:500;
-}
-
-#middle-column {
-	width:100%;
 }
 
 .blue {
