@@ -1,0 +1,50 @@
+/* Search filters */
+
+#main-column {
+	width:75%;
+}
+
+#sidebar-column {
+
+}
+
+#middle-column {
+	/*width:100%;*/
+}
+
+#right-column {
+	width: 25%;
+}
+
+div.max-filters{
+	width:25%;
+	overflow: hidden;
+	margin-right:5px;
+}
+
+div.min-filters{
+	width:2%;
+	/*overflow: hidden;*/
+	margin-right:5px;
+}
+
+div.min-results {
+	width:73%;
+}
+
+div.max-results {
+	width:95%;
+}
+
+input.input-search-filter {
+	font-size: 0.8em;
+}
+
+a.search-control-close:hover, a.search-control-open:hover {
+	cursor: pointer;
+}
+
+div.profile-img-holder img {
+	width:45px;
+}
+
