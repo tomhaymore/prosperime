@@ -8,6 +8,22 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/personalize.js"></script>
 {% endblock %}
 
+{% block extramessage %}
+
+{% if data.tasks %}
+
+	{% if data.tasks.profile %}
+		<p id="task-profile-status" data-task-id="{{data.tasks.profile.id}}"></p>
+	{% endif %}
+
+	{% if data.tasks.connections %}
+		<p id="task-connections-status" data-task-id="{{data.tasks.connections.id}}"></p>
+	{% endif %}
+
+{% endif %}
+
+{% endblock %}
+
 {% block content %}
 {% csrf_token %}
 <div id="content-container" class="main-container">
@@ -57,11 +73,17 @@
 		<div class="personalize-jobs-container pull-left">
 			<p class="main-header">Jobs</p>
 			<p>Enter any job you'd like to have or would like to learn more about.</p>
-			<input type="text" id="personalize-job-name" class="large-text-input" />
-			<button id="personalize-add-job" class="general-add-button">Add</button>
-			<ul class="personalize-jobs-list" id="personalize-jobs-list">
+			<span>
+				<input type="text" id="personalize-job-name" class="large-text-input" />
+			</span>
+			<span>
+				<button id="personalize-add-job" class="general-add-button">Add</button>
+			</span>
+			<div class="personalize-jobs-list-container">
+				<ul class="personalize-jobs-list" id="personalize-jobs-list">
 
-			</ul>
+				</ul>
+			</div>
 		</div>
 		<div class="clear"></div>
 		<div class="personalize-progress-container">

@@ -245,8 +245,14 @@ def finish_link(request):
 
 	# save task ids to session
 	request.session['tasks'] = {
-		'profile': profile_task.id,
-		'connections': connections_task.id
+		'profile': {
+			'status':profile_task.ready(),
+			'id':profile_task.id
+			},
+		'connections': {
+			'status':conections_task.ready(),
+			'id':connections_task.id
+			}
 	}
 
 	messages.success(request, 'Your LinkedIn account has been successfully linked. Please refresh the page to see changes.')
@@ -359,7 +365,7 @@ def profile(request, user_id):
 	else:	
 		start_date = org_list[len(org_list)-1].start_date
 		total_time = helpers._months_from_now(start_date)
-		end_date = datetime.datetime.now()
+		end_date = datetime.now()
 
 		if total_time > 200: 
 		# 200 is an arbitrary constant that seems to fit my laptop screen well

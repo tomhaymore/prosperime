@@ -1,7 +1,74 @@
+// jQuery.fun.exists = function(){return this.length>0;}
 var selected_careers = [];
 var selected_jobs = [];
 
+// var checkTask = function(task_id,task_cat) {
+// 	var task_selector = "#task-" + task_cat + "-status";
+// 	$.ajax({
+// 		url: '/tasks/' + task_id + '/status'
+// 	}).done(function (data) {
+// 		if (data.task.status == "SUCCESS") {
+// 			// if task is finished
+// 			$(task_selector).html("<span class='success-message'>We have finished processing your " + task_cat + ".</span>")
+// 			return 'success';
+// 		} else {
+// 			// if task is not finished yet
+// 			$(task_selector).html("<span class='wait-message'>We are still processing your " + task_cat + ".</span>")
+// 			// refresh page in a few seconds
+// 			return 'fail';
+// 		}
+// 	});
+// };
+
 $(document).ready(function() {
+// 	// check for profile task
+// 	if ($("#task-profile-status").exists()) {
+// 		// get task id
+// 		var profile_task_id = $(this).data('task-id');
+// 		var status = checkTask(profile_task_id,'profile');
+// 		if (status == 'fail') {
+// 			setInterval(checkTask(profile_task_id,'profile'),1000*5);
+// 		} 
+// 		// setInterval(function() {
+// 		// 	$.ajax({
+// 		// 		url: profile_task_url,
+// 		// 	}).done(function (data) {
+// 		// 		if (data.task.status == "SUCCESS") {
+// 		// 			// if task is finished
+// 		// 			$("#task-profile-status").html("<span class='success-message'>Your profile has finished processing.</span>")
+// 		// 		} else {
+// 		// 			// if task is not finished yet
+// 		// 			$("#task-profile-status").html("<span class='wait-message'>We are still processing your profile.</span>")
+// 		// 			// refresh page in a few seconds
+// 		// 		}
+// 		// 	});
+// 		// },1000*10);
+// 	}
+// 	// check for connections task 
+// 	if ($("#task-connections.status").exists()) {
+// 		// get task id
+// 		var connections_task_id = $(this).data('task-id');
+// 		var status = checkTask(connections_task_id,'connections');
+// 		if (status == 'fail') {
+// 			setInterval(checkTask(connections_task_id,'connections'),1000*10);
+// 		} 
+// 		// var connections_task_url = '/tasks/' + connections_task_id + '/status'
+// 		// setInterval(function() {
+// 		// 	$.ajax({
+// 		// 		url: profile_task_url,
+// 		// 	}).done(function (data) {
+// 		// 		if (data.task.status == "SUCCESS") {
+// 		// 			// if task is finished
+// 		// 			$("#task-connections-status").html("<span class='success-message'>Your profile has finished processing.</span>")
+// 		// 		} else {
+// 		// 			// if task is not finished yet
+// 		// 			$("#task-connections-status").html("<span class='wait-message'>We are still processing your profile.</span>")
+// 		// 			// refresh page in a few seconds
+// 		// 		}
+// 		// 	});
+// 		// },1000*10);
+// 	}
+
 	$.ajaxSetup({
         beforeSend: function(xhr, settings) {
             if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {

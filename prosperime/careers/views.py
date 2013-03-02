@@ -15,6 +15,8 @@ from django.core.cache import cache
 from careers.models import SavedPath, SavedPosition, Position, Career, GoalPosition, SavedCareer, IdealPosition
 from accounts.models import Profile
 import careers.careerlib as careerlib
+from entities.models import Entity
+from django.db.models import Count, Q
 
 ######################################################
 ################## CORE VIEWS ########################
@@ -38,6 +40,7 @@ def home(request):
 def discover(request):
 
 	# initiate CarerSimBase
+	career_path = careerlib.CareerPathBase()
 	career_sim = careerlib.CareerSimBase()
 
 	# data array for passing to template
@@ -52,7 +55,7 @@ def discover(request):
 	# Check/Set Cache
 	careers_network = cache.get('discover_careers_network_data_'+str(request.user.id))
 	if careers_network is None:
-		cache.set('discover_careers_network_data_'+str(request.user.id),career_sim.get_careers_brief_in_network(request.user),600)
+		cache.set('discover_careers_network_data_'+str(request.user.id),career_path.get_careers_brief_in_network(request.user),600)
 		careers_network = cache.get('discover_careers_network_data_'+str(request.user.id))
 
 	careers_similar = cache.get('discover_careers_similar_data_'+str(request.user.id))
@@ -75,7 +78,7 @@ def discover(request):
 def discover_career(request,career_id):
 
 	# initiate CarerSimBase
-	career_sim = careerlib.CareerSimBase()
+	# career_path = careerlib.CareerPathBase()
 
 	# get career object
 	career = Career.objects.get(pk=career_id)
@@ -87,7 +90,8 @@ def discover_career(request,career_id):
 	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
 	if paths is None:
 		print 'discover.people missed cache'
-		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),career_sim.get_paths_in_career(request.user,career),600)
+		# cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),career_path.get_paths_in_career(request.user,career),10)
+		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),careerlib.get_paths_in_career(request.user,career),10)
 		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
 	else:
 		print 'discover.people hit cache'
@@ -110,7 +114,7 @@ def discover_career(request,career_id):
 def discover_career_orgs(request, career_id):
 
 	# initiate CarerSimBase
-	career_sim = careerlib.CareerSimBase()
+	career_path = careerlib.CareerPathBase()
 
 	career = Career.objects.get(pk=career_id)
 	entities_in_career = {}
@@ -120,7 +124,7 @@ def discover_career_orgs(request, career_id):
 	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
 	if paths is None:
 		print 'discover.career.orgs missed cache'
-		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),career_sim.get_paths_in_career(request.user,career),600)
+		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),career_path.get_paths_in_career(request.user,career),600)
 		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
 
 	else:
@@ -143,7 +147,7 @@ def discover_career_orgs(request, career_id):
 def discover_career_positions(request, career_id):
 
 	# initiate CarerSimBase
-	career_sim = careerlib.CareerSimBase()
+	career_path = careerlib.CareerPathBase()
 
 	career = Career.objects.get(pk=career_id)
 	positions_in_career = {}
@@ -153,7 +157,7 @@ def discover_career_positions(request, career_id):
 	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
 	if paths is None:
 		print 'discover.career.pos missed cache'
-		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),career_sim.get_paths_in_career(request.user,career),600)
+		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),career_path.get_paths_in_career(request.user,career),600)
 		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
 	else:
 		print 'discover.people hit cache'
@@ -179,22 +183,38 @@ def discover_career_positions(request, career_id):
 	return render_to_response('entities/discover_career.html', {'career': career, 'positions':positions_in_career, 'overview':overview, 'request_type':request_type, 'career_id':career_id}, context_instance=RequestContext(request))
 
 @login_required
+def discover_position(request,pos_id):
+
+	return render_to_response('careers/discover_position.html',{},context_instance=RequestContext(request))
+
+@login_required
 def personalize_careers_jobs(request):
 	'''
 	presents initial set of careers and jobs to user during onboarding for them to selected
 	'''
 	# initiate careerlib
+	career_path = careerlib.CareerPathBase()
 	career_sim = careerlib.CareerSimBase()
+
 	# data array for passing to template
 	data = {}
-	# check to see if tasks have been initiated
-	if 'tasks' in request.session:
-		data = {
-			'profile_task_id':request.session['tasks']['profile'],
-			'connections_task_id':request.session['tasks']['connections'],
-		}
 
-	careers_network = career_sim.get_careers_brief_in_network(request.user)
+	# check to see if tasks are pending
+	# if 'tasks' in request.session:
+	# 	data['tasks'] = {}
+	# 	if 'profile' in request.session['tasks']:
+	# 		data['tasks']['profile'] = request.session['tasks']['profile']
+	# 		if request.session['tasks']['profile']['status'] == True:
+	# 			del request.session['tasks']['profile']
+	# 	if 'connections' in request.session['tasks']:
+	# 		data['tasks']['connections'] = request.session['tasks']['connections']
+	# 		if request.session['tasks']['connections']['status'] == True:
+	# 			del request.session['tasks']['connections']
+	# 	if len(request.session['tasks']) == 0:
+	# 		del request.session['tasks']
+
+	# get career information
+	careers_network = career_path.get_careers_brief_in_network(request.user)
 	careers_similar = career_sim.get_careers_brief_similar(request.user)
 
 	# get list of ids of similar careers to avoid duplication in network
@@ -243,7 +263,7 @@ def add_personalization(request):
 def list_jobs(request):
 	if request.GET:
 		params = request.GET['q']
-		print params
+		# print params
 		jobs = IdealPosition.objects.values('title','id').filter(title__icontains=params)
 	else:
 		jobs = IdealPosition.objects.values('title','id').all()
@@ -672,3 +692,213 @@ def _ready_position_for_proto(p):
 	return array
 
 
+def _get_paths_in_career_alt(user, career):
+
+	paths = {}
+	overview = {}
+
+	# Need: positions related to query
+	career_singleton_array = [career] #needed to make this query work
+	positions_in_career = Position.objects.filter(careers__in=career_singleton_array).select_related('entity', 'person', 'person__profile')
+
+	# Check this fxn to see how it works
+	users_list, user_ids = _get_users_in_network(user)
+
+	## ** DST's ** ##
+
+	# Used to get length of sets
+	all_user_set = set()
+	all_co_set = set()
+	network_user_set = set()
+	network_pos_counter = 0
+	network_co_set = set()
+
+	# Return DST's for 'Network'
+	network_people = []
+	network_cos = []
+	network_pos = []
+
+	# Return DST's for 'Prosperime Community'
+	all_people = []
+	all_cos = []
+	all_pos = []
+
+	# Used for Big Players
+	network_entities_dict = {}
+	all_entities_dict = {}
+
+	for pos in positions_in_career:
+
+		pos_data = {
+			'id':pos.id,
+			'title':pos.title,
+			'co_name':pos.entity.name,
+			'owner':pos.person.profile.full_name(),
+			'owner_id':pos.person.id,
+			'logo_path':pos.entity.default_logo(),
+			# 'logo_path':pos.entity.logo,
+		}
+
+		co_data = {
+			# count logo id people name
+			'name':pos.entity.name,
+			'id':pos.entity.id,
+			'logo_path':pos.entity.default_logo(),
+			# 'logo_path':pos.entity.logo,
+			'people':None,
+		}
+
+		# Format End Dates for person_data object
+		if pos.start_date is not None:
+			start_date = pos.start_date.strftime("%m/%Y")
+		else:
+			start_date = None
+
+		if pos.end_date is not None:
+			end_date = pos.end_date.strftime("%m/%Y")
+		else:
+			end_date = "Current"
+
+		person_data = {
+			'name':pos.person.profile.full_name(),
+			'id':pos.person.id,
+			#'latest_position':pos.person.profile.latest_position(),
+			'pos_title':pos.title,
+			'pos_co_name':pos.entity.name,
+			'pos_id':pos.id,
+			'pos_start_date':start_date,
+			'pos_end_date':end_date,
+			'profile_pic':pos.person.profile.default_profile_pic(),
+			# 'profile_pic':pos.person.profile.profile_pic,
+		}
+
+		# Network & All
+		if pos.person.id in user_ids:
+			
+			# Positions
+			network_pos_counter += 1
+			network_pos.append(pos_data)
+			all_pos.append(pos_data)
+
+			# People
+			network_user_set.add(pos.person.id) 
+			all_user_set.add(pos.person.id)
+			network_people.append(person_data)
+			all_people.append(person_data)
+
+			# Companies
+			
+			# No Duplicates
+			if pos.entity.name not in network_co_set:
+				network_cos.append(co_data)
+			if pos.entity.name not in all_co_set:
+				all_cos.append(co_data)
+			
+			# network_co_set.add(pos.entity.id) # should be id, but crappy db data
+			#all_co_set.add(pos.entity.id) # should be id, but crappy db data
+			network_co_set.add(pos.entity.name)
+			all_co_set.add(pos.entity.name)
+
+			# Entities Dict for BigPlayers
+			## Could rearrange this loop structure for minor boost
+			if pos.entity.id in network_entities_dict:
+				network_entities_dict[pos.entity.id]['count'] += 1
+			else:
+				network_entities_dict[pos.entity.id] = {
+					'count':1,
+					'name':pos.entity.name,
+					'id':pos.entity.id,
+				}
+
+			if pos.entity.id in all_entities_dict:
+				all_entities_dict[pos.entity.id]['count'] += 1
+			else:
+				all_entities_dict[pos.entity.id] = {
+					'count':1,
+					'name':pos.entity.name,
+					'id':pos.entity.id,
+				}
+
+		# Only All
+		else:
+
+			# Positions
+			all_pos.append(pos_data)
+
+			# People
+			all_user_set.add(pos.person.id)
+			all_people.append(person_data)
+
+			# Companies
+			if pos.entity.name not in all_co_set:
+				all_cos.append(co_data)
+
+			# all_co_set.add(pos.entity.id) # should be id, but crappy db data
+			all_co_set.add(pos.entity.name)
+
+			# Entities Dict for BigPlayers
+			if pos.entity.id in all_entities_dict:
+				all_entities_dict[pos.entity.id]['count'] += 1
+			else:
+				all_entities_dict[pos.entity.id] = {
+					'count':1,
+				}
+
+	# People
+	paths['network'] = network_people
+	paths['all'] = all_people
+
+	# Positions
+	paths['networkPositions'] = network_pos
+	paths['allPositions'] = all_pos
+ 
+	# Companies
+	paths['networkCompanies'] = network_cos
+	paths['allCompanies'] = all_cos	
+
+	## Overview
+	overview['network'] = {
+		'num_people': len(network_user_set),
+		'num_pos': network_pos_counter,
+		'num_cos': len(network_co_set),
+	}
+
+	overview['all'] = {
+		'num_people':len(all_user_set),
+		'num_pos':len(positions_in_career),
+		'num_cos':len(all_co_set),
+	}
+
+	# Big Players
+	network_entities_dict = sorted(network_entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
+	overview['network']['bigplayers'] = network_entities_dict[:3]
+
+	all_entities_dict = sorted(all_entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
+	overview['all']['bigplayers'] = all_entities_dict[:3]
+
+	# Add Overview to Paths
+	paths['overview'] = {
+		'network' : overview['network'],
+		'all': overview['all'],
+	}
+
+	return paths
+
+def _get_users_in_network(user,**filters):
+
+	# get schools from user
+	schools = Entity.objects.filter(li_type="school",positions__person=user,positions__type="education").distinct()
+	
+	# get all connected users and those from the same schools
+	
+	users = User.objects.select_related('profile','pictures').values('pk','positions__careers','profile__first_name','profile__last_name','profile__pictures__pic').filter(Q(profile__in=user.profile.connections.all()) | (Q(positions__entity__in=schools))).distinct()
+	# if filters['positions']:
+	# 	users = users.filter(positions__title__in=filters['positions'])
+	# if filters['locations']:
+	# 	users = users.filter(positions__entity__office__city__in=filters['locations'])
+	
+	users_list = [{'id':u['pk'],'first_name':u['profile__first_name'],'last_name':u['profile__last_name'],'profile_pic':u['profile__pictures__pic'],'careers':u['positions__careers']} for u in users]	
+	user_ids = [u['id'] for u in users_list]
+
+	user_ids = set(user_ids)
+	return (users_list, user_ids)
