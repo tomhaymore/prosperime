@@ -170,8 +170,8 @@ $(function(){
 	window.PathSingleView = Backbone.View.extend({
 
 		tagName: "li",
-		//template:_.template($('#path-single-template').html()),
-		template:_.template($('#path-single-template-clayton').html()),
+		template:_.template($('#path-single-template').html()),
+		// template:_.template($('#path-single-template-clayton').html()),
 
 		events: {
 			"click a.path-name-link" : "renderViz",

@@ -84,6 +84,10 @@ div.discover-nav-container div {
 	
 }	
 
+button.personalize-add-job {
+	margin-bottom: -2px;
+}
+
 .tt-suggestions {
 	background-color: #fff;
 	border: 1px solid #ccc;
