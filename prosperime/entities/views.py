@@ -537,8 +537,82 @@ def path_filters(request):
 	locationsSelected = request.GET.getlist('location')
 	sectorsSelected = request.GET.getlist('sector')
 	positionsSelected = request.GET.getlist('position')
+	careersSelected = request.GET.getlist('careers')
+	orgsSelected = request.GET.getlist('orgs')
 
 	# set base filters
+
+	# set career filters
+	careersBase = User.objects.select_related().values("positions__careers__long_name").annotate(freq=Count('pk')).order_by('-freq').distinct()
+	careersFiltered = careersBase
+
+	if locationsSelected:
+		careersFiltered = careersFiltered.filter(positions__entity__office__city__in=locationsSelected)
+
+	if sectorsSelected:
+		careersFiltered = careersFiltered.filter(positions__entity__domains__name__in=sectorsSelected)
+
+	if positionsSelected:
+		careersFiltered = careersFiltered.filter(positions__title__in=positionsSelected)
+
+	if orgsSelected:
+		careersFiltered = careersFiltered.filter(positions__entity__name__in=orgsSelected)
+
+	careersBase = careersBase[:10]
+	
+	careersFilteredDict = {}
+	for c in careersFiltered:
+		careersFilteredDict[c['positions__careers__long_name']] = c['freq']
+
+	for c in careersBase:
+		# make sure it doesn't have a null value
+		if c['positions__careers__long_name']:
+			# get count from filtered dict
+			if c['positions__careers__long_name'] in careersFilteredDict:
+				freq = careersFilteredDict[c['positions__careers__long_name']]
+			else:
+				freq = 0
+			# check to see if the value should be selected
+			if c['positions__careers__long_name'] in careersSelected:
+				filters.append({'name':c['positions__careers__long_name'],'value':c['positions__careers__long_name'],'category':'Career','count':freq,'selected':True})
+			else:
+				filters.append({'name':c['positions__careers__long_name'],'value':c['positions__careers__long_name'],'category':'Career','count':freq,'selected':None})
+
+	# set organization filters
+	orgsBase = User.objects.values("positions__entity__name").annotate(freq=Count('pk')).order_by('-freq').distinct()
+	orgsFiltered = orgsBase
+
+	if locationsSelected:
+		orgsFiltered = orgsFiltered.filter(positions__entity__office__city__in=locationsSelected)
+
+	if sectorsSelected:
+		orgsFiltered = orgsFiltered.filter(positions__entity__domains__name__in=sectorsSelected)
+
+	if positionsSelected:
+		orgsFiltered = orgsFiltered.filter(positions__title__in=positionsSelected)
+
+	if careersSelected:
+		orgsFiltered = orgsFiltered.filter(positions__careers__long_name__in=careersSelected)
+
+	orgsBase = orgsBase[:10]
+	
+	orgsFilteredDict = {}
+	for o in orgsFiltered:
+		orgsFilteredDict[o['positions__entity__name']] = o['freq']
+
+	for o in orgsBase:
+		# make sure it doesn't have a null value
+		if o['positions__entity__name']:
+			# get count from filtered dict
+			if o['positions__entity__name'] in careersFilteredDict:
+				freq = careersFilteredDict[o['positions__entity__name']]
+			else:
+				freq = 0
+			# check to see if the value should be selected
+			if o['positions__entity__name'] in careersSelected:
+				filters.append({'name':o['positions__entity__name'],'value':o['positions__entity__name'],'category':'Organizations','count':freq,'selected':True})
+			else:
+				filters.append({'name':o['positions__entity__name'],'value':o['positions__entity__name'],'category':'Organizations','count':freq,'selected':None})
 
 	# set location filters
 	locationsBase = User.objects.values("positions__entity__office__city").annotate(freq=Count('pk')).order_by('-freq').distinct()
@@ -549,6 +623,12 @@ def path_filters(request):
 	
 	if sectorsSelected:
 		locationsFiltered = locationsFiltered.filter(positions__entity__domains__name__in=sectorsSelected)
+
+	if careersSelected:
+		locationsFiltered = locationsFiltered.filter(positions__careers__long_name__in=careersSelected)
+
+	if orgsSelected:
+		locationsFiltered = locationsFiltered.filter(positions__entity__name__in=orgsSelected)
 
 	locationsBase = locationsBase[:10]
 
@@ -571,61 +651,61 @@ def path_filters(request):
 				filters.append({'name':l['positions__entity__office__city'],'value':l['positions__entity__office__city'],'category':'Location','count':freq,'selected':None})
 
 	# get sector filters
-	sectorsBase = User.objects.values('positions__entity__domains__name').annotate(freq=Count('pk')).distinct()
-	sectorsFiltered = sectorsBase
+	# sectorsBase = User.objects.values('positions__entity__domains__name').annotate(freq=Count('pk')).distinct()
+	# sectorsFiltered = sectorsBase[:10]
 
-	if locationsSelected:
-		sectorsFiltered = sectorsFiltered.filter(positions__entity__office__city__in=locationsSelected)
+	# if locationsSelected:
+	# 	sectorsFiltered = sectorsFiltered.filter(positions__entity__office__city__in=locationsSelected)
 
-	if positionsSelected:
-		sectorsFiltered = sectorsFiltered.filter(positions__title__in=positionsSelected)
+	# if positionsSelected:
+	# 	sectorsFiltered = sectorsFiltered.filter(positions__title__in=positionsSelected)
 
-	sectorsFilteredDict = {}
-	for s in sectorsFiltered:
-		sectorsFilteredDict[s['positions__entity__domains__name']] = s['freq']
+	# sectorsFilteredDict = {}
+	# for s in sectorsFiltered:
+	# 	sectorsFilteredDict[s['positions__entity__domains__name']] = s['freq']
 
-	for s in sectorsBase:
-		# make sure it doesn't have a null value
-		if s['positions__entity__domains__name']:
-			# get count from sectorsFilteredDict
-			if s['positions__entity__domains__name'] in sectorsFilteredDict:
-				freq = sectorsFilteredDict[s['positions__entity__domains__name']]
-			else:
-				freq = 0
-			name = " ".join(word.capitalize() for word in s['positions__entity__domains__name'].replace("_"," ").split())
-			# check to see if the value should be selected
-			if s['positions__entity__domains__name'] in sectorsSelected:
-				filters.append({'name':name,'value':s['positions__entity__domains__name'],'category':'Sector','count':freq,'selected':True})
-			else:
-				filters.append({'name':name,'value':s['positions__entity__domains__name'],'category':'Sector','count':freq,'selected':None})
+	# for s in sectorsBase:
+	# 	# make sure it doesn't have a null value
+	# 	if s['positions__entity__domains__name']:
+	# 		# get count from sectorsFilteredDict
+	# 		if s['positions__entity__domains__name'] in sectorsFilteredDict:
+	# 			freq = sectorsFilteredDict[s['positions__entity__domains__name']]
+	# 		else:
+	# 			freq = 0
+	# 		name = " ".join(word.capitalize() for word in s['positions__entity__domains__name'].replace("_"," ").split())
+	# 		# check to see if the value should be selected
+	# 		if s['positions__entity__domains__name'] in sectorsSelected:
+	# 			filters.append({'name':name,'value':s['positions__entity__domains__name'],'category':'Sector','count':freq,'selected':True})
+	# 		else:
+	# 			filters.append({'name':name,'value':s['positions__entity__domains__name'],'category':'Sector','count':freq,'selected':None})
 	
-	# get position filters
-	positionsBase = User.objects.values('positions__title').annotate(freq=Count('pk')).distinct()
-	positionsFiltered = positionsBase
+	# # get position filters
+	# positionsBase = User.objects.values('positions__title').annotate(freq=Count('pk')).distinct()
+	# positionsFiltered = positionsBase[:10]
 
-	if locationsSelected:
-		positionsFiltered = positionsFiltered.filter(positions__entity__office__city__in=locationsSelected)
-	if sectorsSelected:
-		positionsSelected = positionsFiltered.filter(positions__entity__domains__name__in=sectorsSelected)
+	# if locationsSelected:
+	# 	positionsFiltered = positionsFiltered.filter(positions__entity__office__city__in=locationsSelected)
+	# if sectorsSelected:
+	# 	positionsSelected = positionsFiltered.filter(positions__entity__domains__name__in=sectorsSelected)
 
-	positionsFilteredDict = {}
-	for p in positionsFiltered:
-		positionsFilteredDict[p['positions__title']] = p['freq']
+	# positionsFilteredDict = {}
+	# for p in positionsFiltered:
+	# 	positionsFilteredDict[p['positions__title']] = p['freq']
 
-	for p in positionsBase:
-		# make sure it doesn't have a null value
-		if p['positions__title']:
-			# get count from positionsFilteredDict
-			if p['positions__title'] in positionsFilteredDict:
-				freq = positionsFilteredDict[p['positions__title']]
-			else:
-				freq = 0
-			# check to see if the value should be selected
-			if p['positions__title'] in positionsSelected:
-				selected = True
-			else:
-				selected = False
-			filters.append({'name':p['positions__title'],'value':p['positions__title'],'category':'Positions','count':freq,'selected':selected})
+	# for p in positionsBase:
+	# 	# make sure it doesn't have a null value
+	# 	if p['positions__title']:
+	# 		# get count from positionsFilteredDict
+	# 		if p['positions__title'] in positionsFilteredDict:
+	# 			freq = positionsFilteredDict[p['positions__title']]
+	# 		else:
+	# 			freq = 0
+	# 		# check to see if the value should be selected
+	# 		if p['positions__title'] in positionsSelected:
+	# 			selected = True
+	# 		else:
+	# 			selected = False
+	# 		filters.append({'name':p['positions__title'],'value':p['positions__title'],'category':'Positions','count':freq,'selected':selected})
 
 	# render response
 	return HttpResponse(simplejson.dumps(filters), mimetype="application/json")
@@ -805,25 +885,32 @@ def paths(request):
 
 	# loop through all positions, identify those that belong to connections
 	for u in users:
+		# reset careers array
+		careers = []
 		# check if position held by 
 		if request.user.profile in u.profile.connections.all():
 			connected = True
 			name = u.profile.full_name()
 			current_position = _get_latest_position(u)
 			profile_pic = _get_profile_pic(u.profile)
-			if current_position is not None:
-				positions = _get_positions_for_path(u.positions.all())
-			else:
-				positions = None
+			for c in u.profile.get_all_careers():
+				careers.append({'name':c.long_name,'id':c.id})
+			# if current_position is not None:
+			# 	positions = _get_positions_for_path(u.positions.all())
+			# else:
+			# 	positions = None
 		else:
 			connected = False
 			name = None
 			current_position = _get_latest_position(u,anon=True)
-			positions = _get_positions_for_path(u.positions.all(),anon=True)
+			# positions = _get_positions_for_path(u.positions.all(),anon=True)
 			profile_pic = None
+			for c in u.profile.get_all_careers():
+				careers.append({'name':c.long_name,'id':c.id})
 			# need to convert positions to anonymous
 
-		paths.append({'id':u.id,'profile_pic':profile_pic,'full_name':name,'current_position':current_position,'positions':positions,'connected':connected})
+		# paths.append({'id':u.id,'profile_pic':profile_pic,'full_name':name,'current_position':current_position,'positions':positions,'connected':connected})
+		paths.append({'id':u.id,'profile_pic':profile_pic,'full_name':name,'current_position':current_position,'careers':careers,'connected':connected})
 		# paths.append({'full_name':name,'current_position':current_position,'connected':connected})
 
 	return HttpResponse(simplejson.dumps(paths))

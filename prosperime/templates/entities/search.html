@@ -88,7 +88,7 @@
 {% endblock %}
 
 {% block templates %}
-<script type="text/template" id="path-single-template">
+<script type="text/template" id="path-single-template-old">
 	<li class="list-preview">
 		<div class="left-list-preview">
 			<% if (profile_pic != null) { %>
@@ -129,6 +129,39 @@
 				<div class="path-viz-long" style="display:none;">
 				</div>
 
+			
+		</div>
+	</li>
+</script>
+
+<script type="text/template" id="path-single-template">
+	<li class="list-preview">
+		<div class="left-list-preview">
+			<div class="profile-img-holder pull-left">
+			<% if (profile_pic != null) { %>
+			
+				<img class="logo-preview" src="{{MEDIA_URL}}<%= profile_pic %>" />&nbsp;
+			</div>
+			
+			<% } else { %>
+				<img class="logo-preview" src="{{MEDIA_URL}}pictures/anon.jpg" />&nbsp;
+			<% } %>
+		</div>
+		<div class="right-list-preview pull-left">
+			<p class="path-name"><a class="path-name-link"><%= full_name %></a></p>
+			<p class="path-current-position"><%= current_position %></p>
+		</div>
+		<div class="clearfix"></div>
+		<div class="search-careers-container">
+			
+			<% if (careers != null) {  %>
+			<ul class="search-careers-list flat">
+			<% _.each(careers,function(c) { %>
+				<li class="search-career">
+					<a class="search-button" href="/discover/career<%=c.id%>"><%=c.name%></a>
+				</li>
+			<% }); %>
+			<% } %>
 			
 		</div>
 	</li>

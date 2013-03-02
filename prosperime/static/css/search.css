@@ -44,7 +44,31 @@ a.search-control-close:hover, a.search-control-open:hover {
 	cursor: pointer;
 }
 
-div.profile-img-holder img {
-	width:45px;
+div.search-careers-container {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+ul.search-careers-list {
+	margin-left: 0;
+	font-size:8pt;
+}
+
+ul.search-careers-list li {
+	margin-left: 0;
+	margin-right:10px;
+	margin-top:2px;
+}
+
+a.search-button {
+	display:inline-block;
+	padding: 2px 4px 2px 4px;
+	background-color: rgb(41,98,152);
+	color:#fff;
+	cursor:pointer;
+}
+
+a.search-button:hover {
+	text-decoration: none;
 }
 
