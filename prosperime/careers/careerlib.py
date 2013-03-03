@@ -1092,8 +1092,10 @@ class CareerMapBase():
 		"""
 		fill in career map dictionary from db
 		"""
+		# fetch career ids and position titles
 		careers = Career.objects.values('id','pos_titles')
 
+		# init career map dictionary
 		career_map = {}
 
 		for c in careers:
@@ -1108,8 +1110,10 @@ class CareerMapBase():
 		self.careers_to_positions_map = career_map
 
 	def match_careers_to_position(self,pos):
+		# break position title into ngrams
 		title_ngrams = self.extract_ngrams(self.tokenize_position(pos.title))
 	
+		# initialize careers array
 		careers = []
 
 		if title_ngrams is not None:
@@ -1119,7 +1123,7 @@ class CareerMapBase():
 					if t not in self.STOP_LIST:
 						for k,v in self.careers_to_positions_map.items():
 							if t in v and k not in careers:
-								print 'hello'
+								
 								careers.append(k)
 								# print t + ": " + career.name
 

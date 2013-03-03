@@ -740,7 +740,7 @@ class LIProfile(LIBase):
 
 					# if it's a new company, position must be new as well
 					if inst is not None:
-						self.add_position(self.user,inst,p)
+						self.add_ed_position(self.user,inst,p)
 				else:
 					# TODO update company
 					pos = self.get_position(self.user,inst,p,type="ed")
