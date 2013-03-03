@@ -37,55 +37,7 @@
 {% endblock %}
 
 
-<!-- Right Sidebar -->
-{% block rightSidebar %}
-<div id="search-right-sidebar">
-	<!-- Feedback -->
-	<div class="rounded">
-		{% if user %}
-			<p class="sidebar-header">Want to see improvements?</p>
-			<p>We'd love to hear from you -- <a href="mailto:feedback@prosperime.com">please drop us a line</a></p>
-			
-		{% else %}
-			<!-- CLAY: ?? -->
-			<p class="sidebar-header">Want to see full career paths?</p>
-			<p>Drag and drop any company you'd like to keep track of here.</p>
-		{% endif %}
-	</div>
 
-	<!-- Save Search -->
-	<div class="rounded">
-		<p class="sidebar-header">Save Search</p>
-		{% if user %}
-			<p><a href="#">Save this search</a> to come back and review search results any time.</p>
-		{% else %}
-			<p><a href="/login">Login</a> or <a href="/register">register</a> to save searches.</p>
-		{% endif %}
-	</div>
-
-	<!-- Saved Paths -->
-	{% if saved_paths %}
-	<div class="rounded">
-		<p class="sidebar-header">Your Saved Career Paths</p>
-		{% for title in saved_paths %}
-			<div><a href="/saved_paths/#title/?t={{title}}"> {{title}} </a></div>
-		{%endfor%}
-	</div>
-	{%endif%}
-</div>
-
-
-<div id="arc-container"></div>
-
-<!-- Authenticate -->
-{% if not user.profile.li_linked %}
-{{ user.li_linked }}
-<div class="rounded">
-<a class="btn btn-primary left-spacer" href="/account/authorize">Authorize</a>
-	</div>
-{% endif %}
-
-{% endblock %}
 
 {% block templates %}
 <script type="text/template" id="path-single-template-old">
@@ -140,15 +92,15 @@
 			<div class="profile-img-holder pull-left">
 			<% if (profile_pic != null) { %>
 			
-				<img class="logo-preview" src="{{MEDIA_URL}}<%= profile_pic %>" />&nbsp;
+				<a href="/profile/<%= id %>"><img class="logo-preview" src="{{MEDIA_URL}}<%= profile_pic %>" /></a>&nbsp;
 			</div>
 			
 			<% } else { %>
-				<img class="logo-preview" src="{{MEDIA_URL}}pictures/anon.jpg" />&nbsp;
+				<a href="/profile/<%= id %>"><img class="logo-preview" src="{{MEDIA_URL}}pictures/anon.jpg" /></a>&nbsp;
 			<% } %>
 		</div>
 		<div class="right-list-preview pull-left">
-			<p class="path-name"><a class="path-name-link"><%= full_name %></a></p>
+			<p class="path-name"><a href="/profile/<%= id %>"><%= full_name %></a></p>
 			<p class="path-current-position"><%= current_position %></p>
 		</div>
 		<div class="clearfix"></div>
@@ -158,7 +110,7 @@
 			<ul class="search-careers-list flat">
 			<% _.each(careers,function(c) { %>
 				<li class="search-career">
-					<a class="search-button" href="/discover/career<%=c.id%>"><%=c.name%></a>
+					<a class="search-button" href="/discover/career/<%=c.id%>"><%=c.name%></a>
 				</li>
 			<% }); %>
 			<% } %>
@@ -388,7 +340,6 @@
 	<div class="search-view pull-right">Search: 
 		<ul class="search-view-links inline">
 			<li><a href="/search/#companies/">companies</a></li>
-			<li><a href="/search/#careers/">careers</a></li> 
 		</ul>
 	</div>
 	<div class="clearfix"></div>
@@ -417,8 +368,7 @@
 	<div class="main-header pull-left">Companies</div>
 	<div class="search-view pull-right">Search: 
 		<ul class="search-view-links inline">
-			<li><a href="/search/#paths/">paths</a></li>
-			<li><a href="/search/#careers/">careers</a></li> 
+			<li><a href="/search/#paths/">careers</a></li> 
 		</ul>
 	</div>
 	<div class="clear"></div>

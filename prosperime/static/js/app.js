@@ -182,10 +182,10 @@ $(function(){
 		},
 
 		render: function() {
-			console.log('path single view: ' + this.model.toJSON())
+			// console.log('path single view: ' + this.model.toJSON())
 
 			var renderedContent = this.template(this.model.toJSON());
-			console.log('here')
+			// console.log('here')
 			$(this.el).html(renderedContent);
 			return this;
 		},
@@ -291,6 +291,8 @@ $(function(){
 			var sizeFilters = $("input[name='Size-filters']:checked").map(function(filter) { return this.value });
 			var stageFilters = $("input[name='Stage-filters']:checked").map(function(filter) { return this.value });
 			var positionFilters = $("input[name='Positions-filters']:checked").map(function(filter) { return this.value });
+			var careerFilters = $("input[name='Career-filters']:checked").map(function(filter) { return this.value });
+			var orgFilters = $("input[name='Organizations-filters']:checked").map(function(filter) { return this.value });
 
 			// construct URL
 			if (locationFilters.length > 0 ) {
@@ -308,6 +310,13 @@ $(function(){
 			if (positionFilters.length > 0) {
 				selectedFilters.position = positionFilters;
 			}
+			if (careerFilters.length > 0) {
+				selectedFilters.career = careerFilters;
+			}
+			if (orgFilters.length > 0) {
+				selectedFilters.org = orgFilters;
+			}
+			console.log(selectedFilters);
 			
 			// set initial URL path
 
@@ -652,7 +661,7 @@ $(function(){
 			this.orgsView = new OrgListView({ collection: this.orgs});
 			this.filtersView = new FilterListView({ collection: this.filters});
 			this.pathsView = new PathListView({ collection: this.paths});
-			this.careersView = new CareersView();
+			// this.careersView = new CareersView();
 		},
 
 		emptyCareerSearch: function() {

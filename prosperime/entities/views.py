@@ -537,8 +537,8 @@ def path_filters(request):
 	locationsSelected = request.GET.getlist('location')
 	sectorsSelected = request.GET.getlist('sector')
 	positionsSelected = request.GET.getlist('position')
-	careersSelected = request.GET.getlist('careers')
-	orgsSelected = request.GET.getlist('orgs')
+	careersSelected = request.GET.getlist('career')
+	orgsSelected = request.GET.getlist('org')
 
 	# set base filters
 
@@ -863,55 +863,80 @@ def filters(request):
 
 # JSON dump
 def paths(request):
-	# initialize array of paths
-	paths = []
+	
 	# get search filters
+	careersSelected = request.GET.getlist('career')
+	orgsSelected = request.GET.getlist('org')
 	locationsSelected = request.GET.getlist('location')
 	sectorsSelected = request.GET.getlist('sector')
 	positionsSelected = request.GET.getlist('position')
 
-	# fetch all users
-	# TODO someway to order this to retrieve those most relevant
-	users = User.objects.annotate(no_of_pos=Count('positions__pk')).exclude(pk=request.user.id).order_by('-no_of_pos')
+	full_filters_string = "_".join(careersSelected + orgsSelected + locationsSelected)
 
-	if locationsSelected:
-		users = users.filter(positions__entity__office__city__in=locationsSelected)
-	if sectorsSelected:
-		users = users.filter(positions__entity__domains__name__in=sectorsSelected)
-	if positionsSelected:
-		users = users.filter(positions__title_in=positionsSelected)
+	# check to see if cached
+	paths = cache.get("search_paths_" + full_filters_string)
+	if paths is None:
+		print 'missed cache'
+		# fetch and recache
 
-	users = users[:20]
 
-	# loop through all positions, identify those that belong to connections
-	for u in users:
-		# reset careers array
-		careers = []
-		# check if position held by 
-		if request.user.profile in u.profile.connections.all():
-			connected = True
-			name = u.profile.full_name()
-			current_position = _get_latest_position(u)
-			profile_pic = _get_profile_pic(u.profile)
-			for c in u.profile.get_all_careers():
-				careers.append({'name':c.long_name,'id':c.id})
-			# if current_position is not None:
-			# 	positions = _get_positions_for_path(u.positions.all())
-			# else:
-			# 	positions = None
-		else:
-			connected = False
-			name = None
-			current_position = _get_latest_position(u,anon=True)
-			# positions = _get_positions_for_path(u.positions.all(),anon=True)
-			profile_pic = None
-			for c in u.profile.get_all_careers():
-				careers.append({'name':c.long_name,'id':c.id})
-			# need to convert positions to anonymous
+		# initialize array of paths
+		paths = []
+		
 
-		# paths.append({'id':u.id,'profile_pic':profile_pic,'full_name':name,'current_position':current_position,'positions':positions,'connected':connected})
-		paths.append({'id':u.id,'profile_pic':profile_pic,'full_name':name,'current_position':current_position,'careers':careers,'connected':connected})
-		# paths.append({'full_name':name,'current_position':current_position,'connected':connected})
+		# fetch all users
+		# TODO someway to order this to retrieve those most relevant
+		users = User.objects.annotate(no_of_pos=Count('positions__pk')).exclude(pk=request.user.id).order_by('-no_of_pos')
+
+		if locationsSelected:
+			users = users.filter(positions__entity__office__city__in=locationsSelected)
+		if sectorsSelected:
+			users = users.filter(positions__entity__domains__name__in=sectorsSelected)
+		if positionsSelected:
+			users = users.filter(positions__title_in=positionsSelected)
+		if careersSelected:
+			users = users.filter(positions__careers__long_name__in=careersSelected)
+		if orgsSelected:
+			users = users.filter(positions__entity__name__in=orgsSelected)
+
+
+		users = users[:20]
+
+		# loop through all positions, identify those that belong to connections
+		for u in users:
+			# reset careers array
+			careers = []
+			# check if position held by 
+			if request.user.profile in u.profile.connections.all():
+				id = u.id
+				connected = True
+				name = u.profile.full_name()
+				current_position = _get_latest_position(u)
+				profile_pic = _get_profile_pic(u.profile)
+				for c in u.profile.get_all_careers():
+					careers.append({'name':c.long_name,'id':c.id})
+				# if current_position is not None:
+				# 	positions = _get_positions_for_path(u.positions.all())
+				# else:
+				# 	positions = None
+			else:
+				id = u.id
+				connected = False
+				name = None
+				current_position = _get_latest_position(u,anon=True)
+				# positions = _get_positions_for_path(u.positions.all(),anon=True)
+				profile_pic = None
+				for c in u.profile.get_all_careers():
+					careers.append({'name':c.long_name,'id':c.id})
+				# need to convert positions to anonymous
+
+			# paths.append({'id':u.id,'profile_pic':profile_pic,'full_name':name,'current_position':current_position,'positions':positions,'connected':connected})
+			paths.append({'id':u.id,'profile_pic':profile_pic,'full_name':name,'current_position':current_position,'careers':careers,'connected':connected})
+			# paths.append({'full_name':name,'current_position':current_position,'connected':connected})
+			# store in cache
+			cache.set("search_paths_" + full_filters_string,paths,10)
+	else:
+		print 'hit cache'
 
 	return HttpResponse(simplejson.dumps(paths))
 
