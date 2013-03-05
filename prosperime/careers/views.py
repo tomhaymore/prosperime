@@ -231,6 +231,50 @@ def personalize_careers_jobs(request):
 	return render_to_response('careers/personalize.html',{'data':data,'careers':careers},context_instance=RequestContext(request))
 
 @login_required
+def personalize_careers(request):
+	'''
+	presents initial set of careers  to user during onboarding for them to selected
+	'''
+	# initiate careerlib
+	career_path = careerlib.CareerPathBase()
+	career_sim = careerlib.CareerSimBase()
+
+	# data array for passing to template
+	data = {}
+
+	# check to see if tasks are pending
+	# if 'tasks' in request.session:
+	# 	data['tasks'] = {}
+	# 	if 'profile' in request.session['tasks']:
+	# 		data['tasks']['profile'] = request.session['tasks']['profile']
+	# 		if request.session['tasks']['profile']['status'] == True:
+	# 			del request.session['tasks']['profile']
+	# 	if 'connections' in request.session['tasks']:
+	# 		data['tasks']['connections'] = request.session['tasks']['connections']
+	# 		if request.session['tasks']['connections']['status'] == True:
+	# 			del request.session['tasks']['connections']
+	# 	if len(request.session['tasks']) == 0:
+	# 		del request.session['tasks']
+
+	# get career information
+	careers_network = career_path.get_careers_brief_in_network(request.user)
+	careers_similar = career_sim.get_careers_brief_similar(request.user)
+
+	# get list of ids of similar careers to avoid duplication in network
+	careers_similar_ids = []
+
+	for c in careers_similar:
+		careers_similar_ids.append(c.id)
+
+	careers = {}
+
+	careers['network'] = careers_network
+	careers['similar'] = careers_similar
+
+	return render_to_response('careers/personalize_careers.html',{'data':data,'careers':careers},context_instance=RequestContext(request))
+
+
+@login_required
 def add_personalization(request):
 	# check to make sure POST data came through
 	if request.POST:

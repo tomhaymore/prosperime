@@ -1,4 +1,6 @@
 // jQuery.fun.exists = function(){return this.length>0;}
+
+// initiate arrays for adding personalization
 var selected_careers = [];
 var selected_jobs = [];
 
@@ -106,7 +108,12 @@ $(document).ready(function() {
 		console.log(selected_jobs);
 		$.post('/add_personalization/',{'selected_careers':selected_careers,'selected_jobs':selected_jobs}, function(data) {
 			if (data == "success") {
-				window.location = '/home';
+				// check to see what page we're on; redirect to next personalization page or back to home
+				if window.location == "/personalize/careers/" {
+					window.location = '/personalize/jobs';
+				} else if (window.location == "/personalize/jobs/") {
+					window.location = '/home';	
+				}
 			} else {
 				var warning = "<div id='messages'>";
 				warning += "<ul class='messages'>";
