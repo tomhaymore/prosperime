@@ -625,6 +625,9 @@ class CareerSimBase():
 	# users = User.objects.prefetch_related('positions').exclude(profile__status="deleted")
 	users = {}
 
+	# initializes single map
+	users_orgs_map_single = {}
+
 	# initializes organizational map
 	users_orgs_map = {}
 
@@ -645,6 +648,17 @@ class CareerSimBase():
 				users_dict[u['id']] = {'positions':[{'type':u['positions__type'],'id':u['positions__entity__id']}]}
 		self.users = users_dict
 		# print self.users
+
+	def load_single_map(self):
+		"""
+		loads set of org affiliations for each user
+		"""
+		for k,v in self.users.items():
+			orgs = []
+			for p in v['positions']:
+				orgs.append(p['id'])
+			if orgs:
+				self.users_orgs_map_single[k] = set(orgs)
 
 	def load_maps(self):
 		"""
@@ -686,7 +700,75 @@ class CareerSimBase():
 		}
 		return focal_orgs
 
-	def find_similar_careers(self,id):
+	def find_similar_people_in_career(self,id,career):
+		"""
+		finds similar users within a career
+		"""
+		all_users_in_career = User.objects.values_list('id').filter(positions__careers__in=career)
+
+		focal_orgs = self.get_focal_orgs(id) 
+		sim = []
+		
+		for k,v in self.users_orgs_map_single.items():
+			# check to see if user has the job
+			if k in all_users_in_career:
+				intersect = focal_orgs['orgs'].intersection(v)
+				jaccard = float(len(intersect))/float(len(v))
+				sim.append((k,jaccard,))
+
+		sorted_sim = sorted(sim, key=lambda x:x[1],reverse=True)
+
+		sorted_sim = [u[0] for u in sorted_sim]
+
+		users = User.objects.filter(id__in=sorted_sim)
+
+		return users
+
+	def find_similar_people_in_position(self,id,pos):
+		"""
+		finds similar users within a position
+		"""
+		all_users_in_position = User.objects.values_list('id').filter(position__in=pos)
+
+		focal_orgs = self.get_focal_orgs(id) 
+		sim = []
+		
+		for k,v in self.users_orgs_map_single.items():
+			# check to see if user has the job
+			if k in all_users_in_position:
+				intersect = focal_orgs['orgs'].intersection(v)
+				jaccard = float(len(intersect))/float(len(v))
+				sim.append((k,jaccard,))
+
+		sorted_sim = sorted(sim, key=lambda x:x[1],reverse=True)
+
+		sorted_sim = [u[0] for u in sorted_sim]
+
+		users = User.objects.filter(id__in=sorted_sim)
+
+		return users
+
+	def find_similar_people(self,id):
+		"""
+		measures intersection of sets between focal and other users, returns User objects
+		"""
+		focal_orgs = self.get_focal_orgs(id) 
+		sim = []
+		
+		for k,v in self.users_orgs_map_single.items():
+			intersect = focal_orgs['orgs'].intersection(v)
+			jaccard = float(len(intersect))/float(len(v))
+			sim.append((k,jaccard,))
+
+		sorted_sim = sorted(sim, key=lambda x:x[1],reverse=True)
+
+		sorted_sim = [u[0] for u in sorted_sim]
+
+		users = User.objects.filter(id__in=sorted_sim)
+
+		return users
+
+	def find_similar_people_ids(self,id):
 		"""
 		measures intersection of sets between focal user and other users to find most similar
 		"""
@@ -711,12 +793,11 @@ class CareerSimBase():
 
 		return sorted_orgs_sim[:10]
 
-
 	def get_careers_brief_similar(self,user,**filters):
 
 		user_id = user.id
 
-		users = self.find_similar_careers(user_id)
+		users = self.find_similar_people_ids(user_id)
 		
 		careers = Career.objects.prefetch_related('positions').filter(positions__person_id__in=users).annotate(num_people=Count('positions__person__pk',num_pos=Count('positions__pk'),num_cos=Count('positions__entity__pk'))).order_by('-num_people').distinct()[:10]
 
