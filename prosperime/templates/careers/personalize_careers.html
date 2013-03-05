@@ -1,0 +1,96 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/personalize.css" />
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/typeahead.min.css" />
+<script type="text/javascript" src="{{ STATIC_URL }}js/typeahead.min.js"></script>
+
+<script type="text/javascript" src="{{ STATIC_URL }}js/personalize.js"></script>
+{% endblock %}
+
+{% block extramessage %}
+
+{% if data.tasks %}
+
+	{% if data.tasks.profile %}
+		<p id="task-profile-status" data-task-id="{{data.tasks.profile.id}}"></p>
+	{% endif %}
+
+	{% if data.tasks.connections %}
+		<p id="task-connections-status" data-task-id="{{data.tasks.connections.id}}"></p>
+	{% endif %}
+
+{% endif %}
+
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div id="content-container" class="main-container">
+	<p class="splash-header">Personalize</p>
+	<p class="main-sub-header"><span class="callout-text">Prosperime</span> works best when you help it learn more about you. Based on your professional profile and network, the following careers and jobs seem like they'd be the most intersting to you. Please select which ones you're most interested in or enter your own.</p>
+
+	<div id="careers-container">
+		<!-- <div class="general-nav-container">
+			<div class="pull-left general-nav-selected"><a id="pers-nav-network" href="#network">Your Network</a></div>
+			<div class="pull-left general-nav-unselected"><a id="discover-nav-justlikeyou" href="#justlikeyou">Just Like You</a></div>
+			<div class="clear"></div>
+		</div> -->
+		<div class="personalize-careers-container pull-left">
+			<div class="personalize-careers">
+				<p class="main-header ">Careers</p>
+				<!-- header row -->
+				<!-- <div class="pull-left careers-header-row"></div>
+				<div class="pull-left careers-stats-container">
+					<ul class="careers-stats">
+						<li>people</li>
+						<li>positions</li>
+						<li>companies</li>
+					</ul>
+				</div> -->
+				<div class="clear"></div>
+				<!-- <p class="main-sub-header">Just like you</p> -->
+					<ul class="personalize-career-list">
+					{% for c in careers.similar %}
+						<li>
+							<div class="personalize-career-entry personalize-unselected" data-career-id="{{c.id}}">
+								<!-- <input type="checkbox" class="personalize-checkbox med-checkbox-input pull-left" id="personalize-career-{{c.id}}" data-career-id="{{c.id}}"/>-->
+								<span class="personalize-icon-container">&nbsp;<i class="icon-ok icon-white"></i></span>
+								<a class="careers-name">
+								{{c.name}}
+								</a>
+								<div class="clear"></div>
+							</div>
+						</li>
+					{% endfor %}
+					</ul>
+				
+			
+			
+			</div>
+			
+		</div>
+<!-- 		<div class="personalize-jobs-container pull-left">
+			<p class="main-header">Jobs</p>
+			<p>Enter any job you'd like to have or would like to learn more about.</p>
+			<span>
+				<input type="text" id="personalize-job-name" class="large-text-input" />
+			</span>
+			<span>
+				<button id="personalize-add-job" class="general-add-button">Add</button>
+			</span>
+			<div class="personalize-jobs-list-container">
+				<ul class="personalize-jobs-list" id="personalize-jobs-list">
+
+				</ul>
+			</div>
+		</div> -->
+		<div class="clear"></div>
+		<div class="personalize-progress-container">
+			<button id="personalize-next-button" class="general-add-button">Next</button> or <a href="/home">skip ahead</a>
+			<div class="clear"></div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
