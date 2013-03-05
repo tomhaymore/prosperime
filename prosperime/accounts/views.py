@@ -116,8 +116,11 @@ def finish_login(request):
 		form = FinishAuthForm(request.POST)
 		
 		if form.is_valid():
+			# grab cleaned values from form
 			username = form.cleaned_data['username']
 			email = form.cleaned_data['email']
+			location = form.cleaned_data['location']
+			headline = form.cleaned_data['headline']
 			password = form.cleaned_data['password']
 
 			# check to see if dormant user already exists
@@ -147,7 +150,12 @@ def finish_login(request):
 			# user.profile.full_name = request.session['linkedin_user_info']['firstName'] + " " + request.session['linkedin_user_info']['lastName']		
 			user.profile.first_name = linkedin_user_info['firstName']
 			user.profile.last_name = linkedin_user_info['lastName']
-			user.profile.headline = linkedin_user_info['headline']
+			user.profile.location = location
+			# check to see if user provided a headline
+			if headline:
+				user.profile.headline = headline
+			else:
+				user.profile.headline = linkedin_user_info['headline']
 			user.profile.save()
 
 			# add pofile picture

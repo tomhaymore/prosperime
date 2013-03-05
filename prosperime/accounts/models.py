@@ -41,6 +41,7 @@ class Profile(models.Model):
     middle_name = models.CharField(max_length=150,null=True)
     last_name = models.CharField(max_length=150,null=True)
     headline = models.TextField(null=True)
+    location = models.Charfield(max_length=250,null=True)
     connections = models.ManyToManyField('self',through="Connection",symmetrical=False,related_name="connections+")
     status = models.CharField(max_length=15,default="active")
     # profile_pic = models.ImageField(max_length=450, upload_to=_get_profile_pic_path, blank=True, null=True)

@@ -239,7 +239,7 @@ def add_personalization(request):
 			print request.POST.getlist('selected_careers[]')
 			for career_id in set(request.POST.getlist('selected_careers[]')):
 				career = Career.objects.get(pk=career_id)
-				if career not in request.user.saved_careers:
+				if career not in request.user.saved_careers.all():
 					saved_career = SavedCareer(career=career,owner=request.user)
 					saved_career.save()
 		if 'selected_jobs[]' in request.POST:
