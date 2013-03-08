@@ -12,11 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 
 # Prosperime
-from entities.models import Position, Entity
-from careers.models import SavedPath, SavedPosition, CareerDecision
-
-#from careers.models import SavedPath, SavedPosition, Position, Career, GoalPosition, SavedCareer, IdealPosition
-
+from entities.models import Entity
+from careers.models import SavedPath, SavedPosition, Position, Career, GoalPosition, SavedCareer, IdealPosition, CareerDecision
 from accounts.models import Profile
 import careers.careerlib as careerlib
 
@@ -42,7 +39,7 @@ def addDecision(request):
 
 	if position.type == 'education':
 		decision.type = 'college'
-	elif 'Intern' in position.title:
+	elif 'ntern' in position.title:
 		decision.type = 'internshp'
 	elif position.current:
 		decision.type = 'currentJob'
@@ -69,8 +66,7 @@ def addDecision(request):
 	for alternate in alternates:
 		# get entity
 		entity = Entity.objects.filter(name=alternate)
-		if len(entity) > 1:
-			entity=entity[0]
+		entity=entity[0]
 		decision.alternates.add(entity)
 
 	decision.save()
@@ -110,7 +106,7 @@ def home(request):
 	data['saved_paths'] = SavedPath.objects.filter(owner=user)
 	data['saved_careers'] = request.user.saved_careers.all()
 	data['saved_jobs'] = GoalPosition.objects.filter(owner=user)
-
+	data['career_decisions'] = CareerDecision.objects.all()
 	return render_to_response('home.html',data,context_instance=RequestContext(request))
 
 @login_required

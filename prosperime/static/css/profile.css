@@ -1,8 +1,9 @@
 
-div.profile-careers-container {
-	margin-top: 10px;
-	margin-bottom: 10px;
+
+#profile-careers-container {
+	width:92%;
 }
+
 
 ul.profile-careers-list {
 	margin-left: 0;
@@ -11,7 +12,8 @@ ul.profile-careers-list {
 
 ul.profile-careers-list li {
 	margin-left: 0;
-	margin-right:10px;
+	margin-right:8px;
+	padding-top:8px;
 }
 
 a.profile-button {
@@ -144,7 +146,145 @@ div.career-decision-prompt-btn {
 }
 
 
+div.hidden-data-structure {
+	display:none;
+}
 
+
+.bordered {
+/*	border-bottom:4px solid rgba(85,85,85,0.8);
+	border-left:4px solid rgba(85,85,85,0.8);
+	border-right:4px solid rgba(85,85,85,0.8);
+	border-radius:4px 4px 4px 4px;
+	background-image:url('../img/redox_01.png');
+	background-image:url('../img/handmadepaper.png');*/
+}
+
+.info_box_text {
+	font-size:18px;
+}
+
+.background-internship {
+	/*background-color:rgba(255,195,64,.2);
+	border:2px solid rgb(255,195,64);*/
+	border-radius:4px 4px 4px 4px;
+	background-color:#f9f9f9;
+	border:2px solid #ddd;
+	box-shadow:1px 1px 1px 1px;
+
+}
+
+.background-position {
+	/*background-color:rgba(50,121,202,.2);
+	border:2px solid rgb(50,121,202);*/
+	background-color:#f9f9f9;
+	border:2px solid #ddd;
+	border-radius:4px 4px 4px 4px;
+	box-shadow:1px 1px 1px 1px;
+
+}
+
+.background-education {
+	/*background-color:rgba(191,51,48,.2);
+	border:2px solid rgb(191,51,48);*/
+	border-radius:4px 4px 4px 4px;
+	background-color:#f9f9f9;
+	border:2px solid #ddd;
+	box-shadow:1px 1px 1px 1px;
+
+}
+
+.loose-spacing {
+	letter-spacing:.1em;
+}
+
+
+span.timeline-start-date {
+/*	float:left;
+*/	font-size:1.6em;
+	font-weight:500;
+	/*position:relative;
+	left:50px;*/
+}
+
+span.timeline-end-date {
+/*	float:right;
+*/	font-size:1.6em;
+	font-weight:500;
+	/*position:relative;
+	right:50px;*/
+}
+
+span.timeline-title {
+	display:block;
+	font-weight:500;
+}
+
+span.timeline-entity-name {
+/*	font-variant:small-caps;
+*/	font-weight:500;
+	width:100%;
+	padding-left:15px;
+/*	font-size:1.6em;
+*//*	display:block;
+*/}
+
+span.timeline-description {
+	font-size:1em;
+
+}
+
+span.initial-prompt {
+	text-align:left;
+}
+
+
+/* Major Structures */
+div#timeline-float-screen {
+	position:relative;
+	left:10%;
+	width:80%;
+	height:125px;
+	text-align:center;
+	vertical-align:middle;
+}
+
+div#timeline-float-screen-left {
+	float:left;
+	width:32%;
+	margin-right:45px;
+	padding:10px;
+}
+
+div#timeline-float-screen-right {
+	float:right;
+	width:55%;
+	padding:10px;
+	padding-bottom:0px;
+}
+
+div#timeline-float-screen-center {
+	margin-left:auto;
+	margin-right:auto;
+	width:50%;
+	padding:10px;
+	padding-bottom:0px;
+}
+
+#middle-float-screen {
+	border-radius:4px;
+	margin-left:175px;
+	font-size:0.9em;
+	text-align:center;
+	margin-top:15px;
+}
+
+
+
+#profile-right {
+	margin-top:0px;
+	margin-right:25px;
+}
 
 
 

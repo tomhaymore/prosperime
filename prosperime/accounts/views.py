@@ -23,8 +23,8 @@ from accounts.tasks import process_li_profile, process_li_connections
 
 # Prosperime
 from accounts.models import Account, Profile, Picture
-from careers.models import SavedPath, CareerDecision
-from entities.models import Position, Entity
+from careers.models import SavedPath, CareerDecision, Position
+from entities.models import Entity
 
 import utilities.helpers as helpers
 
@@ -275,8 +275,11 @@ def success(request):
 
 def random_profile(request):
 
-	profile_max = Profile.objects.count()
-	profile_num = random.randint(1, profile_max)
+	while(1):
+		profile_max = Profile.objects.count()
+		profile_num = random.randint(1, profile_max)
+		if (Position.objects.filter(person__id=profile_num).count() > 0):
+			break;
 
 	return profile(request, profile_num)
 
@@ -288,8 +291,8 @@ def profile(request, user_id):
 	user = User.objects.get(id=user_id)
 	# profile = Profile.objects.get(user=user)
 	profile = user.profile
-	# saved_paths = SavedPath.objects.filter(owner=user)
-	saved_paths = user.saved_path.all()
+	saved_paths = SavedPath.objects.filter(owner=user)
+	# saved_paths = user.saved_path.all()
 	# profile_pic = _get_profile_pic(profile)
 	profile_pic = user.profile.default_profile_pic()
 	viewer_saved_paths = SavedPath.objects.filter(owner=request.user)
@@ -308,7 +311,9 @@ def profile(request, user_id):
 	for pos in positions:
 		pos.duration = pos.duration_in_months()
 
-	
+		if 'ntern' in pos.title and 'nternational' not in pos.title:
+			pos.type = 'internship'
+
 		# Assumption: no end date = current
 		if not pos.end_date:
 			pos.end_date = "Current"
@@ -325,7 +330,7 @@ def profile(request, user_id):
 
 		pos.co_name = pos.entity.name
 		pos.domain=None
-
+		pos.pic = pos.entity.default_logo()
 		# Process education positions
 		if pos.type == 'education' or pos.title == 'Student':
 			if pos.degree is not None and pos.field is not None:
@@ -335,54 +340,32 @@ def profile(request, user_id):
 			elif pos.field is not None:
 				pos.title = pos.field
 			else:
-				pos.title = None
-			ed_list.insert(0, pos)
+				pos.title = 'Student' ## Let's just guess 
+			if pos.start_date:
+				ed_list.insert(0, pos)
 		else:
-
-			# if pos.title:
-			# 	print pos.title + ', ' + pos.co_name
 
 			# Assumption: ignore if no start-date, crappy data
 			if pos.start_date:
 				org_list.insert(0, pos)
 			if pos.current:
 				current = pos
-			# else:
-			# 	print 'ignoring: ' + pos.type
 
-	# Still need to uniqify this data!
-	# will do so O(n2) but hey, these are small datasets
+
+
+
+	# will do so O(n2) but hey, these are small 
 	ed_list = _uniqify(ed_list)
 	org_list = _uniqify(org_list)
 
-	# Now, prepare for timeline
-	# First, sort by start_date
-	## ?? org_list.sort(key=lambda x: (int(x.start_date)[:3] + int(x.start_date)[0:2]))
-
-	if len(org_list) == 0:
-		# then we have problem
-		start_date = total_time = end_date = compress = None
-	else:	
-		start_date = org_list[len(org_list)-1].start_date
-		total_time = helpers._months_from_now(start_date)
-		end_date = datetime.datetime.now()
-
-		if total_time > 200: 
-		# 200 is an arbitrary constant that seems to fit my laptop screen well
-			total_time = int(math.ceil(total_time/2))
-			for pos in org_list:
-				pos.duration = int(math.ceil(pos.duration/2))
-			compress = True
-		else:
-			compress = False
-
 	# we have this data... but what to do with it?
-	career_map = profile.all_careers
-	top_careers = profile.top_careers
+	#career_map = profile.all_careers
+	#top_careers = profile.top_careers
+	career_map = None
+	top_careers = None
 
-	x = 0
-	#if user_id == request.user.id:
-	if x == 0:
+	# Check for CareerDecision
+	if user.id == request.user.id:
 		career_decision = _get_career_decision_prompt_position(top_careers, positions, profile)
 		if career_decision is None:
 			career_decision_position = None;
@@ -396,11 +379,27 @@ def profile(request, user_id):
 	else:
 		career_decision_position = None;
 
+	positions = ed_list + org_list
 
+	if len(positions)  == 0:
+		start_date = None
+		total_time = None
+	else:
 
+		for p in positions:
+			if p.start_date is None:
+				positions.remove(p)
 
+		# Sort by start date
+		positions.sort(key=lambda	 p:p.start_date)
+		start_date = positions[0].start_date
+		positions.reverse()
+		total_time = helpers._months_from_now(start_date)
 
-	return render_to_response('accounts/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress, 'career_map': career_map, 'top_careers':top_careers, 'career_decision_prompt':career_decision_position}, context_instance=RequestContext(request))
+	end_date = datetime.datetime.now()
+	compress = None
+
+	return render_to_response('accounts/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress, 'career_map': career_map, 'top_careers':top_careers, 'career_decision_prompt':career_decision_position, 'positions':positions}, context_instance=RequestContext(request))
 	
 @login_required
 def profile_org(request, org_id):

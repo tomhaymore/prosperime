@@ -18,6 +18,7 @@
 			<li><a href="/profile/{{user.id}}">View profile</a></li>
 			<li><a href="/discover">Discover careers</a></li>
 			<li><a href="/search/">Search</a></li>
+			<li><a href='/rand'>Random User</a></li>
 			{% if not user.profile.li_linked %}
 				<li><a href="/account/authorize" onclick="_gaq.push(['_trackEvent', 'home', 'authorize', '{{user.id}}'])">Authorize</a></li>
 			{% endif %}
@@ -77,24 +78,32 @@
 	<div class="dashboard-module pull-left" data-name="dashboard-top-careers">
 		<p class='module-header'>Recent Career Decisions</p>
 		{% if career_decisions %}
+			<ul id='career-decisions-list'>
 			{% for decision in career_decisions %}
 				<li>
 				{% if decision.privacy == 'anonymous' %}
 					Someone 
 				{% else %}
-					{{decision.owner.profile.full_name}}
+					<a href='/profile/{{decision.owner.id}}'>
+						{{decision.owner.profile.full_name}}
+					</a>
 				{% endif %}
 
-				chose {{decision.position.title}} at {{decision.winner.name}} 
+				chose to be a {{decision.position.title}} at 
+				<a href='/profile/org/{{decision.winner.id}}/'>
+					{{decision.winner.name}} 
+				</a>
 
 				{% if decision.alternates %}
 					over other positions at
 					{% for entity in decision.alternates.all %}
+						<a href='/profile/org/{{entity.id}}'>
 						{% if forloop.last %}
-							{{entity.name}}
+							and {{entity.name}}
 						{% else %}
 							{{entity.name}}, 
 						{% endif %}
+						</a>
 					{% endfor %}
 				{% else %}
 				.
@@ -102,8 +111,9 @@
 
 
 			{% endfor %}
+			</ul>
 		{% else %}
-			<p>No recent career decisions in your network. Head to <a href="/profile/{{request.user.id}}/"> your profile </a>to write about a decision of your own now!
+			<p>No recent career decisions in your network. Head to <a href="/profile/{{user.id}}/"> your profile </a>to write about a decision of your own now!
 		{% endif %}
 
 

@@ -21,8 +21,9 @@ from entities.models import Entity, Office, Financing, Industry
 from accounts.models import Picture, Profile
 from careers.models import SavedPath, CareerDecision
 #from entities.careerlib import CareerSimBase
-import careers.careerilb as careerlib
+import careers.careerlib as careerlib
 
+### DEPRECATED ###
 # @login_required
 def home(request):
 	if not request.user.is_authenticated():
@@ -37,7 +38,6 @@ def home(request):
 
 
 	return render_to_response('home.html',data,context_instance=RequestContext(request))
-
 
 def contact(request):
 

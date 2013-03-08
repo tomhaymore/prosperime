@@ -4,11 +4,10 @@ import datetime
 # Django
 from django.db import models
 from django.contrib.auth.models import User
-# from entities.models import Position
 from django.db.models.signals import post_save
 
 # Prosperime
-from careers.models import Position
+from careers.models import Position, Career
 import careers.careerlib as careerlib
 
 class Account(models.Model):

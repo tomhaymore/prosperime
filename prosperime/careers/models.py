@@ -10,7 +10,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 # Entities
-from entities.models import Entity, Industry, Position
+from entities.models import Industry, Entity
 
 class Position(models.Model):
 	entity = models.ForeignKey(Entity,related_name="positions")
@@ -199,7 +199,7 @@ class SavedPosition(models.Model):
 	class Meta:
 		ordering = ['-index']
 
-	position = models.ForeignKey(Position)
+	position = models.ForeignKey(Position, related_name='savedPosition')
 	path = models.ForeignKey(SavedPath)
 	index = models.CharField(max_length = 10, null=True)
 

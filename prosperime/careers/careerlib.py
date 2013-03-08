@@ -9,7 +9,8 @@ import types
 
 
 # from Django
-from entities.models import Industry, User, Entity
+from django.contrib.auth.models import User
+from entities.models import Industry, Entity
 from careers.models import Career, Position, IdealPosition
 from django.core.exceptions import MultipleObjectsReturned
 from django.core import management
@@ -104,7 +105,7 @@ def init_careers_to_positions_map():
 	"""
 	global careers_to_positions_map
 	careers = Career.objects.values('id','pos_titles')
-
+	
 	career_map = {}
 
 	for c in careers:
