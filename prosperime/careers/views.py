@@ -75,6 +75,40 @@ def discover(request):
 	return render_to_response('entities/discover.html',{'data':data,'careers':careers},context_instance=RequestContext(request))
 
 @login_required
+def career_profile(request,career_id):
+	# get career object
+	career = Career.objects.get(pk=career_id)
+
+	# init careerlib
+	career_path = careerlib.CareerPathBase()
+
+	# get ed overview
+	ed_overview = cache.get('career_profile_ed_overview_'+str(request.user.id)+"_"+str(career_id))
+	# check to see if cache was empty
+	if ed_overview is None:
+		cache.set('career_profile_ed_overview_'+str(request.user.id)+"_"+str(career_id),career_path.get_ed_overview(request.user,career))
+		ed_overview = cache.get('career_profile_ed_overview_'+str(request.user.id)+"_"+str(career_id))
+		# ed_overview = career_path.get_ed_overview(request.user,career)
+
+	# get paths overview
+	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+	# check to see if cache is empty
+	if paths is None:
+		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),careerlib.get_paths_in_career(request.user,career),10)
+		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
+
+	# break down paths to make it easier to parses
+	paths_in_career = {}
+	paths_in_career['network'] = paths['network']
+	paths_in_career['all'] = paths['all']
+
+	overview = {}
+	overview['network'] = paths['overview']['network']
+	overview['all'] = paths['overview']['all']
+
+	return render_to_response('careers/career_profile.html',{'career':career,'ed_overview':ed_overview,'paths':paths_in_career,'overview':overview},context_instance=RequestContext(request))
+
+@login_required
 def discover_career(request,career_id):
 
 	# initiate CarerSimBase
