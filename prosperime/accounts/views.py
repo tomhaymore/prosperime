@@ -4,7 +4,10 @@ import cgi
 from datetime import datetime, timedelta
 import urlparse
 import math
+
 # import datetime
+
+import random
 
 # from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, logout as auth_logout, login as auth_login
@@ -22,9 +25,11 @@ from accounts.tasks import process_li_profile, process_li_connections
 
 # Prosperime
 from accounts.models import Account, Profile, Picture
-from careers.models import SavedPath, Career, Position
+from careers.models import SavedPath, CareerDecision, Position
 from entities.models import Entity
+
 import utilities.helpers as helpers
+
 
 def login(request):
 	
@@ -291,6 +296,18 @@ def success(request):
 # 			pic.pic.save(img_filename,img_file,True)
 # 		os.remove('tmp_img')
 	
+
+def random_profile(request):
+
+	while(1):
+		profile_max = Profile.objects.count()
+		profile_num = random.randint(1, profile_max)
+		if (Position.objects.filter(person__id=profile_num).count() > 0):
+			break;
+
+	return profile(request, profile_num)
+
+
 # View for invidiual profiles
 @login_required
 def profile(request, user_id):
@@ -298,15 +315,17 @@ def profile(request, user_id):
 	user = User.objects.get(id=user_id)
 	# profile = Profile.objects.get(user=user)
 	profile = user.profile
-	# saved_paths = SavedPath.objects.filter(owner=user)
-	saved_paths = user.saved_path.all()
+	saved_paths = SavedPath.objects.filter(owner=user)
+	# saved_paths = user.saved_path.all()
 	# profile_pic = _get_profile_pic(profile)
 	profile_pic = user.profile.default_profile_pic()
 	viewer_saved_paths = SavedPath.objects.filter(owner=request.user)
 
 	# Do position processing here!
-	# positions = Position.objects.filter(person=user)
-	positions = user.positions.all()
+
+	# CHECK THAT THIS WORKS
+	positions = Position.objects.filter(person=user).select_related('careerDecision')
+
 	ed_list = []
 	org_list = []
 
@@ -316,7 +335,9 @@ def profile(request, user_id):
 	for pos in positions:
 		pos.duration = pos.duration_in_months()
 
-	
+		if 'ntern' in pos.title and 'nternational' not in pos.title:
+			pos.type = 'internship'
+
 		# Assumption: no end date = current
 		if not pos.end_date:
 			pos.end_date = "Current"
@@ -333,7 +354,7 @@ def profile(request, user_id):
 
 		pos.co_name = pos.entity.name
 		pos.domain=None
-
+		pos.pic = pos.entity.default_logo()
 		# Process education positions
 		if pos.type == 'education' or pos.title == 'Student':
 			if pos.degree is not None and pos.field is not None:
@@ -343,36 +364,62 @@ def profile(request, user_id):
 			elif pos.field is not None:
 				pos.title = pos.field
 			else:
-				pos.title = None
-			ed_list.insert(0, pos)
+				pos.title = 'Student' ## Let's just guess 
+			if pos.start_date:
+				ed_list.insert(0, pos)
 		else:
-
-			# if pos.title:
-			# 	print pos.title + ', ' + pos.co_name
 
 			# Assumption: ignore if no start-date, crappy data
 			if pos.start_date:
 				org_list.insert(0, pos)
 			if pos.current:
 				current = pos
-			# else:
-			# 	print 'ignoring: ' + pos.type
 
-	# Still need to uniqify this data!
-	# will do so O(n2) but hey, these are small datasets
+
+
+
+	# will do so O(n2) but hey, these are small 
 	ed_list = _uniqify(ed_list)
 	org_list = _uniqify(org_list)
 
-	# Now, prepare for timeline
-	# First, sort by start_date
-	## ?? org_list.sort(key=lambda x: (int(x.start_date)[:3] + int(x.start_date)[0:2]))
+	# we have this data... but what to do with it?
+	#career_map = profile.all_careers
+	#top_careers = profile.top_careers
+	career_map = None
+	top_careers = None
 
-	if len(org_list) == 0:
-		# then we have problem
-		start_date = total_time = end_date = compress = None
-	else:	
-		start_date = org_list[len(org_list)-1].start_date
+	# Check for CareerDecision
+	if user.id == request.user.id:
+		career_decision = _get_career_decision_prompt_position(top_careers, positions, profile)
+		if career_decision is None:
+			career_decision_position = None;
+		else:
+			career_decision_position = {
+				'id':career_decision.id,
+				'title':career_decision.title,
+				'co_name':career_decision.entity.name,
+				'type':career_decision.type,
+			}
+	else:
+		career_decision_position = None;
+
+	positions = ed_list + org_list
+
+	if len(positions)  == 0:
+		start_date = None
+		total_time = None
+	else:
+
+		for p in positions:
+			if p.start_date is None:
+				positions.remove(p)
+
+		# Sort by start date
+		positions.sort(key=lambda	 p:p.start_date)
+		start_date = positions[0].start_date
+		positions.reverse()
 		total_time = helpers._months_from_now(start_date)
+
 		end_date = datetime.now()
 
 		if total_time > 200: 
@@ -384,10 +431,144 @@ def profile(request, user_id):
 		else:
 			compress = False
 
-	# we have this data... but what to do with it?
-	career_map = profile.all_careers
+
+	end_date = datetime.now()
+	compress = None
+
+	return render_to_response('accounts/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress, 'career_map': career_map, 'top_careers':top_careers, 'career_decision_prompt':career_decision_position, 'positions':positions}, context_instance=RequestContext(request))
+	
+@login_required
+def profile_org(request, org_id):
+
+	# saved_paths... always need this... better way?
+	saved_paths = SavedPath.objects.filter(owner=request.user)
+
+	# nothing related to entities, so don't know if we can batch here
+	entity = Entity.objects.get(pk=org_id)
+
+	# Basic Entity Data
+	response = {
+		'id':org_id,
+		'name':entity.name,
+		'size':entity.size_range,
+		'description':entity.description,
+		'logo_path':entity.default_logo(),
+	}
+
+	# Related Jobs
+	# Should use entity object, but duplicates!
+	## jobs = Position.objects.filter(entity=entity).select_related('person__profile')
+	jobs = Position.objects.filter(entity__name=entity.name).select_related('person__profile')
+
+	related_jobs = []
+	for j in jobs:
+		jobs_data = {
+			'id':j.id,
+			'title':j.title,
+			'description':j.description,
+			'owner_name':j.person.profile.full_name(),
+			'owner_id':j.person.id,
+		}
+		related_jobs.append(jobs_data)
+
+
+	response['jobs'] = related_jobs
+	response['saved_paths'] = saved_paths
+
+	
+	#return render_to_response('accounts/profile_org.html', response, context_instance=RequestContext(request))
 
 	return render_to_response('accounts/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress, 'career_map': career_map}, context_instance=RequestContext(request))
+
+
+def _test_career_prompt():
+
+
+	# get random profile
+	profile_max = Profile.objects.count()
+	profile_num = random.randint(1, profile_max)
+
+	profile = Profile.objects.get(pk=profile_num)
+	positions = Position.objects.filter(person=profile.user)
+
+	top_careers = profile.top_careers
+
+	values = _get_career_decision_prompt_position(top_careers, positions, profile)
+	
+	if values is None:
+		print 'Person: ' + str(profile.user.id) + profile.full_name() + ' has no positinos?'
+	else:
+		for value in values:
+			print 'Person: ' +str(profile.user.id) + profile.full_name()
+			if value.title is not None:
+				print 'Return Value: ' + value.title + ' ' + value.entity.name
+			else:
+				print 'Return Value: nameless ' + value.entity.name
+
+	return values
+
+def _get_career_decision_prompt_position(top_careers, positions, profile):
+	eligible_candidates = []
+	unique_set = set()
+
+	# Convert QuerySet to List & Uniqify
+	for pos in positions:
+		if pos.title is None:
+			pos.title = ""
+
+		if pos.title+pos.entity.name not in unique_set:
+			eligible_candidates.append(pos)
+			unique_set.add(pos.title + pos.entity.name)
+
+	if len(positions) == 0:
+		return None
+	else: 
+		already_asked = CareerDecision.objects.filter(position__in=positions)
+		print "already asked:"
+		print already_asked
+
+		# ignore positions that we've already asked about
+		for decision in already_asked:
+			eligible_candidates.remove(decision.position)
+
+		# need a copy so that removing from list doesn't short the loop...
+		# 	annoying python implementation quirk
+		candidates_copy = eligible_candidates[:]
+		for candidate in candidates_copy:
+			# ignore singleton entries, in which we have only one position
+			#	for that entity
+			print 'testing: ' +str(candidate.id)
+
+			# Test for Singleton Entity
+			# if Position.objects.filter(entity__name=candidate.entity.name).count() <= 1:
+			# 	eligible_candidates.remove(candidate)
+			# 	print 'remove: '+str(candidate.id) + ' singleton entity'
+
+			# Test for Singleton Position
+			if Position.objects.filter(title=candidate.title).count() <=1:
+				eligible_candidates.remove(candidate)
+				print 'remove: '+str(candidate.id)+ ' singleton pos'
+
+			# Test for no title (ok for ed)
+			elif candidate.title is "" and candidate.type is not 'education':
+				eligible_candidates.remove(candidate)
+				print 'remove: '+str(candidate.id) + ' no title non ed'
+
+			## nagging issues - jobs @ universities... cut them?
+			## CEO, Board Member...
+			## what if all eliminated??
+
+			## idea for better: filter by # entity, position matches
+
+	for e in eligible_candidates:
+		print str(e.id)
+
+	# for now, just return top hit
+	if len(eligible_candidates) >= 1:
+		return eligible_candidates[0]
+	else:
+		return None
+
 
 #################
 #### HELPERS ####

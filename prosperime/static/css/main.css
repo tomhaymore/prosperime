@@ -335,6 +335,10 @@ div.message p {
 
 }
 
+ul#career-decisions-list {
+
+}
+
 
 /* Path */
 
@@ -805,8 +809,8 @@ button.general-add-button:active {
 	padding:4px;
 	border-collapse:separate;
 	border-radius:4px;
-	margin-top:50px;
 	margin-bottom:50px;
+	margin-top:10px;
 	margin-left: 0px auto;
 	margin-right: 0px auto;
 }
@@ -883,7 +887,7 @@ button.general-add-button:active {
 	padding-left:8px;
 }
 
-.timeline-description {
+/*.timeline-description {
 	padding:4px;
 	text-align:left;
 	display:none;
@@ -891,15 +895,15 @@ button.general-add-button:active {
 	border-left:1px solid black;
 	border-right:1px solid black;
 	border-radius:0px 0px 4px 4px;
-	/*background-color:#eee;
+	background-color:#eee;
 	*background-color: #ddd;
 	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#eee),to(#ddd) );
 	background-image: -webkit-linear-gradient(top, #eee, #ddd);
 	background-image: -o-linear-gradient(top, #eee, #ddd);
 	background-image: linear-gradient(to bottom, #eee, #ddd);
 	background-image: -moz-linear-gradient(top, #eee, #ddd);
-	background-repeat: repeat-x;*/
-}
+	background-repeat: repeat-x;
+}*/
 
 .timeline-description-float {
 	position:relative;
@@ -1095,18 +1099,8 @@ div.content-container{
 	margin-top:15px;
 }
 
-#profile-right {
-	margin-top:24px;
-}
 
 
-#middle-float-screen {
-	border-radius:4px;
-	padding-right:0px;
-	margin-left:0px;
-	padding-left:4px;
-	font-size:0.9em;
-}
 
 .box-header {
 	font-size:12px;

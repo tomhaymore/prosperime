@@ -9,7 +9,8 @@ import types
 
 
 # from Django
-from entities.models import Industry, User
+from django.contrib.auth.models import User
+from entities.models import Industry
 from careers.models import Career, Position
 from django.core.exceptions import MultipleObjectsReturned
 from django.core import management

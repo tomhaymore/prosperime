@@ -12,7 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 
 # Prosperime
-from careers.models import SavedPath, SavedPosition, Position, Career, GoalPosition, SavedCareer, IdealPosition
+from entities.models import Entity
+from careers.models import SavedPath, SavedPosition, Position, Career, GoalPosition, SavedCareer, IdealPosition, CareerDecision
 from accounts.models import Profile
 import careers.careerlib as careerlib
 from entities.models import Entity
@@ -21,6 +22,80 @@ from django.db.models import Count, Q
 ######################################################
 ################## CORE VIEWS ########################
 ######################################################
+
+
+def addDecision(request):
+	print 'aqui'
+	response = {}
+
+	if not request.is_ajax or not request.POST:
+		response['success'] = 'incorrect request type'
+		return HttpResponse(simplejson.dumps(response))
+
+	position = Position.objects.get(id=request.POST.get('pos_id'))
+
+	decision = CareerDecision()
+	decision.owner = request.user
+	decision.position = position
+	decision.winner = decision.position.entity
+
+	if position.type == 'education':
+		decision.type = 'college'
+	elif 'ntern' in position.title:
+		decision.type = 'internshp'
+	elif position.current:
+		decision.type = 'currentJob'
+	else:
+		decision.type = None
+
+	privacy = request.POST.get('privacy')
+	if privacy:
+		decision.privacy = privacy
+
+
+	decision.reason = request.POST.get('reason')
+	decision.comments = request.POST.get('comments')
+	decision.mentorship = int(request.POST.get('mentorship'))
+	decision.social = int(request.POST.get('social'))
+	decision.skills = int(request.POST.get('skills'))
+	decision.overall = int(request.POST.get('overall'))
+
+	decision.save()
+	response['sucess'] = 'true'
+
+	alternates = request.POST.get('alternates')
+	alternates =  alternates.split(', ')
+	for alternate in alternates:
+		# get entity
+		entity = Entity.objects.filter(name=alternate)
+		entity=entity[0]
+		decision.alternates.add(entity)
+
+	decision.save()
+	response['alternates'] = 'completed'
+
+	return HttpResponse(simplejson.dumps(response))
+
+
+def entityAutocomplete(request):
+	response = {}
+	query = request.GET.getlist('query')[0]
+	entities = Entity.objects.filter(name__istartswith=query).values('name')
+
+	suggestions = []
+	for e in entities:
+		suggestions.append(str(e['name']))
+
+	# suggestions = simplejson.dumps(suggestions)
+	print suggestions
+	response = {
+		'query': query,
+		'suggestions': suggestions,
+	}
+
+
+	return HttpResponse(simplejson.dumps(response))
+
 
 @login_required
 def home(request):
@@ -33,7 +108,7 @@ def home(request):
 	data['saved_paths'] = SavedPath.objects.filter(owner=user)
 	data['saved_careers'] = request.user.saved_careers.all()
 	data['saved_jobs'] = GoalPosition.objects.filter(owner=user)
-
+	data['career_decisions'] = CareerDecision.objects.all()
 	return render_to_response('home.html',data,context_instance=RequestContext(request))
 
 @login_required
@@ -355,6 +430,7 @@ def list_jobs(request):
 	# jobs = json.dumps(list(jobs))
 	jobs = json.dumps(jobs_list)
 	return HttpResponse(jobs, mimetype="application/json")
+
 
 
 

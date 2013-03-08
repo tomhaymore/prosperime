@@ -534,7 +534,7 @@ def init_careers_to_positions_map():
 	"""
 	global careers_to_positions_map
 	careers = Career.objects.values('id','pos_titles')
-
+	
 	career_map = {}
 
 	for c in careers:

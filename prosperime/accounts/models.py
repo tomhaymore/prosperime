@@ -4,11 +4,10 @@ import datetime
 # Django
 from django.db import models
 from django.contrib.auth.models import User
-# from entities.models import Position
 from django.db.models.signals import post_save
 
 # Prosperime
-from careers.models import Position
+from careers.models import Position, Career
 import careers.careerlib as careerlib
 
 class Account(models.Model):
@@ -46,16 +45,53 @@ class Profile(models.Model):
     status = models.CharField(max_length=15,default="active")
     # profile_pic = models.ImageField(max_length=450, upload_to=_get_profile_pic_path, blank=True, null=True)
 
+
+    # returns a dictionary w/ frequencies of each career
+    def get_all_careers(self):
+        career_dict = {}
+
+        user = self.user
+        positions = Position.objects.filter(person=user).prefetch_related('careers')
+        for p in positions:
+            careers = p.careers.all()
+            for c in careers:
+                if career_dict.has_key(c):
+                    career_dict[c] = career_dict[c] + 1
+                else:
+                    career_dict[c] = 1
+        
+        ## to test this beast
+        # for item in career_dict:
+        #      print item.short_name + ': ' + str(career_dict.get(item))
+
+        return career_dict
+
+    # returns career(s) w/ highest frequency among profile's positions
+    def get_top_careers(self):
+        all_careers = self.all_careers
+        top_careers = []
+        top_frequency = 0
+
+        for career, frequency in all_careers.iteritems():
+            if frequency > top_frequency:
+                del top_careers[:] # this just clears the list
+                top_frequency = frequency
+                top_careers.append(career)
+            if frequency == top_frequency:
+                top_careers.append(career)
+        return top_careers
+
     def get_top_career(self,limit=1):
        careers = careerlib.get_focal_careers(self.user,limit)
        return careers
+
 
     def get_all_careers(self,limit=5):
        careers = careerlib.get_focal_careers(self.user,limit)
        return careers
 
     # Properties of the Profile object
-    top_career = property(get_top_career)
+    top_careers = property(get_top_careers)
     all_careers = property(get_all_careers)
 
     ### Helpers ###

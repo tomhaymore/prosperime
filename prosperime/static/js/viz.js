@@ -135,41 +135,7 @@
 
 
 
-	/* Used in profile pages. Onmouseover event renders the description
-	   for a given element in the element id='middle-float-screen' */
-	var showDescription = function(index, title, co_name, start_date, end_date) {
-		var box = document.getElementById('middle-float-screen')
-		box.innerHTML = ""
-
-		// If no description, will throw exception
-		try {
-			var description = document.getElementsByClassName('timeline-description-text')[index].innerHTML
-			var newText = "<div class='box-header'>"
-			if (title) newText += title
-			if (co_name) newText += ' at ' + co_name
-			newText += "</div>"
-
-
-			if (start_date) {
-				newText += "<div class='box-dates'>"
-				//newText += start_date.substring(0, start_date.indexOf(' ')) + ' ' + start_date.substring(start_date.indexOf(',') + 2)
-				newText += start_date.replace('1, ','')
-				newText += ' - '
-				if (end_date == "Current") newText += "Current"
-				else newText += end_date.replace('1, ', '')
-				newText += "</div>"
-			}
-
-
-			if (description) newText += "<div class='box-description'>" + description + "</div>"
-		} catch (err) {
-			var newText = '<a>For more information, hover over a position</a>'
-		}
-
-		// newText += '<div onclick="addPosition({{viwer_saved_paths|}}Add this position to your career path.'
-
-		box.innerHTML = newText;
-	};
+	
 
 	var createNewPath = function() {
 

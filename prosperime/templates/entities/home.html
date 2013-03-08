@@ -33,4 +33,57 @@
 		</div>
 	</div>
 </div>
+
+<script type="text/javascript">
+	
+	/* Inelegant but effective way to pulsate the element w/o
+	   external JQuery libraries */
+	var highlight = function(elem) {
+		$(elem).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
+	};
+
+
+	var newPathAjax = function() {
+		_gaq.push(['_trackEvent', 'profile', 'newPathCreated'])
+
+		var title = $('#new-path-box').val()
+		if (title.length < 1) {
+			errorCreatingPath('title')
+			return
+		}
+
+		// Attempt POST request via AJAX to create path
+		$.post('/saved_paths/create/', {title: title, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
+				if (response['success']) {
+					console.log(response)
+					// Construct new table element for path
+					var newRow = "<tr><td ondragover='allowDrop(event)' ondrop='dropPosition(event," + title + ", this)'><a href='/saved_paths/#id/?id=" + response['id'] + "'>" + title + "</a></td></tr>"
+
+					// Add to DOM
+					$('#sidebar-path-list > tbody:last').append(newRow)
+					
+					// Clear text field
+					$('#new-path-box-row').remove()
+				} else {
+					errorCreatingPath('db')
+				}
+		}, 'json');
+	};
+
+	var errorCreatingPath = function(reason) {
+		_gaq.push(['_trackEvent', 'profile', 'errorCreatingPath'])
+	
+		var createBox = $('#new-path-box')
+		if (reason == "db") {
+			console.log("Error in the view creating new path...")
+			createBox.val("Please enter a title")
+		} else if (reason == "title") {
+			createBox.val("Please enter a title")
+		}
+
+		highlight(createBox)
+	};
+</script>
+
+
 {% endblock %}

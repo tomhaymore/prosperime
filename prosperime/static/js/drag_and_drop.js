@@ -15,6 +15,8 @@
    This particular method is specific to career paths. */
   function drag(ev) {
   	ev.dataTransfer.setData("pos_id", ev.target.id);
+    _gaq.push(['_trackEvent', 'savedPaths', 'deletePath', 'all'])
+
   };
 
 
