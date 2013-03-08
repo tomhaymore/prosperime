@@ -619,6 +619,14 @@ def test_match_careers_to_position(title=None):
 							# print str(k) + ": " + t
 		# print str(p.title) + " : " + str(careers)
 
+class CareerBase():
+
+	def get_users_in_career(self,career):
+
+		users = User.objects.select_related().filter(positions__careers=career)
+
+		return users
+
 class CareerSimBase():
 
 	# fetch all users
@@ -815,7 +823,45 @@ class CareerSimBase():
 
 		return careers
 
-class CareerPathBase():
+class CareerPathBase(CareerBase):
+
+	def get_ed_overview(self,user,career):
+
+		users = self.get_users_in_career(career)
+
+		# initialize dictionary
+		eds_all = {}
+		eds_network = {}
+		eds = {}
+		# loop through all users in a career
+		for u in users:
+			user_eds_all = []
+			user_eds_network = []
+			for p in u.positions.all():
+				if p.type == "education":
+					user_eds_all.append(p.entity.id)
+				if u.profile in user.profile.connections.all():
+					user_eds_network.append(p.entity.id)
+			user_eds_all = set(user_eds_all)
+			user_eds_network = set(user_eds_network)
+			for e in user_eds_all:
+				if e in eds_all:
+					eds_all[e]['count'] += 1
+				else:
+					org = Entity.objects.get(pk=e)
+					eds_all[e] = {'count':1,'name':org.name}
+			for e in user_eds_network:
+				if e in eds_network:
+					eds_network[e]['count'] += 1
+				else:
+					org = Entity.objects.get(pk=e)
+					eds_network[e] = {'count':1,'name':org.name}
+
+		eds['network'] = eds_network
+		eds['all'] = eds_all
+
+		return eds
+
 
 	def get_paths_in_career(self,user,career):
 		# initialize overview array
