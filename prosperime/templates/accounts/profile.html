@@ -28,7 +28,7 @@
 		{% if user.profile.all_careers %}
 		<ul class="profile-careers-list flat">
 			{% for c in user.profile.all_careers %}
-				<li class="profile-career"><a class="profile-button" href="/discover/career/{{c.id}}">{{c.long_name}}</a></li>
+				<li class="profile-career"><a class="profile-button" href="/career/{{c.id}}">{{c.long_name}}</a></li>
 			{% endfor %}
 		</ul>
 		{% endif %}
