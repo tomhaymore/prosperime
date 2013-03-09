@@ -114,10 +114,6 @@ def finish_login(request):
 		linkedin_user_info = request.session['linkedin_user_info']
 		access_token = request.session['access_token']
 
-		# remove LI info from session
-		del request.session['linkedin_user_info']
-		del request.session['access_token']
-
 		form = FinishAuthForm(request.POST)
 		
 		if form.is_valid():
@@ -263,7 +259,7 @@ def finish_link(request):
 			'id':profile_task.id
 			},
 		'connections': {
-			'status':conections_task.ready(),
+			'status':connections_task.ready(),
 			'id':connections_task.id
 			}
 	}
