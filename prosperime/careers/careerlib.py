@@ -953,7 +953,7 @@ class CareerPathBase(CareerBase):
 					durations.append(duration)
 		if len(durations) > 0:
 			avg = sum(durations,timedelta()) / len(durations)
-			return avg
+			return round(avg.days / 365.25,2)
 		return None
 
 	def avg_duration_all(self,career):
@@ -969,7 +969,7 @@ class CareerPathBase(CareerBase):
 				durations.append(duration)
 		if len(durations) > 0:
 			avg = sum(durations,timedelta()) / len(durations)
-			return avg
+			return round(avg.days / 365.25,2)
 		return None
 
 	def get_paths_in_career(self,user,career):

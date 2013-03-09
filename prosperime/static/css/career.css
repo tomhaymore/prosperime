@@ -21,6 +21,7 @@ div.career-profile-nav-container {
 	padding-left:10px;
 }
 
+
 .career-profile-stats-block {
 	display: inline-block;
 	text-align: center;
@@ -36,6 +37,13 @@ div.career-profile-nav-container {
 .stats-highlighted {
 	color: #fff;
 	background-color: rgb(51,98,152);
+}
+
+.stats-holder {
+	text-align: center;
+	width: 150px;
+	display: inline-block;
+	color: rgb(41,98,152);
 }
 
 .career-profile-stats-container {
