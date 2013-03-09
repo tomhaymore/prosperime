@@ -68,12 +68,20 @@
 			</div>
 			<div class="clear"></div>
 			<div class="career-profile-stats pull-left">
+				<span data-view="network" class="stats-holder">
+					{% if stats.duration.network %}
+						{{stats.duration.network}}
+					{% endif %}
+				</span>
+				<span data-view="all" class="stats-holder">{{stats.duration.all}}</span>
 				<p class="stats-header">Avg # of Years</p>
 			</div>
 			<div class="career-profile-stats pull-left">
+				<span>Coming soon</span>
 				<p class="stats-header">Most common entry position</p>
 			</div>
 			<div class="career-profile-stats pull-left">
+				<span>Coming soon</span>
 				<p class="stats-header">Most common senior position</p>
 			</div>
 			<div class="clear"></div>

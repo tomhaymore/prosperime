@@ -9,8 +9,9 @@ import datetime
 from django.db import models
 from django.contrib.auth.models import User
 
-# Entities
+# Prosperime
 from entities.models import Industry, Entity
+
 
 class Position(models.Model):
 	entity = models.ForeignKey(Entity,related_name="positions")
@@ -142,6 +143,20 @@ class Career(models.Model):
 		if self.short_name:
 			return self.short_name
 		return self.long_name
+
+	def avg_duration_network(self,user):
+		"""
+		returns average length of time in career for users in focal user's network
+		"""
+		import careers.careerlib as careerlib
+		return careerlib.avg_duration_network(self,user)
+
+	def avg_duration_all(self):
+		"""
+		returns average length of time in career for all users
+		"""
+		import careers.careerlib as careerlib
+		return careerlib.avg_duration_all(self)
 
 	name = property(_name)
 

@@ -154,16 +154,19 @@ def career_profile(request,career_id):
 	# get career object
 	career = Career.objects.get(pk=career_id)
 
+	users = User.objects.select_related('profile','positions','pictures').values('id','profile__headline','profile__first_name','profile__last_name','profile__pictures__pic','positions__entity__id','positions__entity__name').filter(positions__careers=career).annotate(no_of_pos=Count('positions__id')).order_by('-no_of_pos')
+
 	# init careerlib
 	career_path = careerlib.CareerPathBase()
 
 	# get ed overview
+	# ed_overview = None
 	ed_overview = cache.get('career_profile_ed_overview_'+str(request.user.id)+"_"+str(career_id))
-	# check to see if cache was empty
+	# # check to see if cache was empty
 	if ed_overview is None:
-		cache.set('career_profile_ed_overview_'+str(request.user.id)+"_"+str(career_id),career_path.get_ed_overview(request.user,career))
+		cache.set('career_profile_ed_overview_'+str(request.user.id)+"_"+str(career_id),career_path.get_ed_overview(request.user,career),10)
 		ed_overview = cache.get('career_profile_ed_overview_'+str(request.user.id)+"_"+str(career_id))
-		# ed_overview = career_path.get_ed_overview(request.user,career)
+	# 	# ed_overview = career_path.get_ed_overview(request.user,career)
 
 	# get paths overview
 	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
@@ -181,7 +184,13 @@ def career_profile(request,career_id):
 	overview['network'] = paths['overview']['network']
 	overview['all'] = paths['overview']['all']
 
-	return render_to_response('careers/career_profile.html',{'career':career,'ed_overview':ed_overview,'paths':paths_in_career,'overview':overview},context_instance=RequestContext(request))
+	stats = {}
+	stats['duration'] = {
+		'network': career_path.avg_duration_network(career,request.user),
+		'all': career_path.avg_duration_all(career)
+		} 
+
+	return render_to_response('careers/career_profile.html',{'stats':stats,'career':career,'ed_overview':ed_overview,'paths':paths_in_career,'overview':overview},context_instance=RequestContext(request))
 
 @login_required
 def discover_career(request,career_id):

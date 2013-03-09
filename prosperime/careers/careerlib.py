@@ -2,6 +2,7 @@
 import json
 import urllib2
 from datetime import datetime
+from datetime import timedelta
 import csv
 import re
 import os
@@ -21,6 +22,14 @@ def get_focal_careers(user,limit=10):
 	career_path = CareerPathBase()
 	careers = career_path.get_focal_careers(user,limit)
 	return careers
+
+def avg_duration_network(career,user):
+	career_path = CareerPathBase()
+	return career_path.avg_duration_network(career,user)
+
+def avg_duration_all(career):
+	career_path = CareerPathBase()
+	return career_path.avg_duration_all(career)
 
 def _get_users_in_network(user,**filters):
 
@@ -623,9 +632,41 @@ class CareerBase():
 
 	def get_users_in_career(self,career):
 
-		users = User.objects.select_related().filter(positions__careers=career)
+		users = User.objects.prefetch_related('profile__connections').select_related('positions').filter(positions__careers=career)
 
 		return users
+
+	def _get_users_in_network(user,**filters):
+
+		# get schools from user
+		schools = Entity.objects.filter(li_type="school",positions__person=user,positions__type="education").distinct()
+		
+		# get all connected users and those from the same schools
+		
+		users = User.objects.select_related('profile','pictures').values('pk','positions__careers','profile__first_name','profile__last_name','profile__pictures__pic').filter(Q(profile__in=user.profile.connections.all()) | (Q(positions__entity__in=schools))).distinct()
+		# if filters['positions']:
+		# 	users = users.filter(positions__title__in=filters['positions'])
+		# if filters['locations']:
+		# 	users = users.filter(positions__entity__office__city__in=filters['locations'])
+		
+		users_list = [{'id':u['pk'],'first_name':u['profile__first_name'],'last_name':u['profile__last_name'],'profile_pic':u['profile__pictures__pic'],'careers':u['positions__careers']} for u in users]	
+		user_ids = [u['id'] for u in users_list]
+
+		user_ids = set(user_ids)
+		return (users_list, user_ids)
+
+	def get_users_full_in_network(user):
+		"""
+		returns User object for all users in network
+		"""
+		# ge schools from user
+		schools = Entity.objects.filter(li_type="school",positions__person=user,positions__type="education").distinct()
+
+		# get all connected users and those from the same schools
+		users = User.objects.select_related('profile','pictures').filter(Q(profile__in=user.profile.connections.all()) | (Q(positions__entity__in=schools))).distinct()
+
+		return users
+
 
 class CareerSimBase():
 
@@ -826,9 +867,13 @@ class CareerSimBase():
 class CareerPathBase(CareerBase):
 
 	def get_ed_overview(self,user,career):
-
+		"""
+		returns ed breakdown of career by school, for network and all users
+		"""
 		users = self.get_users_in_career(career)
-
+		connections = user.profile.connections.all()
+		schools = Entity.objects.filter(li_type='school').values('id','name')
+		
 		# initialize dictionary
 		eds_all = {}
 		eds_network = {}
@@ -840,7 +885,8 @@ class CareerPathBase(CareerBase):
 			for p in u.positions.all():
 				if p.type == "education":
 					user_eds_all.append(p.entity.id)
-				if u.profile in user.profile.connections.all():
+				# if u.profile in user.profile.connections.all():
+				if u.profile in connections:
 					user_eds_network.append(p.entity.id)
 			user_eds_all = set(user_eds_all)
 			user_eds_network = set(user_eds_network)
@@ -848,20 +894,83 @@ class CareerPathBase(CareerBase):
 				if e in eds_all:
 					eds_all[e]['count'] += 1
 				else:
-					org = Entity.objects.get(pk=e)
-					eds_all[e] = {'count':1,'name':org.name}
+					for s in schools:
+						if e == s['id']:
+							# org = Entity.objects.get(pk=e)
+							eds_all[e] = {'count':1,'name':s['name']}
 			for e in user_eds_network:
 				if e in eds_network:
 					eds_network[e]['count'] += 1
 				else:
-					org = Entity.objects.get(pk=e)
-					eds_network[e] = {'count':1,'name':org.name}
+					for s in schools:
+						if e == s['id']:
+							# org = Entity.objects.get(pk=e)
+							eds_network[e] = {'count':1,'name':s['name']}
+					# org = Entity.objects.get(pk=e)
+					# eds_network[e] = {'count':1,'name':org.name}
 
 		eds['network'] = eds_network
 		eds['all'] = eds_all
 
 		return eds
 
+	def _user_career_duration(self,user,career):
+		# get all positions from user
+		positions = Position.objects.filter(person=user,careers=career).order_by('-start_date')
+		# setup placeholder end date
+		end_date = None
+		# loop through all positions
+		i = 0
+		for p in positions:
+			if i == 0:
+				start_date = p.start_date
+			if p.end_date:
+				end_date = p.end_date
+			i += 1
+		# make sure there was at least one end_date
+		if end_date is not None:
+			# calculate duration
+			# duration = end_date - start_date
+			duration = start_date - end_date
+			return duration
+		else:
+			return None
+
+	def avg_duration_network(self,career,user):
+		"""
+		returns average time in career for focal user's network
+		"""
+		# users = self.get_full_users_in_network(user)
+		# positions = Position.objects.filter(user=user.connections.all()).distinct()
+
+		users = User.objects.filter(positions__careers=career)
+		connections = user.profile.connections.all()
+		durations = []
+		for u in users:
+			if u in connections:
+				duration = self._user_career_duration(u,career)
+				if duration is not None:
+					durations.append(duration)
+		if len(durations) > 0:
+			avg = sum(durations,timedelta()) / len(durations)
+			return avg
+		return None
+
+	def avg_duration_all(self,career):
+		"""
+		returns average time in career for all users
+		"""
+		users = User.objects.filter(positions__careers=career)
+
+		durations = []
+		for u in users:
+			duration = self._user_career_duration(u,career)
+			if duration is not None:
+				durations.append(duration)
+		if len(durations) > 0:
+			avg = sum(durations,timedelta()) / len(durations)
+			return avg
+		return None
 
 	def get_paths_in_career(self,user,career):
 		# initialize overview array
