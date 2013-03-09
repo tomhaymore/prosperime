@@ -56,7 +56,7 @@ def login(request):
 @login_required
 def logout(request):
 	auth_logout(request)
-	return HttpResponseRedirect('/')
+	return HttpResponseRedirect('/welcome')
 
 def linkedin_authorize(request):
 		
@@ -198,7 +198,7 @@ def finish_login(request):
 
 			#return HttpResponseRedirect('/account/success')
 			# return HttpResponseRedirect('/search')
-			return HttpResponseRedirect('/personalize')
+			return HttpResponseRedirect('/personalize/careers')
 	else:
 		form = FinishAuthForm()
 
