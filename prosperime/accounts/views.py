@@ -335,8 +335,9 @@ def profile(request, user_id):
 	for pos in positions:
 		pos.duration = pos.duration_in_months()
 
-		if 'ntern' in pos.title and 'nternational' not in pos.title:
-			pos.type = 'internship'
+		if pos.title is not None:
+			if 'ntern' in pos.title and 'nternational' not in pos.title:
+				pos.type = 'internship'
 
 		# Assumption: no end date = current
 		if not pos.end_date:
