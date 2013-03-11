@@ -97,7 +97,6 @@ def entityAutocomplete(request):
 	return HttpResponse(simplejson.dumps(response))
 
 
-@login_required
 def home(request):
 	if not request.user.is_authenticated():
 		return HttpResponseRedirect('welcome')
