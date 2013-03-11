@@ -109,7 +109,7 @@ $(document).ready(function() {
 		$.post('/add_personalization/',{'selected_careers':selected_careers,'selected_jobs':selected_jobs}, function(data) {
 			if (data == "success") {
 				// check to see what page we're on; redirect to next personalization page or back to home
-				if window.location == "/personalize/careers/" {
+				if (window.location == "/personalize/careers/") {
 					window.location = '/personalize/jobs';
 				} else if (window.location == "/personalize/jobs/") {
 					window.location = '/home';	
