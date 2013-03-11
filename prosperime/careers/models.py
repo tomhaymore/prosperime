@@ -90,7 +90,7 @@ class Career(models.Model):
 	updated = models.DateTimeField(auto_now=True, null=True)
 
 	def __unicode__(self):
-		return self.short_name
+		return self.long_name
 
 	def get_pos_titles(self):
 		"""
