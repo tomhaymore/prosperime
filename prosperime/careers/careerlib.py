@@ -478,91 +478,91 @@ def get_paths_in_career(user,career):
 		# return paths, overview
 		return paths
 
-# set max size of ngram
-NGRAM_MAX = 10
+# # set max size of ngram
+# NGRAM_MAX = 10
 
-# set min size of ngram
-NGRAM_MIN = 1
+# # set min size of ngram
+# NGRAM_MIN = 1
 
-# initialize global dictionary for career-to-position mapping
-careers_to_positions_map = {}
+# # initialize global dictionary for career-to-position mapping
+# careers_to_positions_map = {}
 
-# initilize array for stop words
-STOP_LIST = [
-	'director',
-	'manager',
-	'intern',
-	'aide',
-	'clerk',
-	'consultant',
-	'program director',
-	'sales',
-	'founder'
-]
+# # initilize array for stop words
+# STOP_LIST = [
+# 	'director',
+# 	'manager',
+# 	'intern',
+# 	'aide',
+# 	'clerk',
+# 	'consultant',
+# 	'program director',
+# 	'sales',
+# 	'founder'
+# ]
 
-def _load_stop_list():
-	global STOP_LIST
-	try:
-		reader = (open('career_map_stop_list.csv','rU'))
-	except:
-		return None
-	for row in reader:
-		STOP_LIST.append(row[0])
+# def _load_stop_list():
+# 	global STOP_LIST
+# 	try:
+# 		reader = (open('career_map_stop_list.csv','rU'))
+# 	except:
+# 		return None
+# 	for row in reader:
+# 		STOP_LIST.append(row[0])
 
-def _tokenize_position(title):
-	"""
-	tokenizes position title based on spaces
-	"""
-	if title:
-		# tokenize position title
-		tokens = title.split(" ")
-		# reduce all strings to lower case
-		tokens = [t.lower() for t in tokens]
-		return tokens
-	return None
+# def _tokenize_position(title):
+# 	"""
+# 	tokenizes position title based on spaces
+# 	"""
+# 	if title:
+# 		# tokenize position title
+# 		tokens = title.split(" ")
+# 		# reduce all strings to lower case
+# 		tokens = [t.lower() for t in tokens]
+# 		return tokens
+# 	return None
 
-def _extract_ngrams(tokens):
-	"""
-	breaks position titles into appropriate number of ngrams and returns as a list
-	"""
-	if tokens:
-		ngrams = []
-		n_tokens = len(tokens)
-		for i in range(n_tokens):
-			for j in range(i+1,min(n_tokens,NGRAM_MAX)+1):
-				ngram = " ".join(tokens[i:j])
-				ngrams.append(ngram)
-				# ngrams.append(tokens[i:j])
+# def _extract_ngrams(tokens):
+# 	"""
+# 	breaks position titles into appropriate number of ngrams and returns as a list
+# 	"""
+# 	if tokens:
+# 		ngrams = []
+# 		n_tokens = len(tokens)
+# 		for i in range(n_tokens):
+# 			for j in range(i+1,min(n_tokens,NGRAM_MAX)+1):
+# 				ngram = " ".join(tokens[i:j])
+# 				ngrams.append(ngram)
+# 				# ngrams.append(tokens[i:j])
 
-		return ngrams
-	return None
+# 		return ngrams
+# 	return None
 
-def init_careers_to_positions_map():
-	"""
-	fill in career map dictionary from db
-	"""
-	global careers_to_positions_map
-	careers = Career.objects.values('id','pos_titles')
+# def init_careers_to_positions_map():
+# 	"""
+# 	fill in career map dictionary from db
+# 	"""
+# 	global careers_to_positions_map
+# 	careers = Career.objects.values('id','pos_titles')
 	
-	career_map = {}
+# 	career_map = {}
 
-	for c in careers:
-		if c['pos_titles'] is not None:
-			titles = json.loads(c['pos_titles'])
-			# add career-to-position title mapping, reduced to lower case
-			if titles is not None:
-				# print title
-				# pass
-				try:
-					titles = [t.lower() for t in titles]
-				except AttributeError:
-					print titles
-					# pass
+# 	for c in careers:
+# 		if c['pos_titles'] is not None:
+# 			titles = json.loads(c['pos_titles'])
+# 			# add career-to-position title mapping, reduced to lower case
+# 			if titles is not None:
+# 				# print title
+# 				# pass
+# 				try:
+# 					titles = [t.lower() for t in titles]
+# 				except AttributeError:
+# 					print titles
+# 					# pass
 			
-			career_map[c['id']] = titles
-			# print career_map
+# 			career_map[c['id']] = titles
+# 			# print career_map
 
-	careers_to_positions_map = career_map
+# 	careers_to_positions_map = career_map
 
 def match_careers_to_position(pos):
 	career_mapper = CareerMapBase()
@@ -1359,7 +1359,7 @@ class CareerMapBase():
 					if t not in self.STOP_LIST:
 						for k,v in self.careers_to_positions_map.items():
 							if t in v and k not in careers:
-								
+								print t + ": " + k
 								careers.append(k)
 								# print t + ": " + career.name
 
@@ -1403,7 +1403,7 @@ class CareerMapBase():
 							if t in v and k not in careers:
 								careers.append(k)
 								career = Career.objects.get(pk=k)
-								# print t + ": " + career.name
+								print t + ": " + career.name
 			print careers
 
 	def list_unmatched_positions(self):
