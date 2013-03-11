@@ -80,6 +80,7 @@ def addDecision(request):
 def entityAutocomplete(request):
 	response = {}
 	query = request.GET.getlist('query')[0]
+	print 'autocomplete: ' + query
 	entities = Entity.objects.filter(name__istartswith=query).values('name')
 
 	suggestions = []
@@ -437,14 +438,39 @@ def list_jobs(request):
 # VIEW: display ALL user's paths
 def show_paths(request):
 
-	paths = SavedPath.objects.filter(owner=request.user)
+	# paths = SavedPath.objects.filter(owner=request.user)
 
-	data = {
-		'saved_paths': paths,
-	}
+	# data = {
+	# 	'saved_paths': paths,
+	# }
 
-	return render_to_response('careers/saved_paths.html', data,
-		context_instance=RequestContext(request))
+	# return render_to_response('careers/saved_paths.html', data,
+	# 	context_instance=RequestContext(request))
+
+	### TEMPORARILY, A JSON DUMPER
+	paths = SavedPath.objects.filter(owner=request.user).prefetch_related()
+	formatted_paths = []
+	for p in paths:
+		current = {
+			'owner':p.owner.profile.full_name(),
+			'title':p.title,
+			'last_index':p.last_index
+		}
+		saved_positions = SavedPosition.objects.filter(path=p)
+		positions = []
+		for pos in saved_positions:
+			positions.append({
+				'pos_id':pos.position.id,
+				'title':pos.position.title,
+				'entity':pos.position.entity.name,
+				'owner':pos.position.person.profile.full_name(),
+			})
+
+		current['positions'] = positions
+		formatted_paths.append(current)
+		
+
+	return HttpResponse(simplejson.dumps(formatted_paths))
 
 # JSON dumper
 def get_paths(request):
@@ -582,6 +608,60 @@ def save(request):
 
 	return HttpResponse(simplejson.dumps(response))
 
+def get_queue(request):
+	print 'in careers.get_queue'
+	queue = SavedPath.objects.get(owner=request.user, title='queue')
+	queue = _saved_path_to_json(queue)
+	return HttpResponse(simplejson.dumps(queue))
+
+# FOR DEV ONLY 
+def manual_save(user_id, path_id, pos_id):
+
+	path = SavedPath.objects.get(id=path_id)
+	position = Position.objects.get(id=pos_id)
+
+	saved_position = SavedPosition()
+	saved_position.position = position
+	saved_position.path = path
+	saved_position.index = path.get_next_index()
+	saved_position.save()	
+
+	return 'Success'
+
+def add_to_queue(request):
+	response = {}
+	pos_id = request.POST.get('pos_id', False)
+
+	if not request.is_ajax:
+		response['success'] = 'not ajax request'
+	if not request.POST:
+		response['success'] = 'not POST'
+	if not pos_id:
+		response['success'] = 'no pos_id'
+
+	try:
+		existing_queue = SavedPath.objects.get(owner=request.user, title='queue')
+	except:
+		# Create a new one
+		existing_queue = SavedPath()
+		existing_queue.title = 'queue'
+		existing_queue.owner = request.user
+		existing_queue.last_index = 1
+		existing_queue.save()
+		print existing_queue.owner
+
+	try:
+		position = Position.objects.get(id=pos_id)
+		new_pos = SavedPosition()
+		new_pos.position = position
+		new_pos.path = existing_queue
+		new_pos.index = 0
+		new_pos.save()
+	except:
+		response['success'] = 'failed in back-end'
+
+	return HttpResponse(simplejson.dumps(response))
+
 
 # VIEW: creates a path, responds to POST request via AJAX
 def create(request):
@@ -716,6 +796,27 @@ def prototype(request):
 ######################################################
 ##################    HELPERS   ######################
 ######################################################
+
+def _saved_path_to_json(path):
+
+	formatted_path = {
+		'title':path.title,
+		'last_index':path.last_index,
+		'id':path.id,
+	}
+	all_pos = SavedPosition.objects.filter(path=path).select_related('position')
+	positions = []
+	for p in all_pos:
+		positions.append({
+			'title':p.position.title,
+			'pos_id':p.position.id,
+			'owner':p.position.person.profile.full_name(),
+			'owner_id':p.position.person.id,
+			'entity_name':p.position.entity.name,
+			'type':p.position.type,
+		})
+	formatted_path['positions'] = positions
+	return formatted_path
 
 
 def _ready_profiles_for_json(profiles):
