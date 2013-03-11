@@ -931,8 +931,9 @@ def paths(request):
 				name = u.profile.full_name()
 				current_position = _get_latest_position(u)
 				profile_pic = _get_profile_pic(u.profile)
-				for c in u.profile.get_all_careers():
-					careers.append({'name':c.long_name,'id':c.id})
+				for p in u.positions.all():
+					for c in p.careers.all():
+						careers.append({'name':c.long_name,'id':c.id})
 				# if current_position is not None:
 				# 	positions = _get_positions_for_path(u.positions.all())
 				# else:

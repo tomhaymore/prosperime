@@ -311,6 +311,15 @@ def profile(request, user_id):
 	user = User.objects.get(id=user_id)
 	# profile = Profile.objects.get(user=user)
 	profile = user.profile
+	# get careers
+	career_dict = {}
+	for p in user.positions.all():
+		for c in p.careers.all():
+			if c in career_dict:
+				career_dict[c] += 1
+			else:
+				career_dict[c] = 1
+
 	saved_paths = SavedPath.objects.filter(owner=user)
 	# saved_paths = user.saved_path.all()
 	# profile_pic = _get_profile_pic(profile)
@@ -432,7 +441,7 @@ def profile(request, user_id):
 	end_date = datetime.now()
 	compress = None
 
-	return render_to_response('accounts/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress, 'career_map': career_map, 'top_careers':top_careers, 'career_decision_prompt':career_decision_position, 'positions':positions}, context_instance=RequestContext(request))
+	return render_to_response('accounts/profile.html', {'profile':profile,'careers':career_dict,'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress, 'career_map': career_map, 'top_careers':top_careers, 'career_decision_prompt':career_decision_position, 'positions':positions}, context_instance=RequestContext(request))
 	
 @login_required
 def profile_org(request, org_id):
