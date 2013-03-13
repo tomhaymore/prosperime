@@ -243,240 +243,243 @@ def _get_paths_in_career_alt(user, career):
 	return paths
 
 def get_paths_in_career(user,career):
-		# initialize overview array
-		overview = {}
-		paths = {}
+	career_path = CareerPathBase()
+	return career_path.get_paths_in_career(user,career)
 
-		# get users in network
-		users_list, user_ids = _get_users_in_network(user)
+		# # initialize overview array
+		# overview = {}
+		# paths = {}
 
-		network_people = User.objects.prefetch_related().select_related('positions','entities','accounts').filter(id__in=user_ids,positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos').distinct()
-		# CAUTION--values() can return multiple records when requesting M2M values; make sure to reduce
-		# network_people = User.objects.prefetch_related().select_related('profile','positions','pictures').values('id','profile__headline','profile__first_name','profile__last_name','profile__pictures__pic','positions__entity__id','positions__entity__name').filter(id__in=user_ids,positions__careers=career).annotate(no_of_pos=Count('positions__id')).order_by('-no_of_pos')
+		# # get users in network
+		# users_list, user_ids = _get_users_in_network(user)
 
-		# Clayton -- need to uniqify this list, b/c lots of wasted time
-		#	parsing duplicate people ... EDIT: not the problem, problem is
-		#	duplicate positions!
-		# network_people = _order_preserving_uniquify(network_people)
+		# network_people = User.objects.prefetch_related().select_related('positions','entities','accounts').filter(id__in=user_ids,positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos').distinct()
+		# # CAUTION--values() can return multiple records when requesting M2M values; make sure to reduce
+		# # network_people = User.objects.prefetch_related().select_related('profile','positions','pictures').values('id','profile__headline','profile__first_name','profile__last_name','profile__pictures__pic','positions__entity__id','positions__entity__name').filter(id__in=user_ids,positions__careers=career).annotate(no_of_pos=Count('positions__id')).order_by('-no_of_pos')
 
-		network_people_dict = {}
-		num_pos = 0
-		entities = []
-		# entities = set()
-		entities_dict = {}
-		num_cos = 0
-		network_positions = []
-		# counter = 0
+		# # Clayton -- need to uniqify this list, b/c lots of wasted time
+		# #	parsing duplicate people ... EDIT: not the problem, problem is
+		# #	duplicate positions!
+		# # network_people = _order_preserving_uniquify(network_people)
 
-		## Network
-		for p in network_people:
-			# check to see if user is already in the dict
-			# if p.id not in network_people_dict:
-			# 	network_people_dict[p.id] = {
-			# 		'full_name': p.profile.full_name(),
-			# 		'headline': p.profile.headline,
-			# 		'pic':p.profile.default_profile_pic(),
-			# 	}
-			# check each record to make sure the profile pic gets picked up
-			# if 'profile__pictures__pic' in p:
-			# 	network_people_dict[p['id']]['pic'] = p['profile__pictures__pic']
-			for pos in p.positions.all():
-			# if 'positions__entity__id' in p:
-			# increment the position counter
-				entities.append(pos.entity.name)
-				num_pos += 1
-				if pos.entity.name in entities_dict:
-					entities_dict[pos.entity.name]['count'] += 1
-				else:
-					entities_dict[pos.entity.name] = {
-						'count':1,
-						'id':pos.entity.name
-					}
-			# num_pos += len(p.positions.all())
-			# # people_seen = set()
-			# # positions_seen = set()
+		# network_people_dict = {}
+		# num_pos = 0
+		# entities = []
+		# # entities = set()
+		# entities_dict = {}
+		# num_cos = 0
+		# network_positions = []
+		# # counter = 0
 
-			# for pos in p.positions.all():
-			# 	# num_pos += 1
-			# 	entities.append(pos.entity.id)
-			# 	# entities.add(pos.entity.id)
-
-			# 	# if pos in career, add to positions
-			# 	# 	additionally, impose 30 position cap
-				
-			# 	# if career in pos.careers.all():
-			# 	# 	counter += 1
-			# 	# 	print counter
-			# 	#  	if len(network_positions) < 30:
-			# 	# 		# check if seen already (avoid duplicates)
-			# 	# 		if pos.id not in positions_seen:
-			# 	# 			positions_seen.add(pos.id)
-			# 	# 			network_positions.append({
-			# 	# 				'id':pos.id,
-			# 	# 				'title':pos.title,
-			# 	# 				'co_name':pos.entity.name,
-			# 	# 				'owner':pos.person.profile.full_name(),
-			# 	# 				'owner_id':pos.person.id,
-			# 	# 				'logo_path':pos.entity.default_logo(),
-			# 	# 			})
-
-			
-			# 	if pos.entity.name in entities_dict:
-			# 		entities_dict[pos.entity.name]['count'] += 1
-
-			# 		# check if person seen already (avoid duplicates)
-			# 		# 	additionally, cap people @ 5 for now
-			# 		# if p.id not in people_seen and len(entities_dict[pos.entity.name]['people']) < 6:
-						
-			# 		# 	person_dict = {
-			# 		# 		'name':p.profile.full_name(),
-			# 		# 		'id':p.id,
-			# 		# 	}
-			# 		# 	entities_dict[pos.entity.name]['people'].append(person_dict)
-			# 		# 	people_seen.add(p.id)
-
-			# 	else:
-			# 		# people_list = [{
-			# 		# 	'name':p.profile.full_name(),
-			# 		# 	'id':p.id,
-			# 		# }]
-					
-			# 		entities_dict[pos.entity.name] = {
-			# 			'count' : 1,
-			# 			'id':pos.entity.id,
-			# 			# 'logo':pos.entity.default_logo(),
-			# 			# 'people':people_list,	
-			# 		}
-
+		# ## Network
 		# for p in network_people:
 		# 	# check to see if user is already in the dict
-		# 	if p['id'] not in network_people_dict:
-		# 		network_people_dict[p['id']] = {
-		# 			'full_name': p['profile__first_name'] + " " + p['profile__last_name'],
-		# 			'headline': p['profile__headline']
-		# 		}
+		# 	# if p.id not in network_people_dict:
+		# 	# 	network_people_dict[p.id] = {
+		# 	# 		'full_name': p.profile.full_name(),
+		# 	# 		'headline': p.profile.headline,
+		# 	# 		'pic':p.profile.default_profile_pic(),
+		# 	# 	}
 		# 	# check each record to make sure the profile pic gets picked up
-		# 	if 'profile__pictures__pic' in p:
-		# 		network_people_dict[p['id']]['pic'] = p['profile__pictures__pic']
-		# 	if 'positions__entity__id' in p:
+		# 	# if 'profile__pictures__pic' in p:
+		# 	# 	network_people_dict[p['id']]['pic'] = p['profile__pictures__pic']
+		# 	for pos in p.positions.all():
+		# 	# if 'positions__entity__id' in p:
 		# 	# increment the position counter
+		# 		entities.append(pos.entity.name)
 		# 		num_pos += 1
-		# 		if p['positions__entity__name'] in entities_dict:
-		# 			entities_dict[p['positions__entity__name']]['count'] += 1
+		# 		if pos.entity.name in entities_dict:
+		# 			entities_dict[pos.entity.name]['count'] += 1
 		# 		else:
-		# 			entities_dict[p['positions__entity__name']] = {
+		# 			entities_dict[pos.entity.name] = {
 		# 				'count':1,
-		# 				'id':p['positions__entity__name']
+		# 				'id':pos.entity.name
 		# 			}
+		# 	# num_pos += len(p.positions.all())
+		# 	# # people_seen = set()
+		# 	# # positions_seen = set()
+
+		# 	# for pos in p.positions.all():
+		# 	# 	# num_pos += 1
+		# 	# 	entities.append(pos.entity.id)
+		# 	# 	# entities.add(pos.entity.id)
+
+		# 	# 	# if pos in career, add to positions
+		# 	# 	# 	additionally, impose 30 position cap
+				
+		# 	# 	# if career in pos.careers.all():
+		# 	# 	# 	counter += 1
+		# 	# 	# 	print counter
+		# 	# 	#  	if len(network_positions) < 30:
+		# 	# 	# 		# check if seen already (avoid duplicates)
+		# 	# 	# 		if pos.id not in positions_seen:
+		# 	# 	# 			positions_seen.add(pos.id)
+		# 	# 	# 			network_positions.append({
+		# 	# 	# 				'id':pos.id,
+		# 	# 	# 				'title':pos.title,
+		# 	# 	# 				'co_name':pos.entity.name,
+		# 	# 	# 				'owner':pos.person.profile.full_name(),
+		# 	# 	# 				'owner_id':pos.person.id,
+		# 	# 	# 				'logo_path':pos.entity.default_logo(),
+		# 	# 	# 			})
+
+			
+		# 	# 	if pos.entity.name in entities_dict:
+		# 	# 		entities_dict[pos.entity.name]['count'] += 1
+
+		# 	# 		# check if person seen already (avoid duplicates)
+		# 	# 		# 	additionally, cap people @ 5 for now
+		# 	# 		# if p.id not in people_seen and len(entities_dict[pos.entity.name]['people']) < 6:
+						
+		# 	# 		# 	person_dict = {
+		# 	# 		# 		'name':p.profile.full_name(),
+		# 	# 		# 		'id':p.id,
+		# 	# 		# 	}
+		# 	# 		# 	entities_dict[pos.entity.name]['people'].append(person_dict)
+		# 	# 		# 	people_seen.add(p.id)
+
+		# 	# 	else:
+		# 	# 		# people_list = [{
+		# 	# 		# 	'name':p.profile.full_name(),
+		# 	# 		# 	'id':p.id,
+		# 	# 		# }]
+					
+		# 	# 		entities_dict[pos.entity.name] = {
+		# 	# 			'count' : 1,
+		# 	# 			'id':pos.entity.id,
+		# 	# 			# 'logo':pos.entity.default_logo(),
+		# 	# 			# 'people':people_list,	
+		# 	# 		}
+
+		# # for p in network_people:
+		# # 	# check to see if user is already in the dict
+		# # 	if p['id'] not in network_people_dict:
+		# # 		network_people_dict[p['id']] = {
+		# # 			'full_name': p['profile__first_name'] + " " + p['profile__last_name'],
+		# # 			'headline': p['profile__headline']
+		# # 		}
+		# # 	# check each record to make sure the profile pic gets picked up
+		# # 	if 'profile__pictures__pic' in p:
+		# # 		network_people_dict[p['id']]['pic'] = p['profile__pictures__pic']
+		# # 	if 'positions__entity__id' in p:
+		# # 	# increment the position counter
+		# # 		num_pos += 1
+		# # 		if p['positions__entity__name'] in entities_dict:
+		# # 			entities_dict[p['positions__entity__name']]['count'] += 1
+		# # 		else:
+		# # 			entities_dict[p['positions__entity__name']] = {
+		# # 				'count':1,
+		# # 				'id':p['positions__entity__name']
+		# # 			}
 
 
-		num_cos = len(set(entities))
-		# num_cos = len(entities)
+		# num_cos = len(set(entities))
+		# # num_cos = len(entities)
 
-		overview['network'] = {
-			'num_people':len(network_people),
-			'num_pos':num_pos,
-			'num_cos':num_cos
-		}
+		# overview['network'] = {
+		# 	'num_people':len(network_people),
+		# 	'num_pos':num_pos,
+		# 	'num_cos':num_cos
+		# }
 
-		# all_people = User.objects.select_related('profile','positions','pictures').values('id','profile__headline','profile__first_name','profile__last_name','profile__pictures__pic','positions__entity__id','positions__entity__name').filter(positions__careers=career).annotate(no_of_pos=Count('positions__id')).order_by('-no_of_pos')
-		all_people = User.objects.select_related('positions').filter(positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos').distinct()
+		# # all_people = User.objects.select_related('profile','positions','pictures').values('id','profile__headline','profile__first_name','profile__last_name','profile__pictures__pic','positions__entity__id','positions__entity__name').filter(positions__careers=career).annotate(no_of_pos=Count('positions__id')).order_by('-no_of_pos')
+		# all_people = User.objects.select_related('positions').filter(positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos').distinct()
 
-		num_pos = 0
-		entities = []
-		# entities = set()
-		all_entities_dict = {}
-		all_positions = []
-		num_cos = 0
+		# num_pos = 0
+		# entities = []
+		# # entities = set()
+		# all_entities_dict = {}
+		# all_positions = []
+		# num_cos = 0
 
-		## ALL
+		# ## ALL
 
+		# # for p in all_people:
+		# # 	# check to see if user is already in the dict
+		# # 	if p['id'] not in network_people_dict:
+		# # 		network_people_dict[p['id']] = {
+		# # 			'full_name': p['profile__first_name'] + " " + p['profile__last_name']
+		# # 		}
+		# # 		# if ['profile__headline'] in p:
+		# # 		# 	network_people_dict[p['id']]['headline'] = p['profile__headline']
+		# # 		# check to see if this is a connected user
+		# # 		if p['id'] in user_ids:
+		# # 			network_people_dict[p['id']]['connected'] = True
+		# # 		else:
+		# # 			network_people_dict[p['id']]['connected'] = False
+		# # 	# check each record to make sure the profile pic gets picked up
+		# # 	if 'profile__pictures__pic' in p:
+		# # 		network_people_dict[p['id']]['pic'] = p['profile__pictures__pic']
+		# # 	if 'positions__entity__id' in p:
+		# # 	# increment the position counter
+		# # 		entities.append(p['positions__entity__id'])
+		# # 		num_pos += 1
+		# # 		if p['positions__entity__name'] in entities_dict:
+		# # 			entities_dict[p['positions__entity__name']]['count'] += 1
+		# # 		else:
+		# # 			entities_dict[p['positions__entity__name']] = {
+		# # 				'count':1,
+		# # 				'id':p['positions__entity__name']
+		# # 			}
+
+		# # loop through all positions, identify those that belong to connections
 		# for p in all_people:
-		# 	# check to see if user is already in the dict
-		# 	if p['id'] not in network_people_dict:
-		# 		network_people_dict[p['id']] = {
-		# 			'full_name': p['profile__first_name'] + " " + p['profile__last_name']
-		# 		}
-		# 		# if ['profile__headline'] in p:
-		# 		# 	network_people_dict[p['id']]['headline'] = p['profile__headline']
-		# 		# check to see if this is a connected user
-		# 		if p['id'] in user_ids:
-		# 			network_people_dict[p['id']]['connected'] = True
-		# 		else:
-		# 			network_people_dict[p['id']]['connected'] = False
-		# 	# check each record to make sure the profile pic gets picked up
-		# 	if 'profile__pictures__pic' in p:
-		# 		network_people_dict[p['id']]['pic'] = p['profile__pictures__pic']
-		# 	if 'positions__entity__id' in p:
-		# 	# increment the position counter
-		# 		entities.append(p['positions__entity__id'])
+		# 	# check if position held by 
+		# 	if p.id in user_ids:
+		# 		p.connected = True
+		# 	else:
+		# 		p.connected = False
+
+		# 	#num_pos += len(p.positions.all())
+		# 	for pos in p.positions.all():
 		# 		num_pos += 1
-		# 		if p['positions__entity__name'] in entities_dict:
-		# 			entities_dict[p['positions__entity__name']]['count'] += 1
+		# 		if pos.entity.name in all_entities_dict:
+		# 			all_entities_dict[pos.entity.name]['count'] += 1
 		# 		else:
-		# 			entities_dict[p['positions__entity__name']] = {
-		# 				'count':1,
-		# 				'id':p['positions__entity__name']
+		# 			all_entities_dict[pos.entity.name] = {
+		# 				'id':pos.entity.id,
+		# 				'count':1
 		# 			}
+		# 		entities.append(pos.entity.id)
+		# 		# entities.add(pos.entity.id)
 
-		# loop through all positions, identify those that belong to connections
-		for p in all_people:
-			# check if position held by 
-			if p.id in user_ids:
-				p.connected = True
-			else:
-				p.connected = False
+		# num_cos = len(set(entities))
+		# # num_cos = len(entities)
 
-			#num_pos += len(p.positions.all())
-			for pos in p.positions.all():
-				num_pos += 1
-				if pos.entity.name in all_entities_dict:
-					all_entities_dict[pos.entity.name]['count'] += 1
-				else:
-					all_entities_dict[pos.entity.name] = {
-						'id':pos.entity.id,
-						'count':1
-					}
-				entities.append(pos.entity.id)
-				# entities.add(pos.entity.id)
+		# overview['all'] = {
+		# 	'num_people':len(all_people),
+		# 	'num_pos':num_pos,
+		# 	'num_cos':num_cos
+		# }
 
-		num_cos = len(set(entities))
-		# num_cos = len(entities)
+		# # Network Entities Top 3
+		# entities_dict = sorted(entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
+		# overview['network']['bigplayers'] = entities_dict[:3]
 
-		overview['all'] = {
-			'num_people':len(all_people),
-			'num_pos':num_pos,
-			'num_cos':num_cos
-		}
+		# # All Entities Top 3
+		# all_entities_dict = sorted(all_entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
+		# overview['all']['bigplayers'] = all_entities_dict[:3]
 
-		# Network Entities Top 3
-		entities_dict = sorted(entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
-		overview['network']['bigplayers'] = entities_dict[:3]
+		# # People in Network, All
+		# paths['network'] = network_people
+		# paths['all'] = all_people
 
-		# All Entities Top 3
-		all_entities_dict = sorted(all_entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
-		overview['all']['bigplayers'] = all_entities_dict[:3]
+		# # TRIAL - adding entities information
+		# # paths['networkOrgs'] = entities_dict
+		# # paths['allOrgs'] = all_entities_dict
 
-		# People in Network, All
-		paths['network'] = network_people
-		paths['all'] = all_people
+		# # # TRIAL - adding positions information
+		# # paths['networkPositions'] = network_positions
+		# # paths['allPositions'] = all_positions
 
-		# TRIAL - adding entities information
-		# paths['networkOrgs'] = entities_dict
-		# paths['allOrgs'] = all_entities_dict
+		# # Returns nested dict
+		# paths['overview'] = {
+		# 	'network' : overview['network'],
+		# 	'all':overview['all'],
+		# 	}
 
-		# # TRIAL - adding positions information
-		# paths['networkPositions'] = network_positions
-		# paths['allPositions'] = all_positions
-
-		# Returns nested dict
-		paths['overview'] = {
-			'network' : overview['network'],
-			'all':overview['all'],
-			}
-
-		# return paths, overview
-		return paths
+		# # return paths, overview
+		# return paths
 
 # # set max size of ngram
 # NGRAM_MAX = 10
@@ -954,36 +957,6 @@ class CareerPathBase(CareerBase):
 						else:
 							eds_network[p['positions__entity_id']]['count'] += 1
 
-		# for u in users:
-		# 	user_eds_all = []
-		# 	user_eds_network = []
-		# 	for p in u.positions.all():
-		# 		if p.type == "education":
-		# 			user_eds_all.append(p.entity.id)
-		# 		# if u.profile in user.profile.connections.all():
-		# 		if u.profile in connections:
-		# 			user_eds_network.append(p.entity.id)
-		# 	user_eds_all = set(user_eds_all)
-		# 	user_eds_network = set(user_eds_network)
-		# 	for e in user_eds_all:
-		# 		if e in eds_all:
-		# 			eds_all[e]['count'] += 1
-		# 		else:
-		# 			for s in schools:
-		# 				if e == s['id']:
-		# 					# org = Entity.objects.get(pk=e)
-		# 					eds_all[e] = {'count':1,'name':s['name']}
-		# 	for e in user_eds_network:
-		# 		if e in eds_network:
-		# 			eds_network[e]['count'] += 1
-		# 		else:
-		# 			for s in schools:
-		# 				if e == s['id']:
-		# 					# org = Entity.objects.get(pk=e)
-		# 					eds_network[e] = {'count':1,'name':s['name']}
-		# 			# org = Entity.objects.get(pk=e)
-		# 			# eds_network[e] = {'count':1,'name':org.name}
-
 		eds['network'] = eds_network
 		eds['all'] = eds_all
 
@@ -1053,11 +1026,16 @@ class CareerPathBase(CareerBase):
 		paths = {}
 
 		# get users in network
-		users_list, user_ids = _get_users_in_network(user)
+		# users_list, user_ids = _get_users_in_network(user)
 
+		# init list of connections
+		connections = [u['user_id'] for u in user.profile.connections.values('user_id')]
+
+		# get all people (filter for connections in later step)
 		# network_people = User.objects.prefetch_related().select_related('positions','entities','accounts').filter(id__in=user_ids,positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos').distinct()
 		# CAUTION--values() can return multiple records when requesting M2M values; make sure to reduce
-		network_people = User.objects.select_related('profile','positions','pictures').values('id','profile__headline','profile__first_name','profile__last_name','profile__pictures__pic','positions__entity__id','positions__entity__name').filter(id__in=user_ids,positions__careers=career).annotate(no_of_pos=Count('positions__id')).order_by('-no_of_pos')
+		# network_people = User.objects.select_related('profile','positions','pictures').values('id','profile__headline','profile__first_name','profile__last_name','profile__pictures__pic','positions__entity__id','positions__entity__name').filter(id__in=user_ids,positions__careers=career).annotate(no_of_pos=Count('positions__id')).order_by('-no_of_pos')
+		people = User.objects.select_related('profile','positions','pictures').values('id','profile__headline','profile__first_name','profile__last_name','profile__pictures__pic','positions__entity__id','positions__entity__name').filter(positions__careers=career).annotate(no_of_pos=Count('positions__id')).order_by('-no_of_pos')
 
 		# Clayton -- need to uniqify this list, b/c lots of wasted time
 		#	parsing duplicate people ... EDIT: not the problem, problem is
@@ -1065,204 +1043,104 @@ class CareerPathBase(CareerBase):
 		# network_people = _order_preserving_uniquify(network_people)
 
 		network_people_dict = {}
-		num_pos = 0
-		entities = []
-		# entities = set()
-		entities_dict = {}
-		num_cos = 0
-		network_positions = []
-		# counter = 0
+		network_num_pos = 0
+		network_entities = []
+		network_entities_dict = {}
+		network_num_cos = 0
+		# network_positions = []
+		network_num_people = 0
 
-		## Network
-		for p in network_people:
-			# check to see if user is already in the dict
-			if p['id'] not in network_people_dict:
-				network_people_dict[p['id']] = {
+		all_people_dict = {}
+		all_num_pos = 0
+		all_entities = []
+		all_entities_dict = {}
+		all_num_cos = 0
+		# all_positions = []
+		all_num_people = 0
+
+		# loop through all people, filter for those in and out of network, build dicts of paths
+		for p in people:
+			# check to see if in the network
+			if p['id'] in connections:
+				# check to see if user is already in the dict
+				if p['id'] not in network_people_dict:
+					network_people_dict[p['id']] = {
+						'full_name': p['profile__first_name'] + " " + p['profile__last_name'],
+						'headline': p['profile__headline']
+					}
+					network_num_people += 1
+				# check each record to make sure the profile pic gets picked up
+				if 'profile__pictures__pic' in p:
+					network_people_dict[p['id']]['pic'] = p['profile__pictures__pic']
+				if 'positions__entity__id' in p:
+					network_entities.append(p['positions__entity__id'])
+					network_num_pos += 1
+					if p['positions__entity__name'] in network_entities_dict:
+						network_entities_dict[p['positions__entity__name']]['count'] += 1
+					else:
+						network_entities_dict[p['positions__entity__name']] = {
+							'count':1,
+							'id':p['positions__entity__id']
+						}
+			# add all positions
+			if p['id'] not in all_people_dict:
+				all_people_dict[p['id']] = {
 					'full_name': p['profile__first_name'] + " " + p['profile__last_name'],
 					'headline': p['profile__headline']
 				}
+				# check to see if this is a connected user
+				if p['id'] in connections:
+					all_people_dict[p['id']]['connected'] = True
+				else:
+					all_people_dict[p['id']]['connected'] = False
+				all_num_people += 1
 			# check each record to make sure the profile pic gets picked up
 			if 'profile__pictures__pic' in p:
-				network_people_dict[p['id']]['pic'] = p['profile__pictures__pic']
+				all_people_dict[p['id']]['pic'] = p['profile__pictures__pic']
 			if 'positions__entity__id' in p:
 			# increment the position counter
-				entities.append(p['positions__entity__id'])
-				num_pos += 1
-				if p['positions__entity__name'] in entities_dict:
-					entities_dict[p['positions__entity__name']]['count'] += 1
+				all_entities.append(p['positions__entity__id'])
+				all_num_pos += 1
+				if p['positions__entity__name'] in all_entities_dict:
+					all_entities_dict[p['positions__entity__name']]['count'] += 1
 				else:
-					entities_dict[p['positions__entity__name']] = {
+					all_entities_dict[p['positions__entity__name']] = {
 						'count':1,
-						'id':p['positions__entity__name']
+						'id':p['positions__entity__id']
 					}
-			# num_pos += len(p.positions.all())
-			# # people_seen = set()
-			# # positions_seen = set()
-
-			# for pos in p.positions.all():
-			# 	# num_pos += 1
-			# 	entities.append(pos.entity.id)
-			# 	# entities.add(pos.entity.id)
-
-			# 	# if pos in career, add to positions
-			# 	# 	additionally, impose 30 position cap
-				
-			# 	# if career in pos.careers.all():
-			# 	# 	counter += 1
-			# 	# 	print counter
-			# 	#  	if len(network_positions) < 30:
-			# 	# 		# check if seen already (avoid duplicates)
-			# 	# 		if pos.id not in positions_seen:
-			# 	# 			positions_seen.add(pos.id)
-			# 	# 			network_positions.append({
-			# 	# 				'id':pos.id,
-			# 	# 				'title':pos.title,
-			# 	# 				'co_name':pos.entity.name,
-			# 	# 				'owner':pos.person.profile.full_name(),
-			# 	# 				'owner_id':pos.person.id,
-			# 	# 				'logo_path':pos.entity.default_logo(),
-			# 	# 			})
-
-			
-			# 	if pos.entity.name in entities_dict:
-			# 		entities_dict[pos.entity.name]['count'] += 1
-
-			# 		# check if person seen already (avoid duplicates)
-			# 		# 	additionally, cap people @ 5 for now
-			# 		# if p.id not in people_seen and len(entities_dict[pos.entity.name]['people']) < 6:
 						
-			# 		# 	person_dict = {
-			# 		# 		'name':p.profile.full_name(),
-			# 		# 		'id':p.id,
-			# 		# 	}
-			# 		# 	entities_dict[pos.entity.name]['people'].append(person_dict)
-			# 		# 	people_seen.add(p.id)
 
-			# 	else:
-			# 		# people_list = [{
-			# 		# 	'name':p.profile.full_name(),
-			# 		# 	'id':p.id,
-			# 		# }]
-					
-			# 		entities_dict[pos.entity.name] = {
-			# 			'count' : 1,
-			# 			'id':pos.entity.id,
-			# 			# 'logo':pos.entity.default_logo(),
-			# 			# 'people':people_list,	
-			# 		}
-
-		# for p in network_people:
-		# 	# check to see if user is already in the dict
-		# 	if p['id'] not in network_people_dict:
-		# 		network_people_dict[p['id']] = {
-		# 			'full_name': p['profile__first_name'] + " " + p['profile__last_name'],
-		# 			'headline': p['profile__headline']
-		# 		}
-		# 	# check each record to make sure the profile pic gets picked up
-		# 	if 'profile__pictures__pic' in p:
-		# 		network_people_dict[p['id']]['pic'] = p['profile__pictures__pic']
-		# 	if 'positions__entity__id' in p:
-		# 	# increment the position counter
-		# 		num_pos += 1
-		# 		if p['positions__entity__name'] in entities_dict:
-		# 			entities_dict[p['positions__entity__name']]['count'] += 1
-		# 		else:
-		# 			entities_dict[p['positions__entity__name']] = {
-		# 				'count':1,
-		# 				'id':p['positions__entity__name']
-		# 			}
-
-
-		num_cos = len(set(entities))
+		# overview stats for network
+		num_cos = len(set(network_entities))
 		# num_cos = len(entities)
 
 		overview['network'] = {
-			'num_people':len(network_people),
-			'num_pos':num_pos,
-			'num_cos':num_cos
+			'num_people':network_num_people,
+			'num_pos':network_num_pos,
+			'num_cos':network_num_cos
 		}
 
-		all_people = User.objects.select_related('profile','positions','pictures').values('id','profile__headline','profile__first_name','profile__last_name','profile__pictures__pic','positions__entity__id','positions__entity__name').filter(positions__careers=career).annotate(no_of_pos=Count('positions__id')).order_by('-no_of_pos')
-		# all_people = User.objects.select_related('positions').filter(positions__careers=career).annotate(no_of_pos=Count('positions__pk')).order_by('-no_of_pos').distinct()
-
-		num_pos = 0
-		entities = []
-		# entities = set()
-		all_entities_dict = {}
-		all_positions = []
-		num_cos = 0
-
-		## ALL
-
-		for p in all_people:
-			# check to see if user is already in the dict
-			if p['id'] not in network_people_dict:
-				network_people_dict[p['id']] = {
-					'full_name': p['profile__first_name'] + " " + p['profile__last_name']
-				}
-				# if ['profile__headline'] in p:
-				# 	network_people_dict[p['id']]['headline'] = p['profile__headline']
-				# check to see if this is a connected user
-				if p['id'] in user_ids:
-					network_people_dict[p['id']]['connected'] = True
-				else:
-					network_people_dict[p['id']]['connected'] = False
-			# check each record to make sure the profile pic gets picked up
-			if 'profile__pictures__pic' in p:
-				network_people_dict[p['id']]['pic'] = p['profile__pictures__pic']
-			if 'positions__entity__id' in p:
-			# increment the position counter
-				entities.append(p['positions__entity__id'])
-				num_pos += 1
-				if p['positions__entity__name'] in entities_dict:
-					entities_dict[p['positions__entity__name']]['count'] += 1
-				else:
-					entities_dict[p['positions__entity__name']] = {
-						'count':1,
-						'id':p['positions__entity__name']
-					}
-
-		# loop through all positions, identify those that belong to connections
-		# for p in all_people:
-		# 	# check if position held by 
-		# 	if p.id in user_ids:
-		# 		p.connected = True
-		# 	else:
-		# 		p.connected = False
-
-		# 	#num_pos += len(p.positions.all())
-		# 	for pos in p.positions.all():
-		# 		num_pos += 1
-		# 		if pos.entity.name in all_entities_dict:
-		# 			all_entities_dict[pos.entity.name]['count'] += 1
-		# 		else:
-		# 			all_entities_dict[pos.entity.name] = {
-		# 				'id':pos.entity.id,
-		# 				'count':1
-		# 			}
-		# 		# entities.append(pos.entity.id)
-		# 		entities.add(pos.entity.id)
-
-		num_cos = len(set(entities))
+		# overview stats for whole community
+		num_cos = len(set(all_entities))
 		# num_cos = len(entities)
 
 		overview['all'] = {
-			'num_people':len(all_people),
-			'num_pos':num_pos,
-			'num_cos':num_cos
+			'num_people':all_num_people,
+			'num_pos':all_num_pos,
+			'num_cos':all_num_cos
 		}
 
 		# Network Entities Top 3
-		entities_dict = sorted(entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
-		overview['network']['bigplayers'] = entities_dict[:3]
+		network_entities_dict = sorted(network_entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
+		overview['network']['bigplayers'] = network_entities_dict[:3]
 
 		# All Entities Top 3
 		all_entities_dict = sorted(all_entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
 		overview['all']['bigplayers'] = all_entities_dict[:3]
 
 		# People in Network, All
-		paths['network'] = network_people
-		paths['all'] = all_people
+		paths['network'] = network_people_dict
+		paths['all'] = all_people_dict
 
 		# TRIAL - adding entities information
 		# paths['networkOrgs'] = entities_dict

@@ -115,20 +115,20 @@
 			<p class="main-sub-header">People</p><a name="people"></a>
 			<div class="career-profile-paths" data-view="network">
 				<ul class="career-profile-paths-list flat">
-				{% for p in paths.network|slice:":10" %}
+				{% for k,v in paths.network.items|slice:":10" %}
 					<li class="career-profile-paths-item">
-						<img class="career-profile-preview" src="{{ MEDIA_URL }}{{p.profile.default_profile_pic}}" />
-						<p class="career-profile-preview-name"><a href="/profile/{{p.id}}">{{p.profile.full_name}}</a></p>
+						<img class="career-profile-preview" src="{{ MEDIA_URL }}{{v.pic}}" />
+						<p class="career-profile-preview-name"><a href="/profile/{{k}}">{{v.full_name}}</a></p>
 					</li>
 				{% endfor %}
 				</ul>
 			</div>
 			<div class="career-profile-paths" data-view="all" style="display:none;">
 				<ul class="career-profile-paths-list flat">
-				{% for p in paths.all|slice:":10" %}
+				{% for k,v in paths.all.items|slice:":10" %}
 					<li class="career-profile-paths-item">
-						<img class="career-profile-preview" src="{{ MEDIA_URL }}{{p.profile.default_profile_pic}}" />
-						<p class="career-profile-preview-name"><a href="/profile/{{p.id}}">{{p.profile.full_name}}</a></p>
+						<img class="career-profile-preview" src="{{ MEDIA_URL }}{{v.pic}}" />
+						<p class="career-profile-preview-name"><a href="/profile/{{k}}">{{v.full_name}}</a></p>
 					</li>
 				{% endfor %}
 				</ul>
