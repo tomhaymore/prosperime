@@ -967,7 +967,10 @@ class LIConnections(LIBase):
 		# fetch html and soup it
 		
 		# html = self.get_public_page(url)
-		html = urllib2.urlopen(url)
+		try:
+			html = urllib2.urlopen(url)
+		except:
+			return None
 		soup = BeautifulSoup(html)
 
 		# get all profile container divs
