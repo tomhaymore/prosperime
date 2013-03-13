@@ -25,7 +25,6 @@ from django.db.models import Count, Q
 
 
 def addDecision(request):
-	print 'aqui'
 	response = {}
 
 	if not request.is_ajax or not request.POST:
@@ -75,6 +74,49 @@ def addDecision(request):
 	response['alternates'] = 'completed'
 
 	return HttpResponse(simplejson.dumps(response))
+
+
+def viewCareerDecisions(request):
+	data = {}
+
+	return render_to_response('careers/career_decisions.html',data,context_instance=RequestContext(request))
+
+def getDecisions(request):
+
+	if request.GET.getlist('term'):
+		search_term = request.GET.getlist('term')[0]
+	else:
+		search_term = None
+
+	if search_term is None:
+		# empty - return 10 most recent
+		decisions = CareerDecision.objects.all().order_by('date_created')[:10]
+	
+	elif search_term == 'relevantCareers':
+		decisions = CareerDecision.objects.all().order_by('date_created')[:10]
+
+	elif search_term == 'positionsOfInterest':
+		print 'here'
+		queue = SavedPath.objects.get(owner=request.user, title='queue')
+		poi = SavedPosition.objects.filter(path=queue).select_related('position')
+		titles = []
+		for p in poi:
+			titles.append(p.position.title)
+			print p.position.title
+		decisions = CareerDecision.objects.filter(position__title__in=titles)
+
+	elif search_term == 'highestRated':
+		decisions = CareerDecision.objects.all().order_by('date_created')[:10]
+
+	else: # == 'byCompany'
+		decisions = CareerDecision.objects.all().order_by('date_created')[:10]
+
+	response = {
+		'decisions':_decisions_to_json(decisions)
+	}
+
+	return HttpResponse(simplejson.dumps(response))
+
 
 
 def entityAutocomplete(request):
@@ -201,7 +243,7 @@ def discover_career(request,career_id):
 	if paths is None:
 		print 'discover.people missed cache'
 		# cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),career_path.get_paths_in_career(request.user,career),10)
-		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),careerlib.get_paths_in_career(request.user,career),10)
+		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),careerlib.get_paths_in_career(request.user,career),600)
 		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
 	else:
 		print 'discover.people hit cache'
@@ -610,8 +652,12 @@ def save(request):
 
 def get_queue(request):
 	print 'in careers.get_queue'
-	queue = SavedPath.objects.get(owner=request.user, title='queue')
-	queue = _saved_path_to_json(queue)
+	try:
+		queue = SavedPath.objects.get(owner=request.user, title='queue')
+		queue = _saved_path_to_json(queue)
+	except:
+		queue = None
+
 	return HttpResponse(simplejson.dumps(queue))
 
 # FOR DEV ONLY 
@@ -817,6 +863,78 @@ def _saved_path_to_json(path):
 		})
 	formatted_path['positions'] = positions
 	return formatted_path
+
+
+# Takes an array of CareerDecision objects and returns array of 
+	# JSON-able items
+def _decisions_to_json(decisions):
+	formatted_decisions = []
+
+	for d in decisions:
+
+		avg = _average_decision_score(d)
+
+		decision = {
+			'id':d.id,
+			'owner':d.owner.profile.full_name(),
+			'owner_id':d.id,
+			'privacy':d.privacy,
+			'position_title':d.position.title,
+			'position_id':d.position.id,
+			'position_entity_name':d.winner.name,
+			'position_entity_id':d.winner.id,
+			'reason':d.reason,
+			'comments':d.comments,
+			'avg':avg,
+			'social':d.social,
+			'skills':d.skills,
+			'mentorship':d.mentorship,
+			'overall':d.overall,
+		}
+
+		alternates = []
+		for a in d.alternates.all():
+			alternates.append({
+				'entity_name':a.name,
+				'entity_id':a.id,
+			})
+		decision['alternates'] = alternates
+
+		formatted_decisions.append(decision)
+
+	print 'returning formatted decisions: ' + str(len(formatted_decisions))
+	return formatted_decisions
+
+
+def _average_decision_score(decision):
+	denominator = 4
+	numerator = 0
+
+	if decision.social != 0:
+		numerator += decision.social
+	else:
+		denominator -= 1
+
+	if decision.skills != 0:
+		numerator += decision.skills
+	else: 
+		denominator -= 1
+
+	if decision.mentorship != 0:
+		numerator += decision.mentorship
+	else:
+		denominator -= 1
+
+	if decision.overall != 0:
+		numerator += decision.overall
+	else:
+		denominator -= 1
+
+	if denominator == 0:
+		return None
+	else:
+		return numerator / denominator
+
 
 
 def _ready_profiles_for_json(profiles):

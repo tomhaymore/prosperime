@@ -56,7 +56,8 @@
 		{% endif %}
 		<p class="sub-header"><a href="/personalize">Add more positions</a></p>
 	</div>
-	<div class="dashboard-module pull-left" data-name="dashboard-saved-paths">
+	
+	<!-- <div class="dashboard-module pull-left" data-name="dashboard-saved-paths">
 		<p class="module-header" id='saved-paths-module'>Saved Paths</p>
 		{% if saved_paths %} 
 			<table class="table table-striped table-condensed table-bordered path-list" data-name="saved-paths-list">
@@ -73,14 +74,15 @@
 		{% else %}
 			<p>You don't have any saved paths. <a onclick='createNewPathTable()'>Create one now</a>.</p>
 		{% endif %}
-	</div>
+	</div> -->
 
 	<div class="dashboard-module pull-left" data-name="dashboard-top-careers">
 		<p class='module-header'>Recent Career Decisions</p>
+		<a href='/careers/decisions/' class='sub-header'>View All</a><br/>
 		{% if career_decisions %}
 			<ul id='career-decisions-list'>
 			{% for decision in career_decisions %}
-				<li>
+				<li class='sub-header'>
 				{% if decision.privacy == 'anonymous' %}
 					Someone 
 				{% else %}
@@ -93,7 +95,7 @@
 				<a href='/profile/org/{{decision.winner.id}}/'>
 					{{decision.winner.name}} 
 				</a>
-
+<!-- 
 				{% if decision.alternates %}
 					over other positions at
 					{% for entity in decision.alternates.all %}
@@ -107,7 +109,7 @@
 					{% endfor %}
 				{% else %}
 				.
-				{% endif %}
+				{% endif %} -->
 
 
 			{% endfor %}
