@@ -929,7 +929,8 @@ def paths(request):
 				id = u.id
 				connected = True
 				name = u.profile.full_name()
-				current_position = _get_latest_position(u)
+				current_position = u.profile.headline
+				# current_position = _get_latest_position(u)
 				profile_pic = _get_profile_pic(u.profile)
 				for p in u.positions.all():
 					for c in p.careers.all():
@@ -942,7 +943,8 @@ def paths(request):
 				id = u.id
 				connected = False
 				name = None
-				current_position = _get_latest_position(u,anon=True)
+				current_position = u.profile.headline
+				# current_position = _get_latest_position(u,anon=True)
 				# positions = _get_positions_for_path(u.positions.all(),anon=True)
 				profile_pic = None
 				for c in u.profile.get_all_careers():

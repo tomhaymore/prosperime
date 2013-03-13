@@ -14,8 +14,10 @@ $(document).ready(function() {
             $("div[data-view='network']").show();
             $("div[data-view='all']").hide();
             // switch stats
-            $("span[data-view='network']").addClass('stats-highlighted');
-            $("span[data-view='all']").removeClass('stats-highlighted');
+            $("span.carer-profile-stats-block[data-view='network']").addClass('stats-highlighted');
+            $("span.carer-profile-stats-block[data-view='all']").removeClass('stats-highlighted');
+            $("span.stats-holder[data-view='network']").show();
+            $("span.stats-holder[data-view='all']").hide();
         } else {
             console.log("showing all info");
             // switch nav classes
@@ -28,8 +30,10 @@ $(document).ready(function() {
             $("div[data-view='all']").show();
             $("div[data-view='network']").hide();
             // switch stats
-            $("span[data-view='all']").addClass('stats-highlighted');
-            $("span[data-view='network']").removeClass('stats-highlighted');
+            $("span.carer-profile-stats-block[data-view='all']").addClass('stats-highlighted');
+            $("span.carer-profile-stats-block[data-view='network']").removeClass('stats-highlighted');
+            $("span.stats-holder[data-view='all']").show();
+            $("span.stats-holder[data-view='network']").hide();
         }
     })
 });

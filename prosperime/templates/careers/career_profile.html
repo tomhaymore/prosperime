@@ -71,13 +71,37 @@
 				<span data-view="network" class="stats-holder">
 					{% if stats.duration.network %}
 						{{stats.duration.network}}
+					{% else %}
+						n/a
 					{% endif %}
 				</span>
-				<span data-view="all" class="stats-holder">{{stats.duration.all}}</span>
+				<span data-view="all" class="stats-holder" style="display:none;">
+					{% if stats.duration.all %}
+						{{stats.duration.all}}
+					{% else %}
+						n/a
+					{% endif %}</span>
 				<p class="stats-header">Avg # of Years</p>
 			</div>
 			<div class="career-profile-stats pull-left">
-				<span class="stats-holder">Coming soon</span>
+				<span data-view='network' class="stats-holder">
+					{% if stats.positions.entry.network %}
+						{% for k,v in stats.positions.entry.network.items|slice:":1" %}
+							{{k}}
+						{% endfor %}
+					{% else %}
+						n/a
+					{% endif %}
+				</span>
+				<span data-view='all' class="stats-holder" style="display:none;">
+					{% if stats.positions.entry.all %}
+						{% for k,v in stats.positions.entry.all.items|slice:":1" %}
+							{{k}}
+						{% endfor %}
+					{% else %}
+						n/a
+					{% endif %}
+				</span>
 				<p class="stats-header">Most common entry position</p>
 			</div>
 			<div class="career-profile-stats pull-left">
@@ -114,20 +138,44 @@
 		<div class="career-profile-positions-container">
 			<p class="main-sub-header">Positions</p><a name="positions"></a>
 			<div class="career-profile-positions" data-view="network">
-				<p>Coming soon</p>
+				<p>Coming soon!</p>
 			</div>
 			<div class="career-profile-positions" data-view="all" style="display:none;">
-				<p>Coming soon</p>
+				{% if positions.all %}
+					<ul>
+					{% for p in positions.all|slice:":10" %}
+						<li>{{p.title}}</li>
+					{% endfor %}
+					</ul>
+				{% else %}
+					n/a
+				{% endif %}
 			</div>
 			<div class="clear"></div>
 		</div>
 		<div class="career-profile-orgs-container">
 			<p class="main-sub-header">Organizations</p><a name="organizations"></a>
 			<div class="career-profile-orgs" data-view="network">
-				<p>Coming soon</p>
+				{% if orgs.network %}
+					<ul>
+					{% for o in orgs.network|slice:":10" %}
+						<li><a>{{o.name}}</li>
+					{% endfor %}
+					</ul>
+				{% else %}
+					n/a
+				{% endif %}
 			</div>
 			<div class="career-profile-orgs" data-view="all" style="display:none;">
-				<p>Coming soon</p>
+				{% if orgs.all %}
+					<ul>
+					{% for o in orgs.all|slice:":10" %}
+						<li><a>{{o.name}}</li>
+					{% endfor %}
+					</ul>
+				{% else %}
+					n/a
+				{% endif %}
 			</div>
 			<div class="clear"></div>
 		</div>
