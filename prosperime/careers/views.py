@@ -152,8 +152,8 @@ def discover(request):
 def career_profile(request,career_id):
 	# get career object
 	career = Career.objects.get(pk=career_id)
-
-	users = User.objects.select_related('profile','positions','pictures').values('id','profile__headline','profile__first_name','profile__last_name','profile__pictures__pic','positions__entity__id','positions__entity__name').filter(positions__careers=career).annotate(no_of_pos=Count('positions__id')).order_by('-no_of_pos')
+	connections = request.user.profile.connections.all()
+	# users = User.objects.select_related('profile','positions','pictures').values('id','profile__headline','profile__first_name','profile__last_name','profile__pictures__pic','positions__entity__id','positions__entity__name').filter(positions__careers=career).annotate(no_of_pos=Count('positions__id')).order_by('-no_of_pos')
 
 	# init careerlib
 	career_path = careerlib.CareerPathBase()
@@ -163,10 +163,11 @@ def career_profile(request,career_id):
 	ed_overview = cache.get('career_profile_ed_overview_'+str(request.user.id)+"_"+str(career_id))
 	# # check to see if cache was empty
 	if ed_overview is None:
+		print "missed cache @ ed.overview"
 		cache.set('career_profile_ed_overview_'+str(request.user.id)+"_"+str(career_id),career_path.get_ed_overview(request.user,career),10)
 		ed_overview = cache.get('career_profile_ed_overview_'+str(request.user.id)+"_"+str(career_id))
 	# 	# ed_overview = career_path.get_ed_overview(request.user,career)
-
+	
 	# get paths overview
 	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
 	# check to see if cache is empty
@@ -189,7 +190,34 @@ def career_profile(request,career_id):
 		'all': career_path.avg_duration_all(career)
 		} 
 
-	return render_to_response('careers/career_profile.html',{'stats':stats,'career':career,'ed_overview':ed_overview,'paths':paths_in_career,'overview':overview},context_instance=RequestContext(request))
+	positions = career_path.entry_positions_stats(request.user,career)
+	entry = {'network':positions[0],'all':positions[1]}
+	
+	stats['positions'] = {
+		'entry': entry
+	}
+
+	positions_network = Position.objects.filter(person__profile__in=connections,careers=career)
+	positions_all = Position.objects.filter(careers=career)
+
+	positions = {
+		'network': positions_network,
+		'all': positions_all
+	}
+
+	orgs_network = Entity.objects.filter(positions__person__in=connections,positions__careers=career)
+	orgs_all = Entity.objects.filter(positions__careers=career)
+
+	orgs = {
+		'network': orgs_network,
+		'all': orgs_all
+	}
+
+	# todo
+	# restructure ed overview and paths to cycle through users once, combine logic
+	# restructure duration, positions to cycle through positions (maybe combine into one loop)
+
+	return render_to_response('careers/career_profile.html',{'positions':positions,'orgs':orgs,'stats':stats,'career':career,'ed_overview':ed_overview,'paths':paths_in_career,'overview':overview},context_instance=RequestContext(request))
 
 @login_required
 def discover_career(request,career_id):

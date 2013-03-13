@@ -630,7 +630,7 @@ def test_match_careers_to_position(title=None):
 
 class CareerBase():
 
-	def get_users_in_career(self,career):
+	def get_users_in_career_full(self,career):
 
 		users = User.objects.prefetch_related('profile__connections').select_related('positions').filter(positions__careers=career)
 
@@ -866,48 +866,123 @@ class CareerSimBase():
 
 class CareerPathBase(CareerBase):
 
+	def entry_positions_stats(self,user,career):
+
+		# get network positions
+		positions_network = Position.objects.filter(person__profile__in=user.profile.connections.all(),careers=career).order_by('-start_date')
+
+		# init dict of positions
+		pos_dict_network = {}
+
+		# init array of users already tracked
+		users_network = []
+
+		for p in positions_network:
+			if p.person.id not in users_network:
+				if p not in pos_dict_network:
+					pos_dict_network[p.title] = 1
+				else:
+					pos_dict_network[p.title] += 1
+				users_network.append(p.person.id)
+
+		# init dict of positions
+		pos_dict_all = {}
+
+		# init array of users already tracked
+		users_all = []
+
+		# get all positions
+		# todo: collapse into one call, filter on loop for connections
+		positions_all = Position.objects.filter(careers=career).order_by('-start_date')
+
+		for p in positions_all:
+			if p.person.id not in users_all:
+				if p not in pos_dict_all:
+					pos_dict_all[p.title] = 1
+				else:
+					pos_dict_all[p.title] += 1
+				users_all.append(p.person.id)
+
+		return (pos_dict_network, pos_dict_all,)
+
 	def get_ed_overview(self,user,career):
 		"""
 		returns ed breakdown of career by school, for network and all users
 		"""
-		users = self.get_users_in_career(career)
-		connections = user.profile.connections.all()
-		schools = Entity.objects.filter(li_type='school').values('id','name')
+		# users = self.get_users_in_career(career)
+		users = User.objects.values('id','positions__type','positions__entity__name','positions__entity_id').prefetch_related('profile__connections').select_related('positions').filter(positions__careers=career)
+		# positions = Position.objects.values('type','entity_id','entity__name','person_id').filter(careers=career,type="education")
+		# preload all connections
+		connections = [u.user.id for u in user.profile.connections.all()]
+		# schools = Entity.objects.filter(li_type='school').values('id','name')
 		
 		# initialize dictionary
 		eds_all = {}
 		eds_network = {}
 		eds = {}
+		users_all = {}
+		users_network = {}
+
 		# loop through all users in a career
-		for u in users:
-			user_eds_all = []
-			user_eds_network = []
-			for p in u.positions.all():
-				if p.type == "education":
-					user_eds_all.append(p.entity.id)
-				# if u.profile in user.profile.connections.all():
-				if u.profile in connections:
-					user_eds_network.append(p.entity.id)
-			user_eds_all = set(user_eds_all)
-			user_eds_network = set(user_eds_network)
-			for e in user_eds_all:
-				if e in eds_all:
-					eds_all[e]['count'] += 1
+		for p in users:
+			if p['positions__type'] == 'education':
+				# check to see if this user-ed relationship has already been counted
+				if p['id'] in users_all:
+					if p['positions__entity_id'] not in users_all[p['id']]:
+						if p['positions__entity_id'] not in eds_all:
+							eds_all[p['positions__entity_id']] = {'count':1,'name':p['positions__entity__name']}
+						else:
+							eds_all[p['positions__entity_id']]['count'] += 1
 				else:
-					for s in schools:
-						if e == s['id']:
-							# org = Entity.objects.get(pk=e)
-							eds_all[e] = {'count':1,'name':s['name']}
-			for e in user_eds_network:
-				if e in eds_network:
-					eds_network[e]['count'] += 1
-				else:
-					for s in schools:
-						if e == s['id']:
-							# org = Entity.objects.get(pk=e)
-							eds_network[e] = {'count':1,'name':s['name']}
-					# org = Entity.objects.get(pk=e)
-					# eds_network[e] = {'count':1,'name':org.name}
+					users_all[p['id']] = [p['positions__entity_id']]
+					if p['positions__entity_id'] not in eds_all:
+						eds_all[p['positions__entity_id']] = {'count':1,'name':p['positions__entity__name']}
+					else:
+						eds_all[p['positions__entity_id']]['count'] += 1
+				# check to see if this user is part of the focal user's connections
+				if p['id'] in connections:
+					if p['id'] in users_network:
+						if p['positions__entity_id'] not in users_network[p['id']]:
+							if p['positions__entity_id'] not in eds_network:
+								eds_network[p['positions__entity_id']] = {'count':1,'name':p['positions__entity__name']}
+							else:
+								eds_network[p['positions__entity_id']]['count'] += 1
+					else:
+						users_network[p['id']] = [p['positions__entity_id']]
+						if p['positions__entity_id'] not in eds_network:
+							eds_network[p['positions__entity_id']] = {'count':1,'name':p['positions__entity__name']}
+						else:
+							eds_network[p['positions__entity_id']]['count'] += 1
+
+		# for u in users:
+		# 	user_eds_all = []
+		# 	user_eds_network = []
+		# 	for p in u.positions.all():
+		# 		if p.type == "education":
+		# 			user_eds_all.append(p.entity.id)
+		# 		# if u.profile in user.profile.connections.all():
+		# 		if u.profile in connections:
+		# 			user_eds_network.append(p.entity.id)
+		# 	user_eds_all = set(user_eds_all)
+		# 	user_eds_network = set(user_eds_network)
+		# 	for e in user_eds_all:
+		# 		if e in eds_all:
+		# 			eds_all[e]['count'] += 1
+		# 		else:
+		# 			for s in schools:
+		# 				if e == s['id']:
+		# 					# org = Entity.objects.get(pk=e)
+		# 					eds_all[e] = {'count':1,'name':s['name']}
+		# 	for e in user_eds_network:
+		# 		if e in eds_network:
+		# 			eds_network[e]['count'] += 1
+		# 		else:
+		# 			for s in schools:
+		# 				if e == s['id']:
+		# 					# org = Entity.objects.get(pk=e)
+		# 					eds_network[e] = {'count':1,'name':s['name']}
+		# 			# org = Entity.objects.get(pk=e)
+		# 			# eds_network[e] = {'count':1,'name':org.name}
 
 		eds['network'] = eds_network
 		eds['all'] = eds_all
@@ -924,7 +999,7 @@ class CareerPathBase(CareerBase):
 		for p in positions:
 			if i == 0:
 				start_date = p.start_date
-			if p.end_date:
+			if p.end_date is not None:
 				end_date = p.end_date
 			i += 1
 		# make sure there was at least one end_date
