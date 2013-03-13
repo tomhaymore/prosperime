@@ -962,18 +962,18 @@ class CareerPathBase(CareerBase):
 
 		return eds
 
-	def _user_career_duration(self,user,career):
+	def _user_career_duration(self,user_id,career):
 		# get all positions from user
-		positions = Position.objects.filter(person=user,careers=career).order_by('-start_date')
+		positions = Position.objects.values('start_date','end_date').filter(person_id=user_id,careers=career).order_by('-start_date')
 		# setup placeholder end date
 		end_date = None
 		# loop through all positions
 		i = 0
 		for p in positions:
 			if i == 0:
-				start_date = p.start_date
-			if p.end_date is not None:
-				end_date = p.end_date
+				start_date = p['start_date']
+			if p['end_date'] is not None:
+				end_date = p['end_date']
 			i += 1
 		# make sure there was at least one end_date
 		if end_date is not None:
@@ -984,25 +984,48 @@ class CareerPathBase(CareerBase):
 		else:
 			return None
 
-	def avg_duration_network(self,career,user):
+	def get_avg_duration(self,user,career):
 		"""
-		returns average time in career for focal user's network
+		returns average time in career
 		"""
 		# users = self.get_full_users_in_network(user)
 		# positions = Position.objects.filter(user=user.connections.all()).distinct()
 
-		users = User.objects.filter(positions__careers=career)
-		connections = user.profile.connections.all()
-		durations = []
+		# init general dict
+		avg_duration = {}
+		# get all users
+		users = User.objects.values('id').filter(positions__careers=career)
+		
+		# get list of all connections
+		connections = [u['user_id'] for u in user.profile.connections.values('user_id')]
+		
+		# init array of durations
+		network_durations = []
+		all_durations = []
+		
+		# loop through all users, get duration
 		for u in users:
-			if u in connections:
-				duration = self._user_career_duration(u,career)
+			# check to see if user is in network
+			if u['id'] in connections:
+				duration = self._user_career_duration(u['id'],career)
 				if duration is not None:
-					durations.append(duration)
-		if len(durations) > 0:
-			avg = sum(durations,timedelta()) / len(durations)
-			return round(avg.days / 365.25,2)
-		return None
+					network_durations.append(duration)
+			# compile all stats
+			duration = self._user_career_duration(u['id'],career)
+			if duration is not None:
+				all_durations.append(duration)
+
+		# compile network durations
+		if len(network_durations) > 0:
+			avg = sum(network_durations,timedelta()) / len(network_durations)
+			avg_duration['network'] = round(avg.days / 365.25,2)
+		
+		# compile all durations
+		if len(all_durations) > 0:
+			avg = sum(all_durations,timedelta()) / len(all_durations)
+			avg_duration['all'] = round(avg.days / 365.25,2)
+
+		return avg_duration
 
 	def avg_duration_all(self,career):
 		"""

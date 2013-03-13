@@ -172,10 +172,10 @@ def career_profile(request,career_id):
 	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
 	# check to see if cache is empty
 	if paths is None:
-		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),careerlib.get_paths_in_career(request.user,career),10)
+		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),career_path.get_paths_in_career(request.user,career),10)
 		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
 
-	# break down paths to make it easier to parses
+	# break down paths and overview to make it easier to parses
 	paths_in_career = {}
 	paths_in_career['network'] = paths['network']
 	paths_in_career['all'] = paths['all']
@@ -184,10 +184,18 @@ def career_profile(request,career_id):
 	overview['network'] = paths['overview']['network']
 	overview['all'] = paths['overview']['all']
 
+	# get duration overview
+	duration = cache.get('career_stats_duration_'+str(request.user.id)+"_"+str(career_id))
+	# check to see if cache is empty
+	if duration is None:
+		cache.set('career_stats_duration_'+str(request.user.id)+"_"+str(career_id),career_path.get_avg_duration(request.user,career))
+		duration = cache.get('career_stats_duration_'+str(request.user.id)+"_"+str(career_id))
+
 	stats = {}
+	
 	stats['duration'] = {
-		'network': career_path.avg_duration_network(career,request.user),
-		'all': career_path.avg_duration_all(career)
+		'network': duration['network'],
+		'all': duration['all']
 		} 
 
 	positions = career_path.entry_positions_stats(request.user,career)
