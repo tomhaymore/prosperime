@@ -913,7 +913,7 @@ class CareerPathBase(CareerBase):
 		users = User.objects.values('id','positions__type','positions__entity__name','positions__entity_id').prefetch_related('profile__connections').select_related('positions').filter(positions__careers=career)
 		# positions = Position.objects.values('type','entity_id','entity__name','person_id').filter(careers=career,type="education")
 		# preload all connections
-		connections = [u.user.id for u in user.profile.connections.all()]
+		connections = [u['user_id'] for u in user.profile.connections.values('user_id')]
 		# schools = Entity.objects.filter(li_type='school').values('id','name')
 		
 		# initialize dictionary
