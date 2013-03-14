@@ -1124,6 +1124,7 @@ div.content-container{
 .dashboard-module {
 	width:300px;
 	margin-right:20px;
+	min-height:200px;
 }
 
 .module-header {

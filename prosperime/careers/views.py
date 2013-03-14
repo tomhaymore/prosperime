@@ -428,7 +428,7 @@ def personalize_careers(request):
 	careers['network'] = careers_network
 	careers['similar'] = careers_similar
 
-	return render_to_response('careers/personalize_careers.html',{'data':data,'careers':careers},context_instance=RequestContext(request))
+	return render_to_response('careers/personalize_careers.html',{'data':data,'careers':careers,'careers_similar_ids':careers_similar_ids},context_instance=RequestContext(request))
 
 
 @login_required

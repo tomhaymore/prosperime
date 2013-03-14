@@ -1053,11 +1053,15 @@ class CareerPathBase(CareerBase):
 		if len(network_durations) > 0:
 			avg = sum(network_durations,timedelta()) / len(network_durations)
 			avg_duration['network'] = abs(round(avg.days / 365.25,2))
-		
+		else:
+			avg_duration['network'] = None
+
 		# compile all durations
 		if len(all_durations) > 0:
 			avg = sum(all_durations,timedelta()) / len(all_durations)
 			avg_duration['all'] = abs(round(avg.days / 365.25,2))
+		else:
+			avg_duration['all'] = None
 
 		return avg_duration
 
@@ -1168,7 +1172,7 @@ class CareerPathBase(CareerBase):
 						
 
 		# overview stats for network
-		num_cos = len(set(network_entities))
+		network_num_cos = len(set(network_entities))
 		# num_cos = len(entities)
 
 		overview['network'] = {
@@ -1178,7 +1182,7 @@ class CareerPathBase(CareerBase):
 		}
 
 		# overview stats for whole community
-		num_cos = len(set(all_entities))
+		all_num_cos = len(set(all_entities))
 		# num_cos = len(entities)
 
 		overview['all'] = {
@@ -1369,7 +1373,7 @@ class CareerMapBase():
 					if t not in self.STOP_LIST:
 						for k,v in self.careers_to_positions_map.items():
 							if t in v and k not in careers:
-								print t + ": " + k
+								# print str(t) + ": " + str(k)
 								careers.append(k)
 								# print t + ": " + career.name
 

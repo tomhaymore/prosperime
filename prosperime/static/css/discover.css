@@ -148,7 +148,7 @@ ul.career-overview-stats li {
 	color: #fff;
 }
 
-div.discover-paths-network-list {
+div.discover-paths-network-list, div.discover-paths-all-list {
 	width:70%;
 }
 
