@@ -871,42 +871,76 @@ class CareerPathBase(CareerBase):
 
 	def entry_positions_stats(self,user,career):
 
-		# get network positions
-		positions_network = Position.objects.filter(person__profile__in=user.profile.connections.all(),careers=career).order_by('-start_date')
+		# get all positions
+		positions = Position.objects.values('person_id','title').filter(careers=career).order_by('start_date')
 
-		# init dict of positions
-		pos_dict_network = {}
+		# init array of all connections
+		connections = [u['user_id'] for u in user.profile.connections.values('user_id')]
 
-		# init array of users already tracked
+		# init arrays
+		entry_dict_network = {}
+		senior_dict_users_network = {}
+		senior_dict_network = {}
+		entry_dict_all = {}
+		senior_dict_users_all = {}
+		senior_dict_all = {}		
 		users_network = []
-
-		for p in positions_network:
-			if p.person.id not in users_network:
-				if p not in pos_dict_network:
-					pos_dict_network[p.title] = 1
-				else:
-					pos_dict_network[p.title] += 1
-				users_network.append(p.person.id)
-
-		# init dict of positions
-		pos_dict_all = {}
-
-		# init array of users already tracked
 		users_all = []
 
-		# get all positions
-		# todo: collapse into one call, filter on loop for connections
-		positions_all = Position.objects.filter(careers=career).order_by('-start_date')
-
-		for p in positions_all:
-			if p.person.id not in users_all:
-				if p not in pos_dict_all:
-					pos_dict_all[p.title] = 1
+		for p in positions:
+			# check to see if in network
+			if p['person_id'] in connections and p['person_id'] not in users_network:
+				if p['title'] not in entry_dict_network:
+					entry_dict_network[p['title']] = 1
 				else:
-					pos_dict_all[p.title] += 1
-				users_all.append(p.person.id)
+					entry_dict_network[p['title']] += 1
+				users_network.append(p['person_id'])
+			elif p['person_id'] in connections and p['person_id'] in users_network:
+				# add each successive position to users senior slot
+				senior_dict_users_network[p['person_id']] = p['title']
+			# if not in network add to all arrays
+			elif p['person_id'] not in connections and p['person_id'] not in users_all:
+				if p['title'] not in entry_dict_all:
+					entry_dict_all[p['title']] = 1
+				else:
+					entry_dict_all[p['title']] += 1
+				users_all.append(p['person_id'])
+			elif p['person_id'] not in connections and p['person_id'] in users_all:
+				# add each successive position to user's senior slot
+				senior_dict_users_all[p['person_id']] = p['title']
 
-		return (pos_dict_network, pos_dict_all,)
+		# sort entry dicts
+		entry_dict_network_sorted = sorted(entry_dict_network.iteritems(), key=lambda x: x[1], reverse=True)
+		entry_dict_all_sorted = sorted(entry_dict_all.iteritems(), key=lambda x: x[1], reverse=True)
+
+		# compile senior dicts
+		for k,v in senior_dict_users_network.items():
+			if v not in senior_dict_network:
+				senior_dict_network[p['title']] = 1
+			else:
+				senior_dict_network[p['title']] += 1
+
+		for k,v in senior_dict_users_all.items():
+			if v not in senior_dict_all:
+				senior_dict_all[p['title']] = 1
+			else:
+				senior_dict_all[p['title']] += 1
+
+		# sort senior dicts
+		senior_dict_network_sorted = sorted(senior_dict_network.iteritems(), key=lambda x: x[1], reverse=True)
+		senior_dict_all_sorted = sorted(senior_dict_all.iteritems(), key=lambda x: x[1], reverse=True)
+
+		entry = {
+			'network':entry_dict_network_sorted,
+			'all':entry_dict_all_sorted
+		}
+
+		senior = {
+			'network':senior_dict_network_sorted,
+			'all':senior_dict_all_sorted
+		}
+
+		return (entry, senior, )
 
 	def get_ed_overview(self,user,career):
 		"""
@@ -979,7 +1013,7 @@ class CareerPathBase(CareerBase):
 		if end_date is not None:
 			# calculate duration
 			# duration = end_date - start_date
-			duration = start_date - end_date
+			duration = end_date - start_date
 			return duration
 		else:
 			return None
@@ -1018,30 +1052,30 @@ class CareerPathBase(CareerBase):
 		# compile network durations
 		if len(network_durations) > 0:
 			avg = sum(network_durations,timedelta()) / len(network_durations)
-			avg_duration['network'] = round(avg.days / 365.25,2)
+			avg_duration['network'] = abs(round(avg.days / 365.25,2))
 		
 		# compile all durations
 		if len(all_durations) > 0:
 			avg = sum(all_durations,timedelta()) / len(all_durations)
-			avg_duration['all'] = round(avg.days / 365.25,2)
+			avg_duration['all'] = abs(round(avg.days / 365.25,2))
 
 		return avg_duration
 
-	def avg_duration_all(self,career):
-		"""
-		returns average time in career for all users
-		"""
-		users = User.objects.filter(positions__careers=career)
+	# def avg_duration_all(self,career):
+	# 	"""
+	# 	returns average time in career for all users
+	# 	"""
+	# 	users = User.objects.filter(positions__careers=career)
 
-		durations = []
-		for u in users:
-			duration = self._user_career_duration(u,career)
-			if duration is not None:
-				durations.append(duration)
-		if len(durations) > 0:
-			avg = sum(durations,timedelta()) / len(durations)
-			return round(avg.days / 365.25,2)
-		return None
+	# 	durations = []
+	# 	for u in users:
+	# 		duration = self._user_career_duration(u,career)
+	# 		if duration is not None:
+	# 			durations.append(duration)
+	# 	if len(durations) > 0:
+	# 		avg = sum(durations,timedelta()) / len(durations)
+	# 		return round(avg.days / 365.25,2)
+	# 	return None
 
 	def get_paths_in_career(self,user,career):
 		# initialize overview array

@@ -86,8 +86,8 @@
 			<div class="career-profile-stats pull-left">
 				<span data-view='network' class="stats-holder">
 					{% if stats.positions.entry.network %}
-						{% for k,v in stats.positions.entry.network.items|slice:":1" %}
-							{{k}}
+						{% for p in stats.positions.entry.network|slice:":1" %} 
+							{{p.0}}
 						{% endfor %}
 					{% else %}
 						n/a
@@ -95,8 +95,8 @@
 				</span>
 				<span data-view='all' class="stats-holder" style="display:none;">
 					{% if stats.positions.entry.all %}
-						{% for k,v in stats.positions.entry.all.items|slice:":1" %}
-							{{k}}
+						{% for p in stats.positions.entry.all|slice:":1" %} 
+							{{p.0}}
 						{% endfor %}
 					{% else %}
 						n/a
@@ -105,7 +105,24 @@
 				<p class="stats-header">Most common entry position</p>
 			</div>
 			<div class="career-profile-stats pull-left">
-				<span class="stats-holder">Coming soon</span>
+				<span data-view='network' class="stats-holder">
+					{% if stats.positions.senior.network %}
+						{% for p in stats.positions.senior.network|slice:":1" %} 
+							{{p.0}}
+						{% endfor %}
+					{% else %}
+						n/a
+					{% endif %}
+				</span>
+				<span data-view='all' class="stats-holder" style="display:none;">
+					{% if stats.positions.senior.all %}
+						{% for p in stats.positions.senior.all|slice:":1" %} 
+							{{p.0}}
+						{% endfor %}
+					{% else %}
+						n/a
+					{% endif %}
+				</span>
 				<p class="stats-header">Most common senior position</p>
 			</div>
 			<div class="clear"></div>
@@ -156,10 +173,11 @@
 		<div class="career-profile-orgs-container">
 			<p class="main-sub-header">Organizations</p><a name="organizations"></a>
 			<div class="career-profile-orgs" data-view="network">
+				<p>Coming soon!</p>
 				{% if orgs.network %}
 					<ul>
 					{% for o in orgs.network|slice:":10" %}
-						<li><a>{{o.name}}</li>
+						<!-- <li><a>{{o.name}}</li> -->
 					{% endfor %}
 					</ul>
 				{% else %}
@@ -167,10 +185,11 @@
 				{% endif %}
 			</div>
 			<div class="career-profile-orgs" data-view="all" style="display:none;">
+				<p>Coming soon!</p>
 				{% if orgs.all %}
 					<ul>
 					{% for o in orgs.all|slice:":10" %}
-						<li><a>{{o.name}}</li>
+						<!-- <li><a>{{o.name}}</li> -->
 					{% endfor %}
 					</ul>
 				{% else %}

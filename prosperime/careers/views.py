@@ -198,11 +198,15 @@ def career_profile(request,career_id):
 		'all': duration['all']
 		} 
 
-	positions = career_path.entry_positions_stats(request.user,career)
-	entry = {'network':positions[0],'all':positions[1]}
+	positions = cache.get('career_stats_positions_'+str(request.user.id)+"_"+str(career_id))
+	if positions is None:
+	# if entry_positions is None or senior_positions is None:
+		cache.set('career_stats_positions_'+str(request.user.id)+"_"+str(career_id),career_path.entry_positions_stats(request.user,career))
+		positions = cache.get('career_stats_positions_'+str(request.user.id)+"_"+str(career_id))
 	
 	stats['positions'] = {
-		'entry': entry
+		'entry': positions[0],
+		'senior': positions[1]
 	}
 
 	positions_network = Position.objects.filter(person__profile__in=connections,careers=career)
