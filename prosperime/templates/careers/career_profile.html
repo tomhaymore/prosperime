@@ -134,7 +134,12 @@
 				<ul class="career-profile-paths-list flat">
 				{% for k,v in paths.network.items|slice:":10" %}
 					<li class="career-profile-paths-item">
-						<img class="career-profile-preview" src="{{ MEDIA_URL }}{{v.pic}}" />
+						{% if v.pic %}
+							<img class="career-profile-preview" src="{{ MEDIA_URL }}{{v.pic}}" />
+						{% else %}
+							<img class="career-profile-preview" src="{{ MEDIA_URL }}/pictures/anon.jpg" />
+						{% endif %}
+						
 						<p class="career-profile-preview-name"><a href="/profile/{{k}}">{{v.full_name}}</a></p>
 					</li>
 				{% endfor %}
@@ -144,7 +149,11 @@
 				<ul class="career-profile-paths-list flat">
 				{% for k,v in paths.all.items|slice:":10" %}
 					<li class="career-profile-paths-item">
-						<img class="career-profile-preview" src="{{ MEDIA_URL }}{{v.pic}}" />
+						{% if v.pic %}
+							<img class="career-profile-preview" src="{{ MEDIA_URL }}{{v.pic}}" />
+						{% else %}
+							<img class="career-profile-preview" src="{{ MEDIA_URL }}/pictures/anon.jpg" />
+						{% endif %}
 						<p class="career-profile-preview-name"><a href="/profile/{{k}}">{{v.full_name}}</a></p>
 					</li>
 				{% endfor %}
