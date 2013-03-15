@@ -25,7 +25,7 @@ from accounts.tasks import process_li_profile, process_li_connections
 
 # Prosperime
 from accounts.models import Account, Profile, Picture
-from careers.models import SavedPath, CareerDecision, Position
+from careers.models import SavedPath, CareerDecision, Position, SavedPosition
 from entities.models import Entity
 
 import utilities.helpers as helpers
@@ -321,8 +321,8 @@ def random_profile(request):
 def profile(request, user_id):
 
 	user = User.objects.get(id=user_id)
-	# profile = Profile.objects.get(user=user)
 	profile = user.profile
+
 	# get careers
 	career_dict = {}
 	for p in user.positions.all():
@@ -334,11 +334,30 @@ def profile(request, user_id):
 
 	saved_paths = SavedPath.objects.filter(owner=user)
 	# saved_paths = user.saved_path.all()
+
+	# saved_paths = SavedPath.objects.filter(owner=user)
+
 	# profile_pic = _get_profile_pic(profile)
 	profile_pic = user.profile.default_profile_pic()
-	viewer_saved_paths = SavedPath.objects.filter(owner=request.user)
+	saved_path_queryset = SavedPath.objects.filter(owner=request.user).exclude(title='queue')
+	viewer_saved_paths = []
+	for path in saved_path_queryset:
+		viewer_saved_paths.append(_saved_path_to_json(path))
 
-	# Do position processing here!
+
+	# Check if own profile
+	if int(user_id) == int(request.user.id):
+		own_profile = True
+
+		try:
+			queue = SavedPath.objects.filter(owner=request.user, title='queue').prefetch_related()
+			queue = _saved_path_to_json(queue[0])
+		except:
+			queue = None
+	else:
+		own_profile = False
+		queue = None
+
 
 	# CHECK THAT THIS WORKS
 	positions = Position.objects.filter(person=user).select_related('careerDecision')
@@ -407,7 +426,7 @@ def profile(request, user_id):
 	top_careers = None
 
 	# Check for CareerDecision
-	if user.id == request.user.id:
+	if own_profile:
 		career_decision = _get_career_decision_prompt_position(top_careers, positions, profile)
 		if career_decision is None:
 			career_decision_position = None;
@@ -440,21 +459,43 @@ def profile(request, user_id):
 
 		end_date = datetime.now()
 
-		if total_time > 200: 
-		# 200 is an arbitrary constant that seems to fit my laptop screen well
-			total_time = int(math.ceil(total_time/2))
-			for pos in org_list:
-				pos.duration = int(math.ceil(pos.duration/2))
-			compress = True
-		else:
-			compress = False
-
+		# if total_time > 200: 
+		# # 200 is an arbitrary constant that seems to fit my laptop screen well
+		# 	total_time = int(math.ceil(total_time/2))
+		# 	for pos in org_list:
+		# 		pos.duration = int(math.ceil(pos.duration/2))
+		# 	compress = True
+		# else:
+		# 	compress = False
 
 	end_date = datetime.now()
-	compress = None
+	#compress = None
 
-	return render_to_response('accounts/profile.html', {'profile':profile,'careers':career_dict,'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress, 'career_map': career_map, 'top_careers':top_careers, 'career_decision_prompt':career_decision_position, 'positions':positions}, context_instance=RequestContext(request))
+	response = {
+		'profile':profile,
+		# 'saved_paths':saved_paths,
+		'viewer_saved_paths':viewer_saved_paths,
+		'profile_pic':profile_pic,
+		# 'orgs':org_list,
+		# 'ed':ed_list,
+		'positions':positions,
+		'current':current,
+		'start_date':start_date,
+		'end_date':end_date,
+		'total_time':total_time,
+		# 'compress':compress,
+		# 'career_map':career_map,
+		# 'top_careers':top_careers,
+		'career_decision_prompt':career_decision_position,
+		'own_profile':own_profile,
+		'queue':queue,
+	}
+
+	return render_to_response('accounts/profile.html', response, context_instance=RequestContext(request))
+
+	# return render_to_response('accounts/profile.html', {'profile':profile,'careers':career_dict,'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress, 'career_map': career_map, 'top_careers':top_careers, 'career_decision_prompt':career_decision_position, 'positions':positions}, context_instance=RequestContext(request))
 	
+
 @login_required
 def profile_org(request, org_id):
 
@@ -493,7 +534,6 @@ def profile_org(request, org_id):
 	response['jobs'] = related_jobs
 	response['saved_paths'] = saved_paths
 
-	
 	#return render_to_response('accounts/profile_org.html', response, context_instance=RequestContext(request))
 
 	return render_to_response('accounts/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress, 'career_map': career_map}, context_instance=RequestContext(request))
@@ -588,6 +628,28 @@ def _get_career_decision_prompt_position(top_careers, positions, profile):
 		return None
 
 
+def _saved_path_to_json(path):
+
+	formatted_path = {
+		'title':path.title,
+		'last_index':path.last_index,
+		'id':path.id,
+	}
+	all_pos = SavedPosition.objects.filter(path=path).select_related('position')
+	positions = []
+	for p in all_pos:
+		positions.append({
+			'title':p.position.title,
+			'pos_id':p.position.id,
+			'owner':p.position.person.profile.full_name(),
+			'owner_id':p.position.person.id,
+			'entity_name':p.position.entity.name,
+			'type':p.position.type,
+		})
+	formatted_path['positions'] = positions
+	return formatted_path
+
+
 #################
 #### HELPERS ####
 #################
@@ -614,5 +676,7 @@ def _get_profile_pic(profile):
 	if pics.exists():
 		return pics[0].pic.__unicode__()
 	return None
+
+
 
 

@@ -1,0 +1,19 @@
+div#decision-search-filters {
+	width:100%;
+	padding-bottom:15px;
+	border-bottom: 1px solid #333;
+	margin-bottom:15px;
+}
+
+div#decision-search-filters .header {
+	font-weight:600;
+}
+
+div#decision-search-filters label {
+	width:15%;
+	padding-left:35px;
+}
+
+tr.secondary-info {
+	display:none;
+}

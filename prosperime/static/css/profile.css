@@ -46,9 +46,7 @@ div.profile-brief-info {
 	margin-left: 15px
 }
 
-div#middle-float-screen {
-	width:380px;
-}
+
 
 div#career-decision-module {
 
@@ -65,11 +63,7 @@ div#career-decision-prompt {
 
 }
 
-div#career-decision-form {
-	position:relative;
-	/*z-index:1000;*/
 
-}
 
 #career-decision-form textarea{
 	resize:none;
@@ -88,7 +82,7 @@ div.career-decision-prompt-btn {
 }
 
 .full-width {
-	width:100%;
+	width:95%;
 }
 
 #worst{
@@ -110,9 +104,6 @@ div.career-decision-prompt-btn {
 	width:33%;
 }
 
-.submitBtn {
-	margin-left:38%;
-}
 
 .callout-text {
 	color: rgb(41,98,152);
@@ -271,19 +262,85 @@ div#timeline-float-screen-center {
 	padding-bottom:0px;
 }
 
-#middle-float-screen {
-	border-radius:4px;
-	margin-left:175px;
+div#middle-float-screen {
+	width:380px;
+	position:absolute;
+	top:200px;
+	left:425px;
 	font-size:0.9em;
 	text-align:center;
-	margin-top:15px;
 }
 
 
+div#career-decision-form {
+	position:relative;
+	z-index:1000;
+	background-color:#fff;
+	padding:15px;
+	border-radius:2px 2px 2px 2px;
+	width:425px;
+	border:1px solid #555;
+	border-radius:4px;
+
+}
+
+div#career-decision-form form {
+	margin:0px;
+}
 
 #profile-right {
 	margin-top:0px;
 	margin-right:25px;
+}
+
+div.timeline-header {
+	color:rgb(41,98,152);
+	padding-top:40px;
+	padding-left:40px;
+	font-weight:500;
+	font-size:12pt;
+	text-transform: uppercase;
+	letter-spacing:1px;
+
+}
+
+div#queue {
+	margin-left:0px auto;
+	margin-right:0px auto;
+	text-align:center;
+	width:100%;
+/*	border:2px solid midnightblue;
+*/}
+
+div.queue-position {
+	margin-top:25px;
+	padding:5px;
+	padding-top:15px;
+
+	display:inline-block;
+	background-color:rgb(41,98,152);
+	border-radius:2px 2px 2px 2px;
+	width:200px;
+	height:100px;
+	vertical-align:middle;
+	margin-left:5px;
+	margin-right:5px;
+	color:whitesmoke;
+	text-align:left;
+
+}
+
+div.queue-position-hover {
+	box-shadow:1px 1px 1px 1px #333;
+}
+
+.queue-position-title {
+	font-weight:600;
+}
+
+i.profile-chevron {
+	position:relative;
+	top:20px;
 }
 
 

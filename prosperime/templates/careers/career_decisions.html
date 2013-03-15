@@ -1,0 +1,118 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+<!-- JS -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
+<script type='text/javascript' src="{{ STATIC_URL }}js/career_decisions.js"></script>
+<script type='text/javascript' src="{{ STATIC_URL }}js/backbone.js"></script>
+
+<!-- CSS --> 
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/career_decision.css" />
+<link type='text/css' rel='stylesheet' href='{{ STATIC_URL }}css/font-awesome.min.css'/>
+
+{% endblock %}
+
+<!-- Messages -->
+{% block message %}
+
+{% endblock %}
+
+
+
+
+
+<!-- Content (center pane) -->
+{% block content %}
+<div class='main-container content-container'>
+	<div id="search-results-list">
+
+		<div id="decision-search-filters">
+			<div class='header'>Sort by: </div>
+
+			<label class='radio inline'>
+				<input type='radio' name='search-filters' id='most-recent-checkbox' value='option5'> Most Recent
+			</label>
+			<label class="radio inline">
+		    	<input type="radio" name='search-filters' id="relevant-careers-checkbox" value="option1"> Relevant Careers
+		    </label>
+		    <label class="radio inline">
+		    	<input type="radio" name='search-filters' id="positions-of-interest-checkbox" value="option2"> Positions of Interest
+		    </label>
+		    <label class="radio inline">
+		   		<input type="radio" name='search-filters' id="highest-rated-checkbox" value="option3"> Highest Rated
+		    </label>
+		    <label class='radio inline'>
+		    	<input type='radio' name='search-filters' id='company-checkbox' value='option4'> By Company
+		   	</label>
+
+		</div>
+	<!-- Backbone here -->
+	</div>
+</div>
+{% endblock %}
+
+
+
+
+{% block templates %}
+<script type="text/template" id="decisions-list-template">
+	<div id='career-decision-wrapper'>
+		<table id='career-decision-table' class='table table-hover'>
+			<thead><tr>
+				<th></th>
+				<th>Position Title</th>
+				<th>Company/Institution</th>
+				<th>Alternates</th>
+				<th>Average Rating</th>
+
+			</tr></thead>
+			<tbody>
+			<% _.each(decisions.models[0].attributes['decisions'], function(d) {
+				%><tr>
+					<td><i class='icon-caret-right icon-large' onclick='revealSecondaryInfo(<%=d.id%>)'></i></td>
+					<td><%=d.position_title%></td>
+					<td><a href='/profile/org/<%=d.position_entity_id%>'><%=d.position_entity_name%></a></td>
+					<td>
+						<% _.each(d.alternates, function(alternate) {
+							%><a href='/profile/org/<%=alternate.id%>'><%=alternate.entity_name%></a>, <%
+						})%>
+					</td>
+					<td><%=d.avg%></td>
+
+					</tr>
+
+					<tr class='secondary-info info-<%=d.id%>'><td></td>
+						<td><strong>Reason for Decision: </strong></td>
+						<td colspan='3'><%=d.reason%></td>
+					</tr>
+
+					<tr class='secondary-info info-<%=d.id%>'><td></td>
+						<td><strong>Additional Comments: </strong></td>
+						<td colspan='3'><%=d.comments%></td>
+					</tr>
+
+					<tr class='secondary-info info-<%=d.id%>'><td></td>
+						<td><strong>Ratings: </strong></td>
+						<td colspan='3'>Skills Gained/<%=d.skills%>  Environment/<%=d.social%>  Mentorship/<%=d.mentorship%>  Overall/<%=d.overall%> </td>
+					</tr>
+				<%
+			}); %>
+			</tbody>
+		</table>
+	</div>
+</script>
+
+<script type="text/javascript">
+
+	var revealSecondaryInfo = function(decision_id) {
+		$('.info-' + decision_id).each(function() {
+			$(this).toggleClass('secondary-info')
+		});
+		
+	};
+
+</script>
+
+{% endblock %}
+

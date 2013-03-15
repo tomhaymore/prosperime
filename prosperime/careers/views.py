@@ -25,7 +25,6 @@ from django.db.models import Count, Q
 
 
 def addDecision(request):
-	print 'aqui'
 	response = {}
 
 	if not request.is_ajax or not request.POST:
@@ -77,9 +76,53 @@ def addDecision(request):
 	return HttpResponse(simplejson.dumps(response))
 
 
+def viewCareerDecisions(request):
+	data = {}
+
+	return render_to_response('careers/career_decisions.html',data,context_instance=RequestContext(request))
+
+def getDecisions(request):
+
+	if request.GET.getlist('term'):
+		search_term = request.GET.getlist('term')[0]
+	else:
+		search_term = None
+
+	if search_term is None:
+		# empty - return 10 most recent
+		decisions = CareerDecision.objects.all().order_by('date_created')[:10]
+	
+	elif search_term == 'relevantCareers':
+		decisions = CareerDecision.objects.all().order_by('date_created')[:10]
+
+	elif search_term == 'positionsOfInterest':
+		print 'here'
+		queue = SavedPath.objects.get(owner=request.user, title='queue')
+		poi = SavedPosition.objects.filter(path=queue).select_related('position')
+		titles = []
+		for p in poi:
+			titles.append(p.position.title)
+			print p.position.title
+		decisions = CareerDecision.objects.filter(position__title__in=titles)
+
+	elif search_term == 'highestRated':
+		decisions = CareerDecision.objects.all().order_by('date_created')[:10]
+
+	else: # == 'byCompany'
+		decisions = CareerDecision.objects.all().order_by('date_created')[:10]
+
+	response = {
+		'decisions':_decisions_to_json(decisions)
+	}
+
+	return HttpResponse(simplejson.dumps(response))
+
+
+
 def entityAutocomplete(request):
 	response = {}
 	query = request.GET.getlist('query')[0]
+	print 'autocomplete: ' + query
 	entities = Entity.objects.filter(name__istartswith=query).values('name')
 
 	suggestions = []
@@ -248,7 +291,7 @@ def discover_career(request,career_id):
 	if paths is None:
 		print 'discover.people missed cache'
 		# cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),career_path.get_paths_in_career(request.user,career),10)
-		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),careerlib.get_paths_in_career(request.user,career),10)
+		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),careerlib.get_paths_in_career(request.user,career),600)
 		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
 	else:
 		print 'discover.people hit cache'
@@ -485,14 +528,39 @@ def list_jobs(request):
 # VIEW: display ALL user's paths
 def show_paths(request):
 
-	paths = SavedPath.objects.filter(owner=request.user)
+	# paths = SavedPath.objects.filter(owner=request.user)
 
-	data = {
-		'saved_paths': paths,
-	}
+	# data = {
+	# 	'saved_paths': paths,
+	# }
 
-	return render_to_response('careers/saved_paths.html', data,
-		context_instance=RequestContext(request))
+	# return render_to_response('careers/saved_paths.html', data,
+	# 	context_instance=RequestContext(request))
+
+	### TEMPORARILY, A JSON DUMPER
+	paths = SavedPath.objects.filter(owner=request.user).prefetch_related()
+	formatted_paths = []
+	for p in paths:
+		current = {
+			'owner':p.owner.profile.full_name(),
+			'title':p.title,
+			'last_index':p.last_index
+		}
+		saved_positions = SavedPosition.objects.filter(path=p)
+		positions = []
+		for pos in saved_positions:
+			positions.append({
+				'pos_id':pos.position.id,
+				'title':pos.position.title,
+				'entity':pos.position.entity.name,
+				'owner':pos.position.person.profile.full_name(),
+			})
+
+		current['positions'] = positions
+		formatted_paths.append(current)
+		
+
+	return HttpResponse(simplejson.dumps(formatted_paths))
 
 # JSON dumper
 def get_paths(request):
@@ -630,6 +698,64 @@ def save(request):
 
 	return HttpResponse(simplejson.dumps(response))
 
+def get_queue(request):
+	print 'in careers.get_queue'
+	try:
+		queue = SavedPath.objects.get(owner=request.user, title='queue')
+		queue = _saved_path_to_json(queue)
+	except:
+		queue = None
+
+	return HttpResponse(simplejson.dumps(queue))
+
+# FOR DEV ONLY 
+def manual_save(user_id, path_id, pos_id):
+
+	path = SavedPath.objects.get(id=path_id)
+	position = Position.objects.get(id=pos_id)
+
+	saved_position = SavedPosition()
+	saved_position.position = position
+	saved_position.path = path
+	saved_position.index = path.get_next_index()
+	saved_position.save()	
+
+	return 'Success'
+
+def add_to_queue(request):
+	response = {}
+	pos_id = request.POST.get('pos_id', False)
+
+	if not request.is_ajax:
+		response['success'] = 'not ajax request'
+	if not request.POST:
+		response['success'] = 'not POST'
+	if not pos_id:
+		response['success'] = 'no pos_id'
+
+	try:
+		existing_queue = SavedPath.objects.get(owner=request.user, title='queue')
+	except:
+		# Create a new one
+		existing_queue = SavedPath()
+		existing_queue.title = 'queue'
+		existing_queue.owner = request.user
+		existing_queue.last_index = 1
+		existing_queue.save()
+		print existing_queue.owner
+
+	try:
+		position = Position.objects.get(id=pos_id)
+		new_pos = SavedPosition()
+		new_pos.position = position
+		new_pos.path = existing_queue
+		new_pos.index = 0
+		new_pos.save()
+	except:
+		response['success'] = 'failed in back-end'
+
+	return HttpResponse(simplejson.dumps(response))
+
 
 # VIEW: creates a path, responds to POST request via AJAX
 def create(request):
@@ -764,6 +890,99 @@ def prototype(request):
 ######################################################
 ##################    HELPERS   ######################
 ######################################################
+
+def _saved_path_to_json(path):
+
+	formatted_path = {
+		'title':path.title,
+		'last_index':path.last_index,
+		'id':path.id,
+	}
+	all_pos = SavedPosition.objects.filter(path=path).select_related('position')
+	positions = []
+	for p in all_pos:
+		positions.append({
+			'title':p.position.title,
+			'pos_id':p.position.id,
+			'owner':p.position.person.profile.full_name(),
+			'owner_id':p.position.person.id,
+			'entity_name':p.position.entity.name,
+			'type':p.position.type,
+		})
+	formatted_path['positions'] = positions
+	return formatted_path
+
+
+# Takes an array of CareerDecision objects and returns array of 
+	# JSON-able items
+def _decisions_to_json(decisions):
+	formatted_decisions = []
+
+	for d in decisions:
+
+		avg = _average_decision_score(d)
+
+		decision = {
+			'id':d.id,
+			'owner':d.owner.profile.full_name(),
+			'owner_id':d.id,
+			'privacy':d.privacy,
+			'position_title':d.position.title,
+			'position_id':d.position.id,
+			'position_entity_name':d.winner.name,
+			'position_entity_id':d.winner.id,
+			'reason':d.reason,
+			'comments':d.comments,
+			'avg':avg,
+			'social':d.social,
+			'skills':d.skills,
+			'mentorship':d.mentorship,
+			'overall':d.overall,
+		}
+
+		alternates = []
+		for a in d.alternates.all():
+			alternates.append({
+				'entity_name':a.name,
+				'entity_id':a.id,
+			})
+		decision['alternates'] = alternates
+
+		formatted_decisions.append(decision)
+
+	print 'returning formatted decisions: ' + str(len(formatted_decisions))
+	return formatted_decisions
+
+
+def _average_decision_score(decision):
+	denominator = 4
+	numerator = 0
+
+	if decision.social != 0:
+		numerator += decision.social
+	else:
+		denominator -= 1
+
+	if decision.skills != 0:
+		numerator += decision.skills
+	else: 
+		denominator -= 1
+
+	if decision.mentorship != 0:
+		numerator += decision.mentorship
+	else:
+		denominator -= 1
+
+	if decision.overall != 0:
+		numerator += decision.overall
+	else:
+		denominator -= 1
+
+	if denominator == 0:
+		return None
+	else:
+		return numerator / denominator
+
 
 
 def _ready_profiles_for_json(profiles):
