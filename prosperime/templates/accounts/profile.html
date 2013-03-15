@@ -32,10 +32,10 @@
 		<img class="logo-preview" src="/media/{{profile.default_profile_pic}}" />
 	</span>
 	<span class="pull-right" id='profile-careers-container'>
-		{% if user.profile.all_careers %}
+		{% if careers %}
 		<ul class="profile-careers-list flat">
-			{% for c in user.profile.all_careers %}
-				<li class="profile-career"><a class="profile-button" href="/discover/career/{{c.id}}">{{c.long_name}}</a></li>
+			{% for k,v in careers.items %}
+				<li class="profile-career"><a class="profile-button" href="/career/{{k.id}}">{{k.long_name}}</a></li>
 			{% endfor %}
 		</ul>
 		{% endif %}

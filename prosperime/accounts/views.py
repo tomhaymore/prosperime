@@ -53,10 +53,22 @@ def login(request):
 
 	return render_to_response('accounts/login.html',{'form':form},context_instance=RequestContext(request))
 
+def terms(request):
+
+	return render_to_response('terms.html',context_instance=RequestContext(request))
+
+def privacy(request):
+
+	return render_to_response('privacy.html',context_instance=RequestContext(request))
+
+def copyright(request):
+
+	return render_to_response('copyright.html',context_instance=RequestContext(request))
+
 @login_required
 def logout(request):
 	auth_logout(request)
-	return HttpResponseRedirect('/')
+	return HttpResponseRedirect('/welcome')
 
 def linkedin_authorize(request):
 		
@@ -113,10 +125,6 @@ def finish_login(request):
 		# form submitted
 		linkedin_user_info = request.session['linkedin_user_info']
 		access_token = request.session['access_token']
-
-		# remove LI info from session
-		del request.session['linkedin_user_info']
-		del request.session['access_token']
 
 		form = FinishAuthForm(request.POST)
 		
@@ -198,7 +206,7 @@ def finish_login(request):
 
 			#return HttpResponseRedirect('/account/success')
 			# return HttpResponseRedirect('/search')
-			return HttpResponseRedirect('/personalize')
+			return HttpResponseRedirect('/personalize/careers/')
 	else:
 		form = FinishAuthForm()
 
@@ -263,14 +271,14 @@ def finish_link(request):
 			'id':profile_task.id
 			},
 		'connections': {
-			'status':conections_task.ready(),
+			'status':connections_task.ready(),
 			'id':connections_task.id
 			}
 	}
 
 	messages.success(request, 'Your LinkedIn account has been successfully linked. Please refresh the page to see changes.')
 
-	return HttpResponseRedirect('/personalize')
+	return HttpResponseRedirect('/personalize/careers/')
 
 def success(request):
 	return render_to_response('accounts/success.html',context_instance=RequestContext(request))
@@ -314,7 +322,21 @@ def profile(request, user_id):
 
 	user = User.objects.get(id=user_id)
 	profile = user.profile
+
+	# get careers
+	career_dict = {}
+	for p in user.positions.all():
+		for c in p.careers.all():
+			if c in career_dict:
+				career_dict[c] += 1
+			else:
+				career_dict[c] = 1
+
+	saved_paths = SavedPath.objects.filter(owner=user)
+	# saved_paths = user.saved_path.all()
+
 	# saved_paths = SavedPath.objects.filter(owner=user)
+
 	# profile_pic = _get_profile_pic(profile)
 	profile_pic = user.profile.default_profile_pic()
 	saved_path_queryset = SavedPath.objects.filter(owner=request.user).exclude(title='queue')
@@ -349,8 +371,9 @@ def profile(request, user_id):
 	for pos in positions:
 		pos.duration = pos.duration_in_months()
 
-		if 'ntern' in pos.title and 'nternational' not in pos.title:
-			pos.type = 'internship'
+		if pos.title is not None:
+			if 'ntern' in pos.title and 'nternational' not in pos.title:
+				pos.type = 'internship'
 
 		# Assumption: no end date = current
 		if not pos.end_date:
@@ -470,6 +493,9 @@ def profile(request, user_id):
 
 	return render_to_response('accounts/profile.html', response, context_instance=RequestContext(request))
 
+	# return render_to_response('accounts/profile.html', {'profile':profile,'careers':career_dict,'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress, 'career_map': career_map, 'top_careers':top_careers, 'career_decision_prompt':career_decision_position, 'positions':positions}, context_instance=RequestContext(request))
+	
+
 @login_required
 def profile_org(request, org_id):
 
@@ -510,7 +536,7 @@ def profile_org(request, org_id):
 
 	#return render_to_response('accounts/profile_org.html', response, context_instance=RequestContext(request))
 
-	return render_to_response('accounts/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'viewer_saved_paths':viewer_saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress, 'career_map': career_map}, context_instance=RequestContext(request))
+	return render_to_response('accounts/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress, 'career_map': career_map}, context_instance=RequestContext(request))
 
 
 def _test_career_prompt():

@@ -735,6 +735,7 @@ $(function(){
 			// reset to company search
 			this.filters.meta('view','companies');
 			this.filters.meta('query','');
+			this.orgs.meta('query','');
 			// fetch filters
 			this.filters.fetch();
 			// fetch orgs

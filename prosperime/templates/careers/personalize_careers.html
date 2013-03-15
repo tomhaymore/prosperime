@@ -63,6 +63,20 @@
 							</div>
 						</li>
 					{% endfor %}
+					{% for c in careers.network|slice:":10" %}
+						{% if c.0 not in careers_similar_ids %}
+						<li>
+							<div class="personalize-career-entry personalize-unselected" data-career-id="{{c.0}}">
+								<!-- <input type="checkbox" class="personalize-checkbox med-checkbox-input pull-left" id="personalize-career-{{c.id}}" data-career-id="{{c.id}}"/>-->
+								<span class="personalize-icon-container">&nbsp;<i class="icon-ok icon-white"></i></span>
+								<a class="careers-name">
+								{{c.1.long_name}}
+								</a>
+								<div class="clear"></div>
+							</div>
+						</li>
+						{% endif %}
+					{% endfor %}
 					</ul>
 				
 			

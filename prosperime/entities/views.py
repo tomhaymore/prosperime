@@ -19,7 +19,7 @@ from django.core.cache import cache
 # Prosperime
 from entities.models import Entity, Office, Financing, Industry
 from accounts.models import Picture, Profile
-from careers.models import SavedPath, CareerDecision
+from careers.models import SavedPath, CareerDecision, Position, Career
 #from entities.careerlib import CareerSimBase
 import careers.careerlib as careerlib
 
@@ -622,12 +622,12 @@ def path_filters(request):
 		# make sure it doesn't have a null value
 		if o['positions__entity__name']:
 			# get count from filtered dict
-			if o['positions__entity__name'] in careersFilteredDict:
-				freq = careersFilteredDict[o['positions__entity__name']]
+			if o['positions__entity__name'] in orgsFilteredDict:
+				freq = orgsFilteredDict[o['positions__entity__name']]
 			else:
 				freq = 0
 			# check to see if the value should be selected
-			if o['positions__entity__name'] in careersSelected:
+			if o['positions__entity__name'] in orgsSelected:
 				filters.append({'name':o['positions__entity__name'],'value':o['positions__entity__name'],'category':'Organizations','count':freq,'selected':True})
 			else:
 				filters.append({'name':o['positions__entity__name'],'value':o['positions__entity__name'],'category':'Organizations','count':freq,'selected':None})
@@ -805,7 +805,7 @@ def filters(request):
 	# get a list of all sectors
 	# sectorsBase = Entity.objects.values('domain').annotate(freq=Count('pk')).distinct()
 	sectorsBase = Industry.objects.values('name').annotate(freq=Count('pk')).distinct()
-	sectorsFiltered = sectorsBase
+	sectorsFiltered = sectorsBase[:10]
 
 	# if locationsSelected:
 	# 	sectorsFiltered = Entity.objects.filter(office__city__in=locationsSelected).values('domain').annotate(freq=Count('pk')).distinct()
@@ -929,10 +929,12 @@ def paths(request):
 				id = u.id
 				connected = True
 				name = u.profile.full_name()
-				current_position = _get_latest_position(u)
+				current_position = u.profile.headline
+				# current_position = _get_latest_position(u)
 				profile_pic = _get_profile_pic(u.profile)
-				for c in u.profile.get_all_careers():
-					careers.append({'name':c.long_name,'id':c.id})
+				for p in u.positions.all():
+					for c in p.careers.all():
+						careers.append({'name':c.long_name,'id':c.id})
 				# if current_position is not None:
 				# 	positions = _get_positions_for_path(u.positions.all())
 				# else:
@@ -941,7 +943,8 @@ def paths(request):
 				id = u.id
 				connected = False
 				name = None
-				current_position = _get_latest_position(u,anon=True)
+				current_position = u.profile.headline
+				# current_position = _get_latest_position(u,anon=True)
 				# positions = _get_positions_for_path(u.positions.all(),anon=True)
 				profile_pic = None
 				for c in u.profile.get_all_careers():

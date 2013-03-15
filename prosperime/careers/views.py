@@ -334,7 +334,6 @@ def entityAutocomplete(request):
 	return HttpResponse(simplejson.dumps(response))
 
 
-@login_required
 def home(request):
 	if not request.user.is_authenticated():
 		return HttpResponseRedirect('welcome')
@@ -390,26 +389,30 @@ def discover(request):
 def career_profile(request,career_id):
 	# get career object
 	career = Career.objects.get(pk=career_id)
+	connections = request.user.profile.connections.all()
+	# users = User.objects.select_related('profile','positions','pictures').values('id','profile__headline','profile__first_name','profile__last_name','profile__pictures__pic','positions__entity__id','positions__entity__name').filter(positions__careers=career).annotate(no_of_pos=Count('positions__id')).order_by('-no_of_pos')
 
 	# init careerlib
 	career_path = careerlib.CareerPathBase()
 
 	# get ed overview
+	# ed_overview = None
 	ed_overview = cache.get('career_profile_ed_overview_'+str(request.user.id)+"_"+str(career_id))
-	# check to see if cache was empty
+	# # check to see if cache was empty
 	if ed_overview is None:
-		cache.set('career_profile_ed_overview_'+str(request.user.id)+"_"+str(career_id),career_path.get_ed_overview(request.user,career))
+		print "missed cache @ ed.overview"
+		cache.set('career_profile_ed_overview_'+str(request.user.id)+"_"+str(career_id),career_path.get_ed_overview(request.user,career),10)
 		ed_overview = cache.get('career_profile_ed_overview_'+str(request.user.id)+"_"+str(career_id))
-		# ed_overview = career_path.get_ed_overview(request.user,career)
-
+	# 	# ed_overview = career_path.get_ed_overview(request.user,career)
+	
 	# get paths overview
 	paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
 	# check to see if cache is empty
 	if paths is None:
-		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),careerlib.get_paths_in_career(request.user,career),10)
+		cache.set('paths_in_career_'+str(request.user.id)+"_"+str(career_id),career_path.get_paths_in_career(request.user,career),10)
 		paths = cache.get('paths_in_career_'+str(request.user.id)+"_"+str(career_id))
 
-	# break down paths to make it easier to parses
+	# break down paths and overview to make it easier to parses
 	paths_in_career = {}
 	paths_in_career['network'] = paths['network']
 	paths_in_career['all'] = paths['all']
@@ -418,7 +421,52 @@ def career_profile(request,career_id):
 	overview['network'] = paths['overview']['network']
 	overview['all'] = paths['overview']['all']
 
-	return render_to_response('careers/career_profile.html',{'career':career,'ed_overview':ed_overview,'paths':paths_in_career,'overview':overview},context_instance=RequestContext(request))
+	# get duration overview
+	duration = cache.get('career_stats_duration_'+str(request.user.id)+"_"+str(career_id))
+	# check to see if cache is empty
+	if duration is None:
+		cache.set('career_stats_duration_'+str(request.user.id)+"_"+str(career_id),career_path.get_avg_duration(request.user,career))
+		duration = cache.get('career_stats_duration_'+str(request.user.id)+"_"+str(career_id))
+
+	stats = {}
+	
+	stats['duration'] = {
+		'network': duration['network'],
+		'all': duration['all']
+		} 
+
+	positions = cache.get('career_stats_positions_'+str(request.user.id)+"_"+str(career_id))
+	if positions is None:
+	# if entry_positions is None or senior_positions is None:
+		cache.set('career_stats_positions_'+str(request.user.id)+"_"+str(career_id),career_path.entry_positions_stats(request.user,career))
+		positions = cache.get('career_stats_positions_'+str(request.user.id)+"_"+str(career_id))
+	
+	stats['positions'] = {
+		'entry': positions[0],
+		'senior': positions[1]
+	}
+
+	positions_network = Position.objects.filter(person__profile__in=connections,careers=career)
+	positions_all = Position.objects.filter(careers=career)
+
+	positions = {
+		'network': positions_network,
+		'all': positions_all
+	}
+
+	orgs_network = Entity.objects.filter(positions__person__in=connections,positions__careers=career)
+	orgs_all = Entity.objects.filter(positions__careers=career)
+
+	orgs = {
+		'network': orgs_network,
+		'all': orgs_all
+	}
+
+	# todo
+	# restructure ed overview and paths to cycle through users once, combine logic
+	# restructure duration, positions to cycle through positions (maybe combine into one loop)
+
+	return render_to_response('careers/career_profile.html',{'positions':positions,'orgs':orgs,'stats':stats,'career':career,'ed_overview':ed_overview,'paths':paths_in_career,'overview':overview},context_instance=RequestContext(request))
 
 @login_required
 def discover_career(request,career_id):
@@ -617,7 +665,7 @@ def personalize_careers(request):
 	careers['network'] = careers_network
 	careers['similar'] = careers_similar
 
-	return render_to_response('careers/personalize_careers.html',{'data':data,'careers':careers},context_instance=RequestContext(request))
+	return render_to_response('careers/personalize_careers.html',{'data':data,'careers':careers,'careers_similar_ids':careers_similar_ids},context_instance=RequestContext(request))
 
 
 @login_required

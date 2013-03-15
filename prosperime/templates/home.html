@@ -16,7 +16,7 @@
 		<p class="splash-header">Dashboard</p>
 		<ul class="module-list main-sub-header">
 			<li><a href="/profile/{{user.id}}">View profile</a></li>
-			<li><a href="/discover">Discover careers</a></li>
+			<!-- <li><a href="/discover">Discover careers</a></li> -->
 			<li><a href="/search/">Search</a></li>
 			<li><a href='/rand'>Random User</a></li>
 			{% if not user.profile.li_linked %}
@@ -35,16 +35,17 @@
 
 			{% for c in saved_careers %}
 				<li>
-					<a href="/discover/career/{{c.id}}">{{c.name}}</a>
+					<a href="/career/{{c.id}}">{{c.name}}</a>
 				</li>
 			{% endfor %}					
 			</ul>
 		{% endif %}
-		<p class="sub-header"><a href="/personalize">Add more careers</a></p>
+		<p class="sub-header"><a href="/personalize/careers/">Add more careers</a></p>
 	</div>
 	<div class="dashboard-module pull-left" data-name="dashboard-saved-positions">
 		<p class="module-header">My Positions</p>		
-		{% if saved_jobs %}
+		<p>Coming soon</p>
+		<!-- {% if saved_jobs %}
 			<ul>
 
 			{% for j in saved_jobs %}
@@ -54,7 +55,7 @@
 			{% endfor %}					
 			</ul>
 		{% endif %}
-		<p class="sub-header"><a href="/personalize">Add more positions</a></p>
+		<p class="sub-header"><a href="/personalize">Add more positions</a></p> -->
 	</div>
 	
 	<!-- <div class="dashboard-module pull-left" data-name="dashboard-saved-paths">

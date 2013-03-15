@@ -45,16 +45,13 @@ class Profile(models.Model):
     status = models.CharField(max_length=15,default="active")
     # profile_pic = models.ImageField(max_length=450, upload_to=_get_profile_pic_path, blank=True, null=True)
 
-
     # returns a dictionary w/ frequencies of each career
     def get_all_careers(self):
         career_dict = {}
 
-        user = self.user
-        positions = Position.objects.filter(person=user).prefetch_related('careers')
-        for p in positions:
-            careers = p.careers.all()
-            for c in careers:
+        # positions = Position.objects.filter(person=self.user).prefetch_related('careers')
+        for p in self.user.positions.all():
+            for c in p.careers.all():
                 if career_dict.has_key(c):
                     career_dict[c] = career_dict[c] + 1
                 else:

@@ -24,6 +24,7 @@ from entities.models import Entity, Image, Industry, Office
 from careers.models import Career, Position
 import careers.careerlib as careerlib
 from django.core.files import File
+from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 
 # initiate CareerMapBase class
@@ -892,11 +893,15 @@ class LIConnections(LIBase):
 		temp_username = user_info['firstName'] + user_info['lastName'] + user_info['id']
 		temp_username = temp_username[:30]
 		
-		# create dormant user account
-		user = User()
-		user.username = temp_username
-		user.is_active = False
-		user.save()
+		# check to see if user already exists
+		try:
+			user = User.objects.get(username=temp_username)
+		except ObjectDoesNotExist:
+			# create dormant user account
+			user = User()
+			user.username = temp_username
+			user.is_active = False
+			user.save()
 
 		# create user profile
 		user.profile.first_name = user_info['firstName']
@@ -911,6 +916,7 @@ class LIConnections(LIBase):
 			self.add_profile_pic(user,user_info['pictureUrl'])
 
 		# create LinkedIn account
+		
 		acct = Account()
 		acct.owner = user
 		acct.service = 'linkedin'
@@ -967,7 +973,10 @@ class LIConnections(LIBase):
 		# fetch html and soup it
 		
 		# html = self.get_public_page(url)
-		html = urllib2.urlopen(url)
+		try:
+			html = urllib2.urlopen(url)
+		except:
+			return None
 		soup = BeautifulSoup(html)
 
 		# get all profile container divs
