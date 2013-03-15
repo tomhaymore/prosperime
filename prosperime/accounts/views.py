@@ -53,6 +53,18 @@ def login(request):
 
 	return render_to_response('accounts/login.html',{'form':form},context_instance=RequestContext(request))
 
+def terms(request):
+
+	return render_to_response('terms.html',context_instance=RequestContext(request))
+
+def privacy(request):
+
+	return render_to_response('privacy.html',context_instance=RequestContext(request))
+
+def copyright(request):
+
+	return render_to_response('copyright.html',context_instance=RequestContext(request))
+
 @login_required
 def logout(request):
 	auth_logout(request)
