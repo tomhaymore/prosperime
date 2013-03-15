@@ -115,7 +115,7 @@ $(function(){
 					for (var m = 0; m < 4; m++) collection.queue_indices.push(m)
 					collection.overflow = true
 				} else {
-					for (var j = 0; j < positions.length; j++) collection.queue_indices.push(i)
+					for (var j = 0; j < positions.length; j++) collection.queue_indices.push(j)
 				}
 
 				console.log(positions)
