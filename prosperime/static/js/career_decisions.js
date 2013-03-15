@@ -1,4 +1,5 @@
 
+
 $(function(){
 
 	//--------------//
@@ -190,36 +191,6 @@ $(function(){
 			this.decisions.fetch()
 		},
 
-
-
-		pathSearch: function(query) {
-			console.log("searching paths");
-			console.log(query);
-			// set to path view
-			this.filters.meta('view','paths');
-			// test for empty search string, make sure to uncheck all filters
-			if (query === undefined) {
-				this.filtersView.uncheckAll();
-				this.paths.meta('query',null);
-				this.filters.meta('query',null);
-			} else {
-				this.paths.meta('query',query);
-				this.filters.meta('query',query);	
-			}
-			this.paths.fetch();
-			this.filters.fetch();
-		},
-
-		emptyCompanySearch: function() {
-			console.log('empty company search');
-			// reset to company search
-			this.filters.meta('view','companies');
-			this.filters.meta('query','');
-			// fetch filters
-			this.filters.fetch();
-			// fetch orgs
-			this.orgs.fetch();
-		},
 
 
 

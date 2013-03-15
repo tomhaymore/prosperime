@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 
 # Prosperime
-from entities.models import Entity
+from entities.models import Entity, Industry
 from careers.models import SavedPath, SavedPosition, Position, Career, GoalPosition, SavedCareer, IdealPosition, CareerDecision
 from accounts.models import Profile
 import careers.careerlib as careerlib
@@ -22,6 +22,200 @@ from django.db.models import Count, Q
 ######################################################
 ################## CORE VIEWS ########################
 ######################################################
+
+# dev only
+def getIndustriesForUser(user_id):
+	user = User.objects.get(pk=user_id)
+	positions = Position.objects.filter(person=user).prefetch_related().select_related('entity') # check this
+
+	industries = []
+	seen_before = set()
+	for p in positions:
+		p_entity = p.entity
+		p_industries = p_entity.domains.all()
+		print p_industries
+		for i in p_industries:
+			if i.id not in seen_before:
+				seen_before.add(i.id)
+				industries.append(i)
+
+	print 'Industry Report for: ' + user.profile.full_name()
+	print '####################'
+	print 'Positions: '
+	for p in positions:
+		if p.title is not None:
+			print p.title + ' - ' + p.entity.name
+		else:
+			print 'n/a - ' + p.entity.name 
+	print '####################'
+	print 'Industries:'
+	for i in industries:
+		print i.name
+
+
+
+def next(request):
+	data = {}
+
+	print request.GET
+
+	# Get params
+	if request.GET.getlist('i1'):
+		ind_1 = request.GET.getlist('i1')[0]
+		if request.GET.getlist('i2'):
+			ind_2 = request.GET.getlist('i2')[0]
+		else:
+			ind_2 = None
+	else:
+		ind_1 = None
+
+	## Move from One Industry to Another ##
+	if ind_1 and ind_2:
+
+		# Cache
+		data = cache.get('next_industry_data_'+str(request.user.id)+'_'+str(ind_1))
+		if data is None:
+			print 'lvl2: missed cache'
+		else:
+			print 'lvl2: hit cache'
+
+		# Get the specific entry related to this move
+		industry_data = data['transitions'][int(ind_2)]
+		print industry_data
+		new_data = {
+			'lvl':2,
+			'start_name':data['start_name'],
+			'start_id':data['start_id'],
+			'end_name':industry_data[0],
+			'end_id':ind_2,
+			'total_people':industry_data[1],
+			'people':industry_data[2],
+		}
+
+		print 'Double Query: ' + str(ind_1) + ' --> ' + str(ind_2)
+		return HttpResponse(simplejson.dumps(new_data))
+
+
+	## Single Industry ##
+	# All info about a single industry
+	elif ind_1:
+
+		# Check cache
+		data = cache.get('next_industry_data_'+str(request.user.id)+'_'+str(ind_1))
+		if data is None:
+			cache.set('next_industry_data_'+str(request.user.id)+'_'+str(ind_1),_get_industry_data(ind_1),600)
+			data = cache.get('next_industry_data_'+str(request.user.id)+'_'+str(ind_1))
+	
+
+		print 'Single Query: ' + str(ind_1)
+		return HttpResponse(simplejson.dumps(data))
+
+	## Plain Page ##
+	else:
+		return render_to_response('careers/next.html',data,context_instance=RequestContext(request))
+
+
+# constructs the return data structure for a single industry view
+## NOTE: this is a beast, and stores all the dsts needed for the 
+## industry --> industry sub-views. 
+
+### FINAL NOTE: eventually, we might want to be able to segment this by 
+### 'my network' & 'prosperime community'. I do nothing about this now
+def _get_industry_data(ind_id):
+
+		## NOTE ##
+		# You cannot store anything meaningful in the key of the dict
+		# b/c sorting the items later kills the keys. as such, I use
+		# the industry id as a key to construct the dst, but also include
+		# the industry id in the value so that it can be accessed later
+
+		# DST Schema
+		# transitions = {
+		# 	ind_id: [ind_name, num_people, people, ind_id]
+		# }
+
+		# people = {
+		# 	person_id: [person_name, move]
+		# }
+
+		# move = {
+		# 	start_title
+		# 	start_entity_name
+		# 	end_title
+		# 	end_entity_name
+		# }
+
+
+	industry = Industry.objects.get(pk=ind_id)
+	related_positions = Position.objects.filter(entity__domains=industry).select_related('person')
+	people_set = set()
+	transitions = {}
+
+	## Iterate through all positions from given industry
+	for p in related_positions:
+		person = Profile.objects.get(user=p.person)
+
+		## Use set to count the # people related to each industry
+		if p.id not in people_set:
+			people_set.add(p)
+
+		## My ghetto logic where I assume that the next position
+		## in the db is the next pos in someone's timeline
+		next = Position.objects.get(pk=p.pk + 1)
+
+		# If the next position belongs to the same person
+		if next.person == person.user: 
+			ind = next.entity.domains.all()
+
+			# If it has industries
+			if len(ind) > 0:
+
+				ind_id = ind[0].id
+
+				# We've seen this industry before, update dst
+				if ind_id in transitions:
+					# Increment #people counter
+					transitions[ind_id][1] += 1
+
+					# Create a 'move'
+					people = transitions[ind_id][2]
+					# Don't add multiple moves for the same person
+					if person.id not in people:
+						move = {
+							'start_title':p.title,
+							'start_entity_name':p.entity.name,
+							'end_title':next.title,
+							'end_entity_name':next.entity.name,
+						}
+
+						people[person.id] = [person.full_name(), move]
+
+				else:
+					# Haven't seen this transition before
+					move = {
+						'start_title':p.title,
+						'start_entity_name':p.entity.name,
+						'end_title':next.title,
+						'end_entity_name':next.entity.name,
+					}
+
+					# Create People dst
+					people = {person.id: [person.full_name(), move]}
+
+					# add to greater dst
+					transitions[ind_id] = [ind[0].name, 1, people, ind_id]
+
+	total_people = len(people_set)
+	data = {
+			'lvl':1,
+			'start_id':industry.id, 
+			'start_name':industry.name,
+			'total_people': total_people,
+			'transitions':transitions,
+		}
+
+	return data
+
 
 
 def addDecision(request):
