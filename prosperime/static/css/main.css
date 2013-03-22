@@ -1,13 +1,23 @@
 /* Components */
 
+html, body {
+	height:100%;
+}
+
 body {
 	/*padding-top:40px;*/
 	/*background-color:whitesmoke;*/
 	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+	margin: 0;
+	/*margin-bottom:0px;*/
 }
 
 div.background-container {
 	background-color:whitesmoke;
+	min-height:100%;
+	height: auto !important;
+	/*margin:0 auto -60px;*/
+
 }
 
 div#content-container {
@@ -94,7 +104,7 @@ img.main-logo {
 /* Footer */
 
 div.footer-container {
-	width:100%;
+	/*width:100%;*/
 	background-color: #fff;
 	border-top: 1px solid #ccc;
 }
@@ -102,8 +112,8 @@ div.footer-container {
 div.footer-inner {
 	padding-top: 10px;
 	width: 1000px;
-	margin-left: auto;
-	margin-right: auto;
+	margin-left:auto;
+	margin-right:auto;
 	min-height: 35px;
 }
 
@@ -117,9 +127,10 @@ ul.footer-links li {
 
 div.footer {
 	font-size: 0.9em;
-	border-top: 1px solid #ccc;
+	/*border-top: 1px solid #ccc;*/
 	padding-top:10px;
 }
+
 
 /* Messages */
 

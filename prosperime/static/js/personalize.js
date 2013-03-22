@@ -95,6 +95,7 @@ $(document).ready(function() {
 		var job_name = $("#personalize-job-name").val();
 		$("ul#personalize-jobs-list").append("<li data-job-name='"+job_name+"' data-job-id=''>"+job_name+"</li>")
 	}); 
+
 	$("#personalize-next-button").click(function()  {
 		$("div.personalize-career-entry").each(function() {
 			if ($(this).hasClass("personalize-selected")) {
@@ -107,10 +108,13 @@ $(document).ready(function() {
 		console.log(selected_careers);
 		console.log(selected_jobs);
 		$.post('/add_personalization/',{'selected_careers':selected_careers,'selected_jobs':selected_jobs}, function(data) {
-			console.log(data);
-			if (data == "success") {
+			
+			if (data["success"] == true) {
 				// check to see what page we're on; redirect to next personalization page or back to home
-				window.location = "/home";
+
+				// EDIT: Actually, let's redirect to the proper 'what's next' page if the user has a current industry
+				if (data['industries']) window.location = "/next/#?i1=" + data['industries']
+				else window.location = "/home";
 			} else {
 				var warning = "<div id='messages'>";
 				warning += "<ul class='messages'>";
@@ -119,6 +123,6 @@ $(document).ready(function() {
 				warning += "</div>";
 				$('div.messages-container').append(warning);
 			}
-		});
+		}, 'json');
 	});
 })

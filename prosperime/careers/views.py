@@ -57,8 +57,6 @@ def getIndustriesForUser(user_id):
 def next(request):
 	data = {}
 
-	print request.GET
-
 	# Get params
 	if request.GET.getlist('i1'):
 		ind_1 = request.GET.getlist('i1')[0]
@@ -81,7 +79,6 @@ def next(request):
 
 		# Get the specific entry related to this move
 		industry_data = data['transitions'][int(ind_2)]
-		print industry_data
 		new_data = {
 			'lvl':2,
 			'start_name':data['start_name'],
@@ -90,6 +87,7 @@ def next(request):
 			'end_id':ind_2,
 			'total_people':industry_data[1],
 			'people':industry_data[2],
+			'related_industries':data['related_industries'],
 		}
 
 		print 'Double Query: ' + str(ind_1) + ' --> ' + str(ind_2)
@@ -103,7 +101,7 @@ def next(request):
 		# Check cache
 		data = cache.get('next_industry_data_'+str(request.user.id)+'_'+str(ind_1))
 		if data is None:
-			cache.set('next_industry_data_'+str(request.user.id)+'_'+str(ind_1),_get_industry_data(ind_1),600)
+			cache.set('next_industry_data_'+str(request.user.id)+'_'+str(ind_1),_get_industry_data(ind_1, request),600)
 			data = cache.get('next_industry_data_'+str(request.user.id)+'_'+str(ind_1))
 	
 
@@ -121,7 +119,7 @@ def next(request):
 
 ### FINAL NOTE: eventually, we might want to be able to segment this by 
 ### 'my network' & 'prosperime community'. I do nothing about this now
-def _get_industry_data(ind_id):
+def _get_industry_data(ind_id, request):
 
 		## NOTE ##
 		# You cannot store anything meaningful in the key of the dict
@@ -151,6 +149,14 @@ def _get_industry_data(ind_id):
 	people_set = set()
 	transitions = {}
 
+	## Get other industries related to this person's page
+	interested_industries = Profile.objects.get(user=request.user)._industries()
+	formatted_industries = []
+	for i in interested_industries:
+		ind = [i.id, i.name]
+		formatted_industries.append(ind)
+
+
 	## Iterate through all positions from given industry
 	for p in related_positions:
 		person = Profile.objects.get(user=p.person)
@@ -161,7 +167,11 @@ def _get_industry_data(ind_id):
 
 		## My ghetto logic where I assume that the next position
 		## in the db is the next pos in someone's timeline
-		next = Position.objects.get(pk=p.pk + 1)
+		next_pk = p.pk + 1
+		try:
+			next = Position.objects.get(pk=next_pk)
+		except:
+			next.person == person.user
 
 		# If the next position belongs to the same person
 		if next.person == person.user: 
@@ -211,6 +221,7 @@ def _get_industry_data(ind_id):
 			'start_id':industry.id, 
 			'start_name':industry.name,
 			'total_people': total_people,
+			'related_industries': formatted_industries,
 			'transitions':transitions,
 		}
 
@@ -312,11 +323,10 @@ def getDecisions(request):
 	return HttpResponse(simplejson.dumps(response))
 
 
-
+## Autocomplete for multiple entities, used in CareerDecision prompt
 def entityAutocomplete(request):
-	response = {}
+
 	query = request.GET.getlist('query')[0]
-	print 'autocomplete: ' + query
 	entities = Entity.objects.filter(name__istartswith=query).values('name')
 
 	suggestions = []
@@ -329,8 +339,32 @@ def entityAutocomplete(request):
 		'query': query,
 		'suggestions': suggestions,
 	}
+	return HttpResponse(simplejson.dumps(response))
 
+## Autocomplete for industries, used in What Next?
+def industryAutocomplete(request):
 
+	query = request.GET.getlist('query')[0]
+
+	print 'query: ' + query
+	industries = Industry.objects.filter(name__istartswith=query).values('name', 'id')
+
+	suggestions = []
+	seen_before = set()
+	for i in industries:
+		if (i['name']) not in seen_before:
+			item = {
+				'value':i['name'],
+				'data':i['id'],
+			}
+			suggestions.append(item)
+			seen_before.add(i['name'])
+
+	response = {
+		'query':query,
+		'suggestions':suggestions,
+	}	
+	
 	return HttpResponse(simplejson.dumps(response))
 
 
@@ -341,11 +375,29 @@ def home(request):
 	user = request.user
 
 	# data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
-	data['saved_paths'] = SavedPath.objects.filter(owner=user)
+	# data['saved_paths'] = SavedPath.objects.filter(owner=user)
 	data['saved_careers'] = request.user.saved_careers.all()
 	data['saved_jobs'] = GoalPosition.objects.filter(owner=user)
 	data['career_decisions'] = CareerDecision.objects.all()
-	return render_to_response('home.html',data,context_instance=RequestContext(request))
+
+
+	try:
+		poi = SavedPath.objects.get(owner=user, title='queue')
+		poi = poi.positions.all()
+	except:
+		poi = None
+
+	data['positions_of_interest'] = poi
+
+	industries = user.profile._industries()
+	if industries:
+		data['industry'] = industries[0].id
+	else:
+		data['industry'] = None
+		## this means they either have 0 postions or ghetto ones
+	## need current industry, too
+
+	return render_to_response('home_v2.html',data,context_instance=RequestContext(request))
 
 @login_required
 def discover(request):
@@ -694,7 +746,17 @@ def add_personalization(request):
 				except:
 					goal_pos = GoalPosition(owner=request.user,position=ideal_pos)
 					goal_pos.save()
-		return render_to_response('api_success.html')
+
+		## Get current industry to show for 'what's next' page -- 
+		data = {}
+		industries = request.user.profile._industries()
+		if industries:
+			data['industries'] = industries[0].id
+		else:
+			data['industries'] = None
+		data['success'] = True
+		return HttpResponse(simplejson.dumps(data))
+		#return render_to_response('api_success.html', data)
 	else:
 		return render_to_response('api_fail.html')
 

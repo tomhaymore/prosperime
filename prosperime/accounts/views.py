@@ -678,5 +678,43 @@ def _get_profile_pic(profile):
 	return None
 
 
+def fetch_profile(request):
+
+	linkedin_key = '8yb72i9g4zhm'
+	linkedin_secret = 'rp6ac7dUxsvJjQpS'
+
+	# ME
+	access_token = {
+		'oauth_token_secret': "67cbcc33-30bf-423d-b677-92bc3f775559", 
+		'oauth_token': '0a0d3a27-5713-439e-a57e-c2f35798b4a5'
+	}
+
+	acct_id = "MmD6vhOwE-"
+	# set fields to fetch from API
+	fields = "(id,public-profile-url)";
+	
+	# construct url
+	api_url = "http://api.linkedin.com/v1/people/id=%s:%s?format=json" % (acct_id,fields,)
+	 
+
+	consumer = oauth.Consumer(linkedin_key, linkedin_secret)
+	 
+	token = oauth.Token(
+		key=access_token['oauth_token'], 
+		secret=access_token['oauth_token_secret'])
+
+	client = oauth.Client(consumer, token)
+
+	resp, content = client.request(api_url)
+	content = content.lstrip('"')
+	content = content.rstrip('"')
+	print content
+	return HttpResponse(simplejson.dumps(content))
+
+
+
+
+
+
 
 

@@ -1,18 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 	
-	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css" />
-	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/main.css" />
-	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" />
-	<link href="{{ STATIC_URL }}img/favicon.ico" rel="icon"  />
-	<script type="text/javascript" src="{{ STATIC_URL }}js/json2.js"></script>
-	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-<!-- 	// <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js"></script> -->
-	<script type="text/javascript" src="{{ STATIC_URL }}js/uri.js"></script>
-	<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
-	<!--<script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>-->
-		<script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
-	{% block head %} {% endblock %}
+<!-- Favicon -->
+<link href="{{ STATIC_URL }}img/favicon.ico" rel="icon"  />
+
+<!-- CSS -->
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css" />
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/main.css" />
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" />
+
+<!-- JS -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/json2.js"></script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+
+<script type="text/javascript" src="{{ STATIC_URL }}js/uri.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
+<!--<script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>-->
+<script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+
+<!-- Alternates (= no wifi) -->
+<!-- <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js"></script> -->
+
+
+{% block head %} {% endblock %}
 <head> 
 	<title>
 		{% block title %}Prosperime: Don't work, prosper {% endblock %}
@@ -39,12 +49,18 @@
 	                			<a href="/">{{user.profile.full_name}}</a>
 	                		</li>
 	                		<li>
+	                			<a href="/search/">Search</a>
+	                		</li>
+	                		<!-- <li>
+	                			<a href='/rand/'>Random Profile</a>
+	                		</li> -->
+	                		<li>
 	                			<a href="/account/logout/">Logout</a>
 	                		</li>
 	                		{% endif %}
-							<li>
+							<!-- <li>
 								<a href="/contact">Contact</a>
-							</li>
+							</li> -->
 						</ul>
 					</div>
 					<div class="clear"></div>
