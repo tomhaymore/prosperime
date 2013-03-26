@@ -1,0 +1,139 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/position.css" />
+<script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/position.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div id="content-container" class="main-container">
+	<p class="main-header">Position: <span data-pos-id="{{position.id}}" class="position-info splash-slug">{{position.title}}</span></p>
+	{% if position.description %}
+		<p class="main-sub-header">{{position.description}}</p>
+	{% endif %}
+	<div class="position-profile-nav-container">
+		<!-- <span class="main-sub-header pull-left">View stats for: </span> -->
+		<a class="position-profile-nav pull-left selected" data-view="network">Your Network</a> 
+		<a class="position-profile-nav pull-left unselected" data-view="all">Prosperime Community</a>
+		<div class="clear"></div>
+		
+	</div>
+	<div class="position-profile-ed-overview pull-left">
+		<p class="main-sub-header">Educational Breakdown</p>
+		<div id="position-profile-graph-label">&nbsp;</div>
+		{% if ed_overview %}
+			<ul class="ed_overview_network_graph_list">
+			{% for k,v in ed_overview.network.items|slice:":10" %}
+				<li class="ed_overview_network_item" data-id="{{k}}" data-count="{{v.count}}" data-name="{{v.name}}">{{v.name}}</li>
+			{% endfor %}
+			</ul>
+			<ul class="ed_overview_all_graph_list">
+			{% for k,v in ed_overview.all.items|slice:":10" %}
+				<li class="ed_overview_all_item" data-id="{{k}}" data-count="{{v.count}}" data-name="{{v.name}}">{{v.name}}</li>
+			{% endfor %}
+			</ul>
+		{% else %}
+			<p> Breakdown not available.</p>
+		{% endif %}
+		<div id="ed-overview-network-chart"></div>
+		<div id="ed-overview-all-chart" style="display:none;"></div>
+	</div>
+	<div class="position-profile-stats pull-left">
+		<span data-view="network" class="stats-holder">
+			{% if stats.duration.network %}
+				{{stats.duration.network}}
+			{% else %}
+				n/a
+			{% endif %}
+		</span>
+		<span data-view="all" class="stats-holder" style="display:none;">
+			{% if stats.duration.all %}
+				{{stats.duration.all}}
+			{% else %}
+				n/a
+			{% endif %}</span>
+		<p class="stats-header">Avg # of Years</p>
+	</div>
+	<div class="clear"></div>
+	<div id="search-filters-container" class="pull-left">
+	<!-- dynamically populated search filters -->
+	</div>
+	<div id="search-results-list" class="pull-left">
+	<!-- <p class="main-header">Search Results</p> -->
+	</div>
+	<div class="clear"></div>
+</div>
+{% endblock %}
+
+{% block templates %}
+<script type="text/template" id="path-single-template">
+	<li class="list-preview">
+		<div class="left-list-preview">
+			<div class="profile-img-holder pull-left">
+			<% if (profile_pic != null) { %>
+			
+				<a href="/profile/<%= id %>"><img class="logo-preview" src="{{MEDIA_URL}}<%= profile_pic %>" /></a>&nbsp;
+			</div>
+			
+			<% } else { %>
+				<a href="/profile/<%= id %>"><img class="logo-preview" src="{{MEDIA_URL}}pictures/anon.jpg" /></a>&nbsp;
+			<% } %>
+		</div>
+		<div class="right-list-preview pull-left">
+			<p class="path-name"><a href="/profile/<%= id %>"><%= full_name %></a></p>
+			
+		</div>
+		<div class="clearfix"></div>
+		<div class="search-careers-container">
+			
+			<% if (careers != null) {  %>
+			<ul class="search-careers-list flat">
+			<% _.each(careers,function(c) { %>
+				<li class="search-career">
+					<a class="search-button" href="/discover/career/<%=c.id%>"><%=c.name%></a>
+				</li>
+			<% }); %>
+			<% } %>
+			
+		</div>
+	</li>
+</script>
+
+<script type="text/template" id="path-list-template">
+	<div class="main-header pull-left">Career Paths</div>
+	<div class="search-view pull-right">Search: 
+		<ul class="search-view-links inline">
+			<li><a href="/search/#companies/">companies</a></li>
+		</ul>
+	</div>
+	<div class="clearfix"></div>
+	<ul class="path-list"></ul>
+</script>
+
+<script type="text/template" id="search-header-template">
+	<!--<div class="search-form-header sidebar-header">
+		 Refine Your Search
+	</div>--> 
+	<div class="search-control pull-right">
+		<a title="minimize filters" class="search-control-close"><i class="icon-chevron-left"></i></a>
+		<a style="display:none;" title="show filters" class="search-control-open"><i class="icon-chevron-right"></i></a>
+	</div>
+</script>
+
+<script type="text/template" id="search-module-template">
+	<div class="search-form-module">
+		<p class="form-header"><%= category %></p>
+		<ul class="filters-list"></ul>
+	</div>
+</script>
+
+<script type="text/template" id="search-filters-template">
+	<label class="checkbox">
+		<input <% if (selected == true) { %> checked=checked <% } %> name="<%= category %>-filters" class="input-search-filter" type="checkbox" value="<%= value %>"><%= name %> <% if (count != null) {%> (<%= count %>) <% }%></option>
+	</label>
+</script>
+{% endblock %}
