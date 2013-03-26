@@ -1470,16 +1470,20 @@ class CareerImportBase():
 		careers = Career.objects.all()
 
 		for c in careers:
-			titles = c.get_pos_titles()
-			if titles:
-				for t in titles:
-					try:
-						ideal_pos = IdealPosition.objects.get(title=t)
-					except:
-						ideal_pos = IdealPosition(title=t)
-					ideal_pos.save()
-					ideal_pos.careers.add(c)
-					ideal_pos.save()
+			for p in c.positions.all():
+				try:
+					ideal_pos = IdealPosition.objects.get(title=p.title)
+					print "matched"
+				except:
+					ideal_pos = IdealPosition(title=p.title)
+					print "no match"
+				# save ideal position and add career association
+				ideal_pos.save()
+				ideal_pos.careers.add(c)
+				ideal_pos.save()
+				# associate ideal position with actual position
+				p.ideal_position = ideal_pos
+				p.save()
 
 	def test_import_census_matching_data(self,path):
 		# initiate career dict

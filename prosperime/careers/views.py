@@ -336,7 +336,7 @@ def entityAutocomplete(request):
 
 def home(request):
 	if not request.user.is_authenticated():
-		return HttpResponseRedirect('welcome')
+		return HttpResponseRedirect('/welcome')
 	data = {}
 	user = request.user
 
@@ -345,6 +345,7 @@ def home(request):
 	data['saved_careers'] = request.user.saved_careers.all()
 	data['saved_jobs'] = GoalPosition.objects.filter(owner=user)
 	data['career_decisions'] = CareerDecision.objects.all()
+
 	return render_to_response('home.html',data,context_instance=RequestContext(request))
 
 @login_required
@@ -577,9 +578,163 @@ def discover_career_positions(request, career_id):
 	return render_to_response('entities/discover_career.html', {'career': career, 'positions':positions_in_career, 'overview':overview, 'request_type':request_type, 'career_id':career_id}, context_instance=RequestContext(request))
 
 @login_required
-def discover_position(request,pos_id):
+def position_profile(request,pos_id):
 
-	return render_to_response('careers/discover_position.html',{},context_instance=RequestContext(request))
+	# get position
+	position = IdealPosition.objects.get(pk=pos_id)
+	
+	return render_to_response('careers/position_profile.html',{'position':position},context_instance=RequestContext(request))
+
+@login_required
+def position_paths(request,pos_id):
+	from django.core import serializers
+	# get search filters
+	orgsSelected = request.GET.getlist('org')
+	locationsSelected = request.GET.getlist('location')
+	sectorsSelected = request.GET.getlist('sector')
+
+	# compile filters into one string for cache id
+	full_filters_string = "_".join(orgsSelected + sectorsSelected + locationsSelected)
+
+	# check cache
+	paths = cache.get("search_position_paths_" + full_filters_string)
+	if paths is None:
+
+		# fetch all users for paths, filtered by position
+		users = User.objects.prefetch_related('positions').select_related('positions','profile').filter(positions__ideal_position_id=pos_id).annotate(no_of_pos=Count('positions__pk')).exclude(pk=request.user.id).order_by('-no_of_pos')	
+
+		# filter user queryset
+
+		if locationsSelected:
+			users = users.filter(positions__entity__office__city__in=locationsSelected)
+		if sectorsSelected:
+			users = users.filter(positions__entity__domains__name__in=sectorsSelected)
+		if orgsSelected:
+			users = users.filter(positions__entity__name__in=orgsSelected)
+
+		paths = []
+
+		for u in users[:20]:
+			positions = [{'title':p.title,'org':p.entity.name,'org_id':p.entity.id} for p in u.positions.all()]
+			path = {
+				'id':u.id,
+				'full_name':u.profile.full_name(),
+				'profile_pic':None,
+				'positions': positions,
+				'careers':None
+			}
+			paths.append(path)
+
+		cache.set("search_position_paths_" + full_filters_string,paths)
+
+	# paths = serializers.serialize('json',paths)
+	return HttpResponse(json.dumps(paths))
+
+@login_required
+def position_paths_filters(request,pos_id):
+	""" serves up JSON object of params for position_path searches """
+
+	# initialize array for all filters
+	filters = []
+
+	# get search filters
+	locationsSelected = request.GET.getlist('location')
+	sectorsSelected = request.GET.getlist('sector')
+	orgsSelected = request.GET.getlist('org')
+
+	# set base filters
+
+	# set organization filters
+	orgsBase = User.objects.filter(positions__ideal_position_id=pos_id).values("positions__entity__name").annotate(freq=Count('pk')).order_by('-freq').distinct()
+	orgsFiltered = orgsBase
+
+	if locationsSelected:
+		orgsFiltered = orgsFiltered.filter(positions__entity__office__city__in=locationsSelected)
+
+	if sectorsSelected:
+		orgsFiltered = orgsFiltered.filter(positions__entity__domains__name__in=sectorsSelected)
+
+	orgsBase = orgsBase[:10]
+	
+	orgsFilteredDict = {}
+	for o in orgsFiltered:
+		orgsFilteredDict[o['positions__entity__name']] = o['freq']
+
+	for o in orgsBase:
+		# make sure it doesn't have a null value
+		if o['positions__entity__name']:
+			# get count from filtered dict
+			if o['positions__entity__name'] in orgsFilteredDict:
+				freq = orgsFilteredDict[o['positions__entity__name']]
+			else:
+				freq = 0
+			# check to see if the value should be selected
+			if o['positions__entity__name'] in orgsSelected:
+				filters.append({'name':o['positions__entity__name'],'value':o['positions__entity__name'],'category':'Organizations','count':freq,'selected':True})
+			else:
+				filters.append({'name':o['positions__entity__name'],'value':o['positions__entity__name'],'category':'Organizations','count':freq,'selected':None})
+
+	# set location filters
+	locationsBase = User.objects.filter(positions__ideal_position_id=pos_id).values("positions__entity__office__city").annotate(freq=Count('pk')).order_by('-freq').distinct()
+	locationsFiltered = locationsBase
+	
+	if sectorsSelected:
+		locationsFiltered = locationsFiltered.filter(positions__entity__domains__name__in=sectorsSelected)
+
+	if orgsSelected:
+		locationsFiltered = locationsFiltered.filter(positions__entity__name__in=orgsSelected)
+
+	locationsBase = locationsBase[:10]
+
+	locationsFilteredDict = {}
+	for l in locationsFiltered:
+		locationsFilteredDict[l['positions__entity__office__city']] = l['freq']
+
+	for l in locationsBase:
+		# make sure it doesn't have a null value
+		if l['positions__entity__office__city']:
+			# get count from locationsFilteredDict
+			if l['positions__entity__office__city'] in locationsFilteredDict:
+				freq = locationsFilteredDict[l['positions__entity__office__city']]
+			else:
+				freq = 0
+			# check to see if the value should be selected
+			if l['positions__entity__office__city'] in locationsSelected:
+				filters.append({'name':l['positions__entity__office__city'],'value':l['positions__entity__office__city'],'category':'Location','count':freq,'selected':True})
+			else:
+				filters.append({'name':l['positions__entity__office__city'],'value':l['positions__entity__office__city'],'category':'Location','count':freq,'selected':None})
+
+	# get sector filters
+	sectorsBase = User.objects.filter(positions__ideal_position_id=pos_id).values('positions__entity__domains__name').annotate(freq=Count('pk')).distinct()
+	sectorsFiltered = sectorsBase[:10]
+
+	if locationsSelected:
+		sectorsFiltered = sectorsFiltered.filter(positions__entity__office__city__in=locationsSelected)
+
+	if orgsSelected:
+		locationsFiltered = locationsFiltered.filter(positions__entity__name__in=orgsSelected)
+
+	sectorsFilteredDict = {}
+	for s in sectorsFiltered:
+		sectorsFilteredDict[s['positions__entity__domains__name']] = s['freq']
+
+	for s in sectorsBase:
+		# make sure it doesn't have a null value
+		if s['positions__entity__domains__name']:
+			# get count from sectorsFilteredDict
+			if s['positions__entity__domains__name'] in sectorsFilteredDict:
+				freq = sectorsFilteredDict[s['positions__entity__domains__name']]
+			else:
+				freq = 0
+			name = " ".join(word.capitalize() for word in s['positions__entity__domains__name'].replace("_"," ").split())
+			# check to see if the value should be selected
+			if s['positions__entity__domains__name'] in sectorsSelected:
+				filters.append({'name':name,'value':s['positions__entity__domains__name'],'category':'Sector','count':freq,'selected':True})
+			else:
+				filters.append({'name':name,'value':s['positions__entity__domains__name'],'category':'Sector','count':freq,'selected':None})
+	
+	# render response
+	return HttpResponse(simplejson.dumps(filters), mimetype="application/json")
 
 @login_required
 def personalize_careers_jobs(request):
@@ -667,6 +822,10 @@ def personalize_careers(request):
 
 	return render_to_response('careers/personalize_careers.html',{'data':data,'careers':careers,'careers_similar_ids':careers_similar_ids},context_instance=RequestContext(request))
 
+@login_required
+def personalize_jobs(request):
+
+	return render_to_response('careers/personalize_jobs.html',context_instance=RequestContext(request))
 
 @login_required
 def add_personalization(request):
