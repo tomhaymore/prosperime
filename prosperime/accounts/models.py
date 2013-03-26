@@ -123,8 +123,8 @@ class Profile(models.Model):
 
     def _industries(self):
         all_domains = []
-        positions = self.user.positions
-        for pos in positions.all():
+        positions = self.user.positions.all().order_by('-start_date')
+        for pos in positions:
             domains = [i for i in pos.entity.domains.all() if i is not None ]
             all_domains = all_domains + domains
         return all_domains

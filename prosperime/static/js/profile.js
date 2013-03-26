@@ -104,6 +104,10 @@ $(function(){
 		},
 
 		render: function() {
+
+			// Add text to header
+			$('#queue-header').html('Positions of Interest')
+
 			var collection = this // important! (context)
 
 			this.collection.each(function(queueItem) {

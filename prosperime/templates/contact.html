@@ -2,33 +2,58 @@
 
 {% block head %}
 
-<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/discover.css" />
-<script type="text/javascript" src="{{ STATIC_URL }}js/discover.js"></script>
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/contact.css" />
+
+
 {% endblock %}
 
 {% block content %}
 
 <div id="content-container" class="main-container">
-	<div class="pull-left dashboard-header">
-		<p class="splash-header">Contact Us</p>
-	</div>
-	<div class="clear"></div>
+		
+	<div class="module span8 offset2 dummy"></div>
 
-	<div class="contact-module">
-		<p class="module-header">About</p>
-		<p class="contact-module-info">
-			Information about us!
-		</p>				
-	</div>
-	<br/><br/><br/>
-
-	<div class="contact-module">
-		<p class="module-header">Contact Info</p>
-		<p class="contact-module-info">
-			Clayton's SS#: 634-18-6609
-		</p>
+	<!-- About -->
+	<div class="module span8 offset2">
+		<div class="header">About</div>
+		<div class="content">
+			We founded Prosperime with the goal of helping people live happier, more prosperous lives. As we each found ourselves at a crossroads in our own careers, we realized that there was no tool for people like us to find quantitative, relevant, and personalized information about jobs that we might be interested in. It is our hope that Prosperime helps you forge a meaningful career of your own. 
+		</div>
 	</div>
 
-	<div class="clear"></div>
+	<!-- Team -->
+	<div class="module span8 offset2">
+		<div class="header">Team</div>
+		<div class="content">
+			<div class="name">Thomas Haymore</div>
+			<div class="description">
+				Likes: Russian Youth, 
+
+				
+				Dislikes: gluten, 
+			</div>
+
+			<br/>
+
+			<div class="name">Clayton Holz</div>
+			<div class="description">
+				Likes: coffee
+				Dislikes: 
+			</div>
+
+		</div>
+	</div>
+
+
+	<!-- Contact -->
+	<div class="module span8 offset2">
+		<div class="header">Contact</div>
+
+		<div class="content">
+			Hold the phones, because we haven't got any yet. Instead, I'd love to hear from you at <a href="mailto:ctholz@gmail.com">ctholz@gmail.com</a>. Thomas has a darling newborn who likes to make sure he's awake 24/7, so he's always available to respond at <a href="mailto:thomas.haymore@gmail.com">thomas.haymore@gmail.com</a>
+
+		</div>
+	</div>
+
 </div>
 {% endblock %}

@@ -6,6 +6,10 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
 <script type='text/javascript' src="{{ STATIC_URL }}js/next.js"></script>
 <script type='text/javascript' src="{{ STATIC_URL }}js/backbone.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/spin.min.js"></script>
+<!-- Autocomplete comes from here!:
+		https://github.com/devbridge/jQuery-Autocomplete -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.autocomplete.min.js"></script>
 
 <!-- CSS --> 
 <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/next.css" />
@@ -37,8 +41,13 @@
 
 
 	<div id="search-results-container">
-	<!-- Backbone here -->
+		<!-- Backbone here -->
 	</div>
+
+	<div id="header-container">
+		<!-- Backbone here -->
+	</div>
+
 </div>
 {% endblock %}
 
@@ -47,23 +56,36 @@
 
 {% block templates %}
 <script type="text/template" id="search-filters-template">
-	<div class="main-sub-header">Search Filters</div>
+	<!-- /* <div class="main-sub-header">Search Filters</div> */ -->
+
+	<!-- /* Add Search Filters, make first one pre-selected (Most Common) */ -->
 	<% 
+		var counter = 0
 		_.each(filters, function(f) {
-			%>
-				<label class="radio inline">
-					<input type="radio" name="search-filters" id="<%=f%>"><%=f%>
-				</label>
-			<%
-		})
+
+			%><label class="radio inline"><%
+
+			if (counter == 0) {
+				%> 
+					<input class="search-filters" type="radio" name="search-filters" id="<%=f%>" checked><%=f%>
+				<%
+			} else {
+				%>
+					<input class="search-filters" type="radio" name="search-filters" id="<%=f%>" ><%=f%>	
+				<%
+			}
+			%></label><%
+			counter++;
+		});
 	%>
 
 </script>
 
 <script type='text/template' id='lvl1-template'>
 
-	<h3>Search Results: </h1>
+	<h3>Job Moves from the <%=start_name%> industry: </h3>
 
+	<!-- /* Only first 15 results */ -->
 	<table id='search-results-table' class='table table-hover'>
 		<thead>
 			<tr>
@@ -74,17 +96,23 @@
 
 		<tbody>
 			<%
-				transitions = _.sortBy(transitions, function(value) {
-					return -value[1]
-				})
+				if (ordering == 'decreasing') {
+					transitions = _.sortBy(transitions, function(value) {
+						return -value[1]
+					});
+				} else {
+					transitions = _.sortBy(transitions, function(value) {
+						return value[1]
+					});
+				}
 			
-				for (var i = 0; i < transitions.length; i++) {
-					
+				var end = (transitions.length > 15) ? 15 : transitions.length;
+				for (var i = 0; i < end; i++) {
+				// for (var i = end; i > 0; i--) {
 					var value = transitions[i]
 					var end_name = value[0]
 					var num_people = value[1]
 					var end_id = value[3]
-					console.log('v: ' + value)
 					%><tr id="<%=start_id%>-<%=end_id%>">
 						<td><div class="people-box"><%=num_people%>
 							<%if (num_people == 1) { %>
@@ -166,8 +194,67 @@
 
 </script>
 
+<script type="text/template" id="header-template">
+	
+	<div>
+		<% if (industries.length > 1) {
+			%><p>
+				Don&rsquo;t see what you&rsquo;re looking for? We think the following might also interest you, or you can start typing below and to check out others.
+			</p><%
+		} else {
+			%><p>
+				Want to explore other industries? Start typing and see what you find!
+			<p><%
+		} %>
+	</div>
+
+	<span>
+		<% if (industries) {
+			%><ul class="industry-options-container inline"><%
+				for (var i = 0; i < industries.length; i++) {
+					if (industries[i][1] != current) {
+						%><li>
+							<a class="industry-button" href="/next/#?i1=<%=industries[i][0]%>">
+								<%=industries[i][1]%>
+							</a>
+						</li><%
+					}	
+				}
+			%></ul><%
+		 } %>
+	</span>
+
+	<div class="input-append inline">
+		<input type="text" id="alternateIndustryBox">
+		<span class="add-on" id="blue-btn"> Search! </span>
+	</div>
+
+
+</script>
 
 <script type="text/javascript">
+	
+
+
+	var id_selected = null
+
+	<!-- /* Have to use 'on' b/c elem is dynamically added to DOM */ -->
+	$('#header-container').on("click", function() {
+		$('#alternateIndustryBox').autocomplete({
+			serviceUrl: '/careers/industryAutocomplete/',
+			onSelect: function(suggestion) {
+				console.log("setting ID to: " + suggestion.data)
+				id_selected = suggestion.data
+			},
+		});
+
+		$('#blue-btn').on("click", function() {
+			window.scrollTo(0,0)
+			window.location = ('/next/#?i1=' + id_selected)
+		});
+	})
+
+
 
 </script>
 

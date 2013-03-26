@@ -13,7 +13,7 @@
 }
 
 div.container-header {
-	border-bottom: 1px solid #333;
+	/*border-bottom: 1px solid #333;*/
 }
 
 .sub-header {
@@ -99,6 +99,57 @@ span.previous-search {
 	padding-left:12px;
 	padding-right:12px;
 	display:inline-block;
-
 }
+
+a.industry-button {
+/*	display:inline-block;
+	padding: 4px 6px 4px 6px;
+	background-color: rgb(41,98,152);
+	color:#fff;
+	cursor:pointer;	*/
+	color:whitesmoke;
+}
+
+ul.industry-options-container {
+
+	display:inline;
+}
+
+ul.industry-options-container li {
+	border-radius:2px;
+	background-color: rgb(50,121,202);
+	color:whitesmoke;
+	border-radius:4px;
+	font-size:1.4em;
+	text-rendering: optimizelegibility;
+	padding-top:4px;
+	padding-bottom:4px;
+	padding-left:12px;
+	padding-right:12px;
+	display:inline-block;
+	margin:4px;
+}
+
+#header-container {
+	margin-bottom:45px;
+}
+
+.inline {
+	display:inline-block;
+	vertical-align:middle;
+}
+
+
+.autocomplete-suggestions {
+	border: 1px solid #999;
+	background-color:#fffffe;
+	overflow: auto;
+	padding:4px;
+	width:250px !important; /* normally, no, but this is a 3rd party library  
+}
+
+
+
+
+
 

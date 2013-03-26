@@ -23,21 +23,21 @@ from careers.models import SavedPath, CareerDecision, Position, Career
 #from entities.careerlib import CareerSimBase
 import careers.careerlib as careerlib
 
-### DEPRECATED ###
-# @login_required
-def home(request):
-	if not request.user.is_authenticated():
-		return HttpResponseRedirect('welcome')
-	data = {}
-	user = request.user
+# ### DEPRECATED ###
+# # @login_required
+# def home(request):
+# 	if not request.user.is_authenticated():
+# 		return HttpResponseRedirect('welcome')
+# 	data = {}
+# 	user = request.user
 
-	data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
-	data['saved_paths'] = SavedPath.objects.filter(owner=user)
-	data['top_careers'] = []
-	data['career_decisions'] = CareerDecision.objects.all()
+# 	data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
+# 	# data['saved_paths'] = SavedPath.objects.filter(owner=user)
+# 	data['top_careers'] = []
+# 	data['career_decisions'] = CareerDecision.objects.all()
 
 
-	return render_to_response('home.html',data,context_instance=RequestContext(request))
+# 	return render_to_response('home.html',data,context_instance=RequestContext(request))
 
 def contact(request):
 

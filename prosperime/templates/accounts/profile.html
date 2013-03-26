@@ -272,9 +272,9 @@
 		{% if own_profile %}
 		<div class='span12'>
 			<!-- this needs to be only if queue exists... -->
-			<div class='timeline-header'>Positions of Interest</div>
+			<div id="queue-header" class='timeline-header'></div>
 			<div id='queue'>
-				<!-- Bootstrap Here -->
+				<!-- Backbone Here -->
 			</div>
 
 			{% if viewer_saved_paths %}
@@ -315,7 +315,7 @@
 				</div> -->
 
 				<!-- Viewer Saved Paths -->
-				{% if not own_profile %}
+			<!-- 	{% if not own_profile %}
 				<div class="rounded">
 					<p class="sidebar-header">Your Saved Career Paths</p>
 					<p> Like what {{profile.first_name}} has done? Drag any of the positions shown into your desired career path or <a onclick='createNewPath()'>create a new one.</a></p>
@@ -334,7 +334,7 @@
 						{% endfor %}
 						</table>	
 				</div>
-				{% endif %}
+				{% endif %} -->
 			</div>
 			<div class="clear"></div>
 		<!-- </div> -->
@@ -352,7 +352,7 @@
 	</defs> -->
 		
 <script type="text/javascript">
-	(function() {
+	$(function() {
 		/*  Following code taken from http://stackoverflow.com/questions/4771517/raphael-js-path-line-with-gradient to add linear gradients to paths (no native suppport from Raphael) */
 		if (Raphael.vml) {
         	Raphael.el.strokeLinearGradient = function() {
