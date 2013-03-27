@@ -726,22 +726,6 @@ class CareerPathBase(CareerBase):
 
 		return avg_duration
 
-	# def avg_duration_all(self,career):
-	# 	"""
-	# 	returns average time in career for all users
-	# 	"""
-	# 	users = User.objects.filter(positions__careers=career)
-
-	# 	durations = []
-	# 	for u in users:
-	# 		duration = self._user_career_duration(u,career)
-	# 		if duration is not None:
-	# 			durations.append(duration)
-	# 	if len(durations) > 0:
-	# 		avg = sum(durations,timedelta()) / len(durations)
-	# 		return round(avg.days / 365.25,2)
-	# 	return None
-
 	def get_paths_in_career(self,user,career):
 		# initialize overview array
 		overview = {}
