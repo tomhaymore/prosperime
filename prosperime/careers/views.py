@@ -635,10 +635,36 @@ def discover_career_positions(request, career_id):
 @login_required
 def position_profile(request,pos_id):
 
+	# initiate position class
+	import careers.positionlib as positionlib
+	career_pos = positionlib.PositionBase()
+
 	# get position
 	position = IdealPosition.objects.get(pk=pos_id)
 	
-	return render_to_response('careers/position_profile.html',{'position':position},context_instance=RequestContext(request))
+	# ed_overview = None
+	ed_overview = cache.get('position_profile_ed_overview_'+str(request.user.id)+"_"+str(pos_id))
+	# # check to see if cache was empty
+	if ed_overview is None:
+		print "missed cache @ ed.overview"
+		cache.set('position_profile_ed_overview_'+str(request.user.id)+"_"+str(pos_id),career_pos.get_ed_overview(request.user,position),10)
+		ed_overview = cache.get('position_profile_ed_overview_'+str(request.user.id)+"_"+str(pos_id))
+
+	# get duration overview
+	duration = cache.get('position_stats_duration_'+str(request.user.id)+"_"+str(pos_id))
+	# check to see if cache is empty
+	if duration is None:
+		cache.set('position_stats_duration_'+str(request.user.id)+"_"+str(pos_id),career_pos.get_avg_duration_to_position(request.user,position))
+		duration = cache.get('position_stats_duration_'+str(request.user.id)+"_"+str(pos_id))
+
+	stats = {}
+	
+	stats['duration'] = {
+		'network': duration['network'],
+		'all': duration['all']
+		} 
+
+	return render_to_response('careers/position_profile.html',{'stats':stats,'ed_overview':ed_overview,'position':position},context_instance=RequestContext(request))
 
 @login_required
 def position_paths(request,pos_id):
