@@ -32,6 +32,9 @@ from django.conf import settings
 
 class LIBase():
 
+	## Use this for verbose printing during the parsing process
+	logging = True
+
 	# LinkedIn API credentials
 	linkedin_key = '8yb72i9g4zhm'
 	linkedin_secret = 'rp6ac7dUxsvJjQpS'
@@ -276,12 +279,14 @@ class LIBase():
 		content = simplejson.loads(content)
 
 		return content
-
-	def get_company(self,id=None,name=None):
+#############
+## Entity ##
+#############
+	def get_company(self,uniq_id=None,name=None):
 		co = None
-		if id:
+		if uniq_id:
 			try:
-				co = Entity.objects.get(li_uniq_id=id)
+				co = Entity.objects.get(li_uniq_id=uniq_id)
 			except:
 				# if company doesn't exist, return None
 				return None
@@ -303,6 +308,8 @@ class LIBase():
 		# if nothing returned from LI, return None
 		if data is None:
 			# TODO add company
+			if logging:
+				print "Not logging unkown company..."
 			return None
 		
 		# add to database
@@ -310,6 +317,8 @@ class LIBase():
 		co.name = data['name']
 		co.type = 'organization'
 		co.li_uniq_id = id
+
+
 		# coValues = {'li_univ_name':'universalName','li_type':''}
 		if 'universalName' in data:
 			co.li_univ_name = data['universalName']
@@ -367,7 +376,33 @@ class LIBase():
 				for l in data['locations']['values']:
 					self.add_office(co,l)
 
+
+		if self.logging:
+			print 'Add Company: (' + str(co.id) + ') ' + co.name + ' ' + str(li_uniq_id)
+ 
 		return co
+
+	def add_office(self,co,office):
+		o = Office()
+
+		officeValues = {'description':'description','is-hq':'isHeadquarters'}
+		# check to see if there is a description for the office
+		if 'description' in office:
+			o.description = office['description']
+		# check to see if the office has an headquarters value
+		if 'isHeadquarters' in office:
+			o.is_hq = office['isHeadquarters']
+		
+		addressValues = {'addr_1':'street1','addr_2':'street2','city':'city','state_code':'state','postal_code':'postalCode','country_code':'countryCode'}
+		# check to see if there is an address value
+		if 'address' in office:
+			for k,v in addressValues.iteritems(): 
+				if v in office['address']:
+					setattr(o,k,office['address'][v])
+		# relate back to company
+		o.entity = co
+		o.save()
+
 
 	def fetch_co_li_profile(self,co_id=None,name=None):
 		"""
@@ -383,23 +418,63 @@ class LIBase():
 
 		content = self.fetch_data_oauth(self.acct.id,co_api_url)
 
-		# check for erros
+		# check for errors
 		if 'errorCode' in content:
+			if self.logging:
+				print 'Error getting li profile: ' + str(content)
 			return None
 		return content
 
+	def get_institution(self,name=None,type="school"):
+		try:
+			school = Entity.objects.get(li_type="school",name=name)			
+		except:
+			return None
+		# return school
+		return school
+
+	def add_institution(self,data):
+		ed = Entity()
+		ed.name = data['inst_name']
+		# ed.li_uniq_id = data['inst_uniq_id']
+		ed.type = 'organization'
+		ed.subtype = 'ed-institution'
+		ed.li_type = 'school'
+		ed.li_uniq_id = data['inst_uniq_id']
+		ed.save()
+
+		if self.logging:
+			print 'Add Institution: (' + str(ed.id) + ') ' + ed.name + ' '  + str(li_uniq_id)
+
+		return ed
+
+
+#######################
+## Entity - Industry ##
+#######################
 	def get_industry(self,name,code):
 		"""
 		tries to find, and return, matching industry from local db based on LI params
 		"""
-		try:
-			industry = Industry.objects.get(Q(name=name) | Q(li_code=code))
-		except:
-			# no such industry, return None
+		industry = Industry.objects.filter(name=name)
+		if len(industry) == 0:
+			industry = Industry.objects.filter(li_code=code)
+		if len(industry) == 0:
 			return None
-		# return industry object
-		return industry
+		else:
+			return industry[0]
 
+		# try:
+		# 	industry = Industry.objects.get(Q(name=name) | Q(li_code=code))
+		# except:
+		# 	# no such industry, return None
+		# 	return None
+		# # return industry object
+		# return industry
+
+####################
+## Entity - Image ##
+####################
 	def save_li_image(self,co,img_url):
 		"""
 		fetches LI image, saves locally
@@ -424,27 +499,9 @@ class LIBase():
 				logo.logo.save(img_filename,img_file,True)
 			os.remove('tmp_img')
 
-	def add_office(self,co,office):
-		o = Office()
-
-		officeValues = {'description':'description','is-hq':'isHeadquarters'}
-		# check to see if there is a description for the office
-		if 'description' in office:
-			o.description = office['description']
-		# check to see if the office has an headquarters value
-		if 'isHeadquarters' in office:
-			o.is_hq = office['isHeadquarters']
-		
-		addressValues = {'addr_1':'street1','addr_2':'street2','city':'city','state_code':'state','postal_code':'postalCode','country_code':'countryCode'}
-		# check to see if there is an address value
-		if 'address' in office:
-			for k,v in addressValues.iteritems(): 
-				if v in office['address']:
-					setattr(o,k,office['address'][v])
-		# relate back to company
-		o.entity = co
-		o.save()
-
+#########################
+## Careers - Positions ##
+#########################
 	def add_position(self,user,co,data):
 		# dectionary of values to test for and then add if present
 		positionValues = {'title':'title','description':'summary','current':'isCurrent'}
@@ -465,14 +522,19 @@ class LIBase():
 			pos.end_date = self.format_dates(data['endDate'])
 		pos.save()
 		# if pos.title:
-		print "matching..."
 		careers = careerlib.match_careers_to_position(pos)
-		print careers
+		# print careers
 		for c_id in careers:
 			c = Career.objects.get(pk=c_id)
 			# print c
 			pos.careers.add(c)
 		pos.save()
+
+		if self.logging:
+			if pos.title is not None:
+				print 'Add Position: (' + str(pos.id) + ') ' + pos.title + ' ' + pos.entity.name
+			else:
+				print 'Add Position: (' + str(pos.id) + ') ' + 'no title ' + pos.entity.name
 
 		# career = self.add_careers_to_position(pos)
 		
@@ -503,6 +565,9 @@ class LIBase():
 		pos.current = data['isCurrent']
 		pos.save()
 
+		if self.logging:
+			print 'Update Position: (' + str(pos.id) + ') ' + data['title'] + pos.entity.name
+
 		return pos
 
 	def add_careers_to_position(self,pos):
@@ -523,24 +588,6 @@ class LIBase():
 			pos.careers.add(c)
 		pos.save()
 
-	def get_institution(self,name=None,type="school"):
-		try:
-			school = Entity.objects.get(li_type="school",name=name)			
-		except:
-			return None
-		# return school
-		return school
-
-	def add_institution(self,data):
-		ed = Entity()
-		ed.name = data['inst_name']
-		# ed.li_uniq_id = data['inst_uniq_id']
-		ed.type = 'organization'
-		ed.subtype = 'ed-institution'
-		ed.li_type = 'school'
-		ed.li_uniq_id = data['inst_uniq_id']
-		ed.save()
-		return ed
 
 	def add_ed_position(self,user,ed,data):
 		pos = Position()
@@ -562,24 +609,13 @@ class LIBase():
 		
 		pos.save()
 
-	def format_dates(self,date):
-		"""
-		converts string to Python datetime object according to structure of string
-		"""
-		if date is None:
-			return None
+		if self.logging:
+			if title is not None:
+				print 'Add Ed Positions (' + str(pos.id) + ') ' + pos.title + ' ' + ed.name
+			else:
+				print 'Add Ed Position: (' + str(pos.id) + ') ' + 'no name' + ' ' + ed.name
 
-		if 'month' in date:
-			formatted_date = datetime.strptime(str(date['month'])+"/"+str(date['year']),"%m/%Y")
-		elif 'year' in date:
-			formatted_date = datetime.strptime(str(date['year']),"%Y")
-		else:
-			# start date comes from public profile, in Y-m-d format
-			try:
-				formatted_date = datetime.strptime(date,"%Y-%m-%d")
-			except:
-				formatted_date = dateutil.parser.parse(date)
-		return formatted_date
+
 
 	def add_profile_pic(self,user,img_url):
 		"""
@@ -606,6 +642,28 @@ class LIBase():
 				pic.pic.save(img_filename,img_file,True)
 			os.remove('tmp_img')
 
+#############
+## Helpers ##
+#############
+	def format_dates(self,date):
+		"""
+		converts string to Python datetime object according to structure of string
+		"""
+		if date is None:
+			return None
+
+		if 'month' in date:
+			formatted_date = datetime.strptime(str(date['month'])+"/"+str(date['year']),"%m/%Y")
+		elif 'year' in date:
+			formatted_date = datetime.strptime(str(date['year']),"%Y")
+		else:
+			# start date comes from public profile, in Y-m-d format
+			try:
+				formatted_date = datetime.strptime(date,"%Y-%m-%d")
+			except:
+				formatted_date = dateutil.parser.parse(date)
+		return formatted_date
+
 	def mark_as_scanning(self):
 		"""
 		marks account as currently being last_scanned
@@ -624,6 +682,11 @@ class LIBase():
 		self.acct.scanning_now = False
 		# save changes
 		self.acct.save()
+
+
+#######################################################
+
+#######################################################
 
 class LIProfile(LIBase):
 	
@@ -711,8 +774,11 @@ class LIProfile(LIBase):
 
 		# fetch profile data from LinkedIn
 		profile = self.fetch_profile()
-		# print profile
-		# self.stdout.write([profile])
+
+		############################
+		# V2 Edits:                #
+		# - id, pic url, purl only #
+		############################
 		# make sure positions are present
 		if 'positions' in profile:
 			for p in profile['positions']['values']:
@@ -791,10 +857,18 @@ class LIProfile(LIBase):
 	# 			pic.pic.save(img_filename,img_file,True)
 	# 		os.remove('tmp_img')
 
+
+
+
+
+######################################
+	# 		  CONNECTIONS         #
+######################################
 class LIConnections(LIBase):
 
 	# fields from connections API
-	fields = "(id,picture-url,headline,first-name,last-name,positions:(start-date,end-date,title,is-current,summary,company:(id)),public-profile-url)"
+	## EDIT - fields = "(id,picture-url,headline,first-name,last-name,positions:(start-date,end-date,title,is-current,summary,company:(id)),public-profile-url)"
+	fields = "(id)"
 
 	# construct api url
 	api_url = "http://api.linkedin.com/v1/people/~/connections:" + fields + "?format=json"
@@ -808,7 +882,7 @@ class LIConnections(LIBase):
 		Fetches LI connections, runs through each, adds new users, creates connections, and process connections' profiles
 		"""
 
-		# get connections
+		# get connections - all id's
 		connections = self.get_connections()
 
 		# loop through connections
@@ -821,7 +895,8 @@ class LIConnections(LIBase):
 				user = None
 			# check to see if privacy settings prohibit getting any useful information
 			if c['firstName'] == 'private' and c['lastName'] == 'private':
-				print '@ LI Parser, privacy settings set, passing on user'
+				if self.logging:
+					print 'Add Connection: privacy settings set, passing on user'
 				pass
 			else:
 				
@@ -925,6 +1000,9 @@ class LIConnections(LIBase):
 			acct.public_url = user_info['publicProfileUrl']
 		acct.status = "unlinked"
 		acct.save()
+
+		if self.logging:
+			print 'Add Dormant User: ' + user_info['firstName'] + ' ' + user_info['lastName']
 
 		return user
 
@@ -1138,7 +1216,7 @@ class LITest(LIBase):
 		for p in raw_positions:
 			# get title of position
 			title = p.find("div","postitle").span.contents[0]
-			# get unique name of company
+			# get uniq ue name of company
 			co_uniq_name = p.find("a","company-profile-public")
 			if co_uniq_name:
 				co_uniq_name = co_uniq_name.get('href')

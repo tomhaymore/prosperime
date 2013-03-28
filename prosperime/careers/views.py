@@ -23,34 +23,38 @@ from django.db.models import Count, Q
 ################## CORE VIEWS ########################
 ######################################################
 
-# dev only
-def getIndustriesForUser(user_id):
-	user = User.objects.get(pk=user_id)
-	positions = Position.objects.filter(person=user).prefetch_related().select_related('entity') # check this
 
-	industries = []
-	seen_before = set()
-	for p in positions:
-		p_entity = p.entity
-		p_industries = p_entity.domains.all()
-		print p_industries
-		for i in p_industries:
-			if i.id not in seen_before:
-				seen_before.add(i.id)
-				industries.append(i)
+def home(request):
+	if not request.user.is_authenticated():
+		return HttpResponseRedirect('welcome')
+	data = {}
+	user = request.user
 
-	print 'Industry Report for: ' + user.profile.full_name()
-	print '####################'
-	print 'Positions: '
-	for p in positions:
-		if p.title is not None:
-			print p.title + ' - ' + p.entity.name
-		else:
-			print 'n/a - ' + p.entity.name 
-	print '####################'
-	print 'Industries:'
-	for i in industries:
-		print i.name
+	# # data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
+	# # data['saved_paths'] = SavedPath.objects.filter(owner=user)
+	# data['saved_careers'] = request.user.saved_careers.all()
+	# data['saved_jobs'] = GoalPosition.objects.filter(owner=user)
+	# data['career_decisions'] = CareerDecision.objects.all()
+
+
+	# try:
+	# 	poi = SavedPath.objects.get(owner=user, title='queue')
+	# 	poi = poi.positions.all()
+	# except:
+	# 	poi = None
+
+	# data['positions_of_interest'] = poi
+
+	industries = user.profile._industries()
+	if industries:
+		data['industry'] = industries[0].id
+	else:
+		data['industry'] = None
+		## this means they either have 0 postions or ghetto ones
+	## need current industry, too
+
+	return render_to_response('home_v2.html',data,context_instance=RequestContext(request))
+
 
 
 
@@ -119,6 +123,8 @@ def next(request):
 
 ### FINAL NOTE: eventually, we might want to be able to segment this by 
 ### 'my network' & 'prosperime community'. I do nothing about this now
+
+
 def _get_industry_data(ind_id, request):
 
 		## NOTE ##
@@ -167,7 +173,7 @@ def _get_industry_data(ind_id, request):
 
 		## My ghetto logic where I assume that the next position
 		## in the db is the next pos in someone's timeline
-		next_pk = p.pk + 1
+		next_pk = p.pk - 1
 		try:
 			next = Position.objects.get(pk=next_pk)
 		except:
@@ -226,178 +232,6 @@ def _get_industry_data(ind_id, request):
 		}
 
 	return data
-
-
-
-def addDecision(request):
-	response = {}
-
-	if not request.is_ajax or not request.POST:
-		response['success'] = 'incorrect request type'
-		return HttpResponse(simplejson.dumps(response))
-
-	position = Position.objects.get(id=request.POST.get('pos_id'))
-
-	decision = CareerDecision()
-	decision.owner = request.user
-	decision.position = position
-	decision.winner = decision.position.entity
-
-	if position.type == 'education':
-		decision.type = 'college'
-	elif 'ntern' in position.title:
-		decision.type = 'internshp'
-	elif position.current:
-		decision.type = 'currentJob'
-	else:
-		decision.type = None
-
-	privacy = request.POST.get('privacy')
-	if privacy:
-		decision.privacy = privacy
-
-
-	decision.reason = request.POST.get('reason')
-	decision.comments = request.POST.get('comments')
-	decision.mentorship = int(request.POST.get('mentorship'))
-	decision.social = int(request.POST.get('social'))
-	decision.skills = int(request.POST.get('skills'))
-	decision.overall = int(request.POST.get('overall'))
-
-	decision.save()
-	response['sucess'] = 'true'
-
-	alternates = request.POST.get('alternates')
-	alternates =  alternates.split(', ')
-	for alternate in alternates:
-		# get entity
-		entity = Entity.objects.filter(name=alternate)
-		entity=entity[0]
-		decision.alternates.add(entity)
-
-	decision.save()
-	response['alternates'] = 'completed'
-
-	return HttpResponse(simplejson.dumps(response))
-
-
-def viewCareerDecisions(request):
-	data = {}
-
-	return render_to_response('careers/career_decisions.html',data,context_instance=RequestContext(request))
-
-def getDecisions(request):
-
-	if request.GET.getlist('term'):
-		search_term = request.GET.getlist('term')[0]
-	else:
-		search_term = None
-
-	if search_term is None:
-		# empty - return 10 most recent
-		decisions = CareerDecision.objects.all().order_by('date_created')[:10]
-	
-	elif search_term == 'relevantCareers':
-		decisions = CareerDecision.objects.all().order_by('date_created')[:10]
-
-	elif search_term == 'positionsOfInterest':
-		print 'here'
-		queue = SavedPath.objects.get(owner=request.user, title='queue')
-		poi = SavedPosition.objects.filter(path=queue).select_related('position')
-		titles = []
-		for p in poi:
-			titles.append(p.position.title)
-			print p.position.title
-		decisions = CareerDecision.objects.filter(position__title__in=titles)
-
-	elif search_term == 'highestRated':
-		decisions = CareerDecision.objects.all().order_by('date_created')[:10]
-
-	else: # == 'byCompany'
-		decisions = CareerDecision.objects.all().order_by('date_created')[:10]
-
-	response = {
-		'decisions':_decisions_to_json(decisions)
-	}
-
-	return HttpResponse(simplejson.dumps(response))
-
-
-## Autocomplete for multiple entities, used in CareerDecision prompt
-def entityAutocomplete(request):
-
-	query = request.GET.getlist('query')[0]
-	entities = Entity.objects.filter(name__istartswith=query).values('name')
-
-	suggestions = []
-	for e in entities:
-		suggestions.append(str(e['name']))
-
-	# suggestions = simplejson.dumps(suggestions)
-	print suggestions
-	response = {
-		'query': query,
-		'suggestions': suggestions,
-	}
-	return HttpResponse(simplejson.dumps(response))
-
-## Autocomplete for industries, used in What Next?
-def industryAutocomplete(request):
-
-	query = request.GET.getlist('query')[0]
-
-	print 'query: ' + query
-	industries = Industry.objects.filter(name__istartswith=query).values('name', 'id')
-
-	suggestions = []
-	seen_before = set()
-	for i in industries:
-		if (i['name']) not in seen_before:
-			item = {
-				'value':i['name'],
-				'data':i['id'],
-			}
-			suggestions.append(item)
-			seen_before.add(i['name'])
-
-	response = {
-		'query':query,
-		'suggestions':suggestions,
-	}	
-	
-	return HttpResponse(simplejson.dumps(response))
-
-
-def home(request):
-	if not request.user.is_authenticated():
-		return HttpResponseRedirect('welcome')
-	data = {}
-	user = request.user
-
-	# data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
-	# data['saved_paths'] = SavedPath.objects.filter(owner=user)
-	data['saved_careers'] = request.user.saved_careers.all()
-	data['saved_jobs'] = GoalPosition.objects.filter(owner=user)
-	data['career_decisions'] = CareerDecision.objects.all()
-
-
-	try:
-		poi = SavedPath.objects.get(owner=user, title='queue')
-		poi = poi.positions.all()
-	except:
-		poi = None
-
-	data['positions_of_interest'] = poi
-
-	industries = user.profile._industries()
-	if industries:
-		data['industry'] = industries[0].id
-	else:
-		data['industry'] = None
-		## this means they either have 0 postions or ghetto ones
-	## need current industry, too
-
-	return render_to_response('home_v2.html',data,context_instance=RequestContext(request))
 
 @login_required
 def discover(request):
@@ -632,6 +466,184 @@ def discover_career_positions(request, career_id):
 def discover_position(request,pos_id):
 
 	return render_to_response('careers/discover_position.html',{},context_instance=RequestContext(request))
+
+
+def viewCareerDecisions(request):
+	data = {}
+
+	return render_to_response('careers/career_decisions.html',data,context_instance=RequestContext(request))
+
+
+##########################
+###### AJAX Methods ######
+##########################
+
+def addDecision(request):
+	response = {}
+
+	if not request.is_ajax or not request.POST:
+		response['success'] = 'incorrect request type'
+		return HttpResponse(simplejson.dumps(response))
+
+	position = Position.objects.get(id=request.POST.get('pos_id'))
+
+	decision = CareerDecision()
+	decision.owner = request.user
+	decision.position = position
+	decision.winner = decision.position.entity
+
+	if position.type == 'education':
+		decision.type = 'college'
+	elif 'ntern' in position.title:
+		decision.type = 'internshp'
+	elif position.current:
+		decision.type = 'currentJob'
+	else:
+		decision.type = None
+
+	privacy = request.POST.get('privacy')
+	if privacy:
+		decision.privacy = privacy
+
+
+	decision.reason = request.POST.get('reason')
+	decision.comments = request.POST.get('comments')
+	decision.mentorship = int(request.POST.get('mentorship'))
+	decision.social = int(request.POST.get('social'))
+	decision.skills = int(request.POST.get('skills'))
+	decision.overall = int(request.POST.get('overall'))
+
+	decision.save()
+	response['sucess'] = 'true'
+
+	alternates = request.POST.get('alternates')
+	alternates =  alternates.split(', ')
+	for alternate in alternates:
+		# get entity
+		entity = Entity.objects.filter(name=alternate)
+		entity=entity[0]
+		decision.alternates.add(entity)
+
+	decision.save()
+	response['alternates'] = 'completed'
+
+	return HttpResponse(simplejson.dumps(response))
+
+
+def getDecisions(request):
+
+	if request.GET.getlist('term'):
+		search_term = request.GET.getlist('term')[0]
+	else:
+		search_term = None
+
+	if search_term is None:
+		# empty - return 10 most recent
+		decisions = CareerDecision.objects.all().order_by('date_created')[:10]
+	
+	elif search_term == 'relevantCareers':
+		decisions = CareerDecision.objects.all().order_by('date_created')[:10]
+
+	elif search_term == 'positionsOfInterest':
+		print 'here'
+		queue = SavedPath.objects.get(owner=request.user, title='queue')
+		poi = SavedPosition.objects.filter(path=queue).select_related('position')
+		titles = []
+		for p in poi:
+			titles.append(p.position.title)
+			print p.position.title
+		decisions = CareerDecision.objects.filter(position__title__in=titles)
+
+	elif search_term == 'highestRated':
+		decisions = CareerDecision.objects.all().order_by('date_created')[:10]
+
+	else: # == 'byCompany'
+		decisions = CareerDecision.objects.all().order_by('date_created')[:10]
+
+	response = {
+		'decisions':_decisions_to_json(decisions)
+	}
+
+	return HttpResponse(simplejson.dumps(response))
+
+
+## Autocomplete for multiple entities, used in CareerDecision prompt
+def entityAutocomplete(request):
+
+	query = request.GET.getlist('query')[0]
+	entities = Entity.objects.filter(name__istartswith=query).values('name')
+
+	suggestions = []
+	for e in entities:
+		suggestions.append(str(e['name']))
+
+	# suggestions = simplejson.dumps(suggestions)
+	print suggestions
+	response = {
+		'query': query,
+		'suggestions': suggestions,
+	}
+	return HttpResponse(simplejson.dumps(response))
+
+## Autocomplete for industries, used in What Next?
+def industryAutocomplete(request):
+
+	query = request.GET.getlist('query')[0]
+
+	print 'query: ' + query
+	industries = Industry.objects.filter(name__istartswith=query).values('name', 'id')
+
+	suggestions = []
+	seen_before = set()
+	for i in industries:
+		if (i['name']) not in seen_before:
+			item = {
+				'value':i['name'],
+				'data':i['id'],
+			}
+			suggestions.append(item)
+			seen_before.add(i['name'])
+
+	response = {
+		'query':query,
+		'suggestions':suggestions,
+	}	
+	
+	return HttpResponse(simplejson.dumps(response))
+
+
+def home_proto(request):
+
+	# biz_dev = Position.objects.filter(title__contains="Business Development").select_related("entity", "person")
+	# designer = Position.objects.filter(title__contains="Design").select_related("entity", "person")
+	# developer = Position.objects.filter(Q(title__contains="Developer") | Q(title__contains="Engineer")).select_related("entity", "person")
+	# marketer = Position.objects.filter(title__contains="Marketing").select_related("entity", "person")
+	sales = Position.objects.filter(title__contains="Sales").select_related("entity", "person")
+	pr = Position.objects.filter(Q(title__icontains="PR ") | Q(title__icontains="Public Relations")).select_related("entity", "person")
+	associates = Position.objects.filter(title__icontains="Associate").select_related("entity", "person")
+
+
+	data = {
+		# 'biz_dev':_split_and_jsonify(biz_dev),
+		# 'design':_split_and_jsonify(designer),
+		# 'developer':_split_and_jsonify(developer),
+		# 'marketer':_split_and_jsonify(marketer),
+		'sales':_split_and_jsonify(sales),
+		'pr':_split_and_jsonify(pr),
+		'associates':_split_and_jsonify(associates),
+	}
+
+
+
+	return HttpResponse(simplejson.dumps(data))
+
+
+
+
+	# render_to_response("home_v3.html", data, context_instance=RequestContext(request))
+
+
+
 
 @login_required
 def personalize_careers_jobs(request):
@@ -965,18 +977,7 @@ def get_queue(request):
 	return HttpResponse(simplejson.dumps(queue))
 
 # FOR DEV ONLY 
-def manual_save(user_id, path_id, pos_id):
 
-	path = SavedPath.objects.get(id=path_id)
-	position = Position.objects.get(id=pos_id)
-
-	saved_position = SavedPosition()
-	saved_position.position = position
-	saved_position.path = path
-	saved_position.index = path.get_next_index()
-	saved_position.save()	
-
-	return 'Success'
 
 def add_to_queue(request):
 	response = {}
@@ -1092,56 +1093,6 @@ def rearrange(request):
 	return HttpResponse(simplejson.dumps(response))
 
 
-def prototype(request):
-
-	response = []
-
-	if request.GET.getlist('pos', False):
-		pos_id = request.GET.getlist('pos', False)[0]
-		position = Position.objects.get(id=pos_id)
-		print 'Original Request: ' + position.title + " @ " + position.entity.name 
-
-		other_jobs_at_co = Position.objects.filter(entity__name=position.entity.name)
-		profiles_from_company = set()
-		for p in other_jobs_at_co:
-			profiles_from_company.add(Profile.objects.get(user=p.person))
-
-		profiles_same_job_title = set()
-		profiles_exact_same_job = set()
-
-		other_people_who_have_held_this_job = Position.objects.filter(title=position.title)
-		for pos in other_people_who_have_held_this_job:
-			profile = Profile.objects.get(user=pos.person)
-			if profile not in profiles_same_job_title:
-				profiles_same_job_title.add(profile)
-			if pos.entity.name == position.entity.name:
-				# don't want dupes. ok for now
-				profiles_exact_same_job.add(profile)
-
-		# now ready all elements for json...
-		json_profiles_from_company = _ready_profiles_for_json(profiles_from_company)
-		json_profiles_same_job_title = _ready_profiles_for_json(profiles_same_job_title)
-		json_profiles_exact_same_job = _ready_profiles_for_json(profiles_exact_same_job)
-
-		response = {
-			'same_company': json_profiles_from_company,
-			'same_job_title': json_profiles_same_job_title,
-			'same_job_exact': json_profiles_exact_same_job,
-		}
-
-
-	else:
-		response = []
-
-		all_positions = Position.objects.all()[:100]
-		for p in all_positions:
-			formatted_pos = _ready_position_for_proto(p)
-			if formatted_pos:
-				response.append(formatted_pos)
-
-	return HttpResponse(simplejson.dumps(response))
-
-
 
 ######################################################
 ##################    HELPERS   ######################
@@ -1252,6 +1203,36 @@ def _ready_profiles_for_json(profiles):
 		formatted_profiles.append(attribs)
 
 	return formatted_profiles
+
+
+
+def _split_and_jsonify(all_positions):
+
+	intern_total = 0; big_total = 0; bigs = []; interns = []; intern_counter = 0; big_counter = 0;
+
+	for pos in all_positions:
+		if "intern" in pos.title or "Intern" in pos.title:
+			interns.append({'title':pos.title, 'entity_name':pos.entity.name, 'person':pos.person.profile.full_name()})
+			if pos.start_date and pos.end_date:
+				duration = pos.end_date - pos.start_date
+				intern_total += duration.days
+				intern_counter += 1
+
+		else:
+			bigs.append({'title':pos.title, 'entity_name':pos.entity.name, 'person':pos.person.profile.full_name()})
+			if pos.start_date and pos.end_date:
+				duration = pos.end_date - pos.start_date
+				big_total += duration.days
+				big_counter += 1
+
+	data = {
+		'interns':interns,
+		'job_holders':bigs,
+		# 'intern_avg_duration':intern_total/intern_counter,
+		# 'job_avg_duration':big_total/big_counter,
+	}
+
+	return data
 
 
 
@@ -1580,3 +1561,50 @@ def _get_users_in_network(user,**filters):
 
 	user_ids = set(user_ids)
 	return (users_list, user_ids)
+
+
+#######################
+###### Dev Only #######
+#######################
+
+def getIndustriesForUser(user_id):
+	user = User.objects.get(pk=user_id)
+	positions = Position.objects.filter(person=user).prefetch_related().select_related('entity') # check this
+
+	industries = []
+	seen_before = set()
+	for p in positions:
+		p_entity = p.entity
+		p_industries = p_entity.domains.all()
+		print p_industries
+		for i in p_industries:
+			if i.id not in seen_before:
+				seen_before.add(i.id)
+				industries.append(i)
+
+	print 'Industry Report for: ' + user.profile.full_name()
+	print '####################'
+	print 'Positions: '
+	for p in positions:
+		if p.title is not None:
+			print p.title + ' - ' + p.entity.name
+		else:
+			print 'n/a - ' + p.entity.name 
+	print '####################'
+	print 'Industries:'
+	for i in industries:
+		print i.name
+
+
+def manual_save(user_id, path_id, pos_id):
+
+	path = SavedPath.objects.get(id=path_id)
+	position = Position.objects.get(id=pos_id)
+
+	saved_position = SavedPosition()
+	saved_position.position = position
+	saved_position.path = path
+	saved_position.index = path.get_next_index()
+	saved_position.save()	
+
+	return 'Success'

@@ -1,4 +1,52 @@
 
+div#timeline-info-container {
+	margin-right:250px;
+	background-color:#f8f8f8;
+	border-radius:2px;
+	padding:10px;
+	width:400px;
+	height:100px;
+	visibility: hidden;
+	margin-bottom:45px;
+	text-align:center;
+}
+
+div#timeline-description-container {
+	display:none;
+	line-height:27px;
+}
+
+div#timeline-header-container {
+}
+
+div#goal-careers-container {
+/*	width:50%;
+*/}
+
+div#goal-careers-header {
+	display:inline;
+}
+
+div#goal-careers-personalize {
+	display:inline;
+	margin-left:50px;
+	font-weight:600;
+}
+
+div#goal-careers-container table {
+	margin-top:25px;
+	margin-bottom:25px;
+}
+
+div#goal-careers-container table td {
+	padding-left:10px;
+}
+
+div#saved-paths-container .timeline-header {
+	margin-bottom:25px;
+	margin-top:25px;
+}
+
 
 #profile-careers-container {
 	width:92%;
@@ -190,35 +238,17 @@ div.hidden-data-structure {
 }
 
 
-span.timeline-start-date {
-/*	float:left;
-*/	font-size:1.6em;
-	font-weight:500;
-	/*position:relative;
-	left:50px;*/
+div.timeline-date {
+	font-size:1.6em;
 }
 
-span.timeline-end-date {
-/*	float:right;
-*/	font-size:1.6em;
-	font-weight:500;
-	/*position:relative;
-	right:50px;*/
+div.timeline-title {
+
 }
 
-span.timeline-title {
-	display:block;
-	font-weight:500;
-}
+div.timeline-entity-name {
 
-span.timeline-entity-name {
-/*	font-variant:small-caps;
-*/	font-weight:500;
-	width:100%;
-	padding-left:15px;
-/*	font-size:1.6em;
-*//*	display:block;
-*/}
+}
 
 span.timeline-description {
 	font-size:1em;
@@ -295,22 +325,35 @@ div#career-decision-form form {
 
 div.timeline-header {
 	color:rgb(41,98,152);
-	padding-top:40px;
+	/*padding-top:20px;
 	padding-left:40px;
 	font-weight:500;
 	font-size:12pt;
 	text-transform: uppercase;
-	letter-spacing:1px;
+	letter-spacing:1px;*/
+	padding-left:20px;
+	font-size:1.6em;
 
 }
 
+div.reposition {
+	position:relative;
+	top:75px;
+	right:15px;
+	padding-left:0px !important;
+}
+
 div#queue {
+
+}
+
+div.item-container {
 	margin-left:0px auto;
 	margin-right:0px auto;
 	text-align:center;
 	width:100%;
-/*	border:2px solid midnightblue;
-*/}
+	margin-bottom:25px;
+}
 
 div.queue-position {
 	margin-top:25px;
@@ -318,20 +361,30 @@ div.queue-position {
 	padding-top:15px;
 
 	display:inline-block;
-	background-color:rgb(41,98,152);
-	border-radius:2px 2px 2px 2px;
+	/*background-color:rgb(41,98,152);*/
+	background-color:#0c5da5;
+	border-radius:1px;
 	width:200px;
 	height:100px;
 	vertical-align:middle;
-	margin-left:5px;
-	margin-right:5px;
-	color:whitesmoke;
-	text-align:left;
-
+	margin-left:1px;
+	margin-right:1px;
+	color:#fffffe;
+	text-align:center;
+	font-size:1.1em;
 }
 
 div.queue-position-hover {
 	box-shadow:1px 1px 1px 1px #333;
+	cursor:pointer;
+}
+
+div.queue-position-position {
+
+}
+
+div.queue-position-entity {
+	font-weight:600;
 }
 
 .queue-position-title {
