@@ -1,0 +1,36 @@
+.module {
+	text-align:center;
+	margin-top:25px;
+}
+
+.header {
+	font-size:1.6em;
+	border-bottom:1px solid midnightblue;
+	padding:15px;
+	max-width:100px;
+	margin: 0 auto;
+}
+
+
+
+.content {
+	margin-top:25px;
+	line-height:25px;
+}
+
+.main-container {
+	height:600px;
+}
+
+.name {
+	font-weight:600;
+	display:inline-block;
+}
+
+.description {
+	display:inline-block;
+}
+
+.dummy {
+	margin:0px;
+}
