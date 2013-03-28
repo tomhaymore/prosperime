@@ -156,6 +156,8 @@ div#splash-home {
 	margin:0;
 	padding: 35px 0 30px 0; 
 	height:200px;
+	background-color: rgb(45, 110, 184);
+	background-repeat: repeat-y;
 }
 
 div.splash-container {
@@ -176,7 +178,8 @@ p.splash-message-subheader {
 	font-size: 1.4em;
 	line-height: 1.6em;
 	text-align: center;
-	color:#363a3d;
+	/*color:#363a3d;*/
+	color:rgb(43, 46, 48);
 }
 
 a.splash-message, p.splash-message {
@@ -188,7 +191,8 @@ a.splash-message, p.splash-message {
 }
 
 p.splash-submessage a {
-	color:#363a3d;
+	/*color:#363a3d;*/
+	color:rgb(43, 46, 48);
 	font-size: 1.0em;
 	line-height: 1.2em;
 	vertical-align: middle;
@@ -216,6 +220,9 @@ div#promo-message-container {
 	padding-top:10px;
 	background-color: whitesmoke;
 	height:225px;
+	width:1000px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 ul {

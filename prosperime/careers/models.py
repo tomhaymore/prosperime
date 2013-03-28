@@ -17,6 +17,7 @@ class Position(models.Model):
 	entity = models.ForeignKey(Entity,related_name="positions")
 	person = models.ForeignKey(User,related_name="positions")
 	careers = models.ManyToManyField("Career",related_name="positions")
+	ideal_position = models.ForeignKey("IdealPosition",related_name="ideal_position")
 	title = models.CharField(max_length=150,null=True)
 	summary = models.CharField(max_length=450,null=True)
 	description = models.TextField(null=True)
