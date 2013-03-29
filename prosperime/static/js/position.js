@@ -463,7 +463,7 @@ Raphael.fn.pieChart = function (cx, cy, r, values, labels, stroke) {
                 //txt = paper.text(100,10,labels[j]).attr({stroke:"none",opacity:0,"font-size":12});
             p.mouseover(function () {
                 p.stop().animate({transform: "s1.1 1.1 " + cx + " " + cy}, ms, "elastic");
-                $("#career-profile-graph-label").text(labels[j]);
+                $("#position-profile-graph-label").text(labels[j]);
                 //txt.stop().animate({opacity: 1}, text_ms, "elastic");
             }).mouseout(function () {
                 p.stop().animate({transform: ""}, ms, "elastic");
