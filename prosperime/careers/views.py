@@ -52,7 +52,7 @@ def home(request):
 		## this means they either have 0 postions or ghetto ones
 	## need current industry, too
 
-	return render_to_response('home_v2.html',data,context_instance=RequestContext(request))
+	return render_to_response('home_v3.html',data,context_instance=RequestContext(request))
 
 
 

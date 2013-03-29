@@ -325,6 +325,7 @@ def profile(request, user_id):
 	profile_pic = user.profile.default_profile_pic()
 	
 	own_profile = False
+	own_profile_javascript = "false"
 	queue = None
 	viewer_saved_paths = []
 	goal_careers = None
@@ -342,6 +343,7 @@ def profile(request, user_id):
 	# If Own Profile, get extra information
 	if int(user_id) == int(request.user.id):
 		own_profile = True
+		own_profile_javascript = "true"
 
 		# Your Saved Paths
 		saved_path_queryset = SavedPath.objects.filter(owner=request.user).exclude(title='queue')
@@ -389,6 +391,7 @@ def profile(request, user_id):
 		# 'top_careers':top_careers,
 		'career_decision_prompt':career_decision_position,
 		'own_profile':own_profile,
+		'own_profile_javascript':own_profile_javascript, # b/c js has true/false, not True/False
 		'queue':queue,
 		'goal_careers':simplejson.dumps(goal_careers),
 	}

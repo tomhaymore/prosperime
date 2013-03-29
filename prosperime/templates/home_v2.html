@@ -157,43 +157,42 @@
 		var bottom_y = 375
 		var middle_y = bottom_y - box_l
 		var top_y = middle_y - box_l
-		
-		var rect_attr = {
-			'fill':'#408DD2',
-			'stroke-width':1,
-			'stroke':'#fffffe',
+	
+
+
+		var top_extra_color = '#63d0e8'//'#d96585'//'#4ca4fe'//'#679fd2'
+		var top_color =  '#41c3e2'//'#ef8e6d' //#349aff'//#408DD2'
+		var middle_color = '#339dd4'//'#eeb76f'//'#288bf3'//'#0C5DA5'
+		var bottom_color = '#298fc0'//'#60a4d0'//'#197be0'//'#043A6B'
+		var bottom_extra_color = '#161665'
+		var box_color = '#fffffe'
+
+		var box_attr = {
+			'stroke':box_color,
+			'stroke-width':2,
 		}
 
 		var top_extra_rect_attr = {
-			'fill':'#679fd2',
+			'fill':top_extra_color,
 			'stroke-width':1,
-			'stroke':'#679fd2',
+			'stroke':top_extra_color
 		}
 
 		var bottom_extra_rect_attr = {
-			'fill':'#161665',
-			'stroke':'#161665',
+			'fill':bottom_extra_color,
+			'stroke':bottom_extra_color,
 			'stroke-width':1,
 		}
 
 
 		var paper = new Raphael('link-container', paper_w, paper_h)
-		var bottom_box = paper.rect(bottom_box_start_x, bottom_y, box_l, box_l, box_r).attr({
-			'stroke':'#fffffe',
-			'stroke-width':2,
-		})
-		var middle_box = paper.rect(middle_box_start_x, middle_y, box_l, box_l, box_r).attr({
-			// 'fill':'#0C5DA5',
-			'stroke-width':2,
-			'stroke':'#fffffe',
-		})
-		var top_box = paper.rect(top_box_start_x, top_y, box_l, box_l, box_r).attr({
-			// 'fill':'#408DD2',
-			'stroke-width':2,
-			'stroke':'#fffffe',
-		})
+		
+		/* Boxes (Icon Containers) */
+		var bottom_box = paper.rect(bottom_box_start_x, bottom_y, box_l, box_l, box_r).attr(box_attr)
+		var middle_box = paper.rect(middle_box_start_x, middle_y, box_l, box_l, box_r).attr(box_attr)
+		var top_box = paper.rect(top_box_start_x, top_y, box_l, box_l, box_r).attr(box_attr)
 
-
+		
 
 
 
@@ -201,19 +200,19 @@
 		// var bottom_extra_rect_right = paper.rect(bottom_box_start_x + 62.5, bottom_y + box_l, paper_w - bottom_box_start_x - 62.5, box_l, box_r).attr(bottom_extra_rect_attr)
 
 		var bottom_rect_right = paper.rect(bottom_box_start_x + box_l, bottom_y, paper_w - box_l - bottom_box_start_x - gutter, box_l, box_r).attr({
-			'fill':'#043A6B',
+			'fill':bottom_color,
 			'stroke-width':1,
-			'stroke':'#043A6B',//'#fffffe',
+			'stroke':bottom_color,
 		})
 		var middle_rect_right = paper.rect(middle_box_start_x + box_l, middle_y, paper_w - box_l - middle_box_start_x - gutter, box_l, box_r).attr({
-			'fill':'#0C5DA5',
+			'fill':middle_color,
 			'stroke-width':1,
-			'stroke':'#0C5DA5',//'#fffffe',
+			'stroke':middle_color
 		})
 		var top_rect_right = paper.rect(top_box_start_x + box_l, top_y, paper_w - box_l - top_box_start_x - gutter, box_l, box_r).attr({
-			'fill':'#408DD2',
+			'fill':top_color,
 			'stroke-width':1,
-			'stroke':'#408DD2',//'#fffffe',
+			'stroke':top_color,
 		})
 
 		var top_extra_rect_right = paper.rect(top_box_start_x + box_l + 62.5, top_y - box_l, paper_w - top_box_start_x - 62.5, box_l, box_r).attr(top_extra_rect_attr)
@@ -225,19 +224,19 @@
 		// var bottom_extra_rect_left = paper.rect(0, bottom_y + box_l, bottom_box_start_x - 62.5, box_l, box_r).attr(bottom_extra_rect_attr)
 
 		var bottom_rect_left = paper.rect(0, bottom_y, bottom_box_start_x, box_l, box_r).attr({
-			'fill':'#043A6B',
+			'fill':bottom_color,
 			'stroke-width':1,
-			'stroke':'#043A6B',//'#fffffe',
+			'stroke':bottom_color,
 		})
 		var middle_rect_left = paper.rect(0, middle_y, middle_box_start_x, box_l, box_r).attr({
-			'fill':'#0C5DA5',
+			'fill':middle_color,
 			'stroke-width':1,
-			'stroke':'#0C5DA5',//'#fffffe',
+			'stroke':middle_color,
 		})
 		var top_rect_left = paper.rect(0, top_y, top_box_start_x, box_l, box_r).attr({
-			'fill':'#408DD2',
+			'fill':top_color,
 			'stroke-width':1,
-			'stroke':'#408DD2',//'#fffffe',
+			'stroke':top_color,
 		})
 
 		var top_extra_rect_left = paper.rect(0, top_y - box_l, top_box_start_x + 62.5, box_l, box_r).attr(top_extra_rect_attr)

@@ -11,17 +11,23 @@
 {% block content %}
 
 <div id="content-container" class="main-container">
-	<p class="main-header">Position: <span data-pos-id="{{position.id}}" class="position-info splash-slug">{{position.title}}</span></p>
+
+	<!-- Position Header -->
+	<p class="main-header">Position: 
+		<span data-pos-id="{{position.id}}" class="position-info splash-slug">{{position.title}}</span>
+	</p>
 	{% if position.description %}
 		<p class="main-sub-header">{{position.description}}</p>
 	{% endif %}
+
 	<div class="position-profile-nav-container">
 		<!-- <span class="main-sub-header pull-left">View stats for: </span> -->
-		<a class="position-profile-nav pull-left selected" data-view="network">Your Network</a> 
-		<a class="position-profile-nav pull-left unselected" data-view="all">Prosperime Community</a>
+		<a class="position-profile-nav pull-left selected" data-view="network"> Your Network </a> 
+		<a class="position-profile-nav pull-left unselected" data-view="all"> Prosperime Community </a>
 		<div class="clear"></div>
-		
 	</div>
+
+	<!-- Position Stats -->
 	<div class="position-profile-ed-overview pull-left">
 		<p class="main-sub-header">Educational Breakdown</p>
 		<div id="position-profile-graph-label">&nbsp;</div>
@@ -59,12 +65,15 @@
 		<p class="stats-header">Avg # of Years</p>
 	</div>
 	<div class="clear"></div>
+
+	<!-- Filters -->
 	<div id="search-filters-container" class="pull-left">
-	<!-- dynamically populated search filters -->
+		<!-- Backbone - search filters -->
 	</div>
 	<div id="search-results-list" class="pull-left">
-	<!-- <p class="main-header">Search Results</p> -->
+		<!-- Backbone - search results -->
 	</div>
+
 	<div class="clear"></div>
 </div>
 {% endblock %}

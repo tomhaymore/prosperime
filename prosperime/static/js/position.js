@@ -152,7 +152,8 @@ $(function(){
             // console.log('path single view: ' + this.model.toJSON())
 
             var renderedContent = this.template(this.model.toJSON());
-            // console.log('here')
+            console.log('here')
+            console.log(this.model.toJSON())
             $(this.el).html(renderedContent);
             return this;
         },
