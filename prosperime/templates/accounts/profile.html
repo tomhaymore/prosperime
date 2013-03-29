@@ -8,6 +8,11 @@
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.autocomplete.min.js"></script>
+
+<script type="text/javascript">
+	var backbone_careers_init_data = {{goal_careers|safe}}
+</script>
+
 <script type='text/javascript' src='{{ STATIC_URL }}js/backbone.js'></script>
 <script type='text/javascript' src='{{ STATIC_URL }}js/profile.js'></script>
 
@@ -26,35 +31,61 @@
 
 <!-- Header -->
 <div class="main-container content-container">
-	<p class="main-header">Profile: <span class="splash-slug">{{profile.first_name}} {{profile.last_name}}</span></p>
-	<p class="main-sub-header">{{profile.headline}}</p>
-	<span class="pull-left">
-		<img class="logo-preview" src="/media/{{profile.default_profile_pic}}" />
-	</span>
-	<span class="pull-right" id='profile-careers-container'>
-		{% if careers %}
-		<ul class="profile-careers-list flat">
-			{% for k,v in careers.items %}
-				<li class="profile-career"><a class="profile-button" href="/career/{{k.id}}">{{k.long_name}}</a></li>
-			{% endfor %}
-		</ul>
-		{% endif %}
-	</span>
+	<div>
+		<p class="main-header">Profile: 
+			<span class="splash-slug">{{profile.first_name}} {{profile.last_name}}</span>
+		</p>
+		<!-- <p class="main-sub-header">{{profile.headline}}</p> -->
+		<span class="pull-left">
+			<img class="logo-preview" src="/media/{{profile.default_profile_pic}}" />
+		</span>
+		<!-- <span class="pull-right" id='profile-careers-container'>
+			{% if careers %}
+			<ul class="profile-careers-list flat">
+				{% for k,v in careers.items %}
+					<li class="profile-career"><a class="profile-button" href="/career/{{k.id}}">{{k.long_name}}</a></li>
+				{% endfor %}
+			</ul>
+			{% endif %}
+		</span> -->
+
+		<!-- Position Information Here -->
+		<div id="timeline-info-container" class="pull-right">
+			<div id="timeline-header-container">
+				<!-- Visible -->
+			</div>
+
+			<div id="timeline-description-container">
+				<!-- Hidden -->
+			</div>
+		</div>
+
+		<div class="pull-left">
+			{% if positions|length > 0 %}
+				<div class="timeline-header reposition">
+					{% if own_profile %} Your {% endif %} Timeline
+				</div>
+			{% endif %}
+		</div>
+
+
+	</div>
+
 	<div class="clear"></div>
 	
 	{% if positions|length > 0 %}
-		<div class="timeline-header">
-			{% if own_profile %} Your {% endif %} Timeline</div>
+		<!-- <div class="timeline-header">
+			{% if own_profile %} Your {% endif %} Timeline
+		</div> -->
 		<div id="timeline-container">
 			<!-- Fill in with JS -->
 		</div>
 
-
-		<div id='timeline-float-screen'>
+		<!-- <div id='timeline-float-screen'>
 			<div id='timeline-float-screen-center'></div>
 			<div id='timeline-float-screen-left'></div>
 			<div id='timeline-float-screen-right'></div>
-		</div>
+		</div> -->
 	{% endif %}
 
 	<!-- Hidden Data Structure, used to pass info to JS. Not displayed -->
@@ -104,253 +135,56 @@
 		{% endfor %}
 	</div>
 
+	<!-- Career Decision Prompt -->
+	<div class="pull-left span12" style='margin-left:0px'>	
+			<div id="middle-float-screen"ondragover='allowDrop(event)'>
+				<!-- Template here -->
+			</div>	
+	</div>
 
 
+	<!-- Personal Data - Saved Careers, Positions of Interest, and Saved Paths -->
+	{% if own_profile %}
 
-			
+		<!-- Careers of Interest -->
+		<div id="goal-careers-header" class="timeline-header"></div>
+		<div id="goal-careers-personalize" >
+			Interested in something else? Explore your options <a href="/personalize/careers/">here </a>
+		</div>
+		<div id="goal-careers-container" class="item-container">
+			<!-- Backbone here -->
+		</div>
 
-				<!-- PATH VIZ (you gonna die) -->
-				<div class="pull-left span12" style='margin-left:0px'>	
-					
-						<div class="clear"></div>
-						<!-- <div> -->		
-			
 
-		
+		<div id="goal-positions-container">
+			<!-- Not yet implemented -->
+		</div> 
+ 
 
-					<!-- Float Screen -->
-					<div id="middle-float-screen"ondragover='allowDrop(event)'>
-						{% if career_decision_prompt %}
-							<div id='career-decision-module'>
-								<div id="career-decision-prompt">
-								<button class="close" onclick='exitPrompt(false)'>&times;</button>
-								<span class='initial-prompt'>
-								Would you provide a bit of information on your decision to 
-								{% if career_decision_prompt.type == 'education' %}
-									attend 
-								{% else %}
-									work as a {{career_decision_prompt.title}} at 
-								{% endif %}
-								{{career_decision_prompt.co_name}}? This information will go directly to others who are making the same important career decisions. 
-								</span> 
-								<div class='btn career-decision-prompt-btn' onclick='revealPrompt()'>Sure</div>
-								</div>
-								<div id="career-decision-form" class="display-none">
-								<button class="close" onclick='exitPrompt(false)'>&times;</button>
-								<div class='callout-text'>Thanks you for sharing, this information will be invaluable to others just like you.</div>
-								<br/>
-								<form class='form'>
-									<input type='text' class='full-width' placeholder='Where else did you considering working?' name='alternates' id='alternatesTextBox'/><br/>
-									{% if career_decision_prompt.type == 'education' %}
-									<textarea rows='2' class="full-width" name='reason' placeholder='Why did you decide to attend {{career_decision_prompt.co_name}}'></textarea>
-									{% else %}
-									<textarea rows='2' class='full-width' name='reason' placeholder='Why did you decide to work at {{career_decision_prompt.co_name}}?'></textarea>
-									{% endif %}
-									<label>On a scale from 1-5, please rate the following elements of your experience at {{career_decision_prompt.co_name}}.</label>
-								<div id="mentorshipCheckboxes">
-									<div id='control-headers'>
-										<span id='worst'>Poor</span>
-										<span id='best'>Excellent</span>
-									</div>
-									<div id='radio-set-mentorship'>
-									<span class='input-label'>Mentorship:</span>
-									<label class="radio inline">
-  										<input type="radio" id="mentorshipNA" name='mentorship-radio' value="0"> n/a
-									</label>
-									<label class="radio inline">
-  										<input type="radio" id="mentorship1" name='mentorship-radio' value="1"> 1
-									</label>
-									<label class="radio inline">
-  										<input type="radio" id="mentorship2" name='mentorship-radio' value="2"> 2
-									</label>
-									<label class="radio inline">
-  										<input type="radio" id="mentorship3" name='mentorship-radio' value="3"> 3
-									</label>
-									<label class="radio inline">
-  										<input type="radio" id="mentorship4" name='mentorship-radio' value="4"> 4
-									</label>
-									<label class="radio inline">
-  										<input type="radio" id="mentorship5" name='mentorship-radio' value="5"> 5
-									</label>
-									
-									</div>
+		<!-- Positions of Interest -->
+		<div id="queue-header" class='timeline-header'></div>
+		<div id='queue' class="item-container">
+			<!-- Backbone Here -->
+		</div>
 
-									<div id='radio-set-skills'>
-									<span class='input-label'>Skills Gained:</span>
-									<label class="radio inline">
-  										<input type="radio" name='skills-radio' id="skillsNA" value="0"> n/a
-									</label>
-									<label class="radio inline">
-  										<input type="radio" name='skills-radio' id="skills1" value="1"> 1
-									</label>
-									<label class="radio inline">
-  										<input type="radio" name='skills-radio' id="skills2" value="2"> 2
-									</label>
-									<label class="radio inline">
-  										<input type="radio" name='skills-radio' id="skills3" value="3"> 3
-									</label>
-									<label class="radio inline">
-  										<input type="radio" name='skills-radio' id="skills4" value="4"> 4
-									</label>
-									<label class="radio inline">
-  										<input type="radio" name='skills-radio' id="skills5" value="5"> 5
-									</label>
-									</div>
+		<br/><br/>
 
-									<div id='radio-set-social'>
-									<span class='input-label'>
-									Social/Environment:</span>
-									<label class="radio inline">
-  										<input type="radio" name='social-radio' id="socialNA" value="0"> n/a
-									</label>
-									<label class="radio inline">
-  										<input type="radio" name='social-radio' id="social1" value="1"> 1
-									</label>
-									<label class="radio inline">
-  										<input type="radio" name='social-radio' id="social2" value="2"> 2
-									</label>
-									<label class="radio inline">
-  										<input type="radio" name='social-radio' id="social3" value="3"> 3
-									</label>
-									<label class="radio inline">
-  										<input type="radio" name='social-radio' id="social4" value="4"> 4
-									</label>
-									<label class="radio inline">
-  										<input type="radio" name='social-radio' id="social5" value="5"> 5
-									</label>
-									</div>
-
-									<div id='radio-set-overall'>	
-									<span class='input-label'>Overall:</span>
-									<label class="radio inline">
-  										<input type="radio" name='overall-radio' id="overallNA" value="0"> n/a
-									</label>
-									<label class="radio inline">
-  										<input type="radio" name='overall-radio' id="overall1" value="1"> 1
-									</label>
-									<label class="radio inline">
-  										<input type="radio" name='overall-radio' id="overall2" value="2"> 2
-									</label>
-									<label class="radio inline">
-  										<input type="radio" name='overall-radio' id="overall3" value="3"> 3
-									</label>
-									<label class="radio inline">
-  										<input type="radio" name='overall-radio' id="overall4" value="4"> 4
-									</label>
-									<label class="radio inline">
-  										<input type="radio" name='overall-radio' id="overall5" value="5"> 5
-									</label>
-									</div>
-								</div>
-								<br/>
-								{% if career_decision_prompt.type == 'education' %}
-								<textarea rows='2' class='full-width' name='comments' placeholder='Any additional comments for people considering attending {{career_decision_prompt.co_name}}?'</textarea>
-								{% else %}
-								<textarea rows='2' class='full-width' name='comments' placeholder='Any additional comments for people considering working at {{career_decision_prompt.co_name}}?'></textarea>
-								{% endif %}
-								<br/>
-								<div>Select how you want this information to be displayed:</div>
-								<div id='privacy-radio'>
-								<label class="radio inline">
-  									<input type="radio" name='privacy-radio' value="anonymous"/ > Anonymous
-								</label>
-								<label class='radio inline'>
-									<input type='radio' name='privacy-radio' value='public' />Public
-								</label>
-								</div>
-								<br/>
-								<div class='btn submitBtn' onclick='submitCareerDecision({{career_decision_prompt.id}})'>Done</div>
-
-								</form>
-								</div>
-							</div>
-
-						{% endif %}
-					</div>	
-				</div>
-
-		{% if own_profile %}
-		<div class='span12'>
-			<!-- this needs to be only if queue exists... -->
-			<div id="queue-header" class='timeline-header'></div>
-			<div id='queue'>
-				<!-- Backbone Here -->
-			</div>
-
+		<div id="saved-paths-container">
 			{% if viewer_saved_paths %}
 				{% for path in viewer_saved_paths %}
-					<div class='timeline-header'>{{path.title}}</div>
-					<div id='path-{{path.id}}' class='saved-path-timeline'>
-
+					<div class='timeline-header'>Saved Path: {{path.title}}</div>
+						<div id='path-{{path.id}}' class='saved-path-timeline'>	
 					</div>
 				{% endfor %} 
 			{% endif %}
 		</div>
-		{% endif %}
+	{% endif %}
 
-			<!-- Right Sidebar -->
-			<div id="profile-right" class="span3 pull-right">
-			<!-- 	<div class="rounded">
-					{% if user %}
-						<p class="sidebar-header">Want to see improvements?</p>
-						<p>We'd love to hear from you -- <a href="mailto:feedback@prosperime.com">please drop us a line</a></p>
-					{% endif %}
-				</div> -->
-
-				<!-- Profile Saved Paths -->
-				<!-- <div class="rounded">
-					<p class="sidebar-header">{{profile.first_name}}'s Saved Career Paths</p>
-
-					{% if saved_paths %}
-						<table class="table table-striped table-condensed table-bordered position-list">		
-						{% for path in saved_paths %}
-							<tr>
-								<td><a href="/saved_paths/#title/?t={{path.title}}"> {{path.title}} </a></td>
-							</tr>
-						{%endfor%}
-						</table>
-					{% else %}
-						<p>{{profile.first_name}} hasn't saved any career paths yet.</p>
-					{% endif %}
-				</div> -->
-
-				<!-- Viewer Saved Paths -->
-			<!-- 	{% if not own_profile %}
-				<div class="rounded">
-					<p class="sidebar-header">Your Saved Career Paths</p>
-					<p> Like what {{profile.first_name}} has done? Drag any of the positions shown into your desired career path or <a onclick='createNewPath()'>create a new one.</a></p>
-						<table class="table table-striped table-condensed table-bordered path-list" id='sidebar-path-list'>			
-							<tr><td class="timeline-description-header">
-								<a href="/saved_paths/">View All</a>
-							</td></tr>
-						{% for saved_path in viewer_saved_paths %}
-							{% if forloop.last %}
-								<tr class="saved-path-list-last">
-							{% else %}
-								<tr>
-							{% endif %}
-								<td ondragover='allowDrop(event)' ondrop='dropPosition(event, "{{saved_path.title|escape}}", this)'><a href="/saved_paths/#id/?id={{saved_path.id}}">{{saved_path.title}}</a></td>
-								</tr>
-						{% endfor %}
-						</table>	
-				</div>
-				{% endif %} -->
-			</div>
-			<div class="clear"></div>
-		<!-- </div> -->
+	<!-- </div>	 -->
+</div>
 
 			
 
-
-
-
-<!-- 	<defs>
-		<linearGradient id="line-left" x1="0%" y1="0%" x2="100%" y2="0%">
-		<stop offset="0%" style="stop-color:rgb(255,255,0); stop-opacity:1"/>
-		<stop offset="100%" style="stop-color:rgb(255,0,0); stop-opacity:1"/>
-		</linearGradient>
-	</defs> -->
-		
 <script type="text/javascript">
 	$(function() {
 		/*  Following code taken from http://stackoverflow.com/questions/4771517/raphael-js-path-line-with-gradient to add linear gradients to paths (no native suppport from Raphael) */
@@ -414,13 +248,17 @@
 	        };
 	    }
 	}());
+
 	/********/
 	/* MAIN */
 	/********/
 	$(function() {
-		// var num_pos = {{ positions|length }}
-		// var num_paths = {{viewer_saved_paths|length}}
-		// window.location = '/saved_paths/queue/' 
+	
+		/* Display Career Decision prompt if applicable */
+		if ({{career_decision_prompt|length}} > 0) {
+			var template = _.template($('#career-decision-template').html())
+			$('#middle-float-screen').html(template)
+		}
 
 		/* Adds autocomplete to 'Alternates' textbox */
 		$('#alternatesTextBox').autocomplete({
@@ -428,7 +266,6 @@
 	    	delimiter: ', ',
 	    });
 
-	    console.log($('#alternatesTextBox').autocomplete())
 
 		/* Prevents submitting the form when 'Enter' is pressed */
 	    $('#career-decision-form').bind("keyup", function(e) {
@@ -439,13 +276,11 @@
 	  		}
 		});
 
-
-		//var random_number = Math.floor(Math.random()*3)
-		// if (random_number > 1) horizontal_timeline()
-		// else vertical_timeline()
+	    /* Add main timeline */
 		if ({{positions|length}} > 0)
 			horizontal_timeline()
 
+		/* Add saved paths */
 		if ({{viewer_saved_paths|length}} > 0)
 			saved_path_timelines()
 	});
@@ -455,7 +290,7 @@
 	/**********************/
 	var constants = {
 		'paper_width':1000,
-		'paper_height':165,
+		'paper_height':200,
 
 		'education_color': '#bf3330',
 		'internship_color': '#ffc340',
@@ -467,12 +302,17 @@
 		'timeline_y':100,
 		'timeline_start':100,
 		'timeline_color':'#c0c0c0',
+		'timeline_end':875,
 
 		'bootstrap_fonts':'"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
 
-		'lvl1_offset':30,
-		'lvl2_offset':50,
+		'lvl1_offset':45,
+		'lvl2_offset':75,
 
+
+		/* Offsets for Title Boxes */
+		'line_height':30,
+		'info_font_size':12,
 	}
 
 
@@ -529,7 +369,7 @@
 					'stroke-width':'1',
 					'stroke':color,
 					'fill':color,
-					'fill-opacity':'0',
+					'fill-opacity':'.8',
 				});
 
 				// Inner Dot
@@ -558,43 +398,9 @@
 		// pulled from there and used here. In the JS code, data is 
 		// stored on the inner 'dot' svg element
 
-		// Constants
-		var lvl1_offset = 30
-		var lvl2_offset = 50
-
-		var education_color = '#bf3330'
-		var internship_color = '#ffc340'
-		var position_color = 'rgb(50,121,202)'
-
-		// var position_color = '#0c5da5'
-		// var internship_color = '#ffc200'
-		// var education_color = '#ff4f00'
-
-		// var position_color = '#1826B0'
-		// var internship_color = '#fff100'
-		// var education_color = '#ff0700'
-
-
-		var outer_dot_radius = 12
-		var inner_dot_radius = 2
-
-		var timeline_end = 875
-		var timeline_y = 100
-
-		var duration_rect_height = 10
-		var bootstrap_fonts = '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif'
-
-
 		// Create paper and timeline structure
 		var paper = new Raphael('timeline-container', constants.paper_width, constants.paper_height)
 		
-
-		// var timeline = paper.path("M100,100  L875,100")
-		// timeline.attr({
-		// 	stroke:'#555',
-		// 	"stroke-width":2,
-		// 	'stroke-linecap':'round',
-		// });
 
 		// paper.defineLinearGradient("grad1", [{
 		//     "id": "s1",
@@ -624,9 +430,9 @@
 		// console.log('###########################')
 
 		// Beginning and End Text Display Dates for Timeline
-		var start_date_text = paper.text(70,timeline_y, total_start_date).attr({'font-size':'12px', 'stroke':'#c0c0c0', 'text-anchor':'end', 'font-family':bootstrap_fonts})
+		var start_date_text = paper.text(70,constants.timeline_y, total_start_date).attr({'font-size':'12px', 'stroke':'#c0c0c0', 'text-anchor':'end', 'font-family':constants.bootstrap_fonts})
 
-		var end_date_text = paper.text(900,timeline_y, 'Current').attr({'font-size':'12px', 'stroke':'#c0c0c0', 'text-anchor':'start','font-family':bootstrap_fonts})
+		var end_date_text = paper.text(900,constants.timeline_y, 'Current').attr({'font-size':'12px', 'stroke':'#c0c0c0', 'text-anchor':'start','font-family':constants.bootstrap_fonts})
 
 		/* MAIN LOOP */
 		var previous_offsets = {} // so we can avoid overlapping
@@ -650,22 +456,22 @@
 
 			// Still need to check if they put in a future date
 			if (end_date == 'Current' || end_date.length <= 1) {
-				var end_offset = timeline_end
+				var end_offset = constants.timeline_end
 			} else {
 				var end_offset = start_offset + (offset * (months_difference(start_date.split('/')[0], start_date.split('/')[1], end_date.split('/')[0], end_date.split('/')[1], false, 'upper'))) + 100
-				if (end_offset > timeline_end) end_offset = timeline_end
+				if (end_offset > constants.timeline_end) end_offset = constants.timeline_end
 			}
 
 			// Move dots that collide
 			if (start_offset in previous_offsets) {
 				console.log('duplicate, moving dot')
 				overlap = true
-				start_offset += outer_dot_radius // calculate this so they don't mash
+				start_offset += constants.outer_dot_radius // calculate this so they don't mash
 				// This is could still clash if original+12 in set
 			}
 
 			previous_offsets[start_offset] = true
-			console.log('title: ' + title + ' start offset: ' + start_offset + ' end offset: ' + end_offset)
+			// console.log('title: ' + title + ' start offset: ' + start_offset + ' end offset: ' + end_offset)
 			// console.log(title + " " + start_date + ' ' + end_date)
 			
 
@@ -681,10 +487,10 @@
 			// Outer Dot
 			var outer_dot = paper.circle(constants.timeline_start + start_offset, constants.timeline_y, constants.outer_dot_radius)
 			outer_dot.attr({
-				'stroke-width':'1',
+				'stroke-width':'0',
 				'stroke':color,
 				'fill':color,
-				'fill-opacity':'0',
+				'fill-opacity':'.8',
 			});
 
 			// Inner Dot
@@ -695,7 +501,7 @@
 				'fill':color,
 			})
 
-			var position_title = construct_title_box(paper, i, entity_name, start_offset, dot.id)
+			var position_title = construct_title_box(paper, Math.abs(num_positions - i - 1), entity_name, start_offset, dot.id)
 
 
 			// Set Data
@@ -716,10 +522,10 @@
 
 
 			// Add timeline chunk
-			if (start_offset > outer_dot_radius && start_offset < (775 - outer_dot_radius) && !overlap && (previous_end + 16 < start_offset + 100)) {
+			if (start_offset > constants.outer_dot_radius && start_offset < (775 - constants.outer_dot_radius) && !overlap && (previous_end + 16 < start_offset + 100)) {
 				var start_line = previous_end + 32
 				var end_line = start_offset - 16 + 100
-				console.log('line: ' + start_line + ' : ' + end_line)
+				// console.log('line: ' + start_line + ' : ' + end_line)
 				var path_size = "M" + start_line + ",100 L" + end_line + ",100" 
 				var path = paper.path(path_size)
 				path.attr({
@@ -762,7 +568,7 @@
 		}
 		//Fencepost
 		var start_line = previous_end + 32 
-		var path_size = "M" + start_line + "," + timeline_y + " L875," + timeline_y 
+		var path_size = "M" + start_line + "," + constants.timeline_y + " L875," + constants.timeline_y 
 		var path = paper.path(path_size)
 		path.attr({
 			stroke:'#c0c0c0',
@@ -774,75 +580,81 @@
 	// Hover utility
 	var horizontal_hover_in = function(dot, paper) {
 			var data = dot.data
+			var start_date = dot.data('start_date')
+			var end_date = dot.data('end_date')
+			var title = dot.data('title')
+			var id = dot.data('id')
+			var entity_name = dot.data('entity_name')
+			var start_offset = parseInt(dot.data('start_offset'))
+			var end_offset = parseInt(dot.data('end_offset'))
+			var description = dot.data('description')
+			var color = dot.data('color')
 
 			/* Remove old elements */
 			if ($('#duration_rect').length > 0) $('#duration_rect').remove()
-			$('#timeline-float-screen-center').removeClass().empty()
-			$('#timeline-float-screen-left').removeClass().empty()
-			$('#timeline-float-screen-right').removeClass().empty()
+			$('#timeline-info-container').css('visibility', 'visible')
 
 			/* Duration Rectangle */
-			var x = parseInt(dot.data('end_offset')) - parseInt(dot.data('start_offset'))
-			var duration_rect = paper.rect(dot.data('start_offset') + 12, 95, x, 10, 2)
-			duration_rect.attr({
-				'stroke': dot.data('color'),
-				'stroke-linecap':'butt',
-				'fill': dot.data('color'),
-				'fill-opacity': .6
+			var x = end_offset - start_offset
+			var duration_rect = paper.rect(start_offset + 12 + 6, 98, x, 4, 2).attr({
+				'stroke': color,
+				'stroke-width':12,
+				'stroke-opacity':.8,
+				'fill': color,
 			})
 			duration_rect.node.id = 'duration_rect'
 
-			var headerString = '<span class="timeline-start-date">' + 
-				dot.data('start_date') + '</span>' + '-' + 
-				'<span class="timeline-end-date">' +
-				dot.data('end_date') + '</span>' +
-				'<span class="timeline-entity-name">' +
-				dot.data('entity_name') + '</span>'
+			/* Construct HTML Text */
+			var headerString = '<div class="timeline-date">' + 
+				start_date + '-' + end_date + '</div>'
 				
-			if (dot.data('title') != 'None') 
-				headerString += '<span class="timeline-title">' +
-				dot.data('title') + '</span><br/>'
+				
+			if (title != 'None') 
+				headerString += '<div class="timeline-title">' +
+				title + '</div>'
 
-			headerString += '<div class="timeline-interested-in"><i class="icon-ok-circle icon-large" onclick="addInterestedPosition(this, ' + dot.data("id") + ')"></i> <span class="timeline-interested-text">I\'m interested in this position</span></div>'
+			headerString += '<div class="timeline-entity-name">' +
+				entity_name + '</div><br/><div class="timeline-interested-in"><i class="icon-ok-circle icon-large" onclick="addInterestedPosition(this, ' + id + ')"></i> <span class="timeline-interested-text">I\'m interested in this position</span></div>'
 
 			// A). Title & Description
-			if (dot.data('description') != 'None') {
+			if (description != 'None') {
 
-				descriptionString = '<span class="timeline-description">' + dot.data('description') + '</span>'
-				$('#timeline-float-screen-left').html(headerString)
-				$('#timeline-float-screen-right').html(descriptionString)
+				descriptionString = '<span class="timeline-description">' + description + '</span>'
+				descriptionString = "<i class='icon-share-alt pull-right' onclick='flipInfoBox(\"description\")'></i>" + descriptionString
+				// $('#timeline-float-screen-left').html(headerString)
+				// $('#timeline-float-screen-right').html(descriptionString)
 	
-				$('#timeline-float-screen-left').addClass('background-' + dot.data('type'))
-				$('#timeline-float-screen-right').addClass('background-'+ dot.data('type'))
+				// $('#timeline-float-screen-left').addClass('background-' + dot.data('type'))
+				// $('#timeline-float-screen-right').addClass('background-'+ dot.data('type'))
+
+				/* Add 'flip' icon if description */
+				// headerString = "<i class='icon-share-alt pull-right' onclick='flipInfoBox(\"header\")'></i>" + headerString
+
+				$('#timeline-header-container').html(headerString)
+				// $('#timeline-description-container').html(descriptionString)
 
 			// B). Title only
 			} else {
-				$('#timeline-float-screen-center').html(headerString)
-				$('#timeline-float-screen-center').addClass('background-' + dot.data('type'))
+				// $('#timeline-float-screen-center').html(headerString)
+				// $('#timeline-float-screen-center').addClass('background-' + dot.data('type'))
+
+				$('#timeline-header-container').html(headerString)
 			}	
-			
-			// // Finally, darken inner dot
-			// dot.attr({
-			// 	'r':'5'
-			// })
 		}
 		
 	var horizontal_hover_out = function(dot, paper) {
-	
-		// dot.attr({
-		// 	'r':'2'
-		// })
-
+		// do nothing
 	}
 
 	/* Helper fxn constructs title boxes for timeline based on index
 		of current position */
 	var construct_title_box = function(paper, index, entity_name, offset) {
-
 		if (index % 4 == 0) var level = 1
-		else if (index % 4 == 1) var level = 4
-		else if (index % 4 == 2) var level = 3
+		else if (index % 4 == 1) var level = 3
+		else if (index % 4 == 2) var level = 4
 		else var level = 2
+
+		// console.log('index ' + index + ' ' + entity_name + ' ' + level)
 
 		var position_title
 		var width
@@ -850,10 +662,16 @@
 		var y_1
 		var y_2
 		var base = 100
-		var line_height = 20
+		var line_height = constants.line_height
+
+		var title_attr = {
+			'font-size':constants.info_font_size,
+			'font-family':constants.font_family,
+		}
+
 		switch(level) {
 			case 1:
-				position_title = paper.text(constants.timeline_start + offset, constants.timeline_y - constants.lvl1_offset, entity_name)
+				position_title = paper.text(constants.timeline_start + offset, constants.timeline_y - constants.lvl1_offset, entity_name).attr(title_attr)
 				width = position_title.getBBox().width
 				y_start = base - constants.outer_dot_radius // 88
 				y_1 = base - line_height // 80
@@ -862,7 +680,7 @@
 				break;
 
 			case 2:
-				position_title = paper.text(constants.timeline_start + offset, constants.timeline_y + constants.lvl2_offset, entity_name)
+				position_title = paper.text(constants.timeline_start + offset, constants.timeline_y + constants.lvl2_offset, entity_name).attr(title_attr)
 				width = position_title.getBBox().width
 				y_start = base + line_height + constants.outer_dot_radius // 132
 				y_1 = base + (2 * line_height) // 140
@@ -871,7 +689,7 @@
 				break;
 
 			case 3:
-				position_title = paper.text(constants.timeline_start + offset, constants.timeline_y + constants.lvl1_offset, entity_name)
+				position_title = paper.text(constants.timeline_start + offset, constants.timeline_y + constants.lvl1_offset, entity_name).attr(title_attr)
 				width = position_title.getBBox().width
 				y_start = base + constants.outer_dot_radius
 				y_1 = base + line_height
@@ -880,7 +698,7 @@
 				break;
 
 			case 4:
-				position_title = paper.text(constants.timeline_start + offset, constants.timeline_y - constants.lvl2_offset, entity_name)
+				position_title = paper.text(constants.timeline_start + offset, constants.timeline_y - constants.lvl2_offset, entity_name).attr(title_attr)
 				width = position_title.getBBox().width
 				y_start = base - line_height - constants.outer_dot_radius
 				y_1 = base - (2 * line_height)
@@ -891,10 +709,10 @@
 		var position_title_container = paper.path(
 					'M' + (constants.timeline_start + offset) + ', ' + y_start + ' ' + 
 					'L' + (constants.timeline_start + offset + 5) + ', ' + y_1 + ' ' +
-					'L' + (constants.timeline_start + offset + (width / 2) + 5) + ', ' + y_1 + ' ' +  
-					'L' + (constants.timeline_start + offset + (width / 2) + 5) + ', ' + y_2 + ' ' + 
-					'L' + (constants.timeline_start + offset - (width / 2) - 5) + ', ' + y_2 + ' ' + 
-					'L' + (constants.timeline_start + offset - (width / 2) - 5) + ', ' + y_1 + ' ' +  
+					'L' + (constants.timeline_start + offset + (width / 2) + 7) + ', ' + y_1 + ' ' +  
+					'L' + (constants.timeline_start + offset + (width / 2) + 7) + ', ' + y_2 + ' ' + 
+					'L' + (constants.timeline_start + offset - (width / 2) - 7) + ', ' + y_2 + ' ' + 
+					'L' + (constants.timeline_start + offset - (width / 2) - 7) + ', ' + y_1 + ' ' +  
 					'L' + (constants.timeline_start + offset - 5) + ', ' + y_1 + ' ' +  
 					'L' + (constants.timeline_start + offset) + ', ' + y_start
 					)
@@ -906,6 +724,16 @@
 		})
 
 		return position_title
+	}
+
+	var flipInfoBox = function(currentSide) {
+		if (currentSide == "header") {
+			$('#timeline-header-container').hide()
+			$('#timeline-description-container').show()
+		} else {
+			$('#timeline-header-container').show()
+			$('#timeline-description-container').hide()
+		}
 	}
 
 	/* Page-specific drag for GA */
@@ -976,40 +804,7 @@
 		highlight(createBox)
 	};
 
-	/* Used in profile pages. Onmouseover event renders the description
-	   for a given element in the element id='middle-float-screen' */
-	var showDescription = function(index, title, co_name, start_date, end_date) {
-		// Don't override the prompt!
-		if ($('#career-decision-module').length > 0) {
-			console.log('got in here')
-			return false;
-		}
-
-		// Empty what's in the float screen
-		$('#middle-float-screen').empty()
-		// If no description, will throw exception
-		try {
-			// Couldn't get this to work in JQ so stopped trying
-			var description = document.getElementsByClassName('timeline-description-text')[index].innerHTML
-			var newText = "<div class='box-header'>"
-			if (title) newText += title
-			if (co_name) newText += ' at ' + co_name
-			newText += "</div>"
-			if (start_date) {
-				newText += "<div class='box-dates'>"
-				newText += start_date.replace('1, ','')
-				newText += ' - '
-				if (end_date == "Current") newText += "Current"
-				else newText += end_date.replace('1, ', '')
-				newText += "</div>"
-			}
-
-			if (description) newText += "<div class='box-description'>" + description + "</div>"
-		} catch (err) {
-			var newText = '<a>For more information, hover over a position</a>'
-		}
-		$('#middle-float-screen').html(newText);
-	};
+	
 
 
 	var revealPrompt = function() {
@@ -1079,17 +874,8 @@
 		$.post('/saved_paths/add_to_queue/', {pos_id: pos_id,csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
 				console.log(response)
 		}, 'json');
-
-
 	}
 
-	var removeFromQueue = function(pos_id, user_id) {
-		console.log('remove position from queue')
-
-		// THIS NEEDS TO BE BACKBONE'D... FUCK
-
-
-	}
 
 	var upper_timeline_limit = 200;
 	var months_difference = function(mo1, yr1, mo2, yr2, compress, round) {
@@ -1110,283 +896,161 @@
 		if (date.length == 1) return 'Current'
 		var split_date = date.split('/')
 		return split_date[0] + '.' + split_date[1].substring(2)
-		// if (split_date[0].length == 1) 
-		// 	return '0' + split_date[0] + '.' + split_date[1].substring(2)
-		// else
-		// 	return split_date[0] + '.' + split_date[1].substring(2)
 	};
 
-	var vertical_timeline = function() {
-		/*********************/
-		/* VERTICAL TIMELINE */
-		/*********************/
-
-		// Get Metadata
-		var positions = $('#position-data-structure')
-		var num_positions = positions.children().length
-		if (num_positions == 0) return false;
 	
-		console.log('num positions: ' + num_positions)
-		console.log('equal offset: ' + equal_offset)
-
-		var metadata = $('#metadata')
-		var total_start_date = metadata.children()[0].innerHTML
-		var total_end_date = metadata.children()[1].innerHTML
-		var total_time = metadata.children()[2].innerHTML
-
-		/* CONSTANTS */
-
-		// Info Box
-		var info_box_buffer = 15
-		var info_box_width = 300
-		var info_box_height = 100
-		// var equal_offset = (vertical_timeline_length / (num_positions + 1))
-		var equal_offset = info_box_height + (2 * info_box_buffer)
-
-		// Pic
-		// var pic_width = Math.ceil(info_box_width / 4)
-		// var pic_height = (equal_offset - info_box_buffer - 5) * .75
-		var pic_width = 75
-		var pic_height = 50
-		
-		// Description Box
-		var description_box_width = 400
-		var description_box_height = 400
-
-		// Timeline
-		var vertical_timeline_start_offset = 75
-		var vertical_timeline_length = num_positions * equal_offset + vertical_timeline_start_offset
-		console.log('timeline length = ' + vertical_timeline_length)
-
-		/* Create SVG Elements */
-		// Create Paper
-		var paper_width = 1000
-		var paper_height = vertical_timeline_length + 200
-		var paper = new Raphael('timeline-container', paper_width, paper_height)
-
-		
-		// Timeline
-		var main_timeline = paper.path('M100,'+vertical_timeline_start_offset+' L100,'+(vertical_timeline_start_offset + vertical_timeline_length)).attr({
-			'stroke':'#555',
-			'stroke-dasharray':'2, 2'
-		})
-
-		
-		// End Date Rectangle
-		var top_rect = paper.rect(50, vertical_timeline_start_offset - 30, 100, 30, 2).attr({
-			'stroke':'#c0c0c0',
-			'stroke-width':'1',
-			'fill':'rgb(41,98,152)',
-			// 'fill-opacity':0.7,
-		})
-
-		// End Date Rectangle Text
-		var top_rect_text = paper.text(100, vertical_timeline_start_offset - 15, 'Present')
-		top_rect_text.attr({
-			'font-size':'14pt',
-			'stroke':'#fffffe',
-			'font-weight':'200',
-			'font-family': '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
-		})
-		top_rect_text.node.setAttribute('class','loose-spacing')
-
-		// Start Date Rectangle
-		var bottom_rect = paper.rect(50, vertical_timeline_start_offset + vertical_timeline_length, 100, 30, 2)
-		bottom_rect.attr({
-			'stroke':'#c0c0c0',
-			'fill':'rgb(41,98,152)',
-			// 'fill-opacity':0.7,
-		})
-
-		// Start Date Rectangle Text
-		var bottom_rect_text = paper.text(100, vertical_timeline_start_offset + vertical_timeline_length + 15, total_start_date)
-		bottom_rect_text.attr({
-			'font-size':'14px',
-			'stroke':'#fffffe',
-			'font-weight':'200',
-			'font-family': '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
-		})
-		bottom_rect_text.node.setAttribute('class','loose-spacing')
-
-
-		var previous_end = vertical_timeline_start_offset
-		// Add position dots
-		for (var i = num_positions; i > 0; i--) {
-
-			// Get Position data
-			var wrapper = positions.children()[i - 1]
-			var type = wrapper.childNodes[1].innerHTML
-			var title = wrapper.childNodes[3].innerHTML
-			var entity_name = wrapper.childNodes[5].innerHTML
-			var id = wrapper.childNodes[7].innerHTML
-			var description = wrapper.childNodes[9].innerHTML
-			var start_date = wrapper.childNodes[11].innerHTML
-			var end_date = wrapper.childNodes[13].innerHTML
-			var pic = wrapper.childNodes[15].innerHTML
-			console.log(pic)
-
-			var color = 'rgb(50,121,202)'
-			if (type == 'education') color = 'rgb(191,51,48)'
-			if (type == 'internship') color = 'rgb(255,195,64)'
-
-
-			// Outer Dot
-			var y = 50 + (equal_offset * i)
-			var outer_dot = paper.circle(100, y, 12)
-			outer_dot.attr({
-				'stroke-width':'1',
-				'stroke':'rgb(50,121,202)',
-				'fill':'none',
-			});
-
-			// Inner Dot
-			var dot = paper.circle(100, y, 7)
-			dot.attr({
-				'stroke-width':1,
-				'stroke':'rgb(50,121,202)',
-				'fill':'rgb(50,121,202)',
-				'fill-opacity':'.4',
-			})
-
-			if (type == 'education') {
-				outer_dot.attr({'stroke':'rgb(191,51,48)'})
-				dot.attr({'stroke':'rgb(191,51,48)', 'fill':'rgb(191,51,48)'})
-			} else if (type == 'internship') {
-				outer_dot.attr({'stroke':'rgb(255,195,64)'})
-				dot.attr({'stroke':'rgb(255,195,64)', 'fill':'rgb(255,195,64)'})
-			} else type = 'position' //'org' not good for display
-
-			// // Timeline chunk
-			// if (i == num_positions) {
-			// 	var top = previous_end
-			// 	var bottom = previous_end + equal_offset - 50
-			// 	console.log('s: ' + top + ' e: '+ bottom)
-			// }
-
-			// var path = paper.path('M100,' + top + ' L100,' + bottom).attr({'stroke':'#555'})
-			// 	previous_end = top + 32
-
-
-			var box_offset = (equal_offset - info_box_buffer) / 2
-			var info_box = paper.path('M112,' + y + ' L117,' + (y-5) + 'L117,' + (y - box_offset) + ' L' + (117 + info_box_width) + ', ' + (y - box_offset) + ' L' + (117 + info_box_width) + ', ' + (y + box_offset) + ' L117,' + (y + box_offset) + ' L117,' + (y+5) + ' L112,' + y)
-			
-
-
-			var info_box_header_line = paper.path('M117,' + (y - box_offset + 20) + ' L' + (117 + info_box_width) + ',' + (y - box_offset + 20))
-
-			// // If profile pic, throw it in there
-			// if (pic.indexOf('none') == -1) {
-			
-			// 	var image = paper.image('../media/'+pic, 120, y - box_offset + 25, pic_width, pic_height)
-				
-			// }
-
-			var info_box_dates = paper.text(155,(y - box_offset + 10), format_date(start_date) + '/' + format_date(end_date)).attr({
-					'font-family':'"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
-					'font-size':'12px',
-				})
-
-			var info_box_type = paper.circle(119 + (info_box_width) - 20, (y - box_offset + 10), 4).attr({
-					'stroke':color,
-					'fill':color
-			})
-
-
-			var info_box_title = paper.text(117 + (info_box_width / 2), y - 10, title)
-			info_box_title.node.setAttribute('class','info_box_text')
-			info_box_title.attr({
-				'font-family': '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
-				'font-size':'14px',
-				'font-weight':'500'
-			})
-
-			var info_box_entity_name = paper.text(117 + (info_box_width / 2), y + 20, entity_name)
-			info_box_entity_name.node.setAttribute('class','info_box_text')
-			info_box_entity_name.attr({
-				'font-family': '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
-				'font-size':'14px',
-				'font-weight':'500'
-			})
-
-			if (info_box_title.getBBox().width > info_box_width || info_box_entity_name.getBBox().width > info_box_width) {
-				console.log('that shit is too long')
-			}
-
-			dot.data('description', description)
-			dot.data('color', color)
-			dot.data('y', y)
-			type = type.charAt(0).toUpperCase() + type.slice(1);
-			dot.data('type', type)
-			dot.data('title', title)
-			dot.data('entity_name', entity_name)
-
-
-			// On hover to dots
-			dot.hover(function() {
-				// Remove old boxes
-				if ($('#description_box').length > 0) {
-					$('#description_box').remove()
-					$('#description_box_header').remove()
-					$('#description_box_header_line').remove()
-					$('#description_box_header_info').remove()
-				}
-
-				// Add new box
-				var start_x = 117 + info_box_width
-				var description_box = paper.path(
-					'M' + start_x + ', ' + this.data('y') + 
-					' L' + (start_x + 15) + ',' + (this.data('y') - 15) +
-					' L' + (start_x + 15) + ',' + (this.data('y') - 15 - (description_box_height / 3)) +
-					' L' + (start_x + 15 + description_box_width) + ', ' + (this.data('y') - 15 - (description_box_height / 3)) + 
-					' L' + (start_x + 15 + description_box_width) + ', ' + (this.data('y') - 15 + description_box_height / 3) + 
-					' L' + (start_x + 15) + ', ' + (this.data('y') - 15 + description_box_height / 3) + 
-					' L' + (start_x + 15) + ', ' + (this.data('y') + 15) + 
-					' L' + start_x + ', ' + this.data('y')
-					).attr({
-						'stroke-linejoin':'miter',
-					})
-
-
-				// Add header line
-				var description_box_header_line = paper.path(
-					'M' + (start_x + 15) + ', ' + (this.data('y') - 15 - (description_box_height / 3) + 30) + ' L' + (start_x + 15 + description_box_width) + ', ' + (this.data('y') - 15 - (description_box_height / 3) + 30))
-
-				// Add header info
-				var description_box_header = paper.text((start_x + 55), (this.data('y') - (description_box_height / 3) + 3), this.data('type')).attr({
-						'font-size':'14pt',
-						'font-family': '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
-						'stroke':this.data('color')
-				})
-				description_box_header.node.setAttribute('class','loose-spacing')
-
-				var description_box_header_info = paper.text((start_x + 100), (this.data('y') - (description_box_height / 3) + 3), (this.data('title') + ' at ' + this.data('entity_name'))).attr({
-						'font-size':'14pt',
-						'font-family': '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
-						'text-anchor':'start'
-					})			
-
-				// // Add content to the box
-				// var description_box_header = paper.text((start_x + ((15 + description_box_width) / 2)), (this.data('y') - (description_box_height / 3) + 30), 'A description of said position').attr({
-				// 	'font-size':'12pt',
-				// 	'font-family': '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
-				// })
-				// description_box_header.node.id = 'description_box_header'
-
-				// Set ID's so they can be erased
-				description_box.node.id = 'description_box'
-				description_box_header_line.node.id = 'description_box_header_line'
-				description_box_header.node.id = 'description_box_header'
-				description_box_header_info.node.id = 'description_box_header_info'
-
-			},
-			function() {
-
-			});
 	
- 		}
-	}
 
 
+</script>
+
+
+<!-- Template for rendering Career Decision Prompt -->
+<script type="text/template" id="career-decision-template">
+
+	<div id='career-decision-module'>
+		<div id="career-decision-prompt">
+		<button class="close" onclick='exitPrompt(false)'>&times;</button>
+		<span class='initial-prompt'>
+		Would you provide a bit of information on your decision to 
+		{% if career_decision_prompt.type == 'education' %}
+			attend 
+		{% else %}
+			work as a {{career_decision_prompt.title}} at 
+		{% endif %}
+		{{career_decision_prompt.co_name}}? This information will go directly to others who are making the same important career decisions. 
+		</span> 
+		<div class='btn career-decision-prompt-btn' onclick='revealPrompt()'>Sure</div>
+		</div>
+		<div id="career-decision-form" class="display-none">
+		<button class="close" onclick='exitPrompt(false)'>&times;</button>
+		<div class='callout-text'>Thanks you for sharing, this information will be invaluable to others just like you.</div>
+		<br/>
+		<form class='form'>
+			<input type='text' class='full-width' placeholder='Where else did you considering working?' name='alternates' id='alternatesTextBox'/><br/>
+			{% if career_decision_prompt.type == 'education' %}
+			<textarea rows='2' class="full-width" name='reason' placeholder='Why did you decide to attend {{career_decision_prompt.co_name}}'></textarea>
+			{% else %}
+			<textarea rows='2' class='full-width' name='reason' placeholder='Why did you decide to work at {{career_decision_prompt.co_name}}?'></textarea>
+			{% endif %}
+			<label>On a scale from 1-5, please rate the following elements of your experience at {{career_decision_prompt.co_name}}.</label>
+		<div id="mentorshipCheckboxes">
+			<div id='control-headers'>
+				<span id='worst'>Poor</span>
+				<span id='best'>Excellent</span>
+			</div>
+			<div id='radio-set-mentorship'>
+			<span class='input-label'>Mentorship:</span>
+			<label class="radio inline">
+					<input type="radio" id="mentorshipNA" name='mentorship-radio' value="0"> n/a
+			</label>
+			<label class="radio inline">
+					<input type="radio" id="mentorship1" name='mentorship-radio' value="1"> 1
+			</label>
+			<label class="radio inline">
+					<input type="radio" id="mentorship2" name='mentorship-radio' value="2"> 2
+			</label>
+			<label class="radio inline">
+					<input type="radio" id="mentorship3" name='mentorship-radio' value="3"> 3
+			</label>
+			<label class="radio inline">
+					<input type="radio" id="mentorship4" name='mentorship-radio' value="4"> 4
+			</label>
+			<label class="radio inline">
+					<input type="radio" id="mentorship5" name='mentorship-radio' value="5"> 5
+			</label>
+			
+			</div>
+
+			<div id='radio-set-skills'>
+			<span class='input-label'>Skills Gained:</span>
+			<label class="radio inline">
+					<input type="radio" name='skills-radio' id="skillsNA" value="0"> n/a
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='skills-radio' id="skills1" value="1"> 1
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='skills-radio' id="skills2" value="2"> 2
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='skills-radio' id="skills3" value="3"> 3
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='skills-radio' id="skills4" value="4"> 4
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='skills-radio' id="skills5" value="5"> 5
+			</label>
+			</div>
+
+			<div id='radio-set-social'>
+			<span class='input-label'>
+			Social/Environment:</span>
+			<label class="radio inline">
+					<input type="radio" name='social-radio' id="socialNA" value="0"> n/a
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='social-radio' id="social1" value="1"> 1
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='social-radio' id="social2" value="2"> 2
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='social-radio' id="social3" value="3"> 3
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='social-radio' id="social4" value="4"> 4
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='social-radio' id="social5" value="5"> 5
+			</label>
+			</div>
+
+			<div id='radio-set-overall'>	
+			<span class='input-label'>Overall:</span>
+			<label class="radio inline">
+					<input type="radio" name='overall-radio' id="overallNA" value="0"> n/a
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='overall-radio' id="overall1" value="1"> 1
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='overall-radio' id="overall2" value="2"> 2
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='overall-radio' id="overall3" value="3"> 3
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='overall-radio' id="overall4" value="4"> 4
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='overall-radio' id="overall5" value="5"> 5
+			</label>
+			</div>
+		</div>
+		<br/>
+		{% if career_decision_prompt.type == 'education' %}
+		<textarea rows='2' class='full-width' name='comments' placeholder='Any additional comments for people considering attending {{career_decision_prompt.co_name}}?'</textarea>
+		{% else %}
+		<textarea rows='2' class='full-width' name='comments' placeholder='Any additional comments for people considering working at {{career_decision_prompt.co_name}}?'></textarea>
+		{% endif %}
+		<br/>
+		<div>Select how you want this information to be displayed:</div>
+		<div id='privacy-radio'>
+		<label class="radio inline">
+				<input type="radio" name='privacy-radio' value="anonymous"/ > Anonymous
+		</label>
+		<label class='radio inline'>
+			<input type='radio' name='privacy-radio' value='public' />Public
+		</label>
+		</div>
+		<br/>
+		<div class='btn submitBtn' onclick='submitCareerDecision({{career_decision_prompt.id}})'>Done</div>
+
+		</form>
+		</div>
+	</div>
 </script>
 
 {% endblock %}
