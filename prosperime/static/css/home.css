@@ -301,6 +301,96 @@ div#feedback-text {
 
 
 
+/***********/
+/* Home V3 */
+/***********/
+div#v3-container {
+	height:450px;
+	max-height:450px;
+}
+
+table#homepage-main-table {
+	padding:25px;
+	text-align:center;
+	height:450px;
+}
+
+table#homepage-main-table td {
+	margin:25px;
+}
+
+table#homepage-main-table .icon {
+	width:15%;
+	text-align:center;
+}
+
+table#homepage-main-table .header {
+	width:20%;
+	text-align:center;
+	font-size:2.8em;
+	font-weight:600;
+}
+
+table#homepage-main-table .description {
+	padding:25px;
+	font-size:1.2em;
+	line-height:26px;
+	color:#333;
+}
+
+div.header-wrapper {
+	/*background-color:#408dd2;*/
+	height:75px;
+	border-radius:1px;
+	vertical-align:middle;
+	line-height:75px;
+	font-family:Helvetica;
+	cursor:pointer;
+}
+
+div.header-wrapper a {
+	text-decoration:none;
+}
+
+tr.top-row {
+	color:#679FD2;
+	border-bottom:1px solid black;
+}
+
+tr.middle-row {
+	color:#408DD2;
+	border-bottom:1px solid black;
+}
+
+tr.bottom-row {
+	color:#0C5DA5;
+}
+
+div.v3-header-container {
+	border-bottom:1px solid black;
+	padding:25px;
+}
+
+div.v3-main-header {
+	font-size:2.5em;
+	font-family:Helvetica;
+	color:midnightblue;
+}
+
+div.v3-sub-header {
+	padding-left:25px;
+	padding-right:25px;
+	padding-top:25px;
+	font-size:1.2em;
+}
+
+table#homepage-main-table td i {
+	color:#333;
+}
+
+
+
+
 
 
 
