@@ -523,6 +523,8 @@ class LIBase():
 		pos.save()
 		# if pos.title:
 		careers = careerlib.match_careers_to_position(pos)
+		# match position to ideal position
+		careerlib.match_position_to_ideals(pos)
 		# print careers
 		for c_id in careers:
 			c = Career.objects.get(pk=c_id)

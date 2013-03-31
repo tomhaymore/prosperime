@@ -177,9 +177,37 @@ class IdealPosition(models.Model):
 	description = models.TextField(null=True)
 	careers = models.ManyToManyField(Career,related_name="ideal_positions")
 	people = models.ManyToManyField(User,through='GoalPosition')
+	matches = models.TextField(null=True)
 	status = models.CharField(max_length=15,default="active")
 	created = models.DateTimeField(auto_now_add=True, null=True)
 	updated = models.DateTimeField(auto_now=True, null=True)
+
+	def __unicode__(self):
+		return self.title
+
+	def add_pos_match(self,match):
+		"""
+		adds title and industry information for matching positions to an ideal position
+		"""
+		# check to see if there are any matches
+		if self.matches is not None:
+			# load list and append new match
+			matches = json.loads(self.matches)
+			matches['title'] = matches['title'].lower()
+			matches.append(match)
+		else:
+			# create new list with match as first entry
+			matches = [match]
+		
+		# save model
+		self.matches = json.dumps(matches)
+		self.save()
+
+	def get_matches_as_dict(self):
+		"""
+		returns matches as Python dict
+		"""
+		return json.loads(self.matches)
 
 class GoalPosition(models.Model):
 
