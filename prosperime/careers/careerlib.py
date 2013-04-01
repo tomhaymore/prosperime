@@ -967,7 +967,10 @@ class CareerMapBase():
 		"""
 		tokenizes position title based on spaces
 		"""
+		import string
 		if title:
+			# remove all punctuation 
+			title = title.translate(string.maketrans("",""),string.punctuation)
 			# tokenize position title
 			tokens = title.split(" ")
 			# reduce all strings to lower case
