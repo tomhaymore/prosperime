@@ -13,7 +13,7 @@ from django.core.cache import cache
 
 # Prosperime
 from entities.models import Entity, Industry
-from careers.models import SavedPath, SavedPosition, Position, Career, GoalPosition, SavedCareer, IdealPosition, CareerDecision
+from careers.models import SavedPath, SavedPosition, Position, Career, GoalPosition, SavedCareer, IdealPosition, CareerDecision, SavedIndustry
 from accounts.models import Profile
 import careers.careerlib as careerlib
 from entities.models import Entity
@@ -52,7 +52,7 @@ def home(request):
 		## this means they either have 0 postions or ghetto ones
 	## need current industry, too
 
-	return render_to_response('home_v3.html',data,context_instance=RequestContext(request))
+	return render_to_response('home_v4.html',data,context_instance=RequestContext(request))
 
 
 
@@ -161,6 +161,11 @@ def _get_industry_data(ind_id, request):
 		ind = [i.id, i.name]
 		formatted_industries.append(ind)
 
+	## Also, get saved industries
+	saved_industries = SavedIndustry.objects.filter(owner=request.user).select_related("industry")
+	for i in saved_industries:
+		ind = [i.industry.id, i.industry.name]
+		formatted_industries.append(ind)
 
 	## Iterate through all positions from given industry
 	for p in related_positions:
@@ -482,7 +487,7 @@ def position_profile(request,pos_id):
 	ed_overview = cache.get('position_profile_ed_overview_'+str(request.user.id)+"_"+str(pos_id))
 	# # check to see if cache was empty
 	if ed_overview is None:
-		print "missed cache @ ed.overview"
+		print "missed cache position_profile - @ ed.overview"
 		cache.set('position_profile_ed_overview_'+str(request.user.id)+"_"+str(pos_id),career_pos.get_ed_overview(request.user,position),10)
 		ed_overview = cache.get('position_profile_ed_overview_'+str(request.user.id)+"_"+str(pos_id))
 
@@ -514,14 +519,13 @@ def position_paths(request,pos_id):
 	full_filters_string = "_".join(orgsSelected + sectorsSelected + locationsSelected)
 
 	# check cache
-	paths = cache.get("search_position_paths_" + full_filters_string)
+	paths = cache.get("search_position_paths_" + full_filters_string+"_"+pos_id)
 	if paths is None:
 
 		# fetch all users for paths, filtered by position
 		users = User.objects.prefetch_related('positions').select_related('positions','profile').filter(positions__ideal_position_id=pos_id).annotate(no_of_pos=Count('positions__pk')).exclude(pk=request.user.id).order_by('-no_of_pos')	
 
 		# filter user queryset
-
 		if locationsSelected:
 			users = users.filter(positions__entity__office__city__in=locationsSelected)
 		if sectorsSelected:
@@ -532,11 +536,11 @@ def position_paths(request,pos_id):
 		paths = []
 
 		for u in users[:20]:
-			positions = [{'title':p.title,'org':p.entity.name,'org_id':p.entity.id} for p in u.positions.all()]
+			positions = [{'title':p.title,'org':p.entity.name,'org_id':p.entity.id, 'start_date':_date_to_int(p.start_date)} for p in u.positions.all()]
 			path = {
 				'id':u.id,
 				'full_name':u.profile.full_name(),
-				'profile_pic':None,
+				'profile_pic':str(u.profile.default_profile_pic()),
 				'positions': positions,
 				'careers':None
 			}
@@ -664,6 +668,123 @@ def viewCareerDecisions(request):
 ###### AJAX Methods ######
 ##########################
 
+
+## returns JSON-ready array of saved careers
+def getSavedCareers(request):
+
+	formatted_careers = []
+	saved_careers = SavedCareer.objects.filter(owner=request.user).select_related("career")
+	for sc in saved_careers:
+		formatted_careers.append({
+			'title':sc.career.long_name,
+			'id':sc.career.id,
+		})
+
+
+	return HttpResponse(simplejson.dumps(response))
+
+
+## returns JSON-ready array of goal positions
+def getGoalPositions(request):
+
+	formatted_positions = []
+	goal_positions = GoalPosition.objects.filter(owner=request.user).select_related("position")
+	for gp in goal_positions:
+		formatted_positions.append({
+			'title':gp.position.title,
+			'id':gp.position.id,
+		})
+
+	return HttpResponse(simplejson.dumps(response))
+
+
+## Adds a career to user's savedCareers
+def addSavedCareer(request):
+	response = {}
+
+	if not request.is_ajax or not request.POST:
+		response['result'] = 'failure'
+		response['errors'] = 'invalid request type'
+		return HttpResponse(simplejson.dumps(response))
+
+	user = request.user
+	career = Career.objects.get(id=request.POST.get('id'))
+
+	try:
+		saved_career = SavedCareer()
+		saved_career.career = career
+		saved_career.owner = user
+		saved_career.title = career.long_name
+		saved_career.status = "added"
+		saved_career.save()
+		response['result'] = 'success'
+
+	except:
+		response['result'] = 'failure'
+		response['errors'] = 'error saving to DB'
+
+
+	return HttpResponse(simplejson.dumps(response))
+
+## Adds an idealPosition to user's goalPositions
+def addGoalPosition(request):
+	response = {}
+
+	if not request.is_ajax or not request.POST:
+		response['result'] = 'failure'
+		response['errors'] = 'invalid request type'
+		return HttpResponse(simplejson.dumps(response))
+
+	user = request.user
+	ideal_position = IdealPosition.objects.get(id=request.POST.get('id'))
+	
+	try:
+		goal_position = GoalPosition()
+		goal_position.position = ideal_position
+		goal_position.owner = user
+		goal_position.status = "added"
+		goal_position.save()
+		response['result'] = 'success'
+
+	except:
+		response['result'] = 'failure'
+		response['errors'] = 'error saving to DB'
+
+
+	return HttpResponse(simplejson.dumps(response))
+
+
+def addIndustry(request):
+
+	response = {}
+
+	if not request.is_ajax or not request.POST:
+		response['result'] = 'failure'
+		response['errors'] = 'invalid request type'
+		return HttpResponse(simplejson.dumps(response))
+
+	user = request.user
+	industry = Industry.objects.get(id=request.POST.get('id'))
+	print str(industry)
+	print user.profile.full_name() + " requests to save industry " + str(request.POST.get('id'))
+
+	try:
+		saved_industry = SavedIndustry()
+		saved_industry.title = industry.name
+		saved_industry.industry = industry
+		saved_industry.status = "added"
+		saved_industry.owner = user
+		saved_industry.save()
+		response['result'] = 'success'
+
+	except:
+		response['result'] = 'failure'
+		response['errors'] = 'error saving to DB'
+
+
+	return HttpResponse(simplejson.dumps(response))
+
+
 def addDecision(request):
 	response = {}
 
@@ -770,6 +891,48 @@ def entityAutocomplete(request):
 		'suggestions': suggestions,
 	}
 	return HttpResponse(simplejson.dumps(response))
+
+## Autocomplete for careers, used in Profile
+def careerAutocomplete(request):
+
+	query = request.GET.getlist('query')[0]
+	careers = Career.objects.filter(long_name__istartswith=query).values('long_name', 'id')
+
+	suggestions = []
+	for c in careers:
+		item = {
+			'value':c['long_name'],
+			'data':c['id'],
+		}
+		suggestions.append(item)	
+
+	response = {
+		'query':query,
+		'suggestions':suggestions,
+	}
+
+	return HttpResponse(simplejson.dumps(response))
+
+def idealPositionAutocomplete(request):
+
+	query = request.GET.getlist('query')[0]
+	positions = IdealPosition.objects.filter(title__istartswith=query).values('title', 'id')
+
+	suggestions = []
+	for p in positions:
+		item = {
+			'value':p['title'],
+			'data':p['id'],
+		}
+		suggestions.append(item)	
+
+	response = {
+		'query':query,
+		'suggestions':suggestions,
+	}
+
+	return HttpResponse(simplejson.dumps(response))
+
 
 ## Autocomplete for industries, used in What Next?
 def industryAutocomplete(request):
@@ -1288,6 +1451,8 @@ def rearrange(request):
 ##################    HELPERS   ######################
 ######################################################
 
+
+
 def _saved_path_to_json(path):
 
 	formatted_path = {
@@ -1752,6 +1917,18 @@ def _get_users_in_network(user,**filters):
 	user_ids = set(user_ids)
 	return (users_list, user_ids)
 
+def _date_to_int(date):
+
+	if date is None:
+		return None
+
+	year = str(date.year)[2:]
+	month = str(date.month)
+
+	if len(month) == 1:
+		return year + '0' + month
+	else:
+		return year + month
 
 #######################
 ###### Dev Only #######

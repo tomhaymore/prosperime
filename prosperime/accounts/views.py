@@ -25,7 +25,7 @@ from accounts.tasks import process_li_profile, process_li_connections
 
 # Prosperime
 from accounts.models import Account, Profile, Picture
-from careers.models import SavedPath, CareerDecision, Position, SavedPosition, SavedCareer
+from careers.models import SavedPath, CareerDecision, Position, SavedPosition, SavedCareer, GoalPosition
 from entities.models import Entity
 
 import utilities.helpers as helpers
@@ -329,7 +329,8 @@ def profile(request, user_id):
 	queue = None
 	viewer_saved_paths = []
 	goal_careers = None
-	career_decision_position = []
+	career_decision_position = "false"
+	goal_positions = None
 
 	# career_map = profile.all_careers
 	#top_careers = profile.top_careers
@@ -357,6 +358,12 @@ def profile(request, user_id):
 		for career in goal_careers_queryset:
 			goal_careers.append(_saved_career_to_json(career.career))
 
+		# Your Goal Positions
+		goal_positions_queryset = GoalPosition.objects.filter(owner=request.user).select_related("position")
+		goal_positions = []
+		for pos in goal_positions_queryset:
+			goal_positions.append(_ideal_position_to_json(pos.position))
+
 		# Positions of Interest ('Queue')
 		try:
 			queue = SavedPath.objects.filter(owner=request.user, title='queue').prefetch_related()
@@ -365,16 +372,17 @@ def profile(request, user_id):
 			queue = None
 
 		# Career Decision Prompt
-		career_decision = _get_career_decision_prompt_position(top_careers, positions, profile)
-		if career_decision is None:
-			career_decision_position = None;
-		else:
-			career_decision_position = {
-				'id':career_decision.id,
-				'title':career_decision.title,
-				'co_name':career_decision.entity.name,
-				'type':career_decision.type,
-			}
+		# career_decision = _get_career_decision_prompt_position(top_careers, positions, profile)
+		# if career_decision is None:
+		# 	career_decision_position = None;
+		# else:
+		# 	career_decision_position = {
+		# 		'id':career_decision.id,
+		# 		'title':career_decision.title,
+		# 		'co_name':career_decision.entity.name,
+		# 		'type':career_decision.type,
+		# 	}
+		career_decision_position = "false"
 
 
 
@@ -392,8 +400,9 @@ def profile(request, user_id):
 		'career_decision_prompt':career_decision_position,
 		'own_profile':own_profile,
 		'own_profile_javascript':own_profile_javascript, # b/c js has true/false, not True/False
-		'queue':queue,
+		'queue':simplejson.dumps(queue),
 		'goal_careers':simplejson.dumps(goal_careers),
+		'goal_positions':simplejson.dumps(goal_positions),
 	}
 
 	return render_to_response('accounts/profile.html', response, context_instance=RequestContext(request))
@@ -530,7 +539,7 @@ def _get_career_decision_prompt_position(top_careers, positions, profile):
 	else:
 		return None
 
-
+## Takes Saved Path object and returns dict
 def _saved_path_to_json(path):
 
 	formatted_path = {
@@ -562,6 +571,17 @@ def _saved_career_to_json(career):
 
 	return formatted_career
 
+## Takes Ideal Position object and returns dict
+def _ideal_position_to_json(position):
+
+	formatted_position = {
+		'title':position.title,
+		'description':position.description,
+		'id':position.id,
+	}
+
+	return formatted_position
+
 
 # Takes a queryset of user's positions and returns 
 #	information needed for timeline creation
@@ -579,7 +599,7 @@ def _prepare_positions_for_timeline(positions):
 
 		if pos.start_date: # ignore no start_date
 
-			pos.duration = pos.duration_in_months()
+			pos.duration = pos.duration_in_months() + 1 ## so 6/11 - 6/11 != 0
 
 			if pos.title is not None:
 				if 'ntern' in pos.title and 'nternational' not in pos.title:

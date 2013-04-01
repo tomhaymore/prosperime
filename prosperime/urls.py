@@ -35,10 +35,21 @@ urlpatterns = patterns('',
     url(r'^paths/','entities.views.paths'),
     url(r'^path/(\d+)/$','entities.views.path'),
     url(r'^careers/$','entities.views.careers'),
+
+
+    ## Careers - AJAX calls
     url(r'^careers/addDecision/$', 'careers.views.addDecision'),
+    url(r'^careers/addIndustry/$', 'careers.views.addIndustry'),
+    url(r'^careers/addSavedCareer/$', 'careers.views.addSavedCareer'),
+    url(r'^careers/addGoalPosition/$', 'careers.views.addGoalPosition'),
     url(r'^careers/entityAutocomplete/$', 'careers.views.entityAutocomplete'),
     url(r'^careers/decisions/$', 'careers.views.viewCareerDecisions'),
+    url(r'^careers/careerAutocomplete/$', 'careers.views.careerAutocomplete'),
+    url(r'^careers/idealPositionAutocomplete/$', 'careers.views.idealPositionAutocomplete'),
     url(r'^careers/industryAutocomplete/$', 'careers.views.industryAutocomplete'),
+    url(r'^careers/getSavedCareers/$', 'careers.views.getSavedCareers'),
+    url(r'^careers/getGoalPositions/$', 'careers.views.getGoalPositions'),
+    
     url(r'^decisions/', 'careers.views.getDecisions'),
     url(r'^login/','accounts.views.login'),
     url(r'^profile/(\d+)/$', 'accounts.views.profile'),

@@ -353,35 +353,49 @@ div.header-wrapper a {
 }
 
 tr.top-row {
-	color:#679FD2;
-	border-bottom:1px solid black;
+/*	color:#679FD2; */
+	border-bottom:1px dashed rgba(51,51,51,.4);
+	color:rgb(41,98,152);
 }
 
 tr.middle-row {
-	color:#408DD2;
-	border-bottom:1px solid black;
+/*	color:#408DD2; */
+	border-bottom:1px dashed rgba(51,51,51,.4);
+	color:rgb(41,98,152);
+
 }
 
 tr.bottom-row {
-	color:#0C5DA5;
-}
+	color:rgb(41,98,152);
+/*	color:#0C5DA5;
+*/}
 
 div.v3-header-container {
-	border-bottom:1px solid black;
-	padding:25px;
+/*	border-bottom:2px dashed rgba(41,98,152, 0.4);
+*/	padding:25px;
+	padding-bottom:10px;
 }
 
-div.v3-main-header {
+.v3-main-header {
 	font-size:2.5em;
 	font-family:Helvetica;
-	color:midnightblue;
+	color:rgb(41,98,152);
+	border-bottom:2px dashed rgba(41,98,152,0.4);
+	padding:4px 10px;
+}
+
+.v4-welcome-header {
+	font-size:2.8em;
+	font-family:Helvetica;
+	color:rgb(51,98,152);
 }
 
 div.v3-sub-header {
 	padding-left:25px;
 	padding-right:25px;
-	padding-top:25px;
+	padding-top:35px;
 	font-size:1.2em;
+	font-family:"Varela", "Helvetica";
 }
 
 table#homepage-main-table td i {
@@ -390,6 +404,69 @@ table#homepage-main-table td i {
 
 
 
+/*************/
+/*   Home V4 */
+/*************/
+
+.main-container {
+
+}
+
+div.third-container {
+	display:inline-block;
+	text-align:center;
+}
+
+div.v4-header {
+	font-size:2.5em;
+	margin-top:25px;
+	margin-bottom:50px;
+	cursor:pointer;
+	font-family:"Varela", "Helvetica";
+}
+
+div.v4-sub-header {
+	font-family:"Varela", "Helvetica";
+	cursor:pointer;
+	font-size:1.2em;
+	margin-top:25px;
+	margin-bottom:25px;
+	color:#333;
+}
+
+div.third-container a {
+	text-decoration:none;
+	color:rgb(41,98,152);
+}
+
+div.third-container a i {
+	color:#333;
+}
+
+div.description {
+	margin:0px !important;
+	padding:10px;
+/*	border:2px dashed rgba(41,98,152, 0.4);
+*/	height:125px;
+	line-height:22px;
+}
+
+div.v4-text-container {
+	margin-left:20px;
+}
+
+div.sub-description {
+	margin-top:15px;
+	font-size:1.1em;
+	margin-bottom:15px;
+	font-family:"Varela", "Helvetica";
+}
+
+ul.sub-sub-description li {
+	list-style:circle;
+	font-size:.9em;
+
+}
 
 
 

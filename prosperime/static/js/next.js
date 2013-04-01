@@ -47,10 +47,11 @@ $(function(){
 		template: _.template($('#header-template').html()),
 
 		events: {
+			"click #save-button":"saveIndustry",
 		},
 
 		initialize: function() {
-			_.bindAll(this,'render', 'remove');
+			_.bindAll(this,'render', 'remove', 'saveIndustry');
 			this.collection.on('reset',this.render, this);
 			this.collection.on('change', this.render, this);
 		},
@@ -59,10 +60,46 @@ $(function(){
 			this.$el.empty()
 			var collection = this.collection // important! (context)
 			var model = collection.models[0]
+
+			console.log(model)
+
+			// Check if this is a new search. If so, allow user to 
+			// bookmark this industry
+			var new_industry = true
+			for (var i = 0; i < model.get('related_industries').length; i++) {
+				console.log(model.get('related_industries')[i][0])
+				if (model.get('start_id') == model.get('related_industries')[i][0])
+					new_industry = false
+			};
+
+			if (new_industry) {
+				var new_el = "<div id='save-button' class='pull-right inline-block people-box' data-id='" + model.get('start_id') + "'>Save this search</div>"
+				$('#lvl1-header-container').append(new_el)
+
+				// Attach click handler to button after added
+				var id = model.get('start_id')
+				$('#save-button').on("click", function() {
+					var id = $(this).data("id")
+
+					// Save Industry
+					$.post('/careers/addIndustry/', {
+						id:id}, function(response) {
+							if (response["result"] == "success") {
+								console.log("Success")
+								// $('#save-button').fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)
+							} else {
+								console.log("Failed to save industry: " + response["errors"])
+							}
+						}, "json");
+					collection.fetch()
+					collection.render()
+				})
+			}
+
 			this.$el.append(this.template({
 				'industries':model.get('related_industries'),
 				'current':model.get('start_name'),
-			}))
+			}));
 
 			return this;
 		},
@@ -70,6 +107,11 @@ $(function(){
 		remove: function() {
 			$(this.el).empty().detach()
 			return this
+		},
+
+		saveIndustry: function(id) {
+
+			console.log("save: " + id)
 		},
 	});
 
@@ -260,8 +302,11 @@ $(function(){
 		singleQuery: function(query) {
 			console.log('single query: ' + query)
 			this.filterView = new FiltersView({collection:this.changes})
-			this.headerview = new HeaderView({collection:this.changes})
 			this.lvl1view = new Lvl1View({collection:this.changes})
+
+			// Keep this call last
+			this.headerview = new HeaderView({collection:this.changes})
+
 			this.changes._meta['q1'] = query
 			this.changes._meta['q2'] = null
 			this.changes.fetch()

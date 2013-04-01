@@ -1,0 +1,137 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+<!-- CSS -->
+<!-- <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/discover.css" /> -->
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/home.css" />
+<link type='text/css' rel='stylesheet' href='{{ STATIC_URL }}css/font-awesome.min.css' />
+
+
+
+<!-- Lato, Source Sans, Varela -->
+<!-- Javascript -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/discover.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+{% endblock %}
+
+
+{% block content %}
+
+<div id="content-container" class="main-container">
+
+	<!-- Header Links -->
+	<div class="v3-header-container">
+		<div class="v4-welcome-header">
+			Welcome,	
+		</div>
+		<div class="v3-sub-header">
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<span class="v3-main-header">{{user.profile.first_name}}</span>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <!-- Really? No indentation codes? -->
+			Get the most out of Prosperime from the following resources:
+		</div>
+	</div>
+
+	<div id="v3-container">
+		<div id="v4-top-svg-container">
+			<!-- Svg here -->
+		</div>
+
+		<div class="v4-text-container">
+			<div class="span4 third-container description">
+				<a href="/profile/{{user.id}}/#goal-careers-anchor">
+					<i class="icon-search icon-5x"></i>
+					<div class="v4-header">
+						Explore
+					</div>
+				</a>
+				<div class="v4-sub-header">Need help finding the right career?</div>
+				<div class="sub-description">
+					Let us help you find careers and jobs that you might be interested in pursuing.
+				</div>
+				<!-- <ul class="sub-sub-description">
+					<li>Find relevant people, positions, and companies.</li>
+					<li>Get key information, such as position heirarchy and average time spent at each position.</li>
+					<li>See how real people have navigated the career.</li>
+				</ul> -->
+			</div>
+
+			<div class="span4 third-container description">
+				<a href="/next/#?i1={{industry}}">
+					<i class="icon-road icon-5x"></i>
+					<div class="v4-header">
+						What Next
+					</div>
+				</a>
+				<div class="v4-sub-header">Where do people like you go next?</div>
+				<div class="sub-description">
+					Head here to learn more about where you are, and what the people like you are doing.
+				</div>
+				<!-- <ul class="sub-sub-description">
+					<li>See all the job moves from this industry.</li>
+					<li>Find individuals who have similar career interests to you.</li>
+					<li>Glean information on companies and where their employees end up.</li>
+				</ul> -->
+			</div>
+
+			<div class="span4 third-container description">
+				<a href="/profile/{{user.id}}/#goal-positions-anchor">
+					<i class="icon-calendar icon-5x"></i>
+					<div class="v4-header">
+						Plan
+					</div>
+				</a>
+				<div class="v4-sub-header">Want to be the CTO? VP of Sales?</div>
+				<div class="sub-description">
+					Get statistics on how others have reached their goals so that you can do the same.
+				</div>
+				<!-- <ul class="sub-sub-description">
+					<li>Learn how real people have attained their goal positions.</li>
+					<li>See average time, number of previous positions, and education of these people.</li>
+
+				</ul> -->
+			</div>
+		</div>
+
+
+
+		<!-- <div class="v4-text-container">
+			<div class="span4 third-container description">
+						Just want to explore? <br/><br/> Head to your profile to browse careers that other people like you have followed.
+			</div>
+
+			<div class="span4 third-container description">
+					Have an idea of where you want to go? <br/><br/>
+					Head here to learn more about that industry, and what the people in it are doing.
+			</div>
+
+			<div class="span4 third-container description">
+					Want to be a Product Manager? VP of Sales? <br/><br/> Go here for hard statistics on how others have reached their career goals so that you can do the same.
+			</div>
+		</div> -->
+	</div>
+</div>
+
+
+<script type="text/javascript">
+
+	var path_attr = {
+		'stroke-dasharray':"--",
+		'stroke-width':1,
+		'stroke':'rgb(41,98,152)',
+	}
+
+
+
+	var paper1 = new Raphael("v4-top-svg-container", 1000, 100)
+	var p1_1 = paper1.path("M155,2 L155,100").attr(path_attr)
+	var p1_2 = paper1.path("M159,2 L159,55 L475,55 L475,100").attr(path_attr)
+	var p1_3 = paper1.path("M163,2 L163,45 L790,45 L790,100").attr(path_attr)
+
+	var p1_1_1 = paper1.path("M95,100 L250,100").attr(path_attr)
+	var p1_2_1 = paper1.path("M415,100 L565,100").attr(path_attr)
+	var p1_3_1 = paper1.path("M720,100 L870,100").attr(path_attr)
+
+</script>
+
+{% endblock %}

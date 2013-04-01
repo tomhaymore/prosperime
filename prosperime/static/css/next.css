@@ -60,13 +60,15 @@ table#search-results-table td {
 	text-align:center;
 }
 
+
+
 .icon-arrow-right {
 	padding:5px;
 }
 
 div.people-box {
 	/*border:1px solid blue;*/
-	background-color: rgb(50,121,202);
+	background-color: rgb(41,98,152);
 	color:whitesmoke;
 	border-radius:4px;
 	font-size:1.4em;
@@ -77,6 +79,16 @@ div.people-box {
 	padding-right:12px;
 	display:inline-block;
 
+}
+
+div#save-button {
+	margin-right:25px;
+	cursor:pointer;
+}
+
+div.search-box {
+	margin-top:10px;
+	margin-left:5px;
 }
 
 div.people-box a {
@@ -84,12 +96,21 @@ div.people-box a {
 	text-decoration:none;
 }
 
-.inline {
-	display:inline;
+.inline-block {
+	display:inline-block;
+}
+
+.pull-up {
+	margin-top:0px;
+}
+
+p.call-out-text {
+	font-size:1.2em;
+	line-height:25px;
 }
 
 span.previous-search {
-	background-color: rgb(50,121,202);
+	background-color: rgb(41,98,152);
 	color:whitesmoke;
 	border-radius:4px;
 	font-size:1.4em;
@@ -99,6 +120,7 @@ span.previous-search {
 	padding-left:12px;
 	padding-right:12px;
 	display:inline-block;
+	cursor:pointer;
 }
 
 a.industry-button {
@@ -117,7 +139,7 @@ ul.industry-options-container {
 
 ul.industry-options-container li {
 	border-radius:2px;
-	background-color: rgb(50,121,202);
+	background-color: rgb(41,98,152);
 	color:whitesmoke;
 	border-radius:4px;
 	font-size:1.4em;
@@ -128,6 +150,11 @@ ul.industry-options-container li {
 	padding-right:12px;
 	display:inline-block;
 	margin:4px;
+
+}
+
+ul.industry-options-container a {
+	text-decoration:none;
 }
 
 #header-container {

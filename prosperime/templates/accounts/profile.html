@@ -1,6 +1,10 @@
 {% extends "base_full.html" %}
 
 {% block head %}
+<!-- CSS -->
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/profile.css" />
+<link type='text/css' rel='stylesheet' href='{{ STATIC_URL }}css/font-awesome.min.css' />
+
 
 <!-- Javascripts --> 
 <script type="text/javascript" src="{{ STATIC_URL }}js/viz.js"></script>
@@ -11,15 +15,13 @@
 
 <script type="text/javascript">
 	var backbone_careers_init_data = {{goal_careers|safe}}
+	var backbone_goal_positions_init_data = {{goal_positions|safe}}
+	var backbone_positions_of_interest_init_data = {{queue|safe}}
+	var backbone_own_profile = {{own_profile_javascript}}
 </script>
 
 <script type='text/javascript' src='{{ STATIC_URL }}js/backbone.js'></script>
 <script type='text/javascript' src='{{ STATIC_URL }}js/profile.js'></script>
-
-
-<!-- CSS -->
-<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/profile.css" />
-<link type='text/css' rel='stylesheet' href='{{ STATIC_URL }}css/font-awesome.min.css' />
 
 
 {% endblock %}
@@ -31,14 +33,18 @@
 
 <!-- Header -->
 <div class="main-container content-container">
-	<div>
-		<p class="main-header">Profile: 
+	<div class="profile-header-container">
+
+
+		<div class="profile-header">Profile: 
 			<span class="splash-slug">{{profile.first_name}} {{profile.last_name}}</span>
-		</p>
-		<!-- <p class="main-sub-header">{{profile.headline}}</p> -->
-		<span class="pull-left">
+		</div>
+
+		<span>
 			<img class="logo-preview" src="/media/{{profile.default_profile_pic}}" />
 		</span>
+		<!-- <p class="main-sub-header">{{profile.headline}}</p> -->
+		
 		<!-- <span class="pull-right" id='profile-careers-container'>
 			{% if careers %}
 			<ul class="profile-careers-list flat">
@@ -49,43 +55,26 @@
 			{% endif %}
 		</span> -->
 
-		<!-- Position Information Here -->
-		<div id="timeline-info-container" class="pull-right">
-			<div id="timeline-header-container">
-				<!-- Visible -->
-			</div>
-
-			<div id="timeline-description-container">
-				<!-- Hidden -->
-			</div>
-		</div>
-
-		<div class="pull-left">
-			{% if positions|length > 0 %}
-				<div class="timeline-header reposition">
-					{% if own_profile %} Your {% endif %} Timeline
-				</div>
-			{% endif %}
-		</div>
-
-
 	</div>
 
 	<div class="clear"></div>
 	
+	<!-- TIMELINE -->
 	{% if positions|length > 0 %}
-		<!-- <div class="timeline-header">
-			{% if own_profile %} Your {% endif %} Timeline
-		</div> -->
 		<div id="timeline-container">
 			<!-- Fill in with JS -->
 		</div>
 
-		<!-- <div id='timeline-float-screen'>
-			<div id='timeline-float-screen-center'></div>
-			<div id='timeline-float-screen-left'></div>
-			<div id='timeline-float-screen-right'></div>
-		</div> -->
+		<!-- Position Information Here -->
+		<div id="timeline-info-container">
+			<div id="timeline-header-container">
+				
+			</div>
+
+			<div id="timeline-description-container">
+				<!-- currently unused -->
+			</div>
+		</div>
 	{% endif %}
 
 	<!-- Hidden Data Structure, used to pass info to JS. Not displayed -->
@@ -107,6 +96,7 @@
 				<div class='start-date-'>{{p.start_date.month}}/{{p.start_date.year}}</div>
 				<div class='end-date'>{{p.end_date.month}}/{{p.end_date.year}}</div>
 				<div class='pic'>{{p.pic}}</div>
+				<div class="duration">{{p.duration}}</div>
 			</div>
 		{% endfor %}
 	</div>
@@ -147,22 +137,54 @@
 	{% if own_profile %}
 
 		<!-- Careers of Interest -->
-		<div id="goal-careers-header" class="timeline-header"></div>
-		<div id="goal-careers-personalize" >
-			Interested in something else? Explore your options <a href="/personalize/careers/">here </a>
+		<a name="goal-careers-anchor">
+			<div id="goal-careers-header" class="timeline-header anchor inline"></div>
+		</a>
+		
+		<div id="personalize-goal-careers-prompt" class="personalize" >
+			Interested in something else? Explore your options <a onclick="revealPersonalization('goalCareer')">here.</a>
 		</div>
+
+		<div id="personalize-goal-careers" class="personalize" style="display:none">
+			<div class="input-append inline">
+				<input id="personalize-goal-careers-box" type="text">
+				<span id="personalize-goal-careers-add" class="add-on"> Add </span>
+			</div>
+			<div class="flat-button inline personalize-button" onclick="hidePersonalization('goalCareer')"> Back </div>
+		</div>
+
 		<div id="goal-careers-container" class="item-container">
 			<!-- Backbone here -->
 		</div>
 
+		<!-- Goal Positions -->
+		<a name="goal-positions-anchor">
+			<div id="goal-positions-header" class="timeline-header anchor inline"></div>
+		</a>
 
-		<div id="goal-positions-container">
-			<!-- Not yet implemented -->
+		<div id="personalize-goal-positions-prompt" class="personalize">
+			Interested in something else? Explore your options <a onclick="revealPersonalization('goalPosition')">here.</a>
+		</div>
+
+		<div id="personalize-goal-positions" class="personalize" style="display:none">
+			<div class="input-append inline">
+				<input id="personalize-goal-positions-box" type="text">
+				<span id="personalize-goal-positions-add" class="add-on"> Add </span>
+			</div>
+			<div class="flat-button inline personalize-button" onclick="hidePersonalization('goalPosition')"> Back </div>
+
+		</div>
+
+		<div id="goal-positions-container" class="item-container">
+			<!-- Backbone here -->
 		</div> 
  
 
 		<!-- Positions of Interest -->
-		<div id="queue-header" class='timeline-header'></div>
+		<a name="positions-of-interest-anchor">
+			<div id="queue-header" class='timeline-header anchor'></div>
+		</a>
+
 		<div id='queue' class="item-container">
 			<!-- Backbone Here -->
 		</div>
@@ -183,6 +205,92 @@
 	<!-- </div>	 -->
 </div>
 
+
+
+<!-- These fxns won't be needed immediately, so async them -->
+<script async type="text/javascript">
+
+	var selected_ideal_position_id = null
+	var selected_career_id = null
+
+
+	$(function() {
+		 $('#personalize-goal-positions-box').autocomplete({
+	    	serviceUrl: '/careers/idealPositionAutocomplete/',
+	    	onSelect: function(suggestion) {
+				selected_ideal_position_id = suggestion.data
+		    }
+	    });
+
+	    $('#personalize-goal-careers-box').autocomplete({
+	    	serviceUrl: '/careers/careerAutocomplete/',
+	    	onSelect: function(suggestion) {
+	    		selected_career_id = suggestion.data
+	    	}
+	    });
+
+	    $('#personalize-goal-positions .add-on').click(function(ev) {
+	    	$.post('/careers/addGoalPosition/', {'id':selected_ideal_position_id, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
+	    		if (response["result"] == "success") {
+	    			console.log("success")
+	    			$('#personalize-goal-positions-box').fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)
+	    			$('#personalize-goal-positions-add').fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)
+	    		} else 
+	    			console.log("Error: " + response["errors"])
+	    		
+	    	}, "json");
+	    	// window.goalPositions.url("/careers/getGoalPositions/")
+	    	// window.goalPosition.fetch()
+	    })
+
+	    $('#personalize-goal-careers .add-on').click(function(ev) {
+	    	$.post('/careers/addSavedCareer/', {'id':selected_career_id, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
+	    		if (response["result"] == "success") {
+	    			console.log("success")
+	    			$('#personalize-goal-careers-box').fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)
+	    			$('#personalize-goal-careers-add').fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)
+	    		} else 
+	    			console.log("Error: " + response["errors"])
+	    	}, "json");
+	    	// window.goalCareers.url("/careers/getSavedCareers/")
+	    	// window.goalCareers.fetch()
+	    })
+
+	});
+
+	var revealPersonalization = function(type) {
+		if (type == "goalPosition") {
+
+			$('#personalize-goal-positions-prompt').hide()
+			$('#personalize-goal-positions').show()
+
+
+		} else if (type == "goalCareer") {
+
+			$('#personalize-goal-careers-prompt').hide()
+			$('#personalize-goal-careers').show()
+
+		}
+	};
+
+	var hidePersonalization = function(type) {
+
+		if (type == "goalPosition") {
+
+			$('#personalize-goal-positions-prompt').show()
+			$('#personalize-goal-positions').hide()
+
+		} else if (type == "goalCareer") {
+
+			$('#personalize-goal-careers-prompt').show()
+			$('#personalize-goal-careers').hide()
+
+		}
+
+
+	}
+
+</script>
 			
 
 <script type="text/javascript">
@@ -255,7 +363,7 @@
 	$(function() {
 	
 		/* Display Career Decision prompt if applicable */
-		if ({{career_decision_prompt|length}} > 0) {
+		if ({{career_decision_prompt}}) {
 			var template = _.template($('#career-decision-template').html())
 			$('#middle-float-screen').html(template)
 		}
@@ -265,6 +373,15 @@
 	    	serviceUrl: '/careers/entityAutocomplete/',
 	    	delimiter: ', ',
 	    });
+
+	   
+	    /* Condense the info container if own profile */
+	    if ({{own_profile_javascript}}) {
+	    	$('#timeline-info-container').addClass("container-condensed")
+	    	$('#timeline-header-container').html("<br/>Hover over one of your positions to see more")
+	    } else {
+	    	$('#timeline-header-container').html("<br/><br/>Hover over a position to learn more")
+	    }
 
 
 		/* Prevents submitting the form when 'Enter' is pressed */
@@ -379,7 +496,11 @@
 					'fill':color,
 				})		
 
-				var title_box = construct_title_box(paper, j, entity_name, start_offset)	
+				/* Shouldn't be any clashes on a saved path, so 
+					don't worry about secondary text box */
+				if (j % 2 == 0) var fake_index = 0
+				else var fake_index = 1
+				var title_box = construct_title_box(paper, fake_index, entity_name, start_offset)	
 			}
 		}
 	}
@@ -451,6 +572,7 @@
 			var description = wrapper.childNodes[9].innerHTML
 			var start_date = wrapper.childNodes[11].innerHTML
 			var end_date = wrapper.childNodes[13].innerHTML
+			var duration = wrapper.childNodes[17].innerHTML
 
 			var start_offset = offset * (months_difference(total_start_date.split('/')[0], total_start_date.split('/')[1], start_date.split('/')[0], start_date.split('/')[1], false, 'upper'))
 
@@ -519,6 +641,7 @@
 			dot.data('end_offset', end_offset)
 			dot.data('color', color)
 			dot.data('type', type)
+			dot.data('duration', duration)
 
 
 			// Add timeline chunk
@@ -579,6 +702,8 @@
 	}
 	// Hover utility
 	var horizontal_hover_in = function(dot, paper) {
+			
+			/* Get Data... more efficient w/o variables? */
 			var data = dot.data
 			var start_date = dot.data('start_date')
 			var end_date = dot.data('end_date')
@@ -589,6 +714,7 @@
 			var end_offset = parseInt(dot.data('end_offset'))
 			var description = dot.data('description')
 			var color = dot.data('color')
+			var duration = dot.data('duration')
 
 			/* Remove old elements */
 			if ($('#duration_rect').length > 0) $('#duration_rect').remove()
@@ -605,18 +731,26 @@
 			duration_rect.node.id = 'duration_rect'
 
 			/* Construct HTML Text */
-			var headerString = '<div class="timeline-date">' + 
-				start_date + '-' + end_date + '</div>'
-				
-				
+			var headerString = ""
 			if (title != 'None') 
 				headerString += '<div class="timeline-title">' +
 				title + '</div>'
 
 			headerString += '<div class="timeline-entity-name">' +
-				entity_name + '</div><br/><div class="timeline-interested-in"><i class="icon-ok-circle icon-large" onclick="addInterestedPosition(this, ' + id + ')"></i> <span class="timeline-interested-text">I\'m interested in this position</span></div>'
+				entity_name + '</div>'
+
+			headerString += '<div class="timeline-date">' + 
+				start_date + '-' + end_date + ' (' + duration + ' months)</div>'
+			if (title.length < 50) headerString += '<br/>' // just formatting
+				
+
+			// Can't 'like' your own positions
+			if (!{{own_profile_javascript}})
+				headerString += '<div class="timeline-interested-in"><i class="icon-ok-circle icon-large" onclick="addInterestedPosition(this, ' + id + ')"></i> <span class="timeline-interested-text">I\'m interested in this position</span></div>'
+			
 
 			// A). Title & Description
+			/* Currently, not displaying descriptions */
 			if (description != 'None') {
 
 				descriptionString = '<span class="timeline-description">' + description + '</span>'

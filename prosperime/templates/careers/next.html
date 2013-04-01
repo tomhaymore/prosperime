@@ -1,19 +1,59 @@
 {% extends "base_full.html" %}
 
 {% block head %}
+
+<!-- CSS --> 
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/next.css" />
+<link type='text/css' rel='stylesheet' href='{{ STATIC_URL }}css/font-awesome.min.css'/>
+
+
 <!-- JS -->
 <script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
 <script type='text/javascript' src="{{ STATIC_URL }}js/next.js"></script>
 <script type='text/javascript' src="{{ STATIC_URL }}js/backbone.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/spin.min.js"></script>
 <!-- Autocomplete comes from here!:
 		https://github.com/devbridge/jQuery-Autocomplete -->
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.autocomplete.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/Chart.min.js"></script>
 
-<!-- CSS --> 
-<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/next.css" />
-<link type='text/css' rel='stylesheet' href='{{ STATIC_URL }}css/font-awesome.min.css'/>
+
+
+
+<!-- For CSRF in Backbone -->
+<script type="text/javascript">
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    crossDomain: false, // obviates need for sameOrigin test
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type)) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+</script>
 
 {% endblock %}
 
@@ -32,6 +72,12 @@
 			<span class='sub-header'>What Next?  </span>
 			<span id='industry-header'></span>
 		</h3>
+	</div>
+
+	<!-- currently unused -->
+	<div id="chart-container">
+		<!-- <canvas id="pie" width="400" height="400"></canvas> -->
+		<!-- chart here -->
 	</div>
 
 
@@ -83,7 +129,9 @@
 
 <script type='text/template' id='lvl1-template'>
 
-	<h3>Job Moves from the <%=start_name%> industry: </h3>
+	<div id="lvl1-header-container">
+		<h3 class="inline-block pull-up">Job Moves from the <%=start_name%> industry: </h3>
+	</div>
 
 	<!-- /* Only first 15 results */ -->
 	<table id='search-results-table' class='table table-hover'>
@@ -198,11 +246,11 @@
 	
 	<div>
 		<% if (industries.length > 1) {
-			%><p>
+			%><p class="call-out-text">
 				Don&rsquo;t see what you&rsquo;re looking for? We think the following might also interest you, or you can start typing below and to check out others.
 			</p><%
 		} else {
-			%><p>
+			%><p class="call-out-text">
 				Want to explore other industries? Start typing and see what you find!
 			<p><%
 		} %>
@@ -224,9 +272,11 @@
 		 } %>
 	</span>
 
-	<div class="input-append inline">
-		<input type="text" id="alternateIndustryBox">
-		<span class="add-on" id="blue-btn"> Search! </span>
+	<div class="search-box">
+		<div class="input-append">
+			<input type="text" id="alternateIndustryBox">
+			<span class="add-on" id="blue-btn"> Search! </span>
+		</div>
 	</div>
 
 
@@ -234,9 +284,16 @@
 
 <script type="text/javascript">
 	
+	$(function() {
+
+
+	});
+
+
 
 
 	var id_selected = null
+
 
 	<!-- /* Have to use 'on' b/c elem is dynamically added to DOM */ -->
 	$('#header-container').on("click", function() {

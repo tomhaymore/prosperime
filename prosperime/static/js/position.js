@@ -43,6 +43,13 @@ $(document).ready(function() {
 
 $(function(){
 
+    var eatmeat = function(id) {
+        // console.log($('#paper-wrapper-' + id))
+        // $('#paper-wrapper-' + id).html('<h1>Chillaz</h1>')
+        // console.log($('#paper-wrapper-' + id)).html()
+    }
+
+
     //--------------//
     // ** Models ** //
     //--------------//
@@ -133,15 +140,91 @@ $(function(){
     // ** Views ** //
     //-------------//
 
+
+    // View: TimelineView
+    window.TimelineView = Backbone.View.extend({
+
+
+        events: {
+
+        },
+
+        initialize: function() {
+            _.bindAll(this,'render');
+
+            // Must create the paper container beforehand so that 
+            // it exists when render() is called
+            this.paper_div = document.createElement("div")
+
+            // No idea why this has to be done, but it does
+            this.position_title = position_title 
+        },
+
+        render: function() {
+            var positions = []
+            var all_positions = this.model['positions']
+            var length = all_positions.length
+
+            // Sort Positions by Start Date
+                // TODO: what happens w/ no start date?
+            all_positions = _.sortBy(all_positions, function(el) {
+                return el.start_date
+            });
+
+
+            // Only get positions on either side of relevant pos
+            for(var i = 0; i < length; i++) {
+                if (all_positions[i].title == this.position_title) {
+                    if (i < length - 1 && all_positions[i + 1] != this.position_title) {
+
+                        if (i > 0) positions.push(all_positions[i - 1])
+                        positions.push(all_positions[i])
+                        if (i < length - 1) positions.push(all_positions[i + 1])
+
+                    } else if (i == length - 1 && all_positions[i - 1].title != this.position_title) {
+                        
+                        if (i > 0) positions.push(all_positions[i - 1])
+                        positions.push(all_positions[i])
+                        if (i < length - 1) positions.push(all_positions[i + 1])
+                    }
+
+                }
+            }
+
+ 
+
+            /* Timeline Constants */
+            var constants = {
+
+                'paper_w':700,
+                'paper_h':120,
+                'start_offset':25,
+                'midline':60,
+                'text-attributes':{
+                    'font-size':'12',
+                    'font-family':'"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
+                },
+                'position_text_height':40,
+            }
+
+
+            monospaced_timeline(constants, positions, this.paper_div)
+
+            this.$el.append(this.paper_div)
+            // need to return the actual html in this case, not the el
+            return this.$el.html() 
+        },
+
+    });
+
     // View: PathSingleView
     window.PathSingleView = Backbone.View.extend({
 
         tagName: "li",
         template:_.template($('#path-single-template').html()),
-        // template:_.template($('#path-single-template-clayton').html()),
 
         events: {
-            // "click a.path-name-link" : "renderViz",
+
         },
 
         initialize: function() {
@@ -149,12 +232,19 @@ $(function(){
         },
 
         render: function() {
-            // console.log('path single view: ' + this.model.toJSON())
 
+            // Render path container
             var renderedContent = this.template(this.model.toJSON());
-            console.log('here')
-            console.log(this.model.toJSON())
             $(this.el).html(renderedContent);
+
+            // Append timeline
+            var timelineView = new TimelineView({
+                model:this.model.toJSON(),
+            });
+
+            var timeline_wrapper = this.$('.search-timeline-container')
+            timeline_wrapper.html(timelineView.render())
+
             return this;
         },
 
@@ -183,12 +273,12 @@ $(function(){
         },
 
         render: function() {
-            console.log('path list view')
-            var $paths,
-                collection = this.collection;
+
+            var $paths, collection = this.collection;
 
             $(this.el).html(this.template({}));
             $paths = this.$(".path-list");
+
             this.collection.each(function(path) {
                 var view = new PathSingleView({
                     model: path,

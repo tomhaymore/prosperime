@@ -171,9 +171,18 @@ class SavedCareer(models.Model):
 	created = models.DateTimeField(auto_now_add=True, null=True)
 	updated = models.DateTimeField(auto_now=True, null=True)
 
+class SavedIndustry(models.Model):
+
+	industry = models.ForeignKey(Industry)
+	owner = models.ForeignKey(User)
+	title = models.CharField(max_length=150,null=True)
+	status = models.CharField(max_length=15,default="active")
+	created = models.DateTimeField(auto_now_add=True, null=True)
+	updated = models.DateTimeField(auto_now=True, null=True)	
+
 class IdealPosition(models.Model):
 
-	title = models.CharField(max_length=450)
+	title = models.CharField(max_length=450, null=True)
 	description = models.TextField(null=True)
 	careers = models.ManyToManyField(Career,related_name="ideal_positions")
 	people = models.ManyToManyField(User,through='GoalPosition')

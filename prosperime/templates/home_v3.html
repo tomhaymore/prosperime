@@ -1,0 +1,85 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+<!-- CSS -->
+<!-- <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/discover.css" /> -->
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/home.css" />
+<link type='text/css' rel='stylesheet' href='{{ STATIC_URL }}css/font-awesome.min.css' />
+
+<!-- Javascript -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/discover.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+{% endblock %}
+
+
+{% block content %}
+
+<div id="content-container" class="main-container">
+
+	<!-- Header Links -->
+	<div class="v3-header-container">
+		<div class="v3-main-header">
+			Welcome!
+		</div>
+		<div class="v3-sub-header">
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <!-- Really? No indentation codes? -->
+			Get the most out of Prosperime from the following resources:
+		</div>
+	</div>
+
+
+	<div id="v3-container">
+
+		<table id="homepage-main-table">
+			<tr class="top-row">
+				<td class="icon"><i class="icon-search icon-5x"></td>
+				<td class="header">
+					<div class="header-wrapper">
+						<a href="/profile/{{user.id}}/#goal-careers-anchor">Explore</a>
+					</div>
+				</td>
+				<td class="description">
+					Need help figuring out what might be best for you? Head to your profile to browse careers that other people like you have followed.
+				</td>
+			</tr>
+			<tr class="middle-row">
+				<td class="icon"><i class="icon-road icon-5x"></td>
+				<td class="header">
+					<div class="header-wrapper">
+						<!-- Note... what if no industries on file?? -->
+						<a href="/next/#?i1={{industry}}">Next</a>
+					</div>
+				</td>
+				<td class="description">
+					Have an idea of where you want to go? Head here to learn more about that industry, and what the people in it are doing.
+				</td>
+			</tr>
+			<tr class="bottom-row">
+				<td class="icon"><i class="icon-calendar icon-5x"></td>
+				<td class="header">
+					<div class="header-wrapper">
+						<a href="/profile/{{user.id}}/#goal-positions-anchor">Plan</a>
+					</div>
+				</td>
+				<td class="description">
+					Want to be a Product Manager? Director of Sales? <br/> Go here for hard statistics on how others have reached their career goals so that you can do the same.
+				</td>
+			</tr>
+		</table>
+
+
+	</div>
+
+</div>
+
+
+<script type="text/javascript">
+
+
+	
+
+
+
+</script>
+
+{% endblock %}

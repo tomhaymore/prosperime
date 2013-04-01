@@ -2,10 +2,24 @@
 
 {% block head %}
 
-<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/position.css" />
-<script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/position.js"></script>
+<!-- CSS -->
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/position.css" />
+
+
+<!-- JS -->
+	<!-- Hack to pass Django vars to Backbone -->
+	<script type="text/javascript">
+		
+		var position_title = "{{position.title}}"
+
+	</script>
+
+
+	<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/position.js"></script>
+	<script async type="text/javascript" src="{{ STATIC_URL }}js/timeline-viz.js"></script>
+
 {% endblock %}
 
 {% block content %}
@@ -48,6 +62,7 @@
 		<div id="ed-overview-network-chart"></div>
 		<div id="ed-overview-all-chart" style="display:none;"></div>
 	</div>
+
 	<div class="position-profile-stats pull-left">
 		<span data-view="network" class="stats-holder">
 			{% if stats.duration.network %}
@@ -79,12 +94,14 @@
 {% endblock %}
 
 {% block templates %}
+
+
 <script type="text/template" id="path-single-template">
 	<li class="list-preview">
+
 		<div class="left-list-preview">
 			<div class="profile-img-holder pull-left">
-			<% if (profile_pic != null) { %>
-			
+			<% if (profile_pic != null) { %>	
 				<a href="/profile/<%= id %>"><img class="logo-preview" src="{{MEDIA_URL}}<%= profile_pic %>" /></a>&nbsp;
 			</div>
 			
@@ -92,33 +109,39 @@
 				<a href="/profile/<%= id %>"><img class="logo-preview" src="{{MEDIA_URL}}pictures/anon.jpg" /></a>&nbsp;
 			<% } %>
 		</div>
+
 		<div class="right-list-preview pull-left">
-			<p class="path-name"><a href="/profile/<%= id %>"><%= full_name %></a></p>
-			
+			<p class="path-name">
+				<a href="/profile/<%= id %>"><%= full_name %></a>
+			</p>	
 		</div>
 		<div class="clearfix"></div>
+
 		<div class="search-careers-container">
 			
 			<% if (careers != null) {  %>
-			<ul class="search-careers-list flat">
-			<% _.each(careers,function(c) { %>
-				<li class="search-career">
-					<a class="search-button" href="/discover/career/<%=c.id%>"><%=c.name%></a>
-				</li>
-			<% }); %>
+				<ul class="search-careers-list flat">
+					<% _.each(careers,function(c) { %>
+						<li class="search-career">
+							<a class="search-button" href="/discover/career/<%=c.id%>"><%=c.name%></a>
+						</li>
+					<% }); %>
+				</ul>
 			<% } %>
-			
 		</div>
+
+		<div class="search-timeline-container">
+			<div id="paper-wrapper-<%=id%>">
+
+			</div>
+		</div>
+
 	</li>
 </script>
 
 <script type="text/template" id="path-list-template">
 	<div class="main-header pull-left">Career Paths</div>
-	<div class="search-view pull-right">Search: 
-		<ul class="search-view-links inline">
-			<li><a href="/search/#companies/">companies</a></li>
-		</ul>
-	</div>
+	
 	<div class="clearfix"></div>
 	<ul class="path-list"></ul>
 </script>
