@@ -17,6 +17,14 @@ from django.core.exceptions import MultipleObjectsReturned
 from django.core import management
 from django.db.models import Count, Q
 
+def import_initial_ideals(path):
+	career_import = CareerImportBase()
+	career_import.import_initial_ideals(path)
+
+def match_position_to_ideals(pos,test=False):
+	career_map = CareerMapBase()
+	return career_map.match_position_to_ideals(pos,test)
+
 # get focal careers
 def get_focal_careers(user,limit=10):
 	career_path = CareerPathBase()
@@ -30,10 +38,6 @@ def avg_duration_network(career,user):
 def avg_duration_all(career):
 	career_path = CareerPathBase()
 	return career_path.avg_duration_all(career)
-
-def match_position_to_ideals(pos):
-	career_map = CareerMapBase()
-	career_map.match_position_to_ideals(pos)
 
 # def _get_users_in_network(user,**filters):
 
@@ -341,7 +345,8 @@ class CareerSimBase():
 	# fetch all users
 	# users = User.objects.prefetch_related('positions').exclude(profile__status="deleted")
 	users = {}
-
+	flat_users = []
+	user_ids = []
 	# initializes single map
 	users_orgs_map_single = {}
 
@@ -355,8 +360,24 @@ class CareerSimBase():
 		self.load_users()
 		self.load_maps()
 
+	def _calc_time(x):
+		"""
+		calculates length of position
+		"""
+		
+		start = x['positions__start_date']
+		end = x['positions__end_date']
+		if start:
+			if not end:
+				change = datetime.date.today() - start
+			else:
+				change = end - start
+			return (x['id'],x['positions__entity_id'],change.days,)
+
+
 	def load_users(self):
 		users = User.objects.values('id','positions__type','positions__entity__id')
+		self.flat_users = users
 		users_dict = {}
 		for u in users:
 			if u['id'] in users_dict:
@@ -364,12 +385,15 @@ class CareerSimBase():
 			else:
 				users_dict[u['id']] = {'positions':[{'type':u['positions__type'],'id':u['positions__entity__id']}]}
 		self.users = users_dict
+		self.user_ids = [u['id'] for u in users]
 		# print self.users
 
 	def load_single_map(self):
 		"""
 		loads set of org affiliations for each user
 		"""
+		mapped_list = map(self._calc_time,self.flat_users)
+
 		for k,v in self.users.items():
 			orgs = []
 			for p in v['positions']:
@@ -969,12 +993,15 @@ class CareerMapBase():
 		"""
 		import string
 		if title:
+			remove_punctuation_map = dict((ord(char), None) for char in string.punctuation)
 			# remove all punctuation 
-			title = title.translate(string.maketrans("",""),string.punctuation)
+			# title = title.translate(string.maketrans("",""),string.punctuation)
+			# title = " ".join([w.translate(remove_punctuation_map) for w in title])
 			# tokenize position title
 			tokens = title.split(" ")
 			# reduce all strings to lower case
 			tokens = [t.lower() for t in tokens]
+			tokens = [w.translate(remove_punctuation_map) for w in tokens]
 			return tokens
 		return None
 
@@ -1015,6 +1042,26 @@ class CareerMapBase():
 
 		self.careers_to_positions_map = career_map
 
+	def match_careers_to_position(self,pos):
+		# break position title into ngrams
+		title_ngrams = self.extract_ngrams(self.tokenize_position(pos.title))
+		
+		# initialize careers array
+		careers = []
+
+		if title_ngrams is not None:
+			for t in title_ngrams:
+				if t is not None:
+					# make sure position title is not in stop list, e.g., "Manager" or "Director" or something equally generic
+					if t not in self.STOP_LIST:
+						for k,v in self.careers_to_positions_map.items():
+							if t in v and k not in careers:
+								# print str(t) + ": " + str(k)
+								careers.append(k)
+								# print t + ": " + career.name
+
+		return careers
+
 	def init_positions_to_ideals_map(self):
 		"""
 		fill in ideal position map dictionary
@@ -1037,27 +1084,7 @@ class CareerMapBase():
 
 		self.positions_to_ideals_map = ideal_positions_map
 
-	def match_careers_to_position(self,pos):
-		# break position title into ngrams
-		title_ngrams = self.extract_ngrams(self.tokenize_position(pos.title))
-		
-		# initialize careers array
-		careers = []
-
-		if title_ngrams is not None:
-			for t in title_ngrams:
-				if t is not None:
-					# make sure position title is not in stop list, e.g., "Manager" or "Director" or something equally generic
-					if t not in self.STOP_LIST:
-						for k,v in self.careers_to_positions_map.items():
-							if t in v and k not in careers:
-								# print str(t) + ": " + str(k)
-								careers.append(k)
-								# print t + ": " + career.name
-
-		return careers
-
-	def match_position_to_ideals(self,pos):
+	def match_position_to_ideals(self,pos,test=False):
 		"""
 		matches positions to ideals using matching data in ideal positions
 		"""
@@ -1075,15 +1102,38 @@ class CareerMapBase():
 					# check stop list
 					if t not in self.STOP_LIST:
 						for k,v in self.positions_to_ideals_map.items():
-							# check for industry qualifiers
-							if industries:
-								if t in v['titles'] and v['industry'] in industries and k not in ideals:
-									ideals.append(k)
-							else:
-								if t in v['titles'] and k not in ideals:
-									ideals.append(k)
-		pos.ideal_position = IdealPosition.objects.get(pk=ideals[0])
-		pos.save()
+							# loop through each dict in matches
+							for m in v:
+								# initiate flag to test for match
+								is_match = False
+								# check to see if text matches
+								if t == m['title'] and k not in ideals:
+									is_match = True
+									# ideals.append(k)
+									# check for industry qualifiers
+									if 'industries' in m and industries is not None:
+										if m['industries']:
+											if not (set(industries) & set(m['industries'])):
+												is_match = False
+												continue
+									# check for entity qualifiers
+									if 'entities' in m:
+										if pos.entity.id not in m['entities']:
+											is_match = False
+											continue
+									if is_match == True:
+										ideals.append(k)	
+										print t + ": " + m['title']						
+		
+		if not test:
+			if ideals:
+				# fetch all matched ideal positions, sorted by length of title
+				ideals_objects = IdealPosition.objects.filter(pk__in=ideals).extra(order_by=[length("title")])
+				pos.ideal_position = ideals_objects[0]
+				pos.save()
+				return True
+			else:
+				return False
 
 	def test_position(self,title):
 
@@ -1298,6 +1348,42 @@ class CareerImportBase():
 				for t in new_titles:
 					career.add_pos_title(t)
 			career.save()
+
+	def import_initial_ideals(self,path):
+		from careers.models import IdealPosition
+		"""
+		imports initial ideal positions, assumes empty table and will not check for duplicates
+		"""
+
+		ideals = json.loads(open(path).read())
+
+		for i in ideals:
+			ipos = IdealPosition(title=i['title'],description=i['description'])
+			
+			# loop through all the listed industries
+			for m in i['matches']:
+				if m['industries']:
+					industry_ids = []
+					# replace industry names with ids
+					for industry in m['industries']:
+						try:
+							new_industry = Industry.objects.get(name=industry)
+						except MultipleObjectsReturned:
+							new_industry = Industry.objects.filter(name=industry)[0]
+						except:
+							new_industry = Industry(name=industry)
+							new_industry.save()
+						industry_ids.append(new_industry.id)
+					m['industries'] = industry_ids
+			ipos.matches = json.dumps(i['matches'])
+			if 'level' in i:
+				ipos.level = i['level']
+			ipos.save()
+			for c in i['careers']:
+				career = Career.objects.get(pk=c)
+				ipos.careers.add()
+			ipos.save()
+			print "Added " + ipos.title
 
 class CareerExportBase():
 

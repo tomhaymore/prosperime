@@ -17,7 +17,7 @@ class Position(models.Model):
 	entity = models.ForeignKey(Entity,related_name="positions")
 	person = models.ForeignKey(User,related_name="positions")
 	careers = models.ManyToManyField("Career",related_name="positions")
-	ideal_position = models.ForeignKey("IdealPosition",related_name="ideal_position")
+	ideal_position = models.ForeignKey("IdealPosition",related_name="ideal_position",null=True)
 	title = models.CharField(max_length=150,null=True)
 	summary = models.CharField(max_length=450,null=True)
 	description = models.TextField(null=True)
@@ -175,6 +175,7 @@ class IdealPosition(models.Model):
 
 	title = models.CharField(max_length=450)
 	description = models.TextField(null=True)
+	level = models.IntegerField(null=True)
 	careers = models.ManyToManyField(Career,related_name="ideal_positions")
 	people = models.ManyToManyField(User,through='GoalPosition')
 	matches = models.TextField(null=True)
