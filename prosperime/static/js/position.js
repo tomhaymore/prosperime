@@ -205,6 +205,10 @@ $(function(){
                     'font-family':'"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
                 },
                 'position_text_height':40,
+                'box_style':2,
+                'effective_midline':33,
+                'top_text_offset':25,
+                'bottom_text_offset':15,
             }
 
 

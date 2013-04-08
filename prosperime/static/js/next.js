@@ -67,7 +67,6 @@ $(function(){
 			// bookmark this industry
 			var new_industry = true
 			for (var i = 0; i < model.get('related_industries').length; i++) {
-				console.log(model.get('related_industries')[i][0])
 				if (model.get('start_id') == model.get('related_industries')[i][0])
 					new_industry = false
 			};
@@ -80,6 +79,13 @@ $(function(){
 				var id = model.get('start_id')
 				$('#save-button').on("click", function() {
 					var id = $(this).data("id")
+
+					// Make sure industry not a duplicate!
+					for (var h = 0; h < model.get('related_industries'); h++) {
+						if (id == model.get('related_industries')[h][0]) {
+							return false;
+						}
+					}
 
 					// Save Industry
 					$.post('/careers/addIndustry/', {
@@ -165,9 +171,9 @@ $(function(){
 		template: _.template($('#lvl1-template').html()),
 
 		events: {
-			'mouseenter #search-results-table tbody tr': 'tableOver',
-			'mouseleave #search-results-table tbody tr': 'tableOut',
-			'click #search-results-table tbody tr': 'changeClicked',
+			'mouseenter #search-results-table-lvl1 tbody tr': 'tableOver',
+			'mouseleave #search-results-table-lvl1 tbody tr': 'tableOut',
+			'click #search-results-table-lvl1 tbody tr': 'changeClicked',
 		},
 
 		initialize: function() {
@@ -226,10 +232,10 @@ $(function(){
 		template: _.template($('#lvl2-template').html()),
 
 		events: {
-			'mouseenter #search-results-table tbody tr': 'tableOver',
-			'mouseleave #search-results-table tbody tr': 'tableOut',
-			// 'click #search-results-table tbody tr': 'goToProfile',
+			'mouseenter #search-results-table-lvl2 tbody tr': 'tableOver',
+			'mouseleave #search-results-table-lvl2 tbody tr': 'tableOut',
 			'click span.previous-search':'goBack',
+			'click #search-results-table-lvl2 tbody tr':'goToProfile',
 		},
 
 		initialize: function() {
@@ -256,11 +262,34 @@ $(function(){
 
 			$('#industry-header').html(model.get('start_name'))
 
+			// Now add timelines
+			var constants = {
+				'paper_w':700,
+				'paper_h':100,
+				'midline':50,
+				'start_offset':0,
+				'padding':3,
+				'top_text_offset':37,
+				'bottom_text_offset':23,
+			}
+
+			_.each(model.get('people'), function(value, key) {
+
+				var move = value[1]
+				var positions = [{'title':move.start_title, 'org':move.start_entity_name}, {'title':move.end_title, 'org':move.end_entity_name}]
+				monospaced_timeline(constants, positions, "content-"+ key)
+
+			});
+
+		
+
+
 			return this;
 		},
 
 		tableOver: function(ev) {
 			$(ev.currentTarget).toggleClass('info')
+			// $(ev.currentTarget).children(".first-col").children(".flat-button").toggleClass("hide")
 		},
 
 		tableOut: function(ev) {
@@ -269,7 +298,7 @@ $(function(){
 
 		goToProfile: function(ev) {
 			var row_id =  $(ev.currentTarget).attr('id')
-			window.location = '/profile/' + row_id + '/'
+			window.location = "/profile/" + row_id + "/"
 		},
 
 		// Returns to lvl1 search by manipulating url
@@ -277,7 +306,6 @@ $(function(){
 			var current = window.location.toString()
 			App.navigate(current.substring(current.indexOf('?'), current.indexOf('&')), {trigger:true})
 		},
-
 	});
 
 
@@ -289,6 +317,7 @@ $(function(){
 			'':'empty',
 			':query&:query':'doubleQuery',
 			':query':'singleQuery',
+
 		},
 
 		initialize: function() {
@@ -315,6 +344,14 @@ $(function(){
 
 		doubleQuery: function(q1, q2) {
 			console.log('double query: ' + q1 + ' ' + q2)
+
+			if (q2 == 'undefined') {
+				console.log('here')
+				App.history.back()
+				App.history.back()
+				return
+			}
+
 			this.filterView = new FiltersView({collection:this.changes})
 			this.lvl2view = new Lvl2View({collection:this.changes})
 			this.changes._meta['q1'] = q1

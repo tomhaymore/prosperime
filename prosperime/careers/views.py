@@ -52,10 +52,35 @@ def home(request):
 		## this means they either have 0 postions or ghetto ones
 	## need current industry, too
 
-	return render_to_response('home_v4.html',data,context_instance=RequestContext(request))
+	return render_to_response('home_v5.html',data,context_instance=RequestContext(request))
+
+def build(request):
+
+
+	path_results = []
+	path_results.append({'id':10, 'title':'Business Development Intern', 'entity_name':'Coursera'})
+	path_results.append({'id':15, 'title':'Product Manager', 'entity_name': 'Apple'})
+	path_results.append({'id':20, 'title':'Homeophatic Surgeon', 'entity_name': 'Green Remedies, Inc.'})
+	path_results.append({'id':70, 'title':'Televangelist and Local Hero', 'entity_name':'Lakewood Church'})
+	path_results.append({'id':111, 'title':'NFL Linebacker', 'entity_name':'National Football Association'})
+
+	path_title = "Untitled" ## this should default if no title
+
+	current_positions = []
+	current_positions.append({'id':127, 'title':'Business Development Assocaite', 'entity_name': 'Morgan Stanley'})
+	current_positions.append({'id':45, 'title':'Student, B.A.', 'entity_name':'Dartmouth University'})
+	current_positions.append({'id':33, 'title':'Graduate Research Assistant', 'entity_name':'Harvard Medical School'})
+
+
+	data = {
+		'options':simplejson.dumps(path_results),
+		'title':path_title,
+		'current_positions':current_positions,
+	}
 
 
 
+	return render_to_response("careers/build.html", data, context_instance=RequestContext(request))
 
 def next(request):
 	data = {}
@@ -869,6 +894,31 @@ def getDecisions(request):
 
 	response = {
 		'decisions':_decisions_to_json(decisions)
+	}
+
+	return HttpResponse(simplejson.dumps(response))
+
+
+## Autocomplete for positions
+def positionAutocomplete(request):
+
+	query = request.GET.getlist('query')[0]
+	positions = Position.objects.filter(Q(title__istartswith=query) | Q(entity__name__istartswith=query)).values("id", "entity__name", "title")
+
+	suggestions = []
+	for p in positions:
+		string = str(p['title']) + ' at ' + str(p['entity__name'])
+		item = {
+			'value':string,
+			'data':p['id'],
+			'title':p['title'],
+			'entity_name':p['entity__name']
+		}
+		suggestions.append(item)
+
+	response = {
+		'query': query,
+		'suggestions': suggestions,
 	}
 
 	return HttpResponse(simplejson.dumps(response))

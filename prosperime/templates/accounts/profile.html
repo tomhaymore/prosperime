@@ -18,10 +18,52 @@
 	var backbone_goal_positions_init_data = {{goal_positions|safe}}
 	var backbone_positions_of_interest_init_data = {{queue|safe}}
 	var backbone_own_profile = {{own_profile_javascript}}
+
+	var saved_paths = {{viewer_saved_paths|safe}}
+	var positions = {{positions|safe}}
+	var total_start_date = "{{start_date|safe}}"
+	var total_end_date = "{{end_date|safe}}"
+	var total_time = {{total_time|safe}}
 </script>
 
 <script type='text/javascript' src='{{ STATIC_URL }}js/backbone.js'></script>
 <script type='text/javascript' src='{{ STATIC_URL }}js/profile.js'></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/timeline-viz.js"></script>
+<!-- For CSRF in Backbone -->
+<script async type="text/javascript">
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    crossDomain: false, // obviates need for sameOrigin test
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type)) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+</script>
+
 
 
 {% endblock %}
@@ -43,6 +85,14 @@
 		<span>
 			<img class="logo-preview" src="/media/{{profile.default_profile_pic}}" />
 		</span>
+
+		{% if not is_connected %}
+		<div class="pull-right">
+			<span class="flat-button blue-button button-large connect-button" onclick="connect(this, {{profile.id}})">Connect</span>
+		</div>
+		{% endif %}
+
+
 		<!-- <p class="main-sub-header">{{profile.headline}}</p> -->
 		
 		<!-- <span class="pull-right" id='profile-careers-container'>
@@ -61,6 +111,12 @@
 	
 	<!-- TIMELINE -->
 	{% if positions|length > 0 %}
+		<div class="h-header-container">
+			<div class="h-header">
+				Timeline
+			</div>
+		</div>
+
 		<div id="timeline-container">
 			<!-- Fill in with JS -->
 		</div>
@@ -77,53 +133,6 @@
 		</div>
 	{% endif %}
 
-	<!-- Hidden Data Structure, used to pass info to JS. Not displayed -->
-	<div id='position-data-structure' class="hidden-data-structure">
-
-		{% for p in positions %}
-			<div class='position-wrapper'>
-				{% if p.type == 'education' %}
-					<div class='type'>education</div>
-				{% elif p.type == 'internship' %}
-					<div class='type'>internship</div>
-				{% else %}
-					<div class='type'>org</div>
-				{% endif %}
-				<div class='title'>{{p.title}}</div>
-				<div class='entity_name'>{{p.co_name}}</div>
-				<div class='id'>{{p.id}}</div>
-				<div class='description'>{{p.description}}</div>
-				<div class='start-date-'>{{p.start_date.month}}/{{p.start_date.year}}</div>
-				<div class='end-date'>{{p.end_date.month}}/{{p.end_date.year}}</div>
-				<div class='pic'>{{p.pic}}</div>
-				<div class="duration">{{p.duration}}</div>
-			</div>
-		{% endfor %}
-	</div>
-
-	<div id='metadata' class='hidden-data-structure'>
-		<div class='start-date'>{{start_date.month}}/{{start_date.year}}</div>
-		<div class='end-date'>{{end_date.month}}/{{end_date.year}}</div>
-		<div class='total_time'>{{total_time}}</div>
-	</div>
-
-	<div id='paths-data-structure' class='hidden-data-structure'>
-		{% for p in viewer_saved_paths %}
-			<div class='path-wrapper'>
-				<div class='title'>{{p.title}}</div>
-				<div class='id'>{{p.id}}</div>
-				{% for pos in p.positions %}
-					<div class='position-wrapper'>
-						<div class='position-title'>{{pos.title}}</div>
-						<div class='position-id'>{{pos.pos_id}}</div>
-						<div class='position-owner'>{{pos.owner}}</div>
-						<div class='position-entity-name'>{{pos.entity_name}}</div>
-						<div class='position-type'>{{pos.type}}</div>
-					</div>
-				{% endfor %}
-			</div>
-		{% endfor %}
-	</div>
 
 	<!-- Career Decision Prompt -->
 	<div class="pull-left span12" style='margin-left:0px'>	
@@ -136,73 +145,117 @@
 	<!-- Personal Data - Saved Careers, Positions of Interest, and Saved Paths -->
 	{% if own_profile %}
 
-		<!-- Careers of Interest -->
-		<a name="goal-careers-anchor">
-			<div id="goal-careers-header" class="timeline-header anchor inline"></div>
-		</a>
-		
-		<div id="personalize-goal-careers-prompt" class="personalize" >
-			Interested in something else? Explore your options <a onclick="revealPersonalization('goalCareer')">here.</a>
-		</div>
+		<!-- Tabs -->
+		<ul class="nav nav-tabs" id="profile-tabs">
+			<li><a href="#goal-careers" data-toggle="tab">Your Careers</a></li>
+			<li><a href="#goal-positions" data-toggle="tab">Goal Positions</a></li>
+			<li><a href="#positions-of-interest" data-toggle="tab">Interested Positions</a></li>
+		</ul>
 
-		<div id="personalize-goal-careers" class="personalize" style="display:none">
-			<div class="input-append inline">
-				<input id="personalize-goal-careers-box" type="text">
-				<span id="personalize-goal-careers-add" class="add-on"> Add </span>
+		<!-- Tab Content -->
+		<div class="tab-content">
+
+			<!-- Goal Careers -->
+			<div class="tab-pane active" id="goal-careers">
+
+				<!-- Header -->
+				<a name="goal-careers-anchor">
+					<div id="goal-careers-header" class="timeline-header anchor inline"></div>
+				</a>
+				
+				<!-- Not what you're looking for? -->
+				<div id="personalize-goal-careers-prompt" class="personalize" >
+					Interested in something else? Explore your options <a onclick="revealPersonalization('goalCareer')">here.</a>
+				</div>
+				<div id="personalize-goal-careers" class="personalize" style="display:none">
+					<div class="input-append inline">
+						<input id="personalize-goal-careers-box" type="text">
+						<span id="personalize-goal-careers-add" class="add-on"> Add </span>
+					</div>
+					<div class="flat-button inline personalize-button" onclick="hidePersonalization('goalCareer')"> Back </div>
+				</div>
+
+				<!-- Careers container -->
+				<div id="goal-careers-container" class="item-container">
+					<!-- Backbone here -->
+				</div>
 			</div>
-			<div class="flat-button inline personalize-button" onclick="hidePersonalization('goalCareer')"> Back </div>
-		</div>
 
-		<div id="goal-careers-container" class="item-container">
-			<!-- Backbone here -->
-		</div>
+			<!-- Goal Positions -->
+			<div class="tab-pane" id="goal-positions">
 
-		<!-- Goal Positions -->
-		<a name="goal-positions-anchor">
-			<div id="goal-positions-header" class="timeline-header anchor inline"></div>
-		</a>
+				<!-- Header -->
+				<a name="goal-positions-anchor">
+					<div id="goal-positions-header" class="timeline-header anchor inline"></div>
+				</a>
 
-		<div id="personalize-goal-positions-prompt" class="personalize">
-			Interested in something else? Explore your options <a onclick="revealPersonalization('goalPosition')">here.</a>
-		</div>
+				<!-- Not what you're looking for? -->
+				<div id="personalize-goal-positions-prompt" class="personalize">
+					Interested in something else? Explore your options <a onclick="revealPersonalization('goalPosition')">here.</a>
+				</div>
+				<div id="personalize-goal-positions" class="personalize" style="display:none">
+					<div class="input-append inline">
+						<input id="personalize-goal-positions-box" type="text">
+						<span id="personalize-goal-positions-add" class="add-on"> Add </span>
+					</div>
+					<div class="flat-button inline personalize-button" onclick="hidePersonalization('goalPosition')"> Back </div>
 
-		<div id="personalize-goal-positions" class="personalize" style="display:none">
-			<div class="input-append inline">
-				<input id="personalize-goal-positions-box" type="text">
-				<span id="personalize-goal-positions-add" class="add-on"> Add </span>
+				</div>
+				<!-- Positions Container -->
+				<div id="goal-positions-container" class="item-container">
+					<!-- Backbone here -->
+				</div> 
 			</div>
-			<div class="flat-button inline personalize-button" onclick="hidePersonalization('goalPosition')"> Back </div>
 
-		</div>
+			<!-- Interested Positions -->
+			<div class="tab-pane" id="positions-of-interest">
 
-		<div id="goal-positions-container" class="item-container">
-			<!-- Backbone here -->
-		</div> 
- 
+				<!-- Header -->
+				<a name="positions-of-interest-anchor">
+					<div id="queue-header" class='timeline-header anchor'></div>
+				</a>
 
-		<!-- Positions of Interest -->
-		<a name="positions-of-interest-anchor">
-			<div id="queue-header" class='timeline-header anchor'></div>
-		</a>
-
-		<div id='queue' class="item-container">
-			<!-- Backbone Here -->
+				<!-- Container -->
+				<div id='queue' class="item-container">
+					<!-- Backbone Here -->
+				</div>
+			</div>
 		</div>
 
 		<br/><br/>
 
-		<div id="saved-paths-container">
+
+		<!-- Tabs -->
+		<ul class="nav nav-tabs" id="saved-path-tabs">
 			{% if viewer_saved_paths %}
-				{% for path in viewer_saved_paths %}
-					<div class='timeline-header'>Saved Path: {{path.title}}</div>
-						<div id='path-{{path.id}}' class='saved-path-timeline'>	
+				{% for tuple in saved_path_ids %}
+					<li><a href="#{{tuple.0}}" data-toggle="tab">{{tuple.1}}</a></li>
+				{% endfor %}
+			{% endif %}
+		</ul>
+
+
+		<div class="tab-content" id="saved-paths-container">
+			
+			{% if viewer_saved_paths %}
+				{% for tuple in saved_path_ids %}
+					{% if forloop.first %}
+						<div class="tab-pane active" id="{{tuple.0}}">
+					{% else %}
+						<div class="tab-pane" id="{{tuple.0}}">
+					{% endif %}
+					<!-- <div class='timeline-header'>Saved Path: {{path.title}}</div> -->
+						<div id='path-{{tuple.0}}' class='saved-path-timeline'>	</div>
+					<!-- </div> -->
 					</div>
 				{% endfor %} 
 			{% endif %}
+
 		</div>
+
+		
 	{% endif %}
 
-	<!-- </div>	 -->
 </div>
 
 
@@ -230,33 +283,89 @@
 	    });
 
 	    $('#personalize-goal-positions .add-on').click(function(ev) {
+
+	    	// First, make sure not alread a goal pos
+	    	for (var g = 0; g < backbone_goal_positions_init_data.length; g++) {
+	    		if (backbone_goal_positions_init_data[g]['id'] == selected_ideal_position_id) {
+
+	    			// light up that box?
+
+	    			return false;
+	    		}
+	    	}
+
 	    	$.post('/careers/addGoalPosition/', {'id':selected_ideal_position_id, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
 	    		if (response["result"] == "success") {
 	    			console.log("success")
 	    			$('#personalize-goal-positions-box').fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)
 	    			$('#personalize-goal-positions-add').fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)
+	    			update_profile("goalPositions")
 	    		} else 
 	    			console.log("Error: " + response["errors"])
 	    		
 	    	}, "json");
-	    	// window.goalPositions.url("/careers/getGoalPositions/")
-	    	// window.goalPosition.fetch()
 	    })
 
 	    $('#personalize-goal-careers .add-on').click(function(ev) {
+
+	    	// First, make sure not already saved
+	    	for (var h = 0; h < backbone_careers_init_data.length; h++) {
+	    		if (backbone_careers_init_data[h]['id'] == selected_career_id) {
+	    			console.log("goal career already saved")
+	    			// light up that box?
+	    			return false;
+	    		}
+	    	}
+
 	    	$.post('/careers/addSavedCareer/', {'id':selected_career_id, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
 	    		if (response["result"] == "success") {
 	    			console.log("success")
 	    			$('#personalize-goal-careers-box').fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)
 	    			$('#personalize-goal-careers-add').fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)
+	    			update_profile('savedCareers')
 	    		} else 
 	    			console.log("Error: " + response["errors"])
 	    	}, "json");
-	    	// window.goalCareers.url("/careers/getSavedCareers/")
-	    	// window.goalCareers.fetch()
 	    })
 
 	});
+
+	/* Connect users that aren't already connected */
+	var connect = function(elem, connectee_id) {
+
+		$.post("/accounts/connect/", {'id':connectee_id}, function(response) {
+				if (response["result"] == "success") {
+					console.log("success")
+					$(elem).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100)
+				} else {
+					console.log("Failure: " + response["errors"])
+				}
+		}, "json");
+
+	};
+
+	/* Send AJAX request to re-fill instance variable that backbone pulls from. Essentially, manually doing what should be done in Backbone */
+	var update_profile = function(type) {
+		console.log("update profile called")
+		$.get('/accounts/updateProfile/?query=' + type, function(response) {
+			console.log(response)
+	    		if (response["result"] == "success") {
+	    			console.log("success")
+	    			console.log(response["data"])
+
+	    			if (type == "goalPositions") {
+	    				backbone_goal_positions_init_data = response['data']
+	    				window.goalPositions.reset(backbone_goal_positions_init_data)
+
+	    			} else {
+	    				backbone_careers_init_data = response['data']
+	    				window.goalCareers.reset(backbone_careers_init_data)
+	    			}
+	    		} else 
+	    			console.log("Error: " + response["errors"])
+	    			// freak out
+	    	}, "json");
+	}
 
 	var revealPersonalization = function(type) {
 		if (type == "goalPosition") {
@@ -361,6 +470,10 @@
 	/* MAIN */
 	/********/
 	$(function() {
+
+		/* Activate tabs */
+		$("#profile-tabs a:first").tab("show")
+		$("#saved-path-tabs a:first").tab("show")
 	
 		/* Display Career Decision prompt if applicable */
 		if ({{career_decision_prompt}}) {
@@ -394,11 +507,11 @@
 		});
 
 	    /* Add main timeline */
-		if ({{positions|length}} > 0)
+		if (positions.length > 0)
 			horizontal_timeline()
 
 		/* Add saved paths */
-		if ({{viewer_saved_paths|length}} > 0)
+		if (saved_paths.length > 0)
 			saved_path_timelines()
 	});
 
@@ -437,117 +550,45 @@
 	/* SAVED PATH TIMELINES */
 	/************************/
 	var saved_path_timelines = function() {
-		var paths = $('#paths-data-structure')
-		var num_paths = paths.children().length
 
-		// Construct timeline per path
-		for (var i = 0; i < num_paths; i++) {
-			var path_wrapper = paths.children()[i]
-			var num_positions = path_wrapper.children.length - 2
-			var title = path_wrapper.children[0].innerHTML
-			var id = path_wrapper.children[1].innerHTML
+		for (var z = 0; z < saved_paths.length; z++) {
 
-			// Create paper and timeline structure
-			var paper = new Raphael('path-' + id, constants.paper_width, constants.paper_height)
+			var title = saved_paths[z].title
+			var positions = saved_paths[z].positions
+			var id = saved_paths[z].id
+			var n_positions = positions.length
 
-
-			var timeline = paper.path("M100,100  L875,100").attr({
-					stroke: constants.timeline_color,
-					"stroke-width":1,
-					'stroke-linecap':'round',
-					'opacity':'0.8',
-					'stroke-dasharray':'2'
-				});
-
-			var equal_offset = Math.ceil(775 / (num_positions + 1))
-
-			// Add dots per position
-			for (var j = 0; j < num_positions; j++) {
-				var position_wrapper = path_wrapper.children[j + 2]
-				var pos_title = position_wrapper.children[0].innerHTML
-				var id = position_wrapper.children[1].innerHTML
-				var owner = position_wrapper.children[2].innerHTML
-				var entity_name = position_wrapper.children[3].innerHTML
-				var type = position_wrapper.children[4].innerHTML
-
-				// Set dot color based on type
-				var color
-				if (type == 'education') color  = constants.education_color
-				else if (type == 'internship') color = constants.internship_color
-				else {
-					type = 'position' // not 'org'
-					color = constants.position_color
-				}
-
-				var start_offset = (j + 1) * equal_offset
-				
-				// Outer Dot
-				var outer_dot = paper.circle(constants.timeline_start+ start_offset, constants.timeline_y, constants.outer_dot_radius).attr({
-					'stroke-width':'1',
-					'stroke':color,
-					'fill':color,
-					'fill-opacity':'.8',
-				});
-
-				// Inner Dot
-				var dot = paper.circle(constants.timeline_start + start_offset, constants.timeline_y, constants.inner_dot_radius).attr({
-					'stroke-width':1,
-					'stroke':color,
-					'fill':color,
-				})		
-
-				/* Shouldn't be any clashes on a saved path, so 
-					don't worry about secondary text box */
-				if (j % 2 == 0) var fake_index = 0
-				else var fake_index = 1
-				var title_box = construct_title_box(paper, fake_index, entity_name, start_offset)	
+			var saved_path_constants = {
+				'paper_w':constants.paper_width,
+				'paper_h':constants.paper_height,
+				'start_offset':100,
+				'midline':100,
+				'box_style':1,
+				'top_text_offset':38,
+				'bottom_text_offset':25,
 			}
+			monospaced_timeline(saved_path_constants, positions, 'path-' + id)
 		}
 	}
 
-	
+	/* Timeline Instance Variables */
+	var internship_dot_ids = []; var position_dot_ids = []; var education_dot_ids = [];
 
-
+	/***********************/
+	/* HORIZONTAL TIMELINE */
+	/***********************/
 	var horizontal_timeline = function() {
-		/***********************/
-		/* HORIZONTAL TIMELINE */
-		/***********************/
-
-		/** NOTE **/
-		// The way this is designed, data is passed from the view into
-		// the dom and stored in a hidden div structure. Data is then 
-		// pulled from there and used here. In the JS code, data is 
-		// stored on the inner 'dot' svg element
-
+		
 		// Create paper and timeline structure
 		var paper = new Raphael('timeline-container', constants.paper_width, constants.paper_height)
 		
 
-		// paper.defineLinearGradient("grad1", [{
-		//     "id": "s1",
-		//     "offset": "0",
-		//     "style": "stop-color:#555;stop-opacity:1;"
-		// },
-		// {
-		//     "id": "s2",
-		//     "offset": "1",
-		//     "style": "stop-color:#fffffe;stop-opacity:1;"
-		// }]);
-
-		var positions = $('#position-data-structure')
-		var num_positions = positions.children().length
-		var equal_offset = (775 / (num_positions + 1))
-
-		var metadata = $('#metadata')
-		var total_start_date = metadata.children()[0].innerHTML
-		var total_end_date = metadata.children()[1].innerHTML
-		var total_time = metadata.children()[2].innerHTML
+		var num_positions = positions.length
 		var offset = Math.floor(775/total_time)
 
 		// // Convenience Print-outs
 		// start date: ' + total_start_date)
 		// console.log('offset in pixels: ' + offset)
-		console.log('num position: ' + num_positions)
 		// console.log('###########################')
 
 		// Beginning and End Text Display Dates for Timeline
@@ -555,32 +596,35 @@
 
 		var end_date_text = paper.text(900,constants.timeline_y, 'Current').attr({'font-size':'12px', 'stroke':'#c0c0c0', 'text-anchor':'start','font-family':constants.bootstrap_fonts})
 
+		add_selector_circles(paper);
+
+
 		/* MAIN LOOP */
 		var previous_offsets = {} // so we can avoid overlapping
 		var previous_width = 0;
 		var previous_text_offset = 70
 		var previous_end = 84
 
-		var rand = Math.floor(Math.random()*1)
 		for (var i = 0; i < num_positions; i++) {
 			var overlap = false
-			var wrapper = positions.children()[i]
-			var type = wrapper.childNodes[1].innerHTML
-			var title = wrapper.childNodes[3].innerHTML
-			var entity_name = wrapper.childNodes[5].innerHTML
-			var id = wrapper.childNodes[7].innerHTML
-			var description = wrapper.childNodes[9].innerHTML
-			var start_date = wrapper.childNodes[11].innerHTML
-			var end_date = wrapper.childNodes[13].innerHTML
-			var duration = wrapper.childNodes[17].innerHTML
 
-			var start_offset = offset * (months_difference(total_start_date.split('/')[0], total_start_date.split('/')[1], start_date.split('/')[0], start_date.split('/')[1], false, 'upper'))
+			var title = positions[i].title
+			var entity_name = positions[i].co_name
+			var id = positions[i].id
+			var description = positions[i].description
+			var start_date = positions[i].start_date
+			var end_date = positions[i].end_date
+			var duration = positions[i].duration
+			var type = positions[i].type
+
+			var start_offset = offset * (months_difference_js(total_start_date, start_date))
 
 			// Still need to check if they put in a future date
 			if (end_date == 'Current' || end_date.length <= 1) {
 				var end_offset = constants.timeline_end
 			} else {
-				var end_offset = start_offset + (offset * (months_difference(start_date.split('/')[0], start_date.split('/')[1], end_date.split('/')[0], end_date.split('/')[1], false, 'upper'))) + 100
+				var end_offset = start_offset + (offset * months_difference_js(start_date, end_date) + 100)
+
 				if (end_offset > constants.timeline_end) end_offset = constants.timeline_end
 			}
 
@@ -593,37 +637,39 @@
 			}
 
 			previous_offsets[start_offset] = true
-			// console.log('title: ' + title + ' start offset: ' + start_offset + ' end offset: ' + end_offset)
-			// console.log(title + " " + start_date + ' ' + end_date)
-			
-
+		
 			// Set dot color based on type
-			var color
-			if (type == 'education') color  = constants.education_color
-			else if (type == 'internship') color = constants.internship_color
-			else {
-				type = 'position' // not 'org'
-				color = constants.position_color
-			}
-
+			var color = get_color(type)
+			
 			// Outer Dot
-			var outer_dot = paper.circle(constants.timeline_start + start_offset, constants.timeline_y, constants.outer_dot_radius)
-			outer_dot.attr({
+			var outer_dot = paper.circle(constants.timeline_start + start_offset, constants.timeline_y, constants.outer_dot_radius).attr({
 				'stroke-width':'0',
 				'stroke':color,
 				'fill':color,
 				'fill-opacity':'.8',
 			});
 
+			switch(type) {
+				case 'education':
+					education_dot_ids.push(outer_dot.id)
+					break;
+				case 'internship':
+					internship_dot_ids.push(outer_dot.id)
+					break;
+				default:
+					position_dot_ids.push(outer_dot.id)
+					break;
+			};
+
 			// Inner Dot
-			var dot = paper.circle(constants.timeline_start + start_offset, constants.timeline_y, constants.inner_dot_radius)
-			dot.attr({
+			var dot = paper.circle(constants.timeline_start + start_offset, constants.timeline_y, constants.inner_dot_radius).attr({
 				'stroke-width':1,
 				'stroke':color,
 				'fill':color,
 			})
 
-			var position_title = construct_title_box(paper, Math.abs(num_positions - i - 1), entity_name, start_offset, dot.id)
+			// var position_title = construct_title_box(paper, Math.abs(num_positions - i - 1), entity_name, start_offset, dot.id)
+			var position_title = construct_timeline_title(paper, entity_name, start_offset, dot.id)
 
 
 			// Set Data
@@ -635,8 +681,8 @@
 			dot.data('entity_name', entity_name)
 			dot.data('id', id)
 			dot.data('description', description)
-			dot.data('start_date', format_date(start_date))
-			dot.data('end_date', format_date(end_date))
+			dot.data('start_date', start_date)
+			dot.data('end_date', end_date)
 			dot.data('start_offset', start_offset + constants.timeline_start)
 			dot.data('end_offset', end_offset)
 			dot.data('color', color)
@@ -644,14 +690,15 @@
 			dot.data('duration', duration)
 
 
+			// Note... this doesn't really work
 			// Add timeline chunk
 			if (start_offset > constants.outer_dot_radius && start_offset < (775 - constants.outer_dot_radius) && !overlap && (previous_end + 16 < start_offset + 100)) {
+				
 				var start_line = previous_end + 32
 				var end_line = start_offset - 16 + 100
-				// console.log('line: ' + start_line + ' : ' + end_line)
 				var path_size = "M" + start_line + ",100 L" + end_line + ",100" 
-				var path = paper.path(path_size)
-				path.attr({
+
+				var path = paper.path(path_size).attr({
 					stroke: constants.timeline_color,
 					"stroke-width":1,
 					'stroke-linecap':'round',
@@ -689,6 +736,10 @@
 				horizontal_hover_out(dot, paper)
 			});
 		}
+
+		// Now, reposition titles
+		reposition_titles(paper)
+
 		//Fencepost
 		var start_line = previous_end + 32 
 		var path_size = "M" + start_line + "," + constants.timeline_y + " L875," + constants.timeline_y 
@@ -755,12 +806,7 @@
 
 				descriptionString = '<span class="timeline-description">' + description + '</span>'
 				descriptionString = "<i class='icon-share-alt pull-right' onclick='flipInfoBox(\"description\")'></i>" + descriptionString
-				// $('#timeline-float-screen-left').html(headerString)
-				// $('#timeline-float-screen-right').html(descriptionString)
-	
-				// $('#timeline-float-screen-left').addClass('background-' + dot.data('type'))
-				// $('#timeline-float-screen-right').addClass('background-'+ dot.data('type'))
-
+				
 				/* Add 'flip' icon if description */
 				// headerString = "<i class='icon-share-alt pull-right' onclick='flipInfoBox(\"header\")'></i>" + headerString
 
@@ -769,9 +815,6 @@
 
 			// B). Title only
 			} else {
-				// $('#timeline-float-screen-center').html(headerString)
-				// $('#timeline-float-screen-center').addClass('background-' + dot.data('type'))
-
 				$('#timeline-header-container').html(headerString)
 			}	
 		}
@@ -780,84 +823,33 @@
 		// do nothing
 	}
 
-	/* Helper fxn constructs title boxes for timeline based on index
-		of current position */
-	var construct_title_box = function(paper, index, entity_name, offset) {
-		if (index % 4 == 0) var level = 1
-		else if (index % 4 == 1) var level = 3
-		else if (index % 4 == 2) var level = 4
-		else var level = 2
+	
 
-		// console.log('index ' + index + ' ' + entity_name + ' ' + level)
+	var alterDotOpacities = function(paper, type, opacity, stroke, stroke_width) {
+			var dst; var color;
 
-		var position_title
-		var width
-		var y_start
-		var y_1
-		var y_2
-		var base = 100
-		var line_height = constants.line_height
+			if (type.indexOf("position") !== -1) {
+				dst = position_dot_ids
+				color = get_color("position")
+				
+			} else if (type.indexOf("internship") !== -1) {
+				dst = internship_dot_ids
+				color = get_color("internship")
 
-		var title_attr = {
-			'font-size':constants.info_font_size,
-			'font-family':constants.font_family,
-		}
+			} else {
+				dst = education_dot_ids
+				color = get_color("education")
+			}
 
-		switch(level) {
-			case 1:
-				position_title = paper.text(constants.timeline_start + offset, constants.timeline_y - constants.lvl1_offset, entity_name).attr(title_attr)
-				width = position_title.getBBox().width
-				y_start = base - constants.outer_dot_radius // 88
-				y_1 = base - line_height // 80
-				y_2 = base - (2 * line_height) // 60
-
-				break;
-
-			case 2:
-				position_title = paper.text(constants.timeline_start + offset, constants.timeline_y + constants.lvl2_offset, entity_name).attr(title_attr)
-				width = position_title.getBBox().width
-				y_start = base + line_height + constants.outer_dot_radius // 132
-				y_1 = base + (2 * line_height) // 140
-				y_2 = base + (3 * line_height) // 160
-
-				break;
-
-			case 3:
-				position_title = paper.text(constants.timeline_start + offset, constants.timeline_y + constants.lvl1_offset, entity_name).attr(title_attr)
-				width = position_title.getBBox().width
-				y_start = base + constants.outer_dot_radius
-				y_1 = base + line_height
-				y_2 = base + (2 * line_height)
-
-				break;
-
-			case 4:
-				position_title = paper.text(constants.timeline_start + offset, constants.timeline_y - constants.lvl2_offset, entity_name).attr(title_attr)
-				width = position_title.getBBox().width
-				y_start = base - line_height - constants.outer_dot_radius
-				y_1 = base - (2 * line_height)
-				y_2 = base - (3 * line_height)
-
-				break;
-		}
-		var position_title_container = paper.path(
-					'M' + (constants.timeline_start + offset) + ', ' + y_start + ' ' + 
-					'L' + (constants.timeline_start + offset + 5) + ', ' + y_1 + ' ' +
-					'L' + (constants.timeline_start + offset + (width / 2) + 7) + ', ' + y_1 + ' ' +  
-					'L' + (constants.timeline_start + offset + (width / 2) + 7) + ', ' + y_2 + ' ' + 
-					'L' + (constants.timeline_start + offset - (width / 2) - 7) + ', ' + y_2 + ' ' + 
-					'L' + (constants.timeline_start + offset - (width / 2) - 7) + ', ' + y_1 + ' ' +  
-					'L' + (constants.timeline_start + offset - 5) + ', ' + y_1 + ' ' +  
-					'L' + (constants.timeline_start + offset) + ', ' + y_start
-					)
-
-
-		position_title.attr({
-			'font-variant':'small-caps',
-			'font-family': constants.bootstrap_fonts,
-		})
-
-		return position_title
+			_.each(dst, function(id) {
+				var dot = paper.getById(id)
+				dot.attr({
+					'fill':color,
+					'stroke-width':stroke_width,
+					'fill-opacity':opacity,
+					'stroke':stroke,
+				})
+			});
 	}
 
 	var flipInfoBox = function(currentSide) {
@@ -1011,6 +1003,16 @@
 	}
 
 
+	// Compares two dates of format "MM/YY"
+	var months_difference_js = function(start, end) {
+		var diff = 12 * (parseInt(end.substring(3)) - parseInt(start.substring(3)))
+		diff += (parseInt(end.substring(0,2)) - parseInt(start.substring(0,2)))
+		return Math.ceil(diff)
+	}
+
+
+
+	/* DEPRECATED */
 	var upper_timeline_limit = 200;
 	var months_difference = function(mo1, yr1, mo2, yr2, compress, round) {
 
@@ -1025,6 +1027,8 @@
 		return diff;
 	};
 
+	
+	/* DEPCRECATED */
 	/* Takes a date of format MM/YYYY and returns MM.YY */
 	var format_date = function(date) {
 		if (date.length == 1) return 'Current'

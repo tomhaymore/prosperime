@@ -8,6 +8,7 @@
 
 
 <!-- JS -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/timeline-viz.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
 <script type='text/javascript' src="{{ STATIC_URL }}js/next.js"></script>
@@ -15,10 +16,7 @@
 <!-- Autocomplete comes from here!:
 		https://github.com/devbridge/jQuery-Autocomplete -->
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.autocomplete.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/Chart.min.js"></script>
-
-
-
+<!-- <script type="text/javascript" src="{{ STATIC_URL }}js/Chart.min.js"></script> -->
 
 <!-- For CSRF in Backbone -->
 <script type="text/javascript">
@@ -101,6 +99,7 @@ $.ajaxSetup({
 
 
 {% block templates %}
+
 <script type="text/template" id="search-filters-template">
 	<!-- /* <div class="main-sub-header">Search Filters</div> */ -->
 
@@ -134,7 +133,7 @@ $.ajaxSetup({
 	</div>
 
 	<!-- /* Only first 15 results */ -->
-	<table id='search-results-table' class='table table-hover'>
+	<table id='search-results-table-lvl1' class='table table-hover search-results-table'>
 		<thead>
 			<tr>
 				<th><div class="people-box"><%=total_people%> Total People</div></th>
@@ -191,7 +190,7 @@ $.ajaxSetup({
 
 		<h5>"show me people who went from the <i><%=start_name%></i> Industry to the <i><%=end_name%></i> Industry"</h5>
 
-	<table id='search-results-table' class='table table-hover'>
+	<table id='search-results-table-lvl2' class='table table-hover search-results-table'>
 		<thead>
 			<tr>
 				<th><div class="people-box"><%=total_people%> Total People</div></th>
@@ -208,29 +207,25 @@ $.ajaxSetup({
 		<tbody>
 			<%
 				_.each(people, function(value, key) {
-					// console.log('k: ' + key)
-					// console.log('v: ' + value)
 					var person = value[0]
 					var person_id = key
-					var move = value[1]
-					console.log(move)
-					var start_pos_name = move.start_title
-					var start_pos_entity = move.start_entity_name
-					var end_pos_name = move.end_title
-					var end_pos_entity = move.end_entity_name
+					
 					%>
 					<tr id="<%=person_id%>">
-						<td>
+						<td class="first-col">
 							<div class="people-box">
-								<a href="/profile/<%=person_id%>"><%=person%></a>
+								<%=person%>
+							</div>
+
+							<div class="flat-button hide">
+								View Full Timeline
 							</div>
 						</td>
 
-						<td>
-							<div class="content-box">
-								<%=start_pos_name%> / <%=start_pos_entity%>
-									<i class="icon-arrow-right"></i>
-								<%=end_pos_name%> / <%=end_pos_entity%>
+
+						<td class="second-col">
+							<div class="content-box" id="content-<%=person_id%>">
+								
 							</div>
 						</td>
 					</tr>
@@ -285,7 +280,6 @@ $.ajaxSetup({
 <script type="text/javascript">
 	
 	$(function() {
-
 
 	});
 

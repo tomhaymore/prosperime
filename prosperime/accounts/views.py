@@ -24,7 +24,7 @@ from lilib import LIProfile
 from accounts.tasks import process_li_profile, process_li_connections
 
 # Prosperime
-from accounts.models import Account, Profile, Picture
+from accounts.models import Account, Profile, Picture, Connection
 from careers.models import SavedPath, CareerDecision, Position, SavedPosition, SavedCareer, GoalPosition
 from entities.models import Entity
 
@@ -328,6 +328,7 @@ def profile(request, user_id):
 	own_profile_javascript = "false"
 	queue = None
 	viewer_saved_paths = []
+	saved_path_ids = None
 	goal_careers = None
 	career_decision_position = "false"
 	goal_positions = None
@@ -339,7 +340,7 @@ def profile(request, user_id):
 
 	# Convert positions to timeline info
 	positions = Position.objects.filter(person=user).select_related('careerDecision')
-	positions, start_date, end_date, total_time, current = _prepare_positions_for_timeline(positions)
+	formatted_positions, start_date, end_date, total_time, current = _prepare_positions_for_timeline(positions)
 
 	# If Own Profile, get extra information
 	if int(user_id) == int(request.user.id):
@@ -349,20 +350,26 @@ def profile(request, user_id):
 		# Your Saved Paths
 		saved_path_queryset = SavedPath.objects.filter(owner=request.user).exclude(title='queue')
 		viewer_saved_paths = []
+		saved_path_ids = []
 		for path in saved_path_queryset:
 			viewer_saved_paths.append(_saved_path_to_json(path))
+			saved_path_ids.append([path.id, path.title])
 
 		# Your Goal Careers
 		goal_careers_queryset = SavedCareer.objects.filter(owner=request.user).select_related("career")
 		goal_careers = []
 		for career in goal_careers_queryset:
-			goal_careers.append(_saved_career_to_json(career.career))
+			formatted_career = _saved_career_to_json(career.career)
+			formatted_career["saved_career_id"] = career.id
+			goal_careers.append(formatted_career)
 
 		# Your Goal Positions
 		goal_positions_queryset = GoalPosition.objects.filter(owner=request.user).select_related("position")
 		goal_positions = []
 		for pos in goal_positions_queryset:
-			goal_positions.append(_ideal_position_to_json(pos.position))
+			formatted_position = _ideal_position_to_json(pos.position)
+			formatted_position["goal_id"] = pos.id
+			goal_positions.append(formatted_position)
 
 		# Positions of Interest ('Queue')
 		try:
@@ -385,12 +392,23 @@ def profile(request, user_id):
 		career_decision_position = "false"
 
 
+	if not own_profile:
+		# see if connected
+		viewer = request.user.profile
+		if profile in viewer.connections.all():
+			is_connected = True
+		else:
+			is_connected = False
+	else:
+		is_connected = True
+
 
 	response = {
 		'profile':profile,
-		'viewer_saved_paths':viewer_saved_paths,
+		'viewer_saved_paths':simplejson.dumps(viewer_saved_paths),
+		'saved_path_ids':saved_path_ids,
 		'profile_pic':profile_pic,
-		'positions':positions,
+		'positions':simplejson.dumps(formatted_positions),
 		'current':current,
 		'start_date':start_date,
 		'end_date':end_date,
@@ -403,6 +421,7 @@ def profile(request, user_id):
 		'queue':simplejson.dumps(queue),
 		'goal_careers':simplejson.dumps(goal_careers),
 		'goal_positions':simplejson.dumps(goal_positions),
+		'is_connected':is_connected,
 	}
 
 	return render_to_response('accounts/profile.html', response, context_instance=RequestContext(request))
@@ -450,6 +469,115 @@ def profile_org(request, org_id):
 
 	return render_to_response('accounts/profile.html', {'profile':profile, 'saved_paths': saved_paths, 'profile_pic': profile_pic, 'orgs':org_list, 'ed':ed_list, 'current':current, 'start_date':start_date, 'end_date':end_date, 'total_time': total_time, 'compress': compress, 'career_map': career_map}, context_instance=RequestContext(request))
 
+
+#########################
+### JSON/AJAX Methods ###
+#########################
+
+
+# Adds a connection between the requesting user and the profile
+#	currently being viewed
+def connect(request):
+	u1 = request.user
+	u2 = User.objects.get(id=request.POST.get('id'))
+	response = {}
+
+	try:
+		cxn1 = Connection()
+		cxn1.person1 = u1.profile
+		cxn1.person2 = u2.profile
+		cxn1.service = "linkedin"
+		cxn1.status = "added"
+		cxn1.save()
+
+		cxn2 = Connection()
+		cxn2.person1 = u1.profile
+		cxn2.person2 = u2.profile
+		cxn2.service = "linkedin"
+		cxn2.status = "added"
+		cxn2.save()
+
+		response["result"] = "success"
+	except:
+		response["result"] = "failure"
+		response["errors"] = "Error creating connections @ DB"
+
+	return HttpResponse(simplejson.dumps(response))
+
+
+
+# Deletes a goal positions, saved careers, or interested position 
+def deleteItem(request):
+
+	response = {}
+
+	item_type = request.POST.get('type')
+	item_id = request.POST.get('id')
+
+	print "Delete: " + str(item_type) + ' ' + str(item_id)
+
+	if not item_type:
+		response["result"] = "Failure"
+		response["errors"] = "no query found"
+		return HttpResponse(simplejson.dumps(response))
+
+	if item_type == "goal-position":
+		gp = GoalPosition.objects.get(id=item_id)
+		gp.delete()
+		response["result"] = "Success"
+
+	elif item_type == "saved-career":
+		sc = SavedCareer.objects.get(id=item_id)
+		sc.delete()
+		response["result"] = "Success"
+
+	elif item_type == "queue-position":
+		poi = SavedPosition.objects.get(position__id=item_id, path__title="queue", path__owner=request.user)
+		poi.delete()
+		response["result"] = "Success"
+
+	return HttpResponse(simplejson.dumps(response))
+
+
+# Called after a goal position, saved career is added to a profile, allowing
+#	backbone to refresh the template
+def updateProfile(request):
+
+	response = {}
+	query = request.GET.getlist('query')
+
+	if not query:
+		response["result"] = 'failure'
+		return HttpResponse(simplejson.dumps(response))
+
+	if query[0] == "goalPositions":
+
+		goal_positions_queryset = GoalPosition.objects.filter(owner=request.user).select_related("position")
+		goal_positions = []
+		for pos in goal_positions_queryset:
+			goal_positions.append(_ideal_position_to_json(pos.position))
+
+		response["data"] = goal_positions
+
+	elif query[0] == "savedCareers":
+
+		goal_careers_queryset = SavedCareer.objects.filter(owner=request.user).select_related("career")
+		goal_careers = []
+		for career in goal_careers_queryset:
+			goal_careers.append(_saved_career_to_json(career.career))
+
+		response["data"] = goal_careers
+
+	else:
+		response["data"] = None
+
+	response["result"] = "success"
+	return HttpResponse(simplejson.dumps(response))
+
+
+###############
+##  Helpers  ##
+###############
 
 def _test_career_prompt():
 
@@ -555,7 +683,7 @@ def _saved_path_to_json(path):
 			'pos_id':p.position.id,
 			'owner':p.position.person.profile.full_name(),
 			'owner_id':p.position.person.id,
-			'entity_name':p.position.entity.name,
+			'org':p.position.entity.name,
 			'type':p.position.type,
 		})
 	formatted_path['positions'] = positions
@@ -566,7 +694,7 @@ def _saved_career_to_json(career):
 
 	formatted_career = {
 		'title':career.long_name,
-		'id':career.id,
+		'career_id':career.id,
 	}
 
 	return formatted_career
@@ -577,7 +705,7 @@ def _ideal_position_to_json(position):
 	formatted_position = {
 		'title':position.title,
 		'description':position.description,
-		'id':position.id,
+		'ideal_id':position.id,
 	}
 
 	return formatted_position
@@ -597,17 +725,20 @@ def _prepare_positions_for_timeline(positions):
 	# Process each position
 	for pos in positions:
 
-		if pos.start_date: # ignore no start_date
+		formatted_pos = {}
 
-			pos.duration = pos.duration_in_months() + 1 ## so 6/11 - 6/11 != 0
+		if pos.start_date and pos.title: # ignore no start_date
 
-			if pos.title is not None:
-				if 'ntern' in pos.title and 'nternational' not in pos.title:
-					pos.type = 'internship'
-
+			formatted_pos['duration'] = pos.duration_in_months() + 1 ## so 6/11 - 6/11 != 0
+			formatted_pos['id'] = pos.id
+			
 			# Assumption: no end date = current
 			if not pos.end_date:
-				pos.end_date = "Current"
+				formatted_pos['end_date'] = "Current"
+			else:
+				formatted_pos['end_date'] = helpers._format_date(pos.end_date)
+			formatted_pos['start_date'] = helpers._format_date(pos.start_date)
+			formatted_pos['description'] = pos.description
 
 			# domains = pos.entity.domains.all()
 			# if domains:
@@ -615,34 +746,44 @@ def _prepare_positions_for_timeline(positions):
 			# else:
 			# 	pos.domain = None
 
-			pos.co_name = pos.entity.name
+			formatted_pos['co_name'] = pos.entity.name
 			# pos.pic = pos.entity.default_logo()
 
-			# Educations
-			if pos.type == 'education' or pos.title == 'Student':
-				if pos.degree is not None and pos.field is not None:
-					pos.title = pos.degree + ", " + pos.field
-				elif pos.degree is not None:
-					pos.title = pos.degree
-				elif pos.field is not None:
-					pos.title = pos.field
-				else:
-					pos.title = 'Student' ## Let's just guess 
 
-			# Jobs/Internships
+
+			# Internships
+			if 'ntern' in pos.title and 'nternational' not in pos.title or "Summer" in pos.title:
+				formatted_pos['type'] = 'internship'
+				formatted_pos['title'] = pos.title
+
+			# Educations
+			elif pos.type == 'education' or pos.title == 'Student':
+				formatted_pos['type'] = 'education'
+				if pos.degree is not None and pos.field is not None:
+					formatted_pos['title'] = pos.degree + ", " + pos.field
+				elif pos.degree is not None:
+					formatted_pos['title'] = pos.degree
+				elif pos.field is not None:
+					formatted_pos['title'] = pos.field
+				else:
+					formatted_pos['title'] = 'Student' ## Let's just guess 
+
+			# Jobs
 			else:
+				formatted_pos['title'] = pos.title
+				formatted_pos['type'] = 'org'
 				if pos.current:
 					current = pos
 
-			formatted_positions.append(pos)
+			formatted_positions.append(formatted_pos)
 	
 	
 	# Sort by start date
-	formatted_positions.sort(key=lambda	 p:p.start_date)
-	start_date = formatted_positions[0].start_date
+	formatted_positions.sort(key=lambda	 p:(p['start_date'][3:] + p['start_date'][:2]))
+	start_date = formatted_positions[0]['start_date']
 	formatted_positions.reverse()
-	total_time = helpers._months_from_now(start_date)
-	end_date = datetime.now()
+	total_time = helpers._months_from_now_json(start_date)
+	end_date = helpers._format_date(datetime.now())
 
 	return formatted_positions, start_date, end_date, total_time, current
 
@@ -667,183 +808,3 @@ def _uniqify(list):
         solution.append(element)
 
     return solution
-
-def _get_profile_pic(profile):
-	pics = Picture.objects.filter(person=profile,status="active").order_by("created")
-	if pics.exists():
-		return pics[0].pic.__unicode__()
-	return None
-
-
-def fetch_profile(request):
-
-	linkedin_key = '8yb72i9g4zhm'
-	linkedin_secret = 'rp6ac7dUxsvJjQpS'
-
-	# ME
-	access_token = {
-		'oauth_token_secret': "67cbcc33-30bf-423d-b677-92bc3f775559", 
-		'oauth_token': '0a0d3a27-5713-439e-a57e-c2f35798b4a5'
-	}
-
-	acct_id = "MmD6vhOwE-"
-	# set fields to fetch from API
-	fields = "(id,public-profile-url)";
-	
-	# construct url
-	api_url = "http://api.linkedin.com/v1/people/id=%s:%s?format=json" % (acct_id,fields,)
-	 
-
-	consumer = oauth.Consumer(linkedin_key, linkedin_secret)
-	 
-	token = oauth.Token(
-		key=access_token['oauth_token'], 
-		secret=access_token['oauth_token_secret'])
-
-	client = oauth.Client(consumer, token)
-
-	resp, content = client.request(api_url)
-	content = content.lstrip('"')
-	content = content.rstrip('"')
-	print content
-	return HttpResponse(simplejson.dumps(content))
-
-
-def process_public_page(self,user,url):
-		# fetch html and soup it
-		
-		# html = self.get_public_page(url)
-		try:
-			html = urllib2.urlopen(url)
-		except:
-			return None
-		soup = BeautifulSoup(html)
-
-		# get all profile container divs
-		divs = soup.find_all("div","section",id=re.compile("^profile"))
-
-		# loop throuh each div
-		for d in divs:
-			# identify type
-			if d['id'] == 'profile-experience':
-				# extract position data
-				positions = self.extract_pos_from_public_page(d)
-				for p in positions:
-					# check to see if a co uniq was returned
-					if p['co_uniq_name'] is not None:
-						# check to see if new company
-						co = self.get_company(name=p['co_uniq_name'])
-						if co is None:
-							# add new company
-							co = self.add_company(name=p['co_uniq_name'])
-							# if it's a new company, position must be new as well
-							if co is not None:
-								self.add_position(user,co,p)
-						else:
-							pos = self.get_position(user,co,p)
-							if pos is None:
-								self.add_position(user,co,p)
-							
-			# handle Education
-			elif d['id'] == 'profile-education':
-				ed_positions = self.extract_ed_pos_from_public_page(d)
-				for p in ed_positions:
-					# check to see if new company
-					inst = self.get_institution(name=p['inst_name'])
-					if inst is None:
-						# add new company
-						inst = self.add_institution(p)
-						# if it's a new company, position must be new as well
-						# if inst is not None:
-						self.add_ed_position(user,inst,p)
-					else:
-						# TODO update company
-						pos = self.get_position(user,inst,p,type="ed")
-						if pos is None:
-							self.add_ed_position(user,inst,p)
-
-def extract_pos_from_public_page(self,data):
-	# initialize positions array
-	positions = []
-	# get all position divs
-	raw_positions = data.find_all("div","position")
-	# loop through each position
-	for p in raw_positions:
-		# get title of position
-		title = p.find("div","postitle").span.contents[0]
-		# get unique name of company
-		co_uniq_name = p.find("a","company-profile-public")
-		if co_uniq_name:
-			co_uniq_name = co_uniq_name.get('href')
-			m = re.search("(?<=\/company\/)([\w-]*)",co_uniq_name)
-			co_uniq_name = m.group(0).strip()
-			# print co_uniq_name
-			# get start and end dates
-			start_date = p.find("abbr","dtstart")
-			if start_date is not None:
-				start_date = start_date.get('title')
-			try:
-				end_date = p.find('abbr','dtstamp').get('title')
-				current = True
-			except:
-				current = False
-
-			try:
-				end_date = p.find("abbr","dtend").get("title")
-			except:
-				end_date = None
-			# get descriptions
-			try:
-				descr = p.find("p","description").contents[0]
-			except:
-				descr = None
-			# append to main positions array
-			positions.append({'title':title,'co_uniq_name':co_uniq_name,'startDate':start_date,'endDate':end_date,'summary':descr,'isCurrent':current})
-	return positions
-
-def extract_ed_pos_from_public_page(self,data):
-	# initialize positions array
-	positions = []
-	# get all position divs
-	raw_positions = data.find_all("div","position")
-	# loop through each position
-	for p in raw_positions:
-		inst_uniq_id = p.get('id')
-		inst_name = p.h3.contents[0].strip()
-		
-		try:
-			degree = p.find("span","degree").contents[0].strip()
-		except:
-			degree = None
-		try:
-			major = p.find("span","major").contents[0].strip()
-		except:
-			major = None
-
-		try:
-			dates = p.find('p','period')
-			dates = dates.find_all('abbr')
-			start_date = dates[0].get('title')
-			if not start_date:
-				start_date = None
-			end_date = dates[1].get('title')
-			if not end_date:
-				end_date = None
-		except:
-			start_date = None
-			end_date = None
-
-		positions.append({
-			'inst_uniq_id':inst_uniq_id,
-			'inst_name':inst_name,
-			'degree':degree,
-			'fieldOfStudy':major,
-			'start_date':start_date,
-			'end_date':end_date,
-		})
-	return positions
-
-
-
-
-
