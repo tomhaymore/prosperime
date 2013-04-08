@@ -51,6 +51,7 @@ urlpatterns = patterns('',
     url(r'^careers/positionAutocomplete/$', 'careers.views.positionAutocomplete'),
     url(r'^careers/getSavedCareers/$', 'careers.views.getSavedCareers'),
     url(r'^careers/getGoalPositions/$', 'careers.views.getGoalPositions'),
+    url(r'^careers/getNextBuildStep/$', 'careers.views.get_build_step'),
 
     ## Accounts - AJAX calls
     url(r'^accounts/updateProfile/$', 'accounts.views.updateProfile'),

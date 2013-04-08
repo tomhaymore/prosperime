@@ -17,7 +17,7 @@ class Position(models.Model):
 	entity = models.ForeignKey(Entity,related_name="positions")
 	person = models.ForeignKey(User,related_name="positions")
 	careers = models.ManyToManyField("Career",related_name="positions")
-	ideal_position = models.ForeignKey("IdealPosition",related_name="ideal_position")
+	ideal_position = models.ForeignKey("IdealPosition",related_name="ideal_position",null=True)
 	title = models.CharField(max_length=150,null=True)
 	summary = models.CharField(max_length=450,null=True)
 	description = models.TextField(null=True)
@@ -184,11 +184,40 @@ class IdealPosition(models.Model):
 
 	title = models.CharField(max_length=450, null=True)
 	description = models.TextField(null=True)
+	level = models.IntegerField(null=True)
 	careers = models.ManyToManyField(Career,related_name="ideal_positions")
 	people = models.ManyToManyField(User,through='GoalPosition')
+	matches = models.TextField(null=True)
 	status = models.CharField(max_length=15,default="active")
 	created = models.DateTimeField(auto_now_add=True, null=True)
 	updated = models.DateTimeField(auto_now=True, null=True)
+
+	def __unicode__(self):
+		return self.title
+
+	def add_pos_match(self,match):
+		"""
+		adds title and industry information for matching positions to an ideal position
+		"""
+		# check to see if there are any matches
+		if self.matches is not None:
+			# load list and append new match
+			matches = json.loads(self.matches)
+			matches['title'] = matches['title'].lower()
+			matches.append(match)
+		else:
+			# create new list with match as first entry
+			matches = [match]
+		
+		# save model
+		self.matches = json.dumps(matches)
+		self.save()
+
+	def get_matches_as_dict(self):
+		"""
+		returns matches as Python dict
+		"""
+		return json.loads(self.matches)
 
 class GoalPosition(models.Model):
 

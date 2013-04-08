@@ -1233,6 +1233,38 @@ def show_paths(request):
 
 	return HttpResponse(simplejson.dumps(formatted_paths))
 
+# AJAX for getting build steps
+def get_build_step(request):
+	# check if GET parameters were sent
+	if request.GET.getlist('id'):
+		# initiate next and finished flag
+		next = []
+		finished = []
+		# initiate array for next positions
+		pos = []
+		# reduce GET to variable
+		start_pos_id = request.GET.getlist('id')[0]
+
+		# get all user positions of users that have had this ideal position
+		users = User.objects.values('id','positions__id','positions__ideal_position_id','positions__title','positions__entity__name','positions__type').filter(positions__ideal_position_id=start_pos_id).order_by('-positions__start_date').distinct()
+		
+		# loop through
+		for u in users:
+			if u['positions__type'] is not "education":
+				# print u['positions__ideal_position_id']
+				if u['id'] in next and u['id'] not in finished:
+					pos.append({'pos_id':u['positions__id'],'ideal_id':u['positions__ideal_position_id'],'title':u['positions__title'],'name':u['positions__entity__name']})
+					finished.append(u['id'])
+				if u['positions__ideal_position_id'] == int(start_pos_id):
+					print 'match'
+					next.append(u['id'])
+		print next
+		print finished
+		print pos
+
+		return HttpResponse(json.dumps(pos))
+		
+
 # JSON dumper
 def get_paths(request):
 	paths = []
