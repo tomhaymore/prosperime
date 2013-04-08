@@ -3,6 +3,7 @@ import json
 import urllib2
 from datetime import datetime
 from datetime import timedelta
+from datetime import date
 import csv
 import re
 import os
@@ -349,6 +350,7 @@ class CareerSimBase():
 	user_ids = []
 	# initializes single map
 	users_orgs_map_single = {}
+	users_orgs_map_single_valued = {}
 
 	# initializes organizational map
 	users_orgs_map = {}
@@ -359,8 +361,9 @@ class CareerSimBase():
 	def __init__(self):
 		self.load_users()
 		self.load_maps()
+		self.load_single_map()
 
-	def _calc_time(x):
+	def _calc_time(self,x):
 		"""
 		calculates length of position
 		"""
@@ -369,14 +372,15 @@ class CareerSimBase():
 		end = x['positions__end_date']
 		if start:
 			if not end:
-				change = datetime.date.today() - start
+				change = date.today() - start
 			else:
 				change = end - start
-			return (x['id'],x['positions__entity_id'],change.days,)
+
+			return (x['id'],x['positions__entity__id'],abs(round(change.days / 365.25,2)),)
 
 
 	def load_users(self):
-		users = User.objects.values('id','positions__type','positions__entity__id')
+		users = User.objects.values('id','positions__type','positions__entity__id','positions__start_date','positions__end_date')
 		self.flat_users = users
 		users_dict = {}
 		for u in users:
@@ -385,15 +389,34 @@ class CareerSimBase():
 			else:
 				users_dict[u['id']] = {'positions':[{'type':u['positions__type'],'id':u['positions__entity__id']}]}
 		self.users = users_dict
-		self.user_ids = [u['id'] for u in users]
+		self.user_ids = list(set([u['id'] for u in users]))
 		# print self.users
 
 	def load_single_map(self):
 		"""
 		loads set of org affiliations for each user
 		"""
+		# map positions to calculate duration
 		mapped_list = map(self._calc_time,self.flat_users)
+		# reduce / filter map
+		for m in mapped_list:
+			if m:
+				# relabel variables for sanity
+				u_id = m[0]
+				e_id = m[1]
+				dur = m[2]
+				# add user if not already in array
+				if u_id not in self.users_orgs_map_single_valued:
+					self.users_orgs_map_single_valued[u_id] = {e_id:dur}
+				# add entity if not in array
+				elif e_id not in self.users_orgs_map_single_valued[u_id]:
+					self.users_orgs_map_single_valued[u_id][e_id] = dur
 
+				# else add to duration of existing entity entry
+				else:
+					self.users_orgs_map_single_valued[u_id][e_id] = dur + self.users_orgs_map_single_valued[u_id][e_id]
+
+			
 		for k,v in self.users.items():
 			orgs = []
 			for p in v['positions']:
@@ -473,7 +496,7 @@ class CareerSimBase():
 
 		focal_orgs = self.get_focal_orgs(id) 
 		sim = []
-		
+
 		for k,v in self.users_orgs_map_single.items():
 			# check to see if user has the job
 			if k in all_users_in_position:
@@ -1128,7 +1151,7 @@ class CareerMapBase():
 		if not test:
 			if ideals:
 				# fetch all matched ideal positions, sorted by length of title
-				ideals_objects = IdealPosition.objects.filter(pk__in=ideals).extra(order_by=[length("title")])
+				ideals_objects = IdealPosition.objects.filter(pk__in=ideals).extra(order_by=[len("title")])
 				pos.ideal_position = ideals_objects[0]
 				pos.save()
 				return True
