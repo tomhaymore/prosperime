@@ -49,7 +49,7 @@ urlpatterns = patterns('',
     url(r'^careers/industryAutocomplete/$', 'careers.views.industryAutocomplete'),
     url(r'^careers/getSavedCareers/$', 'careers.views.getSavedCareers'),
     url(r'^careers/getGoalPositions/$', 'careers.views.getGoalPositions'),
-    
+    url(r'^careers/getNextBuildStep/$', 'careers.views.get_build_step'),
     url(r'^decisions/', 'careers.views.getDecisions'),
     url(r'^login/','accounts.views.login'),
     url(r'^profile/(\d+)/$', 'accounts.views.profile'),
