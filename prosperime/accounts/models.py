@@ -116,10 +116,14 @@ class Profile(models.Model):
         for p in positions:
             if p.start_date is not None:
                 latest_position = positions[counter]
-                return latest_position.safe_title() + " at " + latest_position.entity.name
+                # return latest_position.safe_title() + " at " + latest_position.entity.name
+                return p
             counter += 1
         else:
             return None
+
+    def educations(self):
+        return self.user.positions.all().filter(type="education").order_by('start_date')
 
     def _industries(self):
         all_domains = []

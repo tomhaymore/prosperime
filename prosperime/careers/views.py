@@ -66,19 +66,58 @@ def build(request):
 
 	path_title = "Untitled" ## this should default if no title
 
+	latest_position = request.user.profile.latest_position()
+	educations = request.user.profile.educations()
+
 	current_positions = []
-	current_positions.append({'id':127, 'title':'Business Development Assocaite', 'entity_name': 'Morgan Stanley'})
-	current_positions.append({'id':45, 'title':'Student, B.A.', 'entity_name':'Dartmouth University'})
-	current_positions.append({'id':33, 'title':'Graduate Research Assistant', 'entity_name':'Harvard Medical School'})
+	current_positions.append({'pos_id':latest_position.id,'ideal_id':latest_position.ideal_position_id,'title':latest_position.title,'entity_name':latest_position.entity.name})
+
+	for e in educations:
+		current_positions.append({'pos_id':e.id,'ideal_id':e.ideal_position_id,'title':e.title,'entity_name':e.entity.name})
+	
+	# current_positions.append({'id':127, 'title':'Business Development Assocaite', 'entity_name': 'Morgan Stanley'})
+	# current_positions.append({'id':45, 'title':'Student, B.A.', 'entity_name':'Dartmouth University'})
+	# current_positions.append({'id':33, 'title':'Graduate Research Assistant', 'entity_name':'Harvard Medical School'})
 
 
 	data = {
-		'options':simplejson.dumps(path_results),
+		'options':json.dumps(path_results),
 		'title':path_title,
 		'current_positions':current_positions,
 	}
 
+	return render_to_response("careers/build.html", data, context_instance=RequestContext(request))
 
+def modify_saved_path(request,id):
+	
+	# get path object
+	path = SavedPath.objects.get(pk=id)
+	
+	# initiate array for steps in saved path
+	path_steps = []
+	
+	# loop through saved steps in path, add as dicts to array
+	for p in path.positions.all():
+		path_steps.append({'pos_id':p.id,'ideal_id':p.ideal_position_id,'title':p.title,'entity_name':p.entity.name})
+
+	# get latest position and educations
+	latest_position = request.user.profile.latest_position()
+	educations = request.user.profile.educations()
+
+	# add to current positions
+	current_positions = []
+	current_positions.append({'pos_id':latest_position.id,'ideal_id':latest_position.ideal_position_id,'title':latest_position.title,'entity_name':latest_position.entity.name})
+
+	for e in educations:
+		current_positions.append({'pos_id':e.id,'ideal_id':e.ideal_position_id,'title':e.title,'entity_name':e.entity.name})
+	
+	# collect data for template
+	data = {
+		'options':json.dumps(path_results),
+		'path':json.dumps(path_steps),
+		'current_positions':current_positions,
+		'path':path
+	}
 
 	return render_to_response("careers/build.html", data, context_instance=RequestContext(request))
 
@@ -1253,7 +1292,7 @@ def get_build_step(request):
 			if u['positions__type'] is not "education":
 				# print u['positions__ideal_position_id']
 				if u['id'] in next and u['id'] not in finished:
-					pos.append({'pos_id':u['positions__id'],'ideal_id':u['positions__ideal_position_id'],'title':u['positions__title'],'name':u['positions__entity__name']})
+					pos.append({'pos_id':u['positions__id'],'ideal_id':u['positions__ideal_position_id'],'title':u['positions__title'],'entity_name':u['positions__entity__name']})
 					finished.append(u['id'])
 				if u['positions__ideal_position_id'] == int(start_pos_id):
 					print 'match'
