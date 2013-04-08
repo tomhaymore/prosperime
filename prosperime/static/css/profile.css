@@ -2,16 +2,19 @@
 
 div#timeline-info-container {
 	margin-top:25px;
-	border-radius:8px;
+	border-radius:4px;
 	padding:10px;
 	width:300px;
 	max-width:300px;
 	height:100px;
 	text-align:center;
-/*	border:1px dashed #333;
-*/	border:2px dashed rgba(41,98,152,1);
+	/*border:2px dashed rgba(41,98,152,1);*/
 	position:relative;
 	left:33%;
+
+	background-color:rgb(41,98,152);
+	color:#fffffe;
+	margin-bottom:25px;
 }
 
 div.container-condensed {
@@ -63,8 +66,8 @@ div#saved-paths-container .timeline-header {
 }
 
 div.profile-header-container {
-	border-bottom: solid 1px rgb(41,98,152);
-	padding-bottom:10px;
+/*	border-bottom: solid 1px rgb(41,98,152);
+*/	padding-bottom:10px;
 }
 
 div.profile-header {
@@ -269,27 +272,15 @@ div.hidden-data-structure {
 	letter-spacing:.1em;
 }
 
-.flat-button {
-	vertical-align:middle;
-	width:auto;
-	height:24px;
-	min-width:16px;
-	padding:4px 5px;
-	font-size:14px;
-	font-weight:normal;
-	line-height:20px;
-	text-align:center;
-	text-shadow: 0 1px 0 #fff;
-	border:1px solid #ccc;
-	background-color:#eee;
-	border-radius:4px;
-}
+
+
 
 div.personalize-button {
 	position:relative;
 	top:4px;
 	left:4px;
 }
+
 
 
 div.timeline-date {
@@ -453,7 +444,9 @@ i.profile-chevron {
 
 
 
-
+.hide {
+	visibility: hidden;
+}
 
 .anchor {
 	text-decoration: none;
@@ -465,6 +458,16 @@ i.profile-chevron {
 
 .inline {
 	display:inline;
+}
+
+.left-half {
+	width:50%;
+}
+
+.connect-button {
+	position:relative;
+	right:75px;
+	top:15px;
 }
 
 

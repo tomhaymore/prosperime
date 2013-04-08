@@ -1,6 +1,110 @@
 
 $(function(){
 
+
+
+	var viewUtilities = {
+		old_html: "",
+		old_row: null,
+
+		renderDelete: function(ev) {
+
+			// First, have to revert any other rows
+
+
+			this.old_html = $(ev.currentTarget).parent().parent().html()
+			var $row = $(ev.currentTarget).parent().parent()
+
+			var yes_button =  "<div class='flat-button button-small yes-button'>Yes</div>"
+			var no_button = "<div class='flat-button button-small no-button'>No</div>"
+			
+			var new_html = "<td>Are you sure you want to delete this?</td><td>" + yes_button + "</td><td>" + no_button + "</td>"
+
+			$(ev.currentTarget).parent().parent().removeClass("info").addClass("error").html(new_html)
+
+			var prototype = this
+			$('.yes-button').click(function() {
+				prototype.yesClicked(ev, prototype.old_html, $row)
+			});
+			$('.no-button').click(function() {
+				prototype.noClicked(ev, prototype.old_html, $row);
+			});
+
+			event.stopImmediatePropagation();
+			return false;	
+		},
+		
+		hoverOver: function(ev) {
+			if (!$(ev.currentTarget).hasClass("error")) {
+				$(ev.currentTarget).toggleClass("info")
+				$(ev.currentTarget).children(".close-button").removeClass("hide")
+			}	
+		},
+
+		hoverOut: function(ev) {
+			if (!$(ev.currentTarget).hasClass("error")) {
+				$(ev.currentTarget).toggleClass("info")
+				$(ev.currentTarget).children(".close-button").addClass("hide")
+			}	
+		},
+
+		yesClicked: function(ev, old_html, row) {
+			var type = $(row).data("type")
+			if (type == "goal-position")
+				var id = $(row).data("goal_id")
+			else if (type == "saved-career")
+				var id = $(row).data("saved_career_id")
+			else
+				var id = $(row).data("id")
+
+
+			$.post('/accounts/deleteItem/', {type:type, id:id}, function(response) {
+					console.log(response)
+					if (response['result'] == "Success") {
+
+						if (type == "goal-position") {
+							for (var n = 0; n < backbone_goal_positions_init_data.length; n++) {
+								if (backbone_goal_positions_init_data[n]["goal_id"] == id) {
+									backbone_goal_positions_init_data.splice(n,1)
+								}
+							}
+							window.goalPositions.reset(backbone_goal_positions_init_data)
+						} else if (type == "saved-career") {
+
+							for (var m = 0; m < backbone_careers_init_data.length; m++) {
+								if (backbone_careers_init_data[m]["goal_id"] == id) {
+									backbone_careers_init_data.splice(m,1)
+								}
+							}
+							window.goalCareers.reset(backbone_careers_init_data)
+						} else {
+
+							// remove from queue
+							for (var p = 0; p < backbone_positions_of_interest_init_data['positions'].length; p++) {
+								if (backbone_positions_of_interest_init_data['positions'][p]['pos_id'] == id)
+									backbone_positions_of_interest_init_data['positions'].splice(p,1)
+							}
+							window.queue.reset(backbone_positions_of_interest_init_data)
+						}
+					} else {
+						console.log('Failure: removal failed: ' + response["errors"])
+					}
+				}, 'json');
+
+
+
+			event.stopImmediatePropagation();
+			return false;
+		},
+
+		noClicked:function(ev, old_html, row) {
+			console.log(viewUtilities["old_html"])
+			row.html(old_html).removeClass("error")
+			event.stopImmediatePropagation();
+			return false;
+		},
+	}
+
 	//--------------//
 	// ** Models ** //
 	//--------------//
@@ -21,25 +125,6 @@ $(function(){
 	//-------------------//
 	// ** Collections ** //
 	//-------------------//
-	// window.QueuePath = Backbone.Collection.extend({
-
-	// 	urlRoot: '/saved_path/queue',
-	// 	model: QueuedPosition, 
-
-	// 	// comparator: function(collection) {
-	// 	// 	return(collection.get('index'))
-	// 	// },
-
-	// 	initialize: function() {
-	// 		this._meta = {}
-	// 	},
-
-	// 	url: function() {	
-	// 		return '/saved_paths/queue/'
-	// 	},
-
-	// });
-
 	
 	// Instantiate Collections
 	window.queue = new Backbone.Collection(backbone_positions_of_interest_init_data, {
@@ -66,15 +151,20 @@ $(function(){
 		el:$('#goal-positions-container'),
 		
 		events: {
-			'click #career-chevron-left':'queueLeft',
-			'click #career-chevron-right':'queueRight',
-			'mouseenter .queue-position':'mouseEnter',
-			'mouseleave .queue-position':'mouseOut',
-			'click .queue-position':'goToCareer',
+			// 'click #career-chevron-left':'queueLeft',
+			// 'click #career-chevron-right':'queueRight',
+			// 'mouseenter .queue-position':'mouseEnter',
+			// 'mouseleave .queue-position':'mouseOut',
+			'click .queue-position':'goToPosition',
+
+			'click #goal-position-table tbody tr td .close':'renderDelete',
+			'mouseenter #goal-position-table tbody tr':'hoverOver',
+			'mouseleave #goal-position-table tbody tr':'hoverOut',
+			'click #goal-position-table tbody tr':'goToPosition',
 		},
 
 		initialize: function() {
-			_.bindAll(this,'render', 'remove', 'create_queue_box', 'queueLeft', 'queueRight', 'renderNewBoxes', 'mouseOut', 'mouseEnter', 'goToCareer');
+			_.bindAll(this,'render', 'remove', 'create_queue_box', 'queueLeft', 'queueRight', 'renderNewBoxes', 'goToPosition');
 			this.collection.on('reset',this.render, this);
 			this.collection.on('change', this.render, this);
 			this.collection.bind('remove', this.remove);
@@ -90,8 +180,9 @@ $(function(){
 		},
 
 		render: function() {
+
 			// Add text to header
-			$('#goal-positions-header').html('Goal Positions')
+			// $('#goal-positions-header').html('Goal Positions')
 
 			// If no goal positions, render differently
 			if (this.collection.models.length == 0) {
@@ -105,21 +196,27 @@ $(function(){
 
 
 			var collection = this // important! (context)
-			var html = ""
+			var html = "<table id='goal-position-table' class='table left-half'>"
 
 			this.collection.each(function(goalPosition) {
 
 				var title = goalPosition.get("title")
-				var id = goalPosition.get("id")
-				if (collection.modelCount++ < 4)
-					html += collection.create_queue_box(title, id)
+				var ideal_id = goalPosition.get("ideal_id")
+				var goal_id = goalPosition.get("goal_id")
+				html += "<tr data-ideal_id='" + ideal_id + "' data-goal_id='" + goal_id + "' data-type='goal-position'><td>" + title + "</td><td class='hide close-button'><button class='close'>&times;</button></td></tr>"
 			});
-			if (this.modelCount > 4) {
-				collection.queue_indices = [0,1,2,3]
-				collection.overflow = true
-				html = '<i class="icon-chevron-left icon-2x profile-chevron" id="career-chevron-left"></i>' + html
-				html += '<i class="icon-chevron-right icon-2x profile-chevron" id="career-chevron-right"></i>'
-			}
+
+			// 	if (collection.modelCount++ < 4)
+			// 		html += collection.create_queue_box(title, id)
+			// });
+			// if (this.modelCount > 4) {
+			// 	collection.queue_indices = [0,1,2,3]
+			// 	collection.overflow = true
+			// 	html = '<i class="icon-chevron-left icon-2x profile-chevron" id="career-chevron-left"></i>' + html
+			// 	html += '<i class="icon-chevron-right icon-2x profile-chevron" id="career-chevron-right"></i>'
+			// }
+
+			html += "</table>"
 			this.$el.html(html)
 
 			return this;
@@ -164,21 +261,11 @@ $(function(){
 			}
 		},
 
-		mouseEnter: function(ev) {
-			if (!$(ev.currentTarget).hasClass('queue-position-hover'))
-				$(ev.currentTarget).toggleClass('queue-position-hover')
-		},
-
-		mouseOut: function(ev) {
-			if ($(ev.currentTarget).hasClass('queue-position-hover'))
-				$(ev.currentTarget).removeClass('queue-position-hover')
-		},
-
-		goToCareer: function(ev) {
-			var id = $(ev.currentTarget).data('id')
+		goToPosition: function(ev) {
+			var id = $(ev.currentTarget).data('ideal_id')
 			window.location = "/position/" + id 
+		},
 
-		}
 
 	});
 
@@ -187,15 +274,21 @@ $(function(){
 		el:$('#goal-careers-container'),
 		
 		events: {
-			'click #career-chevron-left':'queueLeft',
-			'click #career-chevron-right':'queueRight',
-			'mouseenter .queue-position':'mouseEnter',
-			'mouseleave .queue-position':'mouseOut',
+			// 'click #career-chevron-left':'queueLeft',
+			// 'click #career-chevron-right':'queueRight',
+			// 'mouseenter .queue-position':'mouseEnter',
+			// 'mouseleave .queue-position':'mouseOut',
 			'click .queue-position':'goToCareer',
+
+
+			'click #saved-careers-table tbody tr td .close':'renderDelete',
+			'mouseenter #saved-careers-table tbody tr':'hoverOver',
+			'mouseleave #saved-careers-table tbody tr':'hoverOut',
+			'click #saved-careers-table tbody tr':'goToCareer',
 		},
 
 		initialize: function() {
-			_.bindAll(this,'render', 'remove', 'create_queue_box', 'queueLeft', 'queueRight', 'renderNewBoxes', 'mouseOut', 'mouseEnter', 'goToCareer');
+			_.bindAll(this,'render', 'remove', 'create_queue_box', 'queueLeft', 'queueRight', 'renderNewBoxes', 'goToCareer', 'deleteCareer');
 			this.collection.on('reset',this.render, this);
 			this.collection.on('change', this.render, this);
 			this.collection.bind('remove', this.remove);
@@ -207,7 +300,7 @@ $(function(){
 
 		create_queue_box: function(title, id) {
 			if (title.length > 29) return '<div class="queue-position" data-id="'+ id + '">' + title + '</div>'
-			return '<div class="queue-position" data-id="'+ id + '"><br/>' + title + '</div>'
+			return '<div class="queue-position" data-id="'+ id + ' data-type="saved-career"><br/>' + title + '</div>'
 		},
 
 		reset: function() {
@@ -217,7 +310,7 @@ $(function(){
 
 		render: function() {
 			// Add text to header
-			$('#goal-careers-header').html('Careers of Interest')
+			// $('#goal-careers-header').html('Careers of Interest')
 
 			// If no careers, render differently
 			if (this.collection.models.length == 0) {
@@ -232,21 +325,26 @@ $(function(){
 
 
 			var collection = this // important! (context)
-			var html = ""
+			var html = "<table id='saved-careers-table' class='table left-half'>"
 
 			this.collection.each(function(goalCareer) {
 
 				var title = goalCareer.get("title")
-				var id = goalCareer.get("id")
-				if (collection.modelCount++ < 4)
-					html += collection.create_queue_box(title, id)
+				var career_id = goalCareer.get("career_id")
+				var saved_career_id = goalCareer.get("saved_career_id")
+				html += "<tr data-career_id='" + career_id + "' data-saved_career_id='" + saved_career_id + "' data-type='saved-career'><td>" + title + "</td><td class='hide close-button'><button class='close'>&times;</button></td></tr>"
+			// 	if (collection.modelCount++ < 4)
+			// 		html += collection.create_queue_box(title, id)
+			// });
+
 			});
-			if (this.modelCount > 4) {
-				collection.queue_indices = [0,1,2,3]
-				collection.overflow = true
-				html = '<i class="icon-chevron-left icon-2x profile-chevron" id="career-chevron-left"></i>' + html
-				html += '<i class="icon-chevron-right icon-2x profile-chevron" id="career-chevron-right"></i>'
-			}
+			// if (this.modelCount > 4) {
+			// 	collection.queue_indices = [0,1,2,3]
+			// 	collection.overflow = true
+			// 	html = '<i class="icon-chevron-left icon-2x profile-chevron" id="career-chevron-left"></i>' + html
+			// 	html += '<i class="icon-chevron-right icon-2x profile-chevron" id="career-chevron-right"></i>'
+			// }
+			html += "</table>"
 			this.$el.html(html)
 
 			return this;
@@ -291,47 +389,39 @@ $(function(){
 			}
 		},
 
-		mouseEnter: function(ev) {
-			if (!$(ev.currentTarget).hasClass('queue-position-hover'))
-				$(ev.currentTarget).toggleClass('queue-position-hover')
-		},
+		deleteCareer: function(ev) {
 
-		mouseOut: function(ev) {
-			if ($(ev.currentTarget).hasClass('queue-position-hover'))
-				$(ev.currentTarget).removeClass('queue-position-hover')
 		},
 
 		goToCareer: function(ev) {
-			var id = $(ev.currentTarget).data('id')
+			var id = $(ev.currentTarget).data('career_id')
 			window.location = "/career/" + id 
-
 		}
 
 	});
 
 
 	// Single Saved Path Single View
-	window.QueueSingleView = Backbone.View.extend({
+	// window.QueueSingleView = Backbone.View.extend({
 
-		events: {
+	// 	events: {
 		
-		},
+	// 	},
 
-		initialize: function() {
-			this.model.on('change', this.render, this); 
-			_.bindAll(this, 'render')
-			this.model.bind('remove', this.remove)
-		},
+	// 	initialize: function() {
+	// 		this.model.on('change', this.render, this); 
+	// 		_.bindAll(this, 'render')
+	// 		this.model.bind('remove', this.remove)
+	// 	},
 
-		render: function() {
-			console.log('render el')
-			var renderedContent = this.model.toJSON();
-			console.log(renderedContent)
-			$(this.el).html(renderedContent);
-			return this;
-		},
+	// 	render: function() {
+	// 		var renderedContent = this.model.toJSON();
+	// 		console.log(renderedContent)
+	// 		$(this.el).html(renderedContent);
+	// 		return this;
+	// 	},
 
-	});
+	// });
 
 
 	window.QueueListView = Backbone.View.extend ({
@@ -339,14 +429,18 @@ $(function(){
 		el: $('#queue'),
 
 		events: {
-			'click #queue-chevron-left':'queueLeft',
-			'click #queue-chevron-right':'queueRight',
-			'mouseenter .queue-position':'mouseEnter',
-			'mouseleave .queue-position':'mouseOut',
+			// 'click #queue-chevron-left':'queueLeft',
+			// 'click #queue-chevron-right':'queueRight',
+			// 'mouseenter .queue-position':'mouseEnter',
+			// 'mouseleave .queue-position':'mouseOut',
+
+			'click #positions-of-interest-table tbody tr td .close':'renderDelete',
+			'mouseenter #positions-of-interest-table tbody tr':'hoverOver',
+			'mouseleave #positions-of-interest-table tbody tr':'hoverOut',
 		},
 
 		initialize: function() {
-			_.bindAll(this,'render', 'remove', 'create_queue_boxes', 'queueLeft', 'queueRight', 'mouseOut', 'mouseEnter', 'create_queue_box');
+			_.bindAll(this,'render', 'remove', 'create_queue_boxes', 'queueLeft', 'queueRight', 'create_queue_box');
 			this.collection.on('reset',this.render, this);
 			this.collection.on('change', this.render, this);
 			this.collection.bind('remove', this.remove);
@@ -355,7 +449,7 @@ $(function(){
 		},
 
 		create_queue_box: function(id, title, entity_name) {
-			return '<div class="queue-position" data-id="'+ id + '"><div class="queue-position-position">' + title + '</div><div class="queue-position-entity">' + entity_name + '</div></div>'
+			return '<div class="queue-position" data-id="'+ id + '" data-type="queue-position"><div class="queue-position-position">' + title + '</div><div class="queue-position-entity">' + entity_name + '</div></div>'
 		},
 
 		create_queue_boxes: function(collection, positions) {
@@ -380,29 +474,34 @@ $(function(){
 
 		render: function() {
 			// Add text to header
-			$('#queue-header').html('Positions of Interest')
+			// $('#queue-header').html('Positions of Interest')
 
 			var collection = this // important! (context)
-			var html ='<i class="icon-chevron-left icon-2x profile-chevron" id="queue-chevron-left"></i>'
  
 
 			// Because of the how this is passed in (w/ metadata)
 			var positions = this.collection.models[0].get('positions')
 			this.num_positions = positions.length
 			var limit = (positions.length > 4) ? 4 : positions.length;
-			for (var n = 0; n < limit; n++) {
-				html += collection.create_queue_box(positions[n]['pos_id'], positions[n]['title'], positions[n]['entity_name'])
+			
+			// var html ='<i class="icon-chevron-left icon-2x profile-chevron" id="queue-chevron-left"></i>'
+			var html = "<table id='positions-of-interest-table' class='table left-half'>"
+			for (var n = 0; n < this.num_positions; n++) {
+
+				html+= "<tr data-type='queue-position' data-id='" + positions[n]['pos_id'] + "'><td>" + positions[n]['title'] + "</td><td class='hide close-button'><button class='close'>&times;</button></td></tr>"
+				// html += collection.create_queue_box(positions[n]['pos_id'], positions[n]['title'], positions[n]['entity_name'])
 			}
 
-			if (positions.length > 4) {
-					for (var m = 0; m < 4; m++) {
-						collection.queue_indices.push(m)
-						collection.overflow = true
-					}
-			} else 
-				for (var j = 0; j < positions.length; j++) collection.queue_indices.push(j)
+			// if (positions.length > 4) {
+			// 		for (var m = 0; m < 4; m++) {
+			// 			collection.queue_indices.push(m)
+			// 			collection.overflow = true
+			// 		}
+			// } else 
+			// 	for (var j = 0; j < positions.length; j++) collection.queue_indices.push(j)
 			
-			html += '<i class="icon-chevron-right icon-2x profile-chevron" id="queue-chevron-right"></i>'
+			// html += '<i class="icon-chevron-right icon-2x profile-chevron" id="queue-chevron-right"></i>'
+			html += "</table>"
 			this.$el.html(html)
 			return this;
 		},
@@ -456,17 +555,6 @@ $(function(){
 				this.create_queue_boxes(this, this.collection.models[0].get('positions'))
 			}
 		},
-
-		mouseEnter: function(ev) {
-			if (!$(ev.currentTarget).hasClass('queue-position-hover'))
-				$(ev.currentTarget).toggleClass('queue-position-hover')
-		},
-
-		mouseOut: function(ev) {
-			if ($(ev.currentTarget).hasClass('queue-position-hover'))
-				$(ev.currentTarget).removeClass('queue-position-hover')
-		},
-
 	});
 
 
@@ -491,6 +579,11 @@ $(function(){
 
 		empty: function() {
 			if (backbone_own_profile) {
+				_.extend(GoalCareerView.prototype, viewUtilities);
+				_.extend(GoalPositionView.prototype, viewUtilities);
+				_.extend(QueueListView.prototype, viewUtilities);
+
+
 				this.goalCareerView = new GoalCareerView({collection:this.goalCareers})
 				this.goalPositionView = new GoalPositionView({collection:this.goalPositions})
 				this.queueView = new QueueListView({collection:this.queue})

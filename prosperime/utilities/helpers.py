@@ -5,10 +5,34 @@ from django.utils import simplejson
 import math
 import datetime
 
+
+def _months_from_now_json(start_date):
+    ## expects a start-date as a string of form MM/YY
+
+    now = datetime.datetime.now()
+    start_mo = int(start_date[:2])
+    start_yr = int(start_date[3:])
+
+    end_mo = now.month
+    end_yr = int(str(now.year)[2:])
+    
+    return (12 * (end_yr - start_yr)) + (end_mo - start_mo)
+
+
 # Returns # months difference between start_date and now
 def _months_from_now(start_date):
+
     now = datetime.datetime.now()
     return (12 * (now.year - start_date.year)) + (now.month - start_date.month)
+
+# Takes a python datetime obj and returns a string of format MM/YY
+def _format_date(date):
+
+    month = str(date.month)
+    if len(month) == 1:
+        return "0" + month + "/" + str(date.year)[2:]
+    else:
+        return month + "/" + str(date.year)[2:]
 
 # taken straight from viz.js
 def _months_difference(start_mo, start_yr, end_mo, end_yr, compress, round):

@@ -44,19 +44,19 @@ span#industry-header {
 
 }
 
-table#search-results-table {
+table.search-results-table {
 	width:100%;
 }
 
-table#search-results-table th {
+table.search-results-table th {
 	text-align:center;
 }
 
-table#search-results-table tr {
+table.search-results-table tr {
 
 }
 
-table#search-results-table td {
+table.search-results-table td {
 	text-align:center;
 }
 
@@ -172,7 +172,11 @@ ul.industry-options-container a {
 	background-color:#fffffe;
 	overflow: auto;
 	padding:4px;
-	width:250px !important; /* normally, no, but this is a 3rd party library  
+	width:250px !important; /* normally, no, but this is a 3rd party library*/  
+}
+
+.hide {
+	visibility: none;
 }
 
 
