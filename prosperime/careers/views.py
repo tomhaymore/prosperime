@@ -113,8 +113,7 @@ def modify_saved_path(request,id):
 	
 	# collect data for template
 	data = {
-		'options':json.dumps(path_results),
-		'path':json.dumps(path_steps),
+		'path_steps':json.dumps(path_steps),
 		'current_positions':current_positions,
 		'path':path
 	}
@@ -1232,9 +1231,6 @@ def list_jobs(request):
 	jobs = json.dumps(jobs_list)
 	return HttpResponse(jobs, mimetype="application/json")
 
-
-
-
 # VIEW: display ALL user's paths
 def show_paths(request):
 
@@ -1267,8 +1263,7 @@ def show_paths(request):
 			})
 
 		current['positions'] = positions
-		formatted_paths.append(current)
-		
+		formatted_paths.append(current)	
 
 	return HttpResponse(simplejson.dumps(formatted_paths))
 
