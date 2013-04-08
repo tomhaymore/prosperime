@@ -1,0 +1,77 @@
+
+
+div.build-header {
+	font-size:2.5em;
+	color:rgb(41,98,152);
+	margin:25px;
+}
+
+span.build-header-name {
+	color:#aaa;
+}
+
+div.call-out-text {
+	font-size:1.4em;
+	margin:25px;
+}
+
+div#build-positions-container {
+	margin-left:25px;
+
+}
+
+div.build-sub-header {
+	font-size:1.7em;
+	color:rgb(41,98,152);
+	margin-bottom:25px;
+	margin-top:10px;
+}
+
+div.build-positions-search {
+	margin-top:25px;
+	margin-bottom:50px;
+}
+
+input#build-positions-search-box {
+	width:450px;
+}
+
+
+table#build-positions-table {
+	width:50%;
+}
+
+span#add-build-position-button {
+	color:#fffffe;
+	background-color:rgb(41,98,152);
+	text-shadow:none;
+}
+
+div.save-button {
+	margin-right:150px;
+	background-color:rgb(41,98,152);
+	color:#fffffe;
+	font-size:1.4em;
+}
+
+input.build-input {
+	height:30px;
+	line-height:35px;
+	font-size:.8em;
+}
+
+
+
+
+
+/* Modifiers */
+
+.smaller { font-size:1em !important; }
+
+.selected { background-color:rgb(41,98,152); color:#fffffe;}
+
+
+.italicize {
+	font-style: italic;
+	font-weight:200;
+}
