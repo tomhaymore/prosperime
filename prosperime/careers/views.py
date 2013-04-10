@@ -62,19 +62,19 @@ def build(request):
 	educations = request.user.profile.educations()
 
 	current_positions = []
-	all_positions = Position.objects.filter(person=request.user).values("id", "ideal_position__id", "title", 
-		"entity__name")
+	all_positions = Position.objects.filter(person=request.user).values("id", "ideal_position__id", "title", "entity__name")
 	for p in all_positions:
-		current_positions.append({"pos_id": p["id"], "ideal_id": p["ideal_position__id"], "title":str(p["title"]), "entity_name":str(p["entity__name"])})
+		current_positions.append({"pos_id": p["id"], "ideal_id": p["ideal_position__id"], "title":p["title"], "entity_name":p["entity__name"]})
 	# current_positions.append({'pos_id':latest_position.id,'ideal_id':latest_position.ideal_position_id,'title':str(latest_position.title),'entity_name':str(latest_position.entity.name)})
 
-	for e in educations:
-		current_positions.append({'pos_id':e.id,'ideal_id':e.ideal_position_id,'title':e.title,'entity_name':e.entity.name})
+	# for e in educations:
+	# 	current_positions.append({'pos_id':e.id,'ideal_id':e.ideal_position_id,'title':e.title,'entity_name':e.entity.name})
 	
 
 	data = {
 		'title':path_title,
 		'current_positions':current_positions,
+		'current_positions_json':json.dumps(current_positions),
 		'path_id':-1,
 		'path_steps':None,
 	}
@@ -1272,23 +1272,25 @@ def get_next_build_step(request):
 		# initiate array for next positions
 		pos = []
 		# reduce GET to variable
-		start_pos_id = request.GET.getlist('id')[0]
+		# start_ideal_id = request.GET.getlist('ideal_id')[0]
+		start_ideal_id = request.GET.getlist('id')[0]
+		start_pos_id = request.GET.getlist('pos_id')[0]
 
 		# get all user positions of users that have had this ideal position
-		users = User.objects.values('id','positions__id','positions__ideal_position_id','positions__title','positions__entity__name','positions__type').filter(positions__ideal_position_id=start_pos_id).order_by('-positions__start_date').distinct()
+		users = User.objects.values('id','positions__id','positions__ideal_position_id','positions__title','positions__entity__name','positions__type').filter(positions__ideal_position_id=start_ideal_id).order_by('-positions__start_date').distinct()
 		
 		# loop through
 		for u in users:
-			if u['positions__type'] is not "education" and u['positions__title'] is not "Student":
+			# if u['positions__type'] is not "education" and u['positions__title'] is not "Student":
 				# # print u['positions__ideal_position_id']
 				# print "'" + u['positions__title'] + "'"
+			if u['id'] in next and u['id'] not in finished and int(u['positions__id']) != int(start_pos_id):
 				
-				if u['id'] in next and u['id'] not in finished:
-					pos.append({'pos_id':u['positions__id'],'ideal_id':u['positions__ideal_position_id'],'title':u['positions__title'],'entity_name':u['positions__entity__name']})
-					finished.append(u['id'])
-				if u['positions__ideal_position_id'] == int(start_pos_id):
-					print 'match'
-					next.append(u['id'])
+				pos.append({'pos_id':u['positions__id'],'ideal_id':u['positions__ideal_position_id'],'title':u['positions__title'],'entity_name':u['positions__entity__name']})
+				finished.append(u['id'])
+			if u['positions__ideal_position_id'] == int(start_ideal_id):
+				print 'match'
+				next.append(u['id'])
 
 		# print next
 		# print finished

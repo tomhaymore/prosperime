@@ -210,7 +210,7 @@
 
 	/* Constants & Instance Variables */
 	var options = null //{{options|safe}}
-	var current_pos = {{current_positions|safe}}
+	var current_pos = {{current_positions_json|safe}}
 	// console.log(current_pos)
 	var options_data = []
 	var chosen_data = []
@@ -295,12 +295,12 @@
 		chosen_data.push({"dot_id":dot.id, "pos_id":pos_id, "ideal_id": ideal_id})
 
 		/* Get and render options */
-		get_and_render_options(ideal_id)
+		get_and_render_options(ideal_id,pos_id)
 	};
 
-	var get_and_render_options = function(ideal_id) {
+	var get_and_render_options = function(ideal_id,pos_id) {
 
-		options = get_options(ideal_id)
+		options = get_options(ideal_id,pos_id)
 		console.log("Rendering: ")
 		console.log(options)
 		render_options(options)
@@ -472,7 +472,7 @@
 		chosen_data.push({"dot_id":el.id, "pos_id":el.data("pos_id"), "ideal_id": el.data("ideal_id")})
 		options_data.length = 0
 		line_data.push(line.id)
-		get_and_render_options(el.data("ideal_id"))
+		get_and_render_options(el.data("ideal_id"),el.data("pos_id"))
 	}
 
 	var normalize_rows = function() {
@@ -518,7 +518,7 @@
 
 		/* Re-render off of previous dot, if there is one */
 		if (chosen_data.length > 0) {
-			get_and_render_options(chosen_data[chosen_data.length - 1]["ideal_id"])
+			get_and_render_options(chosen_data[chosen_data.length - 1]["ideal_id"],chosen_data[chosen_data.length - 1]["pos_id"])
 			
 			// And re-add click handler
 			paper.getById(chosen_data[chosen_data.length - 1]["dot_id"]).click(go_back)
@@ -576,7 +576,7 @@
 		$('#build-positions-table > tbody:last').append(new_html)
 	};
 
-	var get_options = function(ideal_id) {
+	var get_options = function(ideal_id,pos_id) {
 
 		/* NOTE: using synchronous AJAX call to hold the chain until
 			returns. Consider changing this to one big callback */
@@ -584,7 +584,7 @@
 		var ret_val = null
 		jQuery.ajaxSetup({async:false})
 
-		$.get("/careers/getNextBuildStep/", {'id':ideal_id}, function(response) {
+		$.get("/careers/getNextBuildStep/", {'id':ideal_id,'pos_id':pos_id}, function(response) {
 			y_offset = Math.ceil(y_range/(response.length - 1)) // assuming 5 options...
 			ret_val = response
 		}, "json");
@@ -631,7 +631,7 @@
 		dot.click(go_back)
 
 		/* Get and render options */
-		get_and_render_options(ideal_id)
+		get_and_render_options(ideal_id,pos_id)
 
 	};
 
