@@ -240,13 +240,13 @@ $.ajaxSetup({
 			{% if viewer_saved_paths %}
 				{% for tuple in saved_path_ids %}
 					{% if forloop.first %}
-						<div class="tab-pane active" id="{{tuple.0}}">
+						<div class="tab-pane active" id="{{tuple.0}}"data-index={{forloop.counter0}}>
 					{% else %}
-						<div class="tab-pane" id="{{tuple.0}}">
+						<div class="tab-pane" id="{{tuple.0}}" data-index={{forloop.counter0}}>
 					{% endif %}
-					<!-- <div class='timeline-header'>Saved Path: {{path.title}}</div> -->
-						<div id='path-{{tuple.0}}' class='saved-path-timeline'>	</div>
-					<!-- </div> -->
+
+							<div id='path-{{tuple.0}}' class='saved-path-timeline'>	</div>
+	
 					</div>
 				{% endfor %} 
 			{% endif %}
@@ -395,6 +395,18 @@ $.ajaxSetup({
 			$('#personalize-goal-careers').hide()
 
 		}
+	}
+
+	var delete_path = function(ev) {
+
+		var path_id = $(ev.currentTarget).data("id")
+		$.post("/careers/deleteSavedPath/", {'id':path_id}, function(response) {
+			if (response["result"] == "success") {
+				console.log("Success")
+			} else {
+				console.log("Failure: " + response["errors"])
+			}
+		}, "json");
 
 
 	}
@@ -474,7 +486,17 @@ $.ajaxSetup({
 		/* Activate tabs */
 		$("#profile-tabs a:first").tab("show")
 		$("#saved-path-tabs a:first").tab("show")
-	
+
+		/* B/c of Bootstrap bug, must render timeline tabs dynamically
+			Keep track of index of rendered timelines and catch 'show' events here */
+		var timelines_shown = [0]
+		$('a[data-toggle="tab"]').on('shown', function (e) {
+			var index = $("#saved-paths-container .active").data("index")
+			if (timelines_shown.indexOf(index) == -1) {saved_path_timeline(index)
+				timelines_shown.push(index)
+			}
+		 });
+
 		/* Display Career Decision prompt if applicable */
 		if ({{career_decision_prompt}}) {
 			var template = _.template($('#career-decision-template').html())
@@ -512,7 +534,8 @@ $.ajaxSetup({
 
 		/* Add saved paths */
 		if (saved_paths.length > 0)
-			saved_path_timelines()
+			// saved_path_timelines()
+			saved_path_timeline(0)
 	});
 
 	/**********************/
@@ -549,9 +572,39 @@ $.ajaxSetup({
 	/************************/
 	/* SAVED PATH TIMELINES */
 	/************************/
+
+
+	var saved_path_timeline = function(index) {
+
+		var title = saved_paths[index].title
+		var positions = saved_paths[index].positions
+		var id = saved_paths[index].id
+		var n_positions = positions.length
+
+		var saved_path_constants = {
+			'paper_w':constants.paper_width,
+			'paper_h':150,
+			'start_offset':100,
+			'midline':75,
+			'box_style':1,
+			'top_text_offset':38,
+			'bottom_text_offset':25,
+		}
+
+		monospaced_timeline(saved_path_constants, positions, 'path-' + id)
+		// need to add 'delete' and 'edit' buttons
+		var prepend_html = "<div class='edit-path-button flat-button path-button'><a href='/build/"+ id + "'>Edit</a></div> <div class='delete-path-button flat-button path-button' data-id='"+ id + "'>Delete</div>"
+
+		$('#path-'+id).prepend(prepend_html)
+		$('#path-' + id + ' .delete-path-button').click(delete_path)
+	};
+
+
+
+	/* DEPCRECATED */
 	var saved_path_timelines = function() {
 
-		for (var z = 0; z < saved_paths.length; z++) {
+		for (var z = saved_paths.length - 1; z >= 0; z--) {
 
 			var title = saved_paths[z].title
 			var positions = saved_paths[z].positions
@@ -560,14 +613,16 @@ $.ajaxSetup({
 
 			var saved_path_constants = {
 				'paper_w':constants.paper_width,
-				'paper_h':constants.paper_height,
+				'paper_h':150,
 				'start_offset':100,
-				'midline':100,
+				'midline':75,
 				'box_style':1,
 				'top_text_offset':38,
 				'bottom_text_offset':25,
 			}
 			monospaced_timeline(saved_path_constants, positions, 'path-' + id)
+			// need to add 'delete' and 'edit' buttons
+			var prepend_html = "<div id='edit-path-button' class='flat-button path-button'><a href='/build/"+ id + "'>Edit</a></div> <div id='delete-path-button' class='flat-button path-button'>Delete</div>"
 		}
 	}
 

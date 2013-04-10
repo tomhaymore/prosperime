@@ -56,34 +56,27 @@ def home(request):
 
 def build(request):
 
-
-	path_results = []
-	path_results.append({'id':10, 'title':'Business Development Intern', 'entity_name':'Coursera'})
-	path_results.append({'id':15, 'title':'Product Manager', 'entity_name': 'Apple'})
-	path_results.append({'id':20, 'title':'Homeophatic Surgeon', 'entity_name': 'Green Remedies, Inc.'})
-	path_results.append({'id':70, 'title':'Televangelist and Local Hero', 'entity_name':'Lakewood Church'})
-	path_results.append({'id':111, 'title':'NFL Linebacker', 'entity_name':'National Football Association'})
-
 	path_title = "Untitled" ## this should default if no title
 
-	latest_position = request.user.profile.latest_position()
+	# latest_position = request.user.profile.latest_position()
 	educations = request.user.profile.educations()
 
 	current_positions = []
-	current_positions.append({'pos_id':latest_position.id,'ideal_id':latest_position.ideal_position_id,'title':latest_position.title,'entity_name':latest_position.entity.name})
+	all_positions = Position.objects.filter(person=request.user).values("id", "ideal_position__id", "title", 
+		"entity__name")
+	for p in all_positions:
+		current_positions.append({"pos_id": p["id"], "ideal_id": p["ideal_position__id"], "title":str(p["title"]), "entity_name":str(p["entity__name"])})
+	# current_positions.append({'pos_id':latest_position.id,'ideal_id':latest_position.ideal_position_id,'title':str(latest_position.title),'entity_name':str(latest_position.entity.name)})
 
 	for e in educations:
 		current_positions.append({'pos_id':e.id,'ideal_id':e.ideal_position_id,'title':e.title,'entity_name':e.entity.name})
 	
-	# current_positions.append({'id':127, 'title':'Business Development Assocaite', 'entity_name': 'Morgan Stanley'})
-	# current_positions.append({'id':45, 'title':'Student, B.A.', 'entity_name':'Dartmouth University'})
-	# current_positions.append({'id':33, 'title':'Graduate Research Assistant', 'entity_name':'Harvard Medical School'})
-
 
 	data = {
-		'options':json.dumps(path_results),
 		'title':path_title,
 		'current_positions':current_positions,
+		'path_id':-1,
+		'path_steps':None,
 	}
 
 	return render_to_response("careers/build.html", data, context_instance=RequestContext(request))
@@ -106,16 +99,17 @@ def modify_saved_path(request,id):
 
 	# add to current positions
 	current_positions = []
-	current_positions.append({'pos_id':latest_position.id,'ideal_id':latest_position.ideal_position_id,'title':latest_position.title,'entity_name':latest_position.entity.name})
+	current_positions.append({'pos_id':latest_position.id,'ideal_id':latest_position.ideal_position_id,'title':str(latest_position.title),'entity_name':str(latest_position.entity.name)})
 
 	for e in educations:
-		current_positions.append({'pos_id':e.id,'ideal_id':e.ideal_position_id,'title':e.title,'entity_name':e.entity.name})
+		current_positions.append({'pos_id':e.id,'ideal_id':e.ideal_position_id,'title':str(e.title),'entity_name':str(e.entity.name)})
 	
 	# collect data for template
 	data = {
 		'path_steps':json.dumps(path_steps),
 		'current_positions':current_positions,
-		'path':path
+		'path_id':path.id,
+		'title':path.title
 	}
 
 	return render_to_response("careers/build.html", data, context_instance=RequestContext(request))
@@ -941,16 +935,17 @@ def getDecisions(request):
 def positionAutocomplete(request):
 
 	query = request.GET.getlist('query')[0]
-	positions = Position.objects.filter(Q(title__istartswith=query) | Q(entity__name__istartswith=query)).values("id", "entity__name", "title")
+	positions = Position.objects.filter(Q(title__istartswith=query) | Q(entity__name__istartswith=query)).values("id", "entity__name", "title", "ideal_position__id")
 
 	suggestions = []
 	for p in positions:
 		string = str(p['title']) + ' at ' + str(p['entity__name'])
 		item = {
 			'value':string,
-			'data':p['id'],
+			'pos_id':p['id'],
 			'title':p['title'],
-			'entity_name':p['entity__name']
+			'entity_name':p['entity__name'],
+			'ideal_id':p['ideal_position__id'],
 		}
 		suggestions.append(item)
 
@@ -1268,7 +1263,7 @@ def show_paths(request):
 	return HttpResponse(simplejson.dumps(formatted_paths))
 
 # AJAX for getting build steps
-def get_build_step(request):
+def get_next_build_step(request):
 	# check if GET parameters were sent
 	if request.GET.getlist('id'):
 		# initiate next and finished flag
@@ -1284,20 +1279,114 @@ def get_build_step(request):
 		
 		# loop through
 		for u in users:
-			if u['positions__type'] is not "education":
-				# print u['positions__ideal_position_id']
+			if u['positions__type'] is not "education" and u['positions__title'] is not "Student":
+				# # print u['positions__ideal_position_id']
+				# print "'" + u['positions__title'] + "'"
+				
 				if u['id'] in next and u['id'] not in finished:
 					pos.append({'pos_id':u['positions__id'],'ideal_id':u['positions__ideal_position_id'],'title':u['positions__title'],'entity_name':u['positions__entity__name']})
 					finished.append(u['id'])
 				if u['positions__ideal_position_id'] == int(start_pos_id):
 					print 'match'
 					next.append(u['id'])
-		print next
-		print finished
-		print pos
+
+		# print next
+		# print finished
+		# print pos
+
+		pos = pos[:5] # limit responses to 5
 
 		return HttpResponse(json.dumps(pos))
 		
+def save_build_path(request):
+
+	response = {}
+	if not request.is_ajax or not request.POST:
+		response["result"] = "failure"
+		response["errors"] = "Incorrect request type"
+		return HttpResponse(json.dumps(response))
+
+	title = request.POST.get("title")
+	position_ids = request.POST.getlist("position_ids[]")
+	path_id = int(request.POST.get("path_id"))
+
+	if path_id == -1:
+		# new path
+		try:
+			path = SavedPath()
+			path.title = title
+			path.owner = request.user
+			path.save()
+
+			counter = 0
+			for p_id in position_ids:
+				pos = SavedPosition()
+				pos.path = path
+				pos.index = counter
+				pos.position = Position.objects.get(id=int(p_id))
+				pos.save()
+				counter += 1
+
+			path.last_index = counter
+			path.save()
+		except:
+			response["result"] = "failure"
+			response["errors"] = "Error creating path in careers.views"
+
+	else:
+		path = SavedPath.objects.get(id=path_id)
+
+		try:
+			# probably a faster way to do than batch delete/save
+			for saved_pos in SavedPosition.objects.filter(path=path):
+				saved_pos.delete()
+
+			path.title = title
+			counter = 0
+			for p_id in position_ids:
+				pos = SavedPosition()
+				pos.path = path
+				pos.index = counter
+				pos.position = Position.objects.get(id=int(p_id))
+				pos.save()
+				counter += 1
+
+			path.last_index = counter
+			p.save()
+			response["result"] = "success"
+
+			for p in path.positions:
+				print p
+
+		except:
+			response["result"] = "failure"
+			response["errors"] = "Error saving existing path in careers.views"
+
+
+	response["result"] = "success"
+
+	return HttpResponse(json.dumps(response))
+
+def delete_path(request):
+	response = {}
+
+	if not request.is_ajax or not request.POST:
+		response['result'] = "failure"
+		response['errors'] = "Incorrect request type"
+		return HttpResponse(json.dumps(response))
+
+	path_id = request.POST.get('id')
+	print path_id
+
+	try:
+
+		response["result"] = "success"
+	except:
+		response["result"] = "failure"
+		response["result"] = "Error deleting path from DB in careers.views"
+
+	return HttpResponse(json.dumps(response))
+
 
 # JSON dumper
 def get_paths(request):
