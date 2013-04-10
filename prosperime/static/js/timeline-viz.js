@@ -411,7 +411,6 @@ var monospaced_timeline = function(constants, positions, el) {
                 var y_2 = midline - outer_dot_radius - position_text_height - padding
                 
                 // Create text //17,10
-                console.log(effective_midline)
                 var position_entity = paper.text(x, (effective_midline-top_text_offset), positions[j].org).attr(text_attributes)
                 var position_title = paper.text(x, (effective_midline-bottom_text_offset), positions[j].title).attr(text_attributes)
                 break;

@@ -442,6 +442,33 @@ i.profile-chevron {
 	margin:10px;
 }
 
+div#edit-path-button {
+
+
+}
+
+div#delete-path-button {
+
+}
+
+div.path-button {
+	display:inline-block;
+	float:right;
+	font-size:1.2em;
+	line-height:25px;
+	background-color:rgb(41,98,152);
+	color:#fffffe;
+	width:75px;
+	padding:6px 8px;
+	margin-bottom:0px;
+	margin-right:25px;
+}
+
+div.path-button a {
+	text-decoration: none;
+	color:#fffffe;
+}
+
 
 
 .hide {
