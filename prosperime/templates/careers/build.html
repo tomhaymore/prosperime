@@ -40,32 +40,39 @@
 
 	<div id="build-positions-container">
 
-		<div class="build-sub-header">
-			Current Positions
-		</div>
-
-		<div id="build-save-button" class="flat-button pull-right button-large save-button" onclick="save()">
+		<div id="build-save-button" class="flat-button pull-left button-large save-button" onclick="save()">
 			Save
 		</div>
+		<div class="clear"></div>
 
-		<div id="are-you-sure-prompt"  class="pull-right">
-			<!-- Text here -->
+
+		<div class="pull-left" style="width:50%;">
+			<div class="build-sub-header">
+				Current Positions
+			</div>
+
+			
+
+			<div id="are-you-sure-prompt"  class="">
+				<!-- Text here -->
+			</div>
+
+			<table id="build-positions-table" class="table">
+			{% for pos in current_positions %}
+				<tr><td class="build-start-position" data-pos_id="{{pos.pos_id}}" data-title="{{pos.title}}" data-entity_name="{{pos.entity_name}}" data-ideal_id="{{pos.ideal_id}}">
+					{{pos.title}} at {{pos.entity_name}}
+				</td></tr>
+			{% endfor %}
+			</table>
 		</div>
 
-		<table id="build-positions-table" class="table">
-		{% for pos in current_positions %}
-			<tr><td class="build-start-position" data-pos_id="{{pos.pos_id}}" data-title="{{pos.title}}" data-entity_name="{{pos.entity_name}}" data-ideal_id="{{pos.ideal_id}}">
-				{{pos.title}} at {{pos.entity_name}}
-			</td></tr>
-		{% endfor %}
-		</table>
-
-		<div class="build-positions-search">
+		<div class="build-positions-search pull-right">
 			<div class="input-append inline">
-				<input id="build-positions-search-box" type="text">
+				<input id="build-positions-search-box" type="text" placeholder="Search for a position">
 				<span id="add-build-position-button" class="add-on"> Add </span>
 			</div>
 		</div>
+		<div class="clear"></div>
 	</div>
 
 	

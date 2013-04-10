@@ -41,17 +41,23 @@ div.build-sub-header {
 }
 
 div.build-positions-search {
-	margin-top:25px;
+	margin-top:50px;
 	margin-bottom:50px;
+	margin-left: 15px;
 }
 
 input#build-positions-search-box {
-	width:450px;
+	width:350px;
 }
 
 
 table#build-positions-table {
-	width:50%;
+	/*width:50%;*/
+}
+
+table#build-positions-table tr td {
+	/*width:50%;*/
+	cursor: pointer;
 }
 
 span#add-build-position-button {
