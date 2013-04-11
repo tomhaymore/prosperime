@@ -108,6 +108,7 @@ def modify_saved_path(request,id):
 	data = {
 		'path_steps':json.dumps(path_steps),
 		'current_positions':current_positions,
+		'current_positions_json':json.dumps(current_positions),
 		'path_id':path.id,
 		'title':path.title
 	}
@@ -1331,6 +1332,11 @@ def save_build_path(request):
 
 			path.last_index = counter
 			path.save()
+
+			response["result"] = "success"
+			response["path_id"] = path.id
+
+
 		except:
 			response["result"] = "failure"
 			response["errors"] = "Error creating path in careers.views"
@@ -1354,21 +1360,19 @@ def save_build_path(request):
 				counter += 1
 
 			path.last_index = counter
-			p.save()
+			path.save()
 			response["result"] = "success"
-
-			for p in path.positions:
-				print p
+			response["path_id"] = path.id
 
 		except:
 			response["result"] = "failure"
 			response["errors"] = "Error saving existing path in careers.views"
 
 
-	response["result"] = "success"
-
 	return HttpResponse(json.dumps(response))
 
+
+# Deletes all saved positions and saved path of given path id
 def delete_path(request):
 	response = {}
 
@@ -1378,9 +1382,15 @@ def delete_path(request):
 		return HttpResponse(json.dumps(response))
 
 	path_id = request.POST.get('id')
-	print path_id
+	print "Delete saved_path: " + str(path_id)
 
 	try:
+		saved_positions = SavedPosition.objects.filter(path__id=path_id)
+		for s in saved_positions:
+			s.delete()
+
+		saved_path = SavedPath.objects.get(id=path_id)
+		saved_path.delete()
 
 		response["result"] = "success"
 	except:

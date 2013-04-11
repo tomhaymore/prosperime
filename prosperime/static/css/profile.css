@@ -7,13 +7,13 @@ div#timeline-info-container {
 	width:300px;
 	max-width:300px;
 	height:100px;
-	text-align:center;
+	/*text-align:center;
 	/*border:2px dashed rgba(41,98,152,1);*/
-	position:relative;
+	/*position:relative;
 	left:33%;
 
 	background-color:rgb(41,98,152);
-	color:#fffffe;
+	color:#fffffe;*/
 	margin-bottom:25px;
 }
 
