@@ -17,7 +17,7 @@ class Position(models.Model):
 	entity = models.ForeignKey(Entity,related_name="positions")
 	person = models.ForeignKey(User,related_name="positions")
 	careers = models.ManyToManyField("Career",related_name="positions")
-	ideal_position = models.ForeignKey("IdealPosition",related_name="ideal_position",null=True)
+	ideal_position = models.ForeignKey("IdealPosition",related_name="position",null=True)
 	title = models.CharField(max_length=150,null=True)
 	summary = models.CharField(max_length=450,null=True)
 	description = models.TextField(null=True)
@@ -222,7 +222,7 @@ class IdealPosition(models.Model):
 class GoalPosition(models.Model):
 
 	position = models.ForeignKey(IdealPosition)
-	owner = models.ForeignKey(User)
+	owner = models.ForeignKey(User, related_name="goal_position")
 	status = models.CharField(max_length=15,default="active")
 	created = models.DateTimeField(auto_now_add=True, null=True)
 	updated = models.DateTimeField(auto_now=True, null=True)

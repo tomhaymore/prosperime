@@ -81,6 +81,33 @@ def build(request):
 
 	return render_to_response("careers/build.html", data, context_instance=RequestContext(request))
 
+def plan(request,id=None):
+	# check to see if viewing a specific position
+	from careers.positionlib import IdealPositionBase
+
+	if id:
+		ideal_pos = IdealPosition.objects.get(pk=id)
+
+		ideal_pos_lib = IdealPositionBase()
+		paths = ideal_pos_lib.get_paths_to_ideal_position(ideal_pos.id)
+		matching_users = ideal_pos_li.get_users_matching_ideal_path(ideal_pos.id)
+		data = {
+			'ideal_pos': ideal_pos,
+			'paths': paths,
+			'goal_positions': None
+		}
+
+	else:
+
+		goal_positions = request.user.goal_position.all()
+
+		data = {
+			'ideal_pos':None,
+			'paths':None,
+			'goal_positions':goal_positions
+		}
+	return render_to_response("careers/plan.html", data, context_instance=RequestContext(request))
+
 def modify_saved_path(request,id):
 	
 	# get path object
@@ -1292,14 +1319,39 @@ def get_next_build_step(request):
 				print 'match'
 				next.append(u['id'])
 
-		# print next
-		# print finished
-		# print pos
-
 		pos = pos[:5] # limit responses to 5
 
 		return HttpResponse(json.dumps(pos))
+	
+# AJAX for returning a JSON of ideal position paths
+def get_ideal_pos_paths(request):
+	# verify GET has righ parameters
+	if request.GET.getlist('ideal_id'):
+
+		# reduce GET param to regular variable
+		ideal_pos_id = request.GET.getlist('ideal_id')[0]
+
+		# instantiate positionlib class
+		from careers.positionlib import IdealPositionBase
+		ideal_pos_lib = IdealPositionBase()
 		
+		
+		full_paths = {}
+		# check for initial path
+		initial_path_id = request.GET.getlist('initial')
+		print initial_path_id
+		if initial_path_id:
+			initial_path_id = initial_path_id[0]
+			# fetch paths
+			paths = ideal_pos_lib.get_paths_to_ideal_position(ideal_pos_id,initial_path_id)
+		else:
+			# fetch paths
+			paths = ideal_pos_lib.get_paths_to_ideal_position(ideal_pos_id)
+
+		# return paths as json
+		full_paths['paths'] = paths
+		return HttpResponse(json.dumps(full_paths))
+
 def save_build_path(request):
 
 	response = {}

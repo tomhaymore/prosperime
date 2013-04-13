@@ -8,6 +8,43 @@ import os
 from django.contrib.auth.models import User
 from careers.models import Career, Position, IdealPosition
 
+class NestedDict(dict):
+	"""                                                                       
+	Nested dictionary of arbitrary depth with autovivification.
+	Allows data access via extended slice notation.                           
+	"""
+	def __getitem__(self, keys):
+		if not isinstance(keys, basestring):
+			try:
+				node = self
+				for key in keys:
+					node = dict.__getitem__(node, key)
+				return node
+			except TypeError:
+			# *keys* is not a list or tuple.
+				pass
+		try:
+			return dict.__getitem__(self, keys)
+		except KeyError:
+			raise KeyError(keys)
+
+	def __setitem__(self, keys, value):
+		# Let's assume *keys* is a list or tuple.
+		if not isinstance(keys, basestring):
+			try:
+				node = self
+				for key in keys[:-1]:
+					try:
+						node = dict.__getitem__(node, key)
+					except KeyError:
+						node[key] = type(self)()
+						node = node[key]
+				return dict.__setitem__(node, keys[-1], value)
+			except TypeError:
+				# *keys* is not a list or tuple.
+				pass
+		dict.__setitem__(self, keys, value)
+
 class PositionBase():
 
 	def get_ed_overview(self,user,position):
@@ -134,3 +171,72 @@ class PositionBase():
 			return duration
 		else:
 			return None
+
+class IdealPositionBase(PositionBase):
+
+	def get_paths_to_ideal_position(self,ideal_pos_id,initial=None,limit=5):
+		# fetch ideal position object
+		ideal_pos = IdealPosition.objects.get(pk=ideal_pos_id)
+		if initial:
+			reg_pos = Position.objects.get(pk=initial)
+		# get all paths with ideal position
+		users = User.objects.values('id','positions__ideal_position_id','positions__entity__name','positions__entity__id','positions__id','positions__title').filter(positions__ideal_position_id=ideal_pos_id).order_by("positions__start_date").distinct()
+
+		# loop through and build nested dictionary
+		all_paths = {}
+		for user in users:
+			all_paths[user['id']] = [{'id':u['id'],'title':u['positions__title'],'entity_id':u['positions__entity__id'],'entity_name':u['positions__entity__name'],'ideal_id':u['positions__ideal_position_id'],'pos_id':u['positions__id']} for u in users if u['id'] == user['id']]
+
+		all_ideal_paths = NestedDict()
+
+		# loop throgh each user
+		i = 1
+		for k,v in all_paths.items():
+			# init flags
+			next = []
+			# init arrays for nestdict ref
+			local_path = []
+			local_count_path = []
+			# loop over each position
+			for pos in v:
+				# print pos
+				# print local_path
+				# print all_ideal_paths
+
+				if initial:
+					
+					if pos['entity_id'] is not None and int(pos['entity_id']) == int(reg_pos.entity_id):
+						next.append(k)
+						continue
+
+					if k not in next:
+						continue
+
+				# finish loop if this position is or is past ideal position
+				if pos['ideal_id'] == ideal_pos_id:
+					continue
+
+				if pos['entity_name'] not in all_ideal_paths[local_path]:
+					all_ideal_paths[local_path][pos['entity_name']] = {'entity_name':pos['entity_name'],'title':pos['title'],'ideal_id':pos['ideal_id'],'pos_id':pos['pos_id'],'count':1,'paths':{}}
+					local_path.extend([pos['entity_name'],'paths'])
+					
+					# local_count_path.append('count')
+				else:
+					# print pos
+					if local_path:
+						local_count_path = local_path[:-1].append('count')
+					else:
+						local_count_path.extend([pos['entity_name'],'count'])
+					# print local_count_path
+
+					all_ideal_paths[local_count_path] += 1
+					# print all_ideal_paths[local_count_path]
+			i+=1
+			if i > limit:
+				break
+
+		return all_ideal_paths
+
+	def get_users_matching_ideal_path(self,path):
+
+		return None

@@ -3,7 +3,8 @@
 div.build-header {
 	font-size:2.5em;
 	color:rgb(41,98,152);
-	margin:25px;
+	margin-top:25px;
+	margin-bottom:25px;
 }
 
 span.build-header-name {
@@ -24,7 +25,7 @@ div#are-you-sure-prompt {
 
 div.call-out-text {
 	font-size:1.4em;
-	margin:25px;
+	margin-bottom:25px;
 	line-height:27px;
 }
 
