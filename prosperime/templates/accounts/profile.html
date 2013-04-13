@@ -229,7 +229,7 @@ $.ajaxSetup({
 		<ul class="nav nav-tabs" id="saved-path-tabs">
 			{% if viewer_saved_paths %}
 				{% for tuple in saved_path_ids %}
-					<li><a href="#{{tuple.0}}" data-toggle="tab">{{tuple.1}}</a></li>
+					<li id="path-tab-{{tuple.0}}"><a href="#{{tuple.0}}" data-toggle="tab">{{tuple.1}}</a></li>
 				{% endfor %}
 			{% endif %}
 		</ul>
@@ -403,12 +403,18 @@ $.ajaxSetup({
 		$.post("/careers/deleteSavedPath/", {'id':path_id}, function(response) {
 			if (response["result"] == "success") {
 				console.log("Success")
+
+				// Remove from view & re-render first tab
+				$('#path-' + path_id).remove()
+				$('#path-tab-' + path_id).remove()
+
+				if ($("#saved-path-tabs a").length > 0)
+					$("#saved-path-tabs a:first").tab("show")
+
 			} else {
 				console.log("Failure: " + response["errors"])
 			}
 		}, "json");
-
-
 	}
 
 </script>

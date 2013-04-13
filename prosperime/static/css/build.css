@@ -1,4 +1,8 @@
 
+div#path-container {
+	overflow:scroll;
+	width:800px;
+}
 
 div.build-header {
 	font-size:2.5em;
@@ -13,13 +17,14 @@ span.build-header-name {
 
 div#are-you-sure-prompt {
 	max-width:250px;
-	background-color:#333;
+	background-color:#e74c3c;
 	position:relative;
 	color:#fffffe;
-	top:50px;
-	left:165px;
+	bottom:115px;
+	left:160px;
 	border-radius:4px;
 	padding:6px 8px;
+	text-align:center;
 
 }
 
@@ -74,12 +79,31 @@ div.save-button {
 	font-size:1.4em;
 	width:100px;
 	padding:8px 10px;
+	margin-bottom:15px;
+}
+
+div#delete-button {
+	background-color:#e74c3c;
+	font-size:1.4em;
+	color:#fffffe;
+	width:100px;
+	padding:8px 10px;
+	border-radius:4px;
+	margin-bottom:15px;
 }
 
 input.build-input {
 	height:30px;
 	line-height:35px;
 	font-size:.8em;
+}
+
+.autocomplete-suggestions {
+	border: 1px solid #999;
+	background: #FFF;
+	overflow: auto;
+	width:400px !important; /* normally, no, but this is a 3rd party library */ 
+
 }
 
 

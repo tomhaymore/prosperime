@@ -27,6 +27,16 @@
 		{% else %}
 			<span class="build-header-name">{{title}}</span>
 		{% endif %}
+
+		<div id="delete-button-container" class="pull-right flat-button">
+			{% if path_id > -1 %}
+				<div id="delete-button" onclick="delete_path()">
+					Delete
+				</div>
+			{% endif %}
+		</div>
+
+
 	</div>
 
 	<div class="call-out-text">
@@ -105,29 +115,7 @@
 		});
 
 		// Current position click handler
-		$('#build-positions-table td').click(function(ev) {
-
-			// If already selected, do nothing
-			if ($(ev.currentTarget).parent().hasClass("selected")) {
-				return false;
-			};
-
-			// Clear search box
-			$('#build-positions-search-box').val("")
-
-			var pos_id = $(ev.currentTarget).data("pos_id")
-			var title = $(ev.currentTarget).data("title")
-			var entity_name = $(ev.currentTarget).data("entity_name")
-			var ideal_id = $(ev.currentTarget).data("ideal_id")
-
-			normalize_rows()
-
-			// For selected row, take off hover handler
-			$(ev.currentTarget).parent().off("mouseenter mouseleave").toggleClass("info").addClass("selected")
-
-			// Add this as the first position in path
-			add_first_position(pos_id, ideal_id, title, entity_name)
-		});
+		$('#build-positions-table td').click(current_position_clicked);
 
 		var position_selected_pos_id = null
 		var position_selected_title = null
@@ -149,12 +137,17 @@
 
 		// Add click handler to search box
 	    $('#add-build-position-button').click(function(ev) {
-
+	    	console.log("Add button clicked")
 	    	// If there's something there
 	    	if ($('#build-positions-search-box').val().length > 0) {
 	    		add_first_position(position_selected_pos_id, position_selected_ideal_id, position_selected_title, position_selected_entity_name)
-	    		normalize_rows()
-	    	} 
+
+	    		// Add click handler to row
+	    		$('#build-positions-table td:last').click(current_position_clicked)
+
+	    		// Add to "current" list
+	    		current_pos.push({'entity_name':position_selected_entity_name, 'ideal_id':position_selected_ideal_id, 'pos_id':position_selected_pos_id, 'title':position_selected_title})
+	    	};
 	    });
 
 
@@ -218,7 +211,9 @@
 	/* Constants & Instance Variables */
 	var options = null //{{options|safe}}
 	var current_pos = {{current_positions_json|safe}}
-	// console.log(current_pos)
+
+	// Note, if a new path is saved, this will change
+	var path_id = {{path_id}}
 	var options_data = []
 	var chosen_data = []
 	var line_data = []
@@ -231,7 +226,7 @@
 	var y_max = y_range / 2
 	var y_offset = Math.ceil(y_range/(4)) // assuming 5 options...
 	var x_start = 125
-	var dot_distance = 150
+	var dot_distance = 125
 	var text_offset1 = 40
 	var text_offset2 = 25
 	var text_offset3 = 10
@@ -249,6 +244,11 @@
 		'stroke-width':0,
 	};
 
+	var saved_dot_attributes = {
+		'fill':'#043A68',
+		'stroke-width':0,
+	};
+
 	var chosen_line_attributes = {
 		'stroke':'#777'
 	};
@@ -259,11 +259,13 @@
 
 	var text_attributes = {
 		"font-size":12,
+		"font-family": '"Open Sans", "Helvetica"',
 	};
 
 	var option_text_attributes = {
 		"font-size":12,
 		"text-anchor":"start",
+		"font-family":'"Open Sans", "Helvetica"'
 	};
 
 	/* Create Paper */
@@ -391,29 +393,40 @@
 			position_ids.push(chosen_data[g]["pos_id"])
 		}
 
-		// If no title, prod the users for one
-		if (title == "Untitled" && !save_attempted) {
-			$('#are-you-sure-prompt').html("Want to give this path a title first? Click on 'Untitled' to give it a name.").show();
-			
-			save_attempted = true;
-			return false;
-		}
-
 		// Don't allow path of length 0 to save
 		if (position_ids.length == 0) {
 			$('#are-you-sure-prompt').html("There are no positions in this path! Start adding positions below.").show();
 			return false;
 		} 
 
-		console.log("Pre-save: [title:" + title + "] [position_ids:" + position_ids + "] [path_id:" + {{path_id}} + ']')
+
+		// If no title, prod the users for one
+		if (title == "Untitled" && !save_attempted) {
+			$('#are-you-sure-prompt').html("Want to give this path a title first? Click on the title above to give it a name.").show();
+			
+			save_attempted = true;
+			return false;
+		}
+
+	
+		console.log("Pre-save: [title:" + title + "] [position_ids:" + position_ids + "] [path_id:" + path_id + ']')
 
 		// Post to DB
 		$.post("/careers/saveBuildPath/",
-			{'title':title, 'position_ids':position_ids, 'path_id':{{path_id}}, 'csrfmiddlewaretoken':"{{csrf_token}}"},
+			{'title':title, 'position_ids':position_ids, 'path_id':path_id, 'csrfmiddlewaretoken':"{{csrf_token}}"},
 			function(response) {
 				if (response["result"] == "success") {
 					console.log("Success")
 					$('.save-button').html("Saved")
+
+					// Now that saved, cab be deleted
+					var delete_html = "<div id='delete-button'  onclick='delete_path()'>Delete</div>"
+					$('#delete-button-container').html(delete_html)
+
+					// Set new path id
+					path_id = response["path_id"]
+					console.log("new path id set to : " + path_id)
+
 				} else {
 					console.log("Failure: " + response["errors"])
 				}
@@ -512,11 +525,21 @@
 	}
 
 	var go_back = function() {
+
 		/* Delete most recent dot */
 		var most_recent = paper.getById(chosen_data.pop()["dot_id"])
 		remove_dot_and_text(most_recent)
 		
-		/* Remove its options */
+
+		/* Animate options backwards */
+		// var x = x_start + (chosen_data.length * dot_distance)
+		// for (var z = 0; z < options_data.length; z++) {
+
+		// 	// Callback - once completed, run the rest of go_back()
+		// 	paper.getById(options_data[z]["dot_id"]).animate({"cx":x, "cy":midline}, 500, go_back_part_2)
+		// }
+
+		
 		remove_options()
 
 		/* Remove its line */
@@ -529,9 +552,32 @@
 			
 			// And re-add click handler
 			paper.getById(chosen_data[chosen_data.length - 1]["dot_id"]).click(go_back)
+		} else {
+			// unselect starting point
+			normalize_rows()
 		}
+	};
 
-	}
+	/* Ghetto, but allows the animation to run */
+	var go_back_part_2 = function() {
+
+		remove_options()
+
+		/* Remove its line */
+		if (line_data.length > 0)
+			paper.getById(line_data.pop()).remove()
+
+		/* Re-render off of previous dot, if there is one */
+		if (chosen_data.length > 0) {
+			get_and_render_options(chosen_data[chosen_data.length - 1]["ideal_id"],chosen_data[chosen_data.length - 1]["pos_id"])
+			
+			// And re-add click handler
+			paper.getById(chosen_data[chosen_data.length - 1]["dot_id"]).click(go_back)
+		} else {
+			// unselect starting point
+			normalize_rows()
+		}
+	};
 
 	var remove_dot_and_text = function(dot) {
 		paper.getById(dot.data("title_text_id")).remove()
@@ -549,22 +595,13 @@
 		chosen_data.length = 0;
 	};
 
+	var callback = function() {
+		console.log("callback")
+
+		
+	}
+
 	var remove_options = function() {
-
-
-		// TODO: get this animation to work!
-
-		// var x = x_start + (chosen_data.length * dot_distance)
-
-		// for (var z = 0; z < options_data.length; z++) {
-		// 	// Animate them back to prior dot
-		// 	var dot = paper.getById(options_data[z]["dot_id"])
-		// 	console.log(dot.attr("cx") + ' ' + dot.attr("cy"))
-		// 	paper.getById(options_data[z]["dot_id"]).animate({"cx":x, "cy":midline}, "2e2", bob)
-
-		// 	console.log(dot.attr("cx") + ' ' + dot.attr("cy"))
-		// 	console.log("'sssdfsdf")
-		// }
 
 		// Delete option dots, titles, entity names
 		for (var j = 0; j < options_data.length; j++) {
@@ -613,10 +650,20 @@
 			var ideal_id = positions[e].ideal_id
 			var x = x_start + (chosen_data.length * dot_distance)
 
+			// Alternate location of text
+			if (e % 2 == 0) {
+				var title_y = midline - text_offset1
+				var entity_name_y = midline - text_offset2
+			}
+			else {
+				var title_y = midline + text_offset2
+				var entity_name_y = midline + text_offset1
+			}
+
 			/* Create SVG Elements */
-			var dot = paper.circle(x, midline, dot_radius).attr(chosen_dot_attributes)
-			var title_text = paper.text(x, midline - text_offset1, title).attr(text_attributes)
-			var entity_text = paper.text(x, midline - text_offset2, entity_name).attr(text_attributes)
+			var dot = paper.circle(x, midline, dot_radius).attr(saved_dot_attributes)
+			var title_text = paper.text(x, title_y, title).attr(text_attributes)
+			var entity_text = paper.text(x, entity_name_y, entity_name).attr(text_attributes)
 
 			/* Set relevant data on dot element */
 			dot.data("pos_id", pos_id)
@@ -639,8 +686,48 @@
 
 		/* Get and render options */
 		get_and_render_options(ideal_id,pos_id)
-
 	};
+
+	var delete_path = function(ev) {
+
+		$.post("/careers/deleteSavedPath/", {'id':path_id, 'csrfmiddlewaretoken': "{{csrf_token}}"}, function(response) {
+			if (response["result"] == "success") {
+				console.log("Success")
+
+				$('#delete-button').fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)
+
+				// Once deleted... go to a new path
+				window.location = "/build/"
+				
+			} else {
+				console.log("Failure: " + response["errors"])
+			}
+		}, "json");
+	};
+
+	var current_position_clicked = function(ev) {
+
+		// If already selected, do nothing
+		if ($(ev.currentTarget).parent().hasClass("selected")) {
+			return false;
+		};
+
+		// Clear search box
+		$('#build-positions-search-box').val("")
+
+		var pos_id = $(ev.currentTarget).data("pos_id")
+		var title = $(ev.currentTarget).data("title")
+		var entity_name = $(ev.currentTarget).data("entity_name")
+		var ideal_id = $(ev.currentTarget).data("ideal_id")
+
+		normalize_rows()
+
+		// For selected row, take off hover handler
+		$(ev.currentTarget).parent().off("mouseenter mouseleave").toggleClass("info").addClass("selected")
+
+		// Add this as the first position in path
+		add_first_position(pos_id, ideal_id, title, entity_name)
+	}
 
 </script>
 
