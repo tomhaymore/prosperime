@@ -240,7 +240,7 @@ class IdealPositionBase(PositionBase):
 	def get_users_matching_ideal_path(self,path):
 		import operator
 
-		users = User.objects.exclude(status="dormant")
+		users = User.objects.exclude(profile__status="dormant")
 
 		user_ideal_ids = {}
 		user_ideal_match = {}
