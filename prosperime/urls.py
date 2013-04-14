@@ -58,6 +58,7 @@ urlpatterns = patterns('',
     url(r'^careers/saveBuildPath/$', 'careers.views.save_build_path'),
     url(r'^careers/deleteSavedPath/$', 'careers.views.delete_path'),
     url(r'^careers/getIdealPosPath/$', 'careers.views.get_ideal_pos_paths'),
+    url(r'^careers/getIdealMatches/$', 'careers.views.get_ideal_match_users'),
 
     ## Accounts - AJAX calls
     url(r'^accounts/updateProfile/$', 'accounts.views.updateProfile'),

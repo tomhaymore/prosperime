@@ -90,7 +90,7 @@ def plan(request,id=None):
 
 		ideal_pos_lib = IdealPositionBase()
 		paths = ideal_pos_lib.get_paths_to_ideal_position(ideal_pos.id)
-		matching_users = ideal_pos_li.get_users_matching_ideal_path(ideal_pos.id)
+		matching_users = ideal_pos_lib.get_users_matching_ideal_path([ideal_pos.id])
 		data = {
 			'ideal_pos': ideal_pos,
 			'paths': paths,
@@ -1352,6 +1352,22 @@ def get_ideal_pos_paths(request):
 		# return paths as json
 		full_paths['paths'] = paths
 		return HttpResponse(json.dumps(full_paths))
+
+# AJAX method for retreiving users who match an ideal path
+def get_ideal_match_users(request):
+	# verify GET has right parameters
+	if request.GET.getlist('path')
+
+		# reduce GET to list
+		path = request.GET.getlist('path')
+
+		# instantiate positionlib class
+		from careers.positionlib import IdealPositionBase
+		ideal_pos_lib = IdealPositionBase()
+
+		matches = ideal_pos_lib.get_users_matching_ideal_path(path)
+
+		return HttpResponse(json.dumps(matches))
 
 def save_build_path(request):
 
