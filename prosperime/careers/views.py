@@ -54,6 +54,7 @@ def home(request):
 
 	return render_to_response('home_v5.html',data,context_instance=RequestContext(request))
 
+@login_required
 def build(request):
 
 	path_title = "Untitled" ## this should default if no title
@@ -81,6 +82,7 @@ def build(request):
 
 	return render_to_response("careers/build.html", data, context_instance=RequestContext(request))
 
+@login_required
 def plan(request,id=None):
 	# check to see if viewing a specific position
 	from careers.positionlib import IdealPositionBase
@@ -108,6 +110,7 @@ def plan(request,id=None):
 		}
 	return render_to_response("careers/plan.html", data, context_instance=RequestContext(request))
 
+@login_required
 def modify_saved_path(request,id):
 	
 	# get path object
@@ -142,6 +145,7 @@ def modify_saved_path(request,id):
 
 	return render_to_response("careers/build.html", data, context_instance=RequestContext(request))
 
+@login_required
 def next(request):
 	data = {}
 
