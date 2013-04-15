@@ -86,7 +86,8 @@ def build(request):
 def plan(request,id=None):
 	# check to see if viewing a specific position
 	from careers.positionlib import IdealPositionBase
-
+	if request.GET.getlist('ideal'):
+		id = IdealPosition.objects.filter(title=request.GET['ideal'])[0].id
 	if id:
 		ideal_pos = IdealPosition.objects.get(pk=id)
 
@@ -1046,7 +1047,7 @@ def idealPositionAutocomplete(request):
 		'suggestions':suggestions,
 	}
 
-	return HttpResponse(simplejson.dumps(response))
+	return HttpResponse(json.dumps(response))
 
 
 ## Autocomplete for industries, used in What Next?

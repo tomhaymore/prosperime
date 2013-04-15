@@ -84,7 +84,7 @@ $(document).ready(function() {
     	name: 'jobs',
     	remote: '/careers/jobs?q=%QUERY',
     	limit: 10
-    	})
+    	});
 	$("div.personalize-career-entry").click(function() {
 		console.log($(this).data('career-id'))
 		$(this).toggleClass("personalize-unselected");

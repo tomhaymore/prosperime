@@ -3,16 +3,19 @@
 {% block head %}
 
 <!-- CSS -->
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/typeahead.min.css" />
 	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/plan.css" />
 
 
+
 <!-- JS -->
-	<script type="text/javascript" src="{{ STATIC_URL }}js/plan.js"></script>
+	
 	<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>
 	<script async type="text/javascript" src="{{ STATIC_URL }}js/timeline-viz.js"></script>
-	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.autocomplete.min.js"></script>
-
+	
+	<script type="text/javascript" src="{{ STATIC_URL }}js/typeahead.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/plan.js"></script>
 {% endblock %}
 
 
@@ -79,7 +82,7 @@
 			</table>
 			<div class="">
 				<input id="plan-positions-search-box" type="text" class="flat-input" placeholder="Search for a position">
-				<a id="add-plan-position-button" class="flat-button blue-button"> Add </a>
+				<a id="go-plan-position-button" class="flat-button blue-button"> Go </a>
 			</div>
 		</div>
 
