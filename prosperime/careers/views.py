@@ -1356,11 +1356,12 @@ def get_ideal_pos_paths(request):
 # AJAX method for retreiving users who match an ideal path
 def get_ideal_match_users(request):
 	# verify GET has right parameters
-	if request.GET.getlist('path')
+	
+	if request.GET.getlist('path[]'):
 
 		# reduce GET to list
 		path = request.GET.getlist('path')
-
+		print path
 		# instantiate positionlib class
 		from careers.positionlib import IdealPositionBase
 		ideal_pos_lib = IdealPositionBase()

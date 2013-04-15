@@ -239,7 +239,7 @@ class IdealPositionBase(PositionBase):
 
 	def get_users_matching_ideal_path(self,path):
 		import operator
-
+		path = set(path)
 		users = User.objects.exclude(profile__status="dormant")
 
 		user_ideal_ids = {}
@@ -248,12 +248,13 @@ class IdealPositionBase(PositionBase):
 		for u in users:
 			user_ideal_ids[u.id] = [p.ideal_position_id for p in u.positions.all()]
 
-		for k,v in user_ideal_ids:
-			intersect = len(path.intersect(v))
+		# print user_ideal_ids 
+		for k,v in user_ideal_ids.iteritems():
+			intersect = len(path.intersection(v))
 			user_ideal_match[k] = intersect
 
 		sorted_matches = sorted(user_ideal_match.iteritems(), key=operator.itemgetter(1))
 		sorted_matches_ids = [s[0] for s in sorted_matches]
-		matched_users = [{'id':u.id,'full_name':u.profile.full_name(),'pic':u.profile.default_profile_pic}] for u in User.objects.filter(id__in=sorted_matches_ids)]
+		matched_users = [{'id':u.id,'full_name':u.profile.full_name(),'pic':u.profile.default_profile_pic()} for u in User.objects.filter(id__in=sorted_matches_ids)]
 
 		return matched_users[:5]

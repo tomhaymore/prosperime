@@ -321,7 +321,7 @@ def random_profile(request):
 def profile(request, user_id):
 
 	user = User.objects.get(id=user_id)
-	if user.status == "dormant":
+	if user.profile.status == "dormant":
 		HttpResponseRedirect("/home")
 	profile = user.profile
 	profile_pic = user.profile.default_profile_pic()
