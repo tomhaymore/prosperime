@@ -934,6 +934,12 @@ button.general-add-button:active {
 	width: 300px;
 }
 
+.flat-input {
+	width: 350px;
+	border-radius: 0px;
+	margin-top: 7px;
+	height: 20px;
+}
 
 /*CLAYTON's PATH VIZ */
 .path-viz-short li {
