@@ -43,6 +43,7 @@ class Profile(models.Model):
     location = models.CharField(max_length=250,null=True)
     connections = models.ManyToManyField('self',through="Connection",symmetrical=False,related_name="connections+")
     status = models.CharField(max_length=15,default="active")
+    prefs = models.TextField(null=True)
     # profile_pic = models.ImageField(max_length=450, upload_to=_get_profile_pic_path, blank=True, null=True)
 
     # returns a dictionary w/ frequencies of each career
@@ -145,8 +146,16 @@ class Profile(models.Model):
     def get_similar_users(self):
         top_career_path = get_top_career(self)
 
-        
-
+    def add_pref(self,key,value):
+        if self.prefs:
+            prefs = json.loads(prefs)
+            prefs[key] = value
+        else:
+            prefs = {
+                key:value
+            }
+        self.prefs = json.dumps(prefs)
+        self.save()
 
 class Picture(models.Model):
 
