@@ -58,7 +58,7 @@ div.header-large {
 	height:24px;
 	line-height:24px;
 	min-width:16px;
-	padding:4px 5px;
+	padding:5px 10px 5px 10px;
 	font-size:14px;
 	font-weight:normal;
 	line-height:20px;
@@ -66,9 +66,14 @@ div.header-large {
 	/*text-shadow: 0 1px 0 #fff;*/
 	/*border:1px solid #ccc;*/
 	background-color:#fffffe;
-	border-radius:4px;
+	border-radius:2px;
 	cursor:pointer;
 	font-weight:500;
+}
+
+.green-button {
+	background-color: #339933;
+	color:#fffffe;
 }
 
 .button-small {
@@ -245,7 +250,7 @@ div.footer {
 /* Messages */
 
 div.messages-container {
-	padding-top:5px;
+	/*padding-top:5px;*/
 }
 
 div#messages {
@@ -276,8 +281,8 @@ div.splash-container {
 }
 
 p.splash-message-header {
-	color:#000;
-	font-size: 1.8em;
+	color:#fffffe;
+	font-size: 2.5em;
 	line-height: 1.8em;
 	margin-top:15px;
 	font-weight: 500;
@@ -285,11 +290,11 @@ p.splash-message-header {
 }
 
 p.splash-message-subheader {
-	font-size: 1.4em;
-	line-height: 1.6em;
+	font-size: 1.8em;
+	line-height: 2.0em;
 	text-align: center;
-	/*color:#363a3d;*/
-	color:rgb(43, 46, 48);
+	color:#e6e6e6;
+	/*color:rgb(43, 46, 48);*/
 }
 
 a.splash-message, p.splash-message {
@@ -301,8 +306,8 @@ a.splash-message, p.splash-message {
 }
 
 p.splash-submessage a {
-	/*color:#363a3d;*/
-	color:rgb(43, 46, 48);
+	color:#e6e6e6;
+	/*color:rgb(43, 46, 48);*/
 	font-size: 1.0em;
 	line-height: 1.2em;
 	vertical-align: middle;
@@ -310,6 +315,7 @@ p.splash-submessage a {
 
 p.splash-submessage a:hover {
 	color:#fff;
+	text-decoration: underline;
 } 
 
 a.splash-message:hover {
@@ -328,11 +334,17 @@ p.promo-message {
 
 div#promo-message-container {
 	padding-top:10px;
-	background-color: whitesmoke;
+	/*background-color: whitesmoke;
 	height:225px;
 	width:1000px;
 	margin-left: auto;
+	margin-right: auto;*/
+}
+
+div#promo-message-inner {
+	width:1000px;
 	margin-right: auto;
+	margin-left: auto;
 }
 
 ul {
@@ -1372,3 +1384,53 @@ div.general-nav-container div {
 
 /* Contact Page */
 
+/************/
+/***  V5  ***/
+/************/
+div#v5-header-container {
+	padding-left:25px;
+}
+
+div.v5-header {
+	font-size:2.5em;
+	color:rgb(41,98,152);
+	padding-bottom:25px;
+	text-align:left;
+	padding-top:50px;
+}
+
+div.v5-text {
+	font-size:1.3em;
+	line-height:25px;
+	text-align:left;
+}
+
+div#v5-container {
+	height:475px;
+	max-height:475px;
+	margin-left:25px;
+}
+
+div.v5-button {
+	margin-bottom:50px;
+	margin-top:25px;
+	padding-top:10px;
+	padding-bottom:10px;
+	background-color: rgb(41,98,152);
+	color:#fffffe;
+	max-width:200px;
+	font-size:1.4em;
+	line-height:24px;
+}
+
+div.v5-button a {
+	text-decoration: none;
+	color:#fffffe;
+}
+
+div.third-container {
+	display:inline-block;
+	text-align:center;
+	width:300px;
+	margin-right:30px;
+}
