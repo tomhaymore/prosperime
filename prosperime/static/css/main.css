@@ -76,6 +76,11 @@ div.header-large {
 	color:#fffffe;
 }
 
+.blue-button {
+	background-color: #265f98;
+	color:#fffffe;
+}
+
 .button-small {
 	height:16px;
 	line-height:16px;
@@ -251,6 +256,7 @@ div.footer {
 
 div.messages-container {
 	/*padding-top:5px;*/
+	background-color: #336633;
 }
 
 div#messages {
@@ -258,9 +264,10 @@ div#messages {
 	margin-left: auto;
 	margin-right: auto;
 	/*margin-top: 10px;*/
-	border: none;
-	border-radius: 5px;
-	background-color: #fff;
+	/*border: none;
+	border-radius: 5px;*/
+	background-color: #336633;
+	color:#fffffe;
 	padding: 5px;
 }
 
@@ -1388,7 +1395,7 @@ div.general-nav-container div {
 /***  V5  ***/
 /************/
 div#v5-header-container {
-	padding-left:25px;
+	/*padding-left:25px;*/
 }
 
 div.v5-header {

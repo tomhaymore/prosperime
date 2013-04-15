@@ -5,22 +5,23 @@
 {% endblock %}
 
 {% block content %}
-<div class="span11 offset1">
-<h3>Couldn't stay away?</h3>
-{% if msg %}
-<p class="message_error">{{ msg }}</p>
-{% endif %}
-<!-- <p>Enter the information below to log in.</p> -->
-<form action="" method="post" name="login">
-	{% csrf_token %}
-	{{ form.non_field_errors }}
-    {{ form.errors }}
-	{{ form.as_p }}
-	<fieldset>
-		<button type="submit" class="btn btn-success">Submit</button><a class="btn btn-primary left-spacer" href="/account/authorize">Login with LinkedIn</a>
-	</fieldset>
-</form>
+<div id="content-container" class="main-container">
+	<h3>Couldn't stay away?</h3>
+	{% if msg %}
+	<p class="message_error">{{ msg }}</p>
+	{% endif %}
+	<!-- <p>Enter the information below to log in.</p> -->
+	<form id="login-form" action="" method="post" name="login">
+		{% csrf_token %}
+		{{ form.non_field_errors }}
+	    {{ form.errors }}
+		{{ form.as_p }}
+		<fieldset>
+			<a type="submit" onClick="$('#login-form').submit();" class="flat-button green-button">Submit</a><a class="flat-button blue-button left-spacer" href="/account/authorize">Login with LinkedIn</a>
+		</fieldset>
+	</form>
 </div>
+
 {% endblock %}
 
 {% block rightSidebar %}
