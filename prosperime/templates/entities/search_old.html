@@ -1,0 +1,454 @@
+{% extends "base_search.html" %}
+
+{% block head %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/app.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/search.css" />
+{% endblock %}
+
+<!-- Messages -->
+{% block message %}
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% endblock %}
+
+
+<!-- Left Sidebar -->
+{% block sidebar %}
+<div id="search-filters-container" class="">
+	<!-- dynamically populated search filters -->
+</div>
+{% endblock %}
+
+
+<!-- Content (center pane) -->
+{% block content %}
+<div id="search-results-list">
+	<!-- <p class="main-header">Search Results</p> -->
+</div>
+{% endblock %}
+
+
+<!-- Right Sidebar -->
+{% block rightSidebar %}
+<div id="search-right-sidebar">
+	<!-- Feedback -->
+	<div class="rounded">
+		{% if user %}
+			<p class="sidebar-header">Want to see improvements?</p>
+			<p>We'd love to hear from you -- <a href="mailto:feedback@prosperime.com">please drop us a line</a></p>
+			
+		{% else %}
+			<!-- CLAY: ?? -->
+			<p class="sidebar-header">Want to see full career paths?</p>
+			<p>Drag and drop any company you'd like to keep track of here.</p>
+		{% endif %}
+	</div>
+
+	<!-- Save Search -->
+	<div class="rounded">
+		<p class="sidebar-header">Save Search</p>
+		{% if user %}
+			<p><a href="#">Save this search</a> to come back and review search results any time.</p>
+		{% else %}
+			<p><a href="/login">Login</a> or <a href="/register">register</a> to save searches.</p>
+		{% endif %}
+	</div>
+
+	<!-- Saved Paths -->
+	{% if saved_paths %}
+	<div class="rounded">
+		<p class="sidebar-header">Your Saved Career Paths</p>
+		{% for title in saved_paths %}
+			<div><a href="/saved_paths/#title/?t={{title}}"> {{title}} </a></div>
+		{%endfor%}
+	</div>
+	{%endif%}
+</div>
+
+
+<div id="arc-container"></div>
+
+<!-- Authenticate -->
+{% if not user.profile.li_linked %}
+{{ user.li_linked }}
+<div class="rounded">
+<a class="btn btn-primary left-spacer" href="/account/authorize">Authorize</a>
+	</div>
+{% endif %}
+
+{% endblock %}
+
+{% block templates %}
+<script type="text/template" id="path-single-template-old">
+	<li class="list-preview">
+		<div class="left-list-preview">
+			<% if (profile_pic != null) { %>
+			
+			<div class="profile-img-holder pull-left">
+				<img class="logo-preview" src="/media/<%= profile_pic %>" />&nbsp;
+			</div>
+			
+			<% } %>
+		</div>
+		<div class="right-list-preview pull-left">
+			<p class="path-name"><a class="path-name-link"><%= full_name %></a></p>
+			<p class="path-current-position"><%= current_position %></p>
+		</div>
+		<div class="clearfix"></div>
+		<div class="path-viz">
+				<div class="path-viz-short">
+					<% if (positions != null) {  
+					var i = 0;
+					_.each(positions,function(pos) { 
+						if (i <= 4) { %>
+						<span class="path-viz-pos"><a href="#"><%= pos.co_name %></a></span>
+					<% } else { %>
+						<span class="path-viz-pos" style="display:none;"><a href="#"><%= pos.co_name %></a></span>
+					<% }
+					if (pos.last_position == false && i < 4) { %>
+						<span class="path-viz-sep"> &gt; </span>
+					<% } else if (pos.last_position == false && i >= 4) {%>
+						<span class="path-viz-sep" style="display:none;"> &gt; </span>
+					<%
+					}
+
+					i++;
+						
+					}); 
+					} %>
+				</div>
+				<div class="path-viz-long" style="display:none;">
+				</div>
+
+			
+		</div>
+	</li>
+</script>
+
+<script type="text/template" id="path-single-template">
+	<li class="list-preview">
+		<div class="left-list-preview">
+			<div class="profile-img-holder pull-left">
+			<% if (profile_pic != null) { %>
+			
+				<img class="logo-preview" src="{{MEDIA_URL}}<%= profile_pic %>" />&nbsp;
+			</div>
+			
+			<% } else { %>
+				<img class="logo-preview" src="{{MEDIA_URL}}pictures/anon.jpg" />&nbsp;
+			<% } %>
+		</div>
+		<div class="right-list-preview pull-left">
+			<p class="path-name"><a href="/profile/<%= id %>"><%= full_name %></a></p>
+			<p class="path-current-position"><%= current_position %></p>
+		</div>
+		<div class="clearfix"></div>
+		<div class="search-careers-container">
+			
+			<% if (careers != null) {  %>
+			<ul class="search-careers-list flat">
+			<% _.each(careers,function(c) { %>
+				<li class="search-career">
+					<a class="search-button" href="/discover/career/<%=c.id%>"><%=c.name%></a>
+				</li>
+			<% }); %>
+			<% } %>
+			
+		</div>
+	</li>
+</script>
+
+<script type="text/javascript" src="../../static/js/viz.js"></script>
+<script type="text/template" id="path-single-template-clayton">
+ 
+	<li class="list-preview">
+		<div class="left-list-preview">
+			<% if (profile_pic != null) { %>
+			
+			<div class="profile-img-holder pull-left">
+				<img class="logo-preview" src="/media/<%= profile_pic %>" />&nbsp;
+			</div>
+			
+			<% } %>
+		</div>
+
+		<div class="right-list-preview pull-left">
+			<p class="path-name"><a class="path-name-link"><%= full_name %></a></p>
+			<p class="path-current-position"><%= current_position %></p>
+		</div>
+		<div class="clearfix"></div>
+		<div class="path-viz">
+				<div class="path-viz-short">
+					<% if (positions != null) { 
+					var num_positions = 0;
+					var ed_list = []
+					var org_list = []
+
+					// Segment positions into education & orgs, clean up end dates
+					_.each(positions,function(pos) {
+						// If no end date, assumed to be current
+						if (!pos['end_date']) pos['end_date'] = "Current";
+						
+						if (pos.type == 'education' || pos.title == 'Student') {
+							ed_list.push(pos)
+						} else {
+							// Ignore positions w/ no start-date... crappy data
+							if (pos['start_date']) org_list.push(pos)
+						}
+						num_positions++
+					}); 
+					
+					// Uniqify ed and pos lists using underscore
+					ed_list = _.uniq(ed_list, false, function(current) {
+						return current.title + ' ' + current.co_name
+					});
+					org_list = _.uniq(org_list, false, function(current) {
+						return current.title + ' ' + current.co_name
+					});
+
+					// A little bit of voodoo in viz.js...
+					org_list = prepare_for_timeline(org_list)
+
+					// Reverse order so that render most recent first
+					ed_list = ed_list.reverse()
+					org_list = org_list.reverse() 
+
+					// EDUCATION: 
+					if (ed_list.length > 0) %><h5>Education: </h5><ul class='ed_list'><%
+					
+					_.each(ed_list, function(ed) {
+						%><li class="path-viz-pos indent"><a href="#"><%
+						if (ed.title && ed.start_date) {
+							%>
+							<%= ed.title %> at <%= ed.co_name %>
+							<%= ed.start_date%> to <%= ed.end_date %>
+							<%
+						} else if (ed.title) {
+							%><%= ed.title %> at <%= ed.co_name %><%
+						} else if(ed.start_date) {
+							%>
+							<%= ed.co_name %>
+							<%= ed.start_date%> to <%= ed.end_date %>
+							<%
+						} else {
+							%><%= ed.co_name %><%
+						}
+						%></a></li><%
+					});
+
+					// EXPERIENCE: (orgs)
+					var counter = 0;
+					%></ul><h5>Experience: </h5><ul><%
+					_.each(org_list, function(org) {
+						%><li class="<%=id%>-list indent"  onmouseover="timeline_hover_in(this, <%=counter%>)" onmouseout="timeline_hover_out(this, <%=counter%>)"><div onclick="positionClicked('<%=id%>-list', <%=counter%>)"><%
+						if(org.title) {
+							%>
+							<span class="timeline-header">
+							<span class="timeline-title"><%= org.title %></span>
+							at
+							<span class="timeline-co_name"><%= org.co_name %></span>
+							</span><%
+						} else %><span class="timeline-header"><span class="timeline-co_name"><%= org.co_name %></span></span><%
+
+						// DESCRIPTION:
+						// Note that display:none needed for the js toggling to work. It's a hack
+						%></div><div class="timeline-description <%=id%>-description" style="display:none"><div onclick="positionClicked('<%=id%>-list', <%=counter%>)"><%
+							if (org.start_date) {
+								%>
+									<span class="timeline-description-header">Duration: </span>
+									<span class="timeline-dates"><%=org.start_date%> to <%=org.end_date%></span>
+								<%
+							}
+							%><br/><%
+
+							if (org.description) {
+								%>
+									<span class="timeline-description-header">More Information: </span>
+									<p><%=org.description%></p>
+								<%
+							}
+							%>
+							</div>
+								<div class="btn btn-small save-position-btn" onclick="open_saved_paths(saved_path_list, this.parentNode, <%=org.id%>)">
+									Save this position!
+								</div>
+							</div>
+						</li><%
+						counter++;
+					});		
+					%></dl><%
+
+					// Ensure timeline will fit
+					var compress_timeline = false
+					if (org_list.total_time > upper_timeline_limit) {
+						compress_timeline = true
+						// console.log("Compressing timeline. Was: " + org_list.total_time + " is: " + org_list.total_time/2)
+						org_list.total_time = Math.ceil(org_list.total_time / 2)
+					}
+
+					// TIMELINE VIEW
+					%><table class='timeline'><%
+					_.each(org_list, function(org) {
+						%><tr class="timeline-row"><%
+
+						lower_bound = months_difference(org_list.start_mo, org_list.start_yr, parse(org.start_date.substring(0,2)), parseInt(org.start_date.substring(3)), compress_timeline, "lower")
+						if (org.end_date != "Current") {
+						upper_bound = months_difference(org_list.start_mo, org_list.start_yr, parseInt(org.end_date.substring(0,2)), parseInt(org.end_date.substring(3)), compress_timeline, "upper")
+						} else upper_bound = org_list.total_time
+
+						// Essentially, create a td for each month for each position. If the month was part of the position's
+						// lifespan, then it is colspanned.
+						// Note: this will break if org.title is empty
+						var pass_counter = 0
+						for (var i=0; i<=org_list.total_time;i++) {
+							if (i == lower_bound) {
+								%>
+								<td class="timeline-col-highlighted <%=id%>-timeline" title="<%=org.title%>" colspan="<%=upper_bound - lower_bound%>">
+									<%=org.co_name%>
+								</td>
+								<%
+								pass_counter = upper_bound - lower_bound
+							}
+							else if (pass_counter == 0){
+								%><td class="timeline-col"></td><%
+							} else {
+								pass_counter--;
+							}
+						}
+						%></tr><%
+					});
+
+					// Bottom row w/ start & end dates
+					%>
+					<tr class="timeline-row-bottom">
+						<td class="timeline-col-start" colspan="<%=Math.floor(org_list.total_time / 2)%>"><%=org_list.start_mo%>/<%=org_list.start_yr%></td>
+						<td class="timeline-col-end" colspan="<%=Math.floor(org_list.total_time)%>">Present</td>
+					</tr>
+					</table>
+					<%
+				} %>
+				</div>
+				<div class="path-viz-long" style="display:none;">
+				</div>
+		</div>
+	</li>
+
+</script>
+
+<script type="text/template" id="path-single-viz-template">
+	<div class="path-viz-timeline">
+		<div class="path-viz-timeline-left"></div>
+		<div class="path-viz-timeline-center"></div>
+		<div class="path-viz-timeline-right"></div>
+		<% if (positions != null) {
+			var $pathLeft = $("div.path-viz-timeline-left");
+			var $pathCenter = $("div.path-viz-timeline-center");
+			var $pathRigth = $("div.path-viz-timeline-right");
+			var length = _.size(positions);
+			var i = 0;
+			_.each(positions,function(pos) { %>
+				// render position
+				var renderedPos = 0;
+
+				// test if even
+				if (i % 2 == 0) {
+					$pathRight.append()
+				} else {
+
+				}
+				<div class="path-viz-row">
+					<div class="path-viz-sep-circle pull-left"></div>
+					<div class="path-viz-pos pull-left"><%= pos.co_name %></div>
+					<div class="clearfix"></div>
+				</div>
+				<% if (i <= length) { %>
+				<div class="path-viz-row">
+					<div class="path-viz-sep-line pull-left"></div>
+					<div class="clearfix"></div>
+				</div>
+				<% }
+				i++; 
+			});
+		} %>
+	</div>
+</script>
+
+<script type="text/template" id="path-list-template">
+	<!--<div class="main-header pull-left">Career Paths</div><div class="pull-right btn-group disabled"><button class="btn-small">Paths</button><button class="btn-small">Companies</button></div>-->
+	<div class="main-header pull-left">Career Paths</div>
+	<div class="search-view pull-right">Search: 
+		<ul class="search-view-links inline">
+			<li><a href="/search/#companies/">companies</a></li>
+			<li><a href="/search/#careers/">careers</a></li> 
+		</ul>
+	</div>
+	<div class="clearfix"></div>
+	<ul class="path-list"></ul>
+</script>
+
+<script type="text/template" id="org-single-template">
+	<li class="list-preview">			
+		<div class="left-list-preview">
+			<% if (images__logo != null) { %>
+			<div class="img-holder">
+				<img class="logo-preview" src="/media/<%= images__logo %>" />&nbsp;
+			</div>
+			<% } %>
+		</div>
+		
+		<div class="right-list-preview"
+			<span class="company-header"><%= name %></span><br/>
+			<p><%= summary %></p>
+		</div>
+		<div class="clear"></div>
+	</li>
+</script>
+
+<script type="text/template" id="org-list-template">
+	<div class="main-header pull-left">Companies</div>
+	<div class="search-view pull-right">Search: 
+		<ul class="search-view-links inline">
+			<li><a href="/search/#paths/">paths</a></li>
+			<li><a href="/search/#careers/">careers</a></li> 
+		</ul>
+	</div>
+	<div class="clear"></div>
+	<ul class="org-list"></ul>
+</script>
+
+<script type="text/template" id="search-header-template">
+	<!--<div class="search-form-header sidebar-header">
+		 Refine Your Search
+	</div>--> 
+	<div class="search-control pull-right">
+		<a title="minimize filters" class="search-control-close"><i class="icon-chevron-left"></i></a>
+		<a style="display:none;" title="show filters" class="search-control-open"><i class="icon-chevron-right"></i></a>
+	</div>
+</script>
+
+<script type="text/template" id="search-module-template">
+	<div class="search-form-module">
+		<p class="form-header"><%= category %></p>
+		<ul class="filters-list"></ul>
+	</div>
+</script>
+
+<script type="text/template" id="search-filters-template">
+	<label class="checkbox">
+		<input <% if (selected == true) { %> checked=checked <% } %> name="<%= category %>-filters" class="input-search-filter" type="checkbox" value="<%= value %>"><%= name %> <% if (count != null) {%> (<%= count %>) <% }%></option>
+	</label>
+</script>
+
+
+
+{% endblock %}
+
