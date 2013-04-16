@@ -515,6 +515,7 @@ div#v5-container {
 }
 
 div.v5-button {
+	width:220px;
 	margin-bottom:50px;
 	margin-top:25px;
 	padding-top:10px;
