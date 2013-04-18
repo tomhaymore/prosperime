@@ -1406,7 +1406,7 @@ class CareerImportBase():
 			ipos.save()
 			for c in i['careers']:
 				career = Career.objects.get(pk=c)
-				ipos.careers.add()
+				ipos.careers.add(career)
 			ipos.save()
 			print "Added " + ipos.title
 
