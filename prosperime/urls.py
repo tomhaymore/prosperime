@@ -2,8 +2,8 @@ from django.conf.urls.defaults import patterns, include, url
 from django.conf import settings
 
 # Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+from django.contrib import admin
+admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
@@ -30,7 +30,7 @@ urlpatterns = patterns('',
     url(r'^discover/career/(\d+)/$','careers.views.discover_career'),
     url(r'^discover/career/(\d+)/orgs/$', 'careers.views.discover_career_orgs'),
     url(r'^discover/career/(\d+)/positions/$', 'careers.views.discover_career_positions'),
-    url(r'^discover/position/(\d+)/$','careers.views.discover_position'),
+    # url(r'^discover/position/(\d+)/$','careers.views.discover_position'),
     url(r'^search/','entities.views.search'),
     url(r'^companies/','entities.views.companies'),
     url(r'^filters/','entities.views.filters'),
@@ -96,7 +96,7 @@ urlpatterns = patterns('',
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', include(admin.site.urls)),
 )
 
 if not settings.DEBUG:

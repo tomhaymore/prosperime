@@ -86,7 +86,8 @@ def build(request):
 def plan(request,id=None):
 	# check to see if viewing a specific position
 	from careers.positionlib import IdealPositionBase
-
+	if request.GET.getlist('ideal'):
+		id = IdealPosition.objects.filter(title=request.GET['ideal'])[0].id
 	if id:
 		ideal_pos = IdealPosition.objects.get(pk=id)
 
@@ -1046,7 +1047,7 @@ def idealPositionAutocomplete(request):
 		'suggestions':suggestions,
 	}
 
-	return HttpResponse(simplejson.dumps(response))
+	return HttpResponse(json.dumps(response))
 
 
 ## Autocomplete for industries, used in What Next?
@@ -1304,26 +1305,39 @@ def get_next_build_step(request):
 		# initiate array for next positions
 		pos = []
 		# reduce GET to variable
-		# start_ideal_id = request.GET.getlist('ideal_id')[0]
+		
 		start_ideal_id = request.GET.getlist('id')[0]
 		start_pos_id = request.GET.getlist('pos_id')[0]
 
+		# get ideal position object
+		ideal_pos = IdealPosition.objects.get(pk=start_ideal_id)
+
 		# get all user positions of users that have had this ideal position
-		users = User.objects.values('id','positions__id','positions__ideal_position_id','positions__title','positions__entity__name','positions__type').filter(positions__ideal_position_id=start_ideal_id).order_by('-positions__start_date').distinct()
+		users = User.objects.values('id','positions__id','positions__type','positions__degree','positions__ideal_position_id','positions__ideal_position__level','positions__title','positions__entity__name','positions__type').filter(positions__ideal_position_id=start_ideal_id).order_by('-positions__start_date').distinct()
 		
 		# loop through
 		for u in users:
+			
+			# filter out various ineligible positions
+			print str(u['positions__ideal_position__level']) + ":" + str(ideal_pos.level)
+			if u['positions__ideal_position__level'] and int(u['positions__ideal_position__level']) < int(ideal_pos.level):
+				print "same ideal pos level @ build"
+				continue
+			if u['positions__type'] == 'education' and u['positions__degree'] is None:
+				continue
 			# if u['positions__type'] is not "education" and u['positions__title'] is not "Student":
 				# # print u['positions__ideal_position_id']
 				# print "'" + u['positions__title'] + "'"
 			if u['id'] in next and u['id'] not in finished and int(u['positions__id']) != int(start_pos_id):
-				
 				pos.append({'pos_id':u['positions__id'],'ideal_id':u['positions__ideal_position_id'],'title':u['positions__title'],'entity_name':u['positions__entity__name']})
 				finished.append(u['id'])
 			if u['positions__ideal_position_id'] == int(start_ideal_id):
-				print 'match'
+				# print 'match'
 				next.append(u['id'])
-
+			# set career flag
+			prev_career = None
+			# add to processed positions array
+			
 		pos = pos[:5] # limit responses to 5
 
 		return HttpResponse(json.dumps(pos))

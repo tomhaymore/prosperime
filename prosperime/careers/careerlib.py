@@ -1401,6 +1401,8 @@ class CareerImportBase():
 			ipos.matches = json.dumps(i['matches'])
 			if 'level' in i:
 				ipos.level = i['level']
+			else:
+				ipos.level = 1
 			ipos.save()
 			for c in i['careers']:
 				career = Career.objects.get(pk=c)

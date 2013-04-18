@@ -22,6 +22,9 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+
+AWS_STORAGE_BUCKET_NAME = 'prosperme_images'
 # LI callback
 LI_CALLBACK = "http://www.prosperime.com/account/authenticate"
 
@@ -108,6 +111,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
+STATICFILES_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '4d=rkr6)pb43q@4bsy34e-8of7s4%4wm@#ds6^pf7xx6fwc*b$'
@@ -156,6 +160,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'entities',
     'accounts',
+    'storages',
     # 'kombu.transport.django',
     'djcelery',
     # 'saved_paths',

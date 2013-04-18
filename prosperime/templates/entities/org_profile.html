@@ -1,0 +1,33 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+<!-- Head -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/viz.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/drag_and_drop.js"></script>
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/profile.css" />
+{% endblock %}
+
+
+
+<!-- Content -->
+{% block content %}
+
+
+<!-- Header -->
+<div class="main-container content-container">
+	<p class="main-header">Profile: <span class="splash-slug">{{org.name}}</span></p>
+	<p class="main-sub-header">{{org.summary}}</p>
+
+
+<!-- Center --> 
+	<div class="profile-container">
+	</div>
+		
+<script type="text/javascript">
+
+
+</script>
+
+{% endblock %}
+
+
