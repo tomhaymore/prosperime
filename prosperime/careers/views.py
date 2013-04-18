@@ -1321,7 +1321,7 @@ def get_next_build_step(request):
 		for u in users:
 			
 			# filter out various ineligible positions
-			if u['positions__ideal_position__level'] is not None and is_ed and int(u['positions__ideal_position__level']) == int(ideal_pos.level):
+			if u['positions__ideal_position__level'] is not None and is_ed is True and int(u['positions__ideal_position__level']) == int(ideal_pos.level):
 				print "same level ed @ build"
 				continue
 			if u['positions__ideal_position__level'] and int(u['positions__ideal_position__level']) < int(ideal_pos.level):
