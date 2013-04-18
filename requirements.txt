@@ -1,4 +1,3 @@
-BeautifulSoup==3.0.8.1
 Django==1.4.2
 PIL==1.1.7
 South==0.7.6
