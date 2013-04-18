@@ -71,7 +71,7 @@
 				{% if goal_positions %}
 					{% for pos in goal_positions %}
 						<tr>
-							<td><a href="/{{pos.id}}">{{pos.title}}</a></td>
+							<td><a href="{{pos.ideal_position.id}}">{{pos.position.title}}</a></td>
 						</tr>
 					{% endfor %}
 				{% else %}
