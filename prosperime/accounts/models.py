@@ -94,7 +94,12 @@ class Profile(models.Model):
 
     ### Helpers ###
     def full_name(self):
-        full_name = self.first_name + " " + self.last_name
+        if self.first_name and self.last_name:
+            full_name = self.first_name + " " + self.last_name
+        elif self.first_name:
+            full_name = self.first_name
+        else:
+            full_name = self.last_name
         return full_name
 
     def std_name(self):
