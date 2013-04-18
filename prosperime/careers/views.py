@@ -1317,8 +1317,11 @@ def get_next_build_step(request):
 		
 		# loop through
 		for u in users:
+			
 			# filter out various ineligible positions
-			if u['positions__ideal_position__level'] and int(u['positions__ideal_position__level']) < ideal_pos.level:
+			print str(u['positions__ideal_position__level']) + ":" + str(ideal_pos.level)
+			if u['positions__ideal_position__level'] and int(u['positions__ideal_position__level']) < int(ideal_pos.level):
+				print "same ideal pos level @ build"
 				continue
 			if u['positions__type'] == 'education' and u['positions__degree'] is None:
 				continue
@@ -1329,9 +1332,12 @@ def get_next_build_step(request):
 				pos.append({'pos_id':u['positions__id'],'ideal_id':u['positions__ideal_position_id'],'title':u['positions__title'],'entity_name':u['positions__entity__name']})
 				finished.append(u['id'])
 			if u['positions__ideal_position_id'] == int(start_ideal_id):
-				print 'match'
+				# print 'match'
 				next.append(u['id'])
-
+			# set career flag
+			prev_career = None
+			# add to processed positions array
+			
 		pos = pos[:5] # limit responses to 5
 
 		return HttpResponse(json.dumps(pos))
