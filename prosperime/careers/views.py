@@ -1324,10 +1324,10 @@ def get_next_build_step(request):
 			
 			# filter out various ineligible positions
 			if u['positions__ideal_position__level'] is not None and is_ed is True and int(u['positions__ideal_position__level']) == int(ideal_pos.level):
-				print "same level ed @ build"
+				# print "same level ed @ build"
 				continue
 			if u['positions__ideal_position__level'] and int(u['positions__ideal_position__level']) < int(ideal_pos.level):
-				print "same ideal pos level @ build"
+				# print "same ideal pos level @ build"
 				continue
 			if u['positions__type'] == 'education' and u['positions__degree'] is None:
 				continue
