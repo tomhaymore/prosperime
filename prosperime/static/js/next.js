@@ -271,6 +271,7 @@ $(function(){
 				'padding':3,
 				'top_text_offset':37,
 				'bottom_text_offset':23,
+				'box_style':3,
 			}
 
 			_.each(model.get('people'), function(value, key) {

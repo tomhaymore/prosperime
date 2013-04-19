@@ -433,8 +433,8 @@ var monospaced_timeline = function(constants, positions, el) {
         }
 
         // Create box
-
         switch(box_style) {
+
             // Full Box
             case 1:
                 var position_title_box = paper.path(
@@ -458,6 +458,11 @@ var monospaced_timeline = function(constants, positions, el) {
                     "L" + (x-padding) + ", " + y_1 + " " + 
                     "L" + (x-(width/2)) + ", " + y_1
                 )
+                break;
+
+            case 3:
+                break;
         }
+
     }
 }; 

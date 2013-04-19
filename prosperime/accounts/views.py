@@ -138,13 +138,16 @@ def finish_login(request):
 
 			# check to see if dormant user already exists
 			try: 
-				user = User.objects.get(status="dormant",account__uniq_id=linkedin_user_info['id'])
+				user = User.objects.get(profile__status="dormant",account__uniq_id=linkedin_user_info['id'])
 				existing = True
+				user.profile.status = "active"
+
 			except:
 				# create user
 				user = User.objects.create_user(username,email,password)
 				user.save()
 				existing = False
+				user.profile.status = "active"
 
 			# make sure using right backend
 			request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
@@ -183,6 +186,7 @@ def finish_login(request):
 			else:
 				# create LinkedIn account
 				acct = Account()
+			
 			acct.owner = user
 			acct.access_token = access_token['oauth_token']
 			acct.token_secret = access_token['oauth_token_secret']
@@ -205,7 +209,6 @@ def finish_login(request):
 			}
 
 			#return HttpResponseRedirect('/account/success')
-			# return HttpResponseRedirect('/search')
 			return HttpResponseRedirect('/personalize/careers/')
 	else:
 		form = FinishAuthForm()
@@ -378,7 +381,7 @@ def profile(request, user_id):
 			queue = SavedPath.objects.filter(owner=request.user, title='queue').prefetch_related()
 			queue = _saved_path_to_json(queue[0])
 		except:
-			queue = None
+			queue = []
 
 		# Career Decision Prompt
 		# career_decision = _get_career_decision_prompt_position(top_careers, positions, profile)

@@ -197,6 +197,8 @@ def next(request):
 			cache.set('next_industry_data_'+str(request.user.id)+'_'+str(ind_1),_get_industry_data(ind_1, request),600)
 			data = cache.get('next_industry_data_'+str(request.user.id)+'_'+str(ind_1))
 	
+		## Turn off Cache for dev
+		# data = _get_industry_data(ind_1, request)
 
 		print 'Single Query: ' + str(ind_1)
 		return HttpResponse(simplejson.dumps(data))
