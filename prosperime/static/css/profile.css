@@ -129,6 +129,12 @@ div.profile-brief-info {
 	margin-left: 15px
 }
 
+div.empty-tab {
+	text-align:left;
+	margin-left:25px;
+	font-size:1.2em;
+	line-height:24px;
+}
 
 
 div#career-decision-module {

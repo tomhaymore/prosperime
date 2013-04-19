@@ -473,6 +473,13 @@ $(function(){
 		},
 
 		render: function() {
+
+			// If no queue, return!
+			if (this.collection.models.length == 0) {
+				this.$el.html("<div class='empty-tab'>You haven't indicated interest in any positions... yet.</div>")
+				return this;
+			}
+
 			// Add text to header
 			// $('#queue-header').html('Positions of Interest')
 
@@ -492,15 +499,6 @@ $(function(){
 				// html += collection.create_queue_box(positions[n]['pos_id'], positions[n]['title'], positions[n]['entity_name'])
 			}
 
-			// if (positions.length > 4) {
-			// 		for (var m = 0; m < 4; m++) {
-			// 			collection.queue_indices.push(m)
-			// 			collection.overflow = true
-			// 		}
-			// } else 
-			// 	for (var j = 0; j < positions.length; j++) collection.queue_indices.push(j)
-			
-			// html += '<i class="icon-chevron-right icon-2x profile-chevron" id="queue-chevron-right"></i>'
 			html += "</table>"
 			this.$el.html(html)
 			return this;
