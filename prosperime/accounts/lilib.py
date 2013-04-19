@@ -1164,7 +1164,7 @@ class LIConnections(LIBase):
 
 			if co_uniq_name:
 				co_uniq_name = co_uniq_name.get('href')
-				m = re.search("(?<=\/company\/)([\w-]*)",co_uniq_name)
+				m = re.search("(?<=\/company\/)([\\.&\w-]*)",co_uniq_name)
 				co_uniq_name = m.group(0).strip()
 				# print co_uniq_name
 				# get start and end dates
