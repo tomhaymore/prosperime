@@ -979,7 +979,8 @@ class LIConnections(LIBase):
 					user = self.process_connection_and_create_user(c)
 				
 				# Either way, create the connection object
-				self.add_connection(self.user, user)
+				if user is not None:
+					self.add_connection(self.user, user)
 
 
 
@@ -1027,24 +1028,31 @@ class LIConnections(LIBase):
 
 	def process_connection_and_create_user(self, user_info):
 
+		## Edge case that showed up in production
+		if 'publicProfileUrl' not in user_info:
+			return None
+		
 		## go to purl, parse, create user, profile, return user
 		user = self.process_public_page_full(user_info['publicProfileUrl'], user_info['id'])
 		
-		## Add picture url from user_info b/c not crawlable
-		if 'pictureUrl' in user_info:
-			self.add_profile_pic(user, user_info['pictureUrl'])
+		if user is not None:
+			## Add picture url from user_info b/c not crawlable
+			if 'pictureUrl' in user_info:
+				self.add_profile_pic(user, user_info['pictureUrl'])
 
-		## Create account
-		acct = Account()
-		acct.owner = user
-		acct.service = 'linkedin'
-		acct.uniq_id = user_info['id']
-		if 'publicProfileUrl' in user_info:
-			acct.public_url = user_info['publicProfileUrl']
-		acct.status = "unlinked"
-		acct.save()
+			## Create account
+			acct = Account()
+			acct.owner = user
+			acct.service = 'linkedin'
+			acct.uniq_id = user_info['id']
+			if 'publicProfileUrl' in user_info:
+				acct.public_url = user_info['publicProfileUrl']
+			acct.status = "unlinked"
+			acct.save()
 
-		return user
+			return user
+		else:
+			return None
 
 
 	## V2 CODE TAKES INTO ACCOUNT ADDITIONAL FIELDS
@@ -1053,6 +1061,7 @@ class LIConnections(LIBase):
 		try:
 			html = urllib2.urlopen(url)
 		except:
+			print "ERROR PROCESSING PUBLIC PAGE - HTML OPEN FAILED: " + url
 			return None
 		soup = BeautifulSoup(html)
 
@@ -1190,7 +1199,7 @@ class LIConnections(LIBase):
 				positions.append({'title':title,'co_uniq_name':co_uniq_name,'startDate':start_date,'endDate':end_date,'summary':descr,'isCurrent':current})
 		
 			elif self.logging:
-				print "@extract_pos_from_public_page, no co_uniq_name found, bailint out"
+				print "@extract_pos_from_public_page, no co_uniq_name found, bailing out"
 				
 		return positions
 
