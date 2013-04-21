@@ -1157,6 +1157,8 @@ class CareerMapBase():
 				return True
 			else:
 				return False
+		else:
+			print pos.title + str(ideals)
 
 	def test_position(self,title):
 
