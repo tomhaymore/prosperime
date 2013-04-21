@@ -1146,7 +1146,7 @@ class CareerMapBase():
 											continue
 									if is_match == True:
 										ideals.append(k)	
-										print t + ": " + m['title']						
+										print "Initial match: " + t + ": " + m['title']						
 		
 		if not test:
 			if ideals:
@@ -1158,7 +1158,7 @@ class CareerMapBase():
 			else:
 				return False
 		else:
-			print pos.title + str(ideals)
+			print "Final match: " + pos.title + str(ideals)
 
 	def test_position(self,title):
 
