@@ -1130,24 +1130,46 @@ class CareerMapBase():
 							for m in v:
 								# initiate flag to test for match
 								is_match = False
-								# check to see if text matches
-								if t == m['title'] and k not in ideals:
-									is_match = True
-									# ideals.append(k)
-									# check for industry qualifiers
-									if 'industries' in m and industries is not None:
-										if m['industries']:
-											if not (set(industries) & set(m['industries'])):
+								# check if it's a wild match
+								if m['type'] == 'wild':
+									# check for regex match with wild token
+									p = re.compile(r"\b%s\b"%m['token'],flags=re.IGNORECASE)
+									match = re.search(p,t)
+									# check to see if the token matches and the base string is in the title
+									if m['title'] in t and match:
+										is_match = True
+										if 'industries' in m and industries is not None:
+											if m['industries']:
+												if not (set(industries) & set(m['industries'])):
+													is_match = False
+													continue
+										# check for entity qualifiers
+										if 'entities' in m:
+											if pos.entity.id not in m['entities']:
 												is_match = False
 												continue
-									# check for entity qualifiers
-									if 'entities' in m:
-										if pos.entity.id not in m['entities']:
-											is_match = False
-											continue
-									if is_match == True:
-										ideals.append(k)	
-										print "Initial match: " + t + ": " + m['title']						
+										if is_match == True:
+											ideals.append(k)	
+											print "Initial match: " + t + ": " + m['title']		
+								# check to see if text matches
+								else:
+									if t == m['title'] and k not in ideals:
+										is_match = True
+										# ideals.append(k)
+										# check for industry qualifiers
+										if 'industries' in m and industries is not None:
+											if m['industries']:
+												if not (set(industries) & set(m['industries'])):
+													is_match = False
+													continue
+										# check for entity qualifiers
+										if 'entities' in m:
+											if pos.entity.id not in m['entities']:
+												is_match = False
+												continue
+										if is_match == True:
+											ideals.append(k)	
+											print "Initial match: " + t + ": " + m['title']						
 		if ideals:
 			# fetch all matched ideal positions, sorted by length of title
 			ideals_objects = IdealPosition.objects.filter(pk__in=ideals).extra(order_by=[len("title")])
