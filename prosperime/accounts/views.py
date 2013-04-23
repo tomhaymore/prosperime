@@ -146,14 +146,26 @@ def finish_login(request):
 				# create user
 				user = User.objects.create_user(username,email,password)
 				user.save()
+				user.set_password(password)
+				user.username = username
+				user.save()
 				existing = False
 				user.profile.status = "active"
+				user.profile.save()
 
-			# make sure using right backend
-			request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
+			
 			# log user in
 			user = authenticate(username=username,password=password)
+			# make sure using right backend
+			request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
 			# make sure authentication worked
+			if user is not None:
+				auth_login(request,user)
+			else:
+				# try logging in now with LinkedIn
+				request.session['_auth_user_backend'] = 'prosperime.accounts.backends.LinkedinBackend'
+				user = authenticate(acct_id=linkedin_user_info['id'])
+				
 			if user is not None:
 				auth_login(request,user)
 			else:
