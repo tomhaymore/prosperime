@@ -11,13 +11,18 @@
 {% block content %}
 
 <div id="splash-home">
+
 	<div class="span10 offset1">
 		<p class="splash-message-header">Don't just work, prosper!</p>
 		<p class="splash-message-subheader">Prosperime helps you discover actual career paths from real people in your network.</p>
-		<p class="text-center splash-submessage"><a class="flat-button green-button center" href="/account/authorize">Get started</a></p>
-		<p class="text-center splash-submessage"><a class="left-spacer center" href="/account/login">Already registered?</a></p>
-		
+		<p class="text-center splash-submessage no-hover">
+			<a id="get-started-button" class="flat-button green-button center" href="/account/authorize">Get started</a>
+		</p>
+		<!-- <p class="text-center splash-submessage">
+			<a class="left-spacer center" href="/account/login">Already registered?</a>
+		</p>	 -->
 	</div>
+
 	<div class="clear"></div>
 
 </div>
@@ -28,14 +33,14 @@
 	<div id="promo-message-inner">
 			<div class="third-container pull-left">
 				<div class="v5-header"><a href="/build/">Build</a></div>
-				<div class="v5-text">Build your career step-by-step and see what possibilities each new job opens up</div>
+				<div class="v5-text">Build your career step-by-step and see what possibilities each new job opens up.</div>
 				<div class="flat-button v5-button"><a href="/build/">Start Building</a></div>
 			</div>
 
 			<!-- Plan -->
 			<div class="third-container pull-left">
 				<div class="v5-header"><a href="/profile/{{user.id}}/">Plan</a></div>
-				<div class="v5-text">Pick your ideal job and see how others have achieved it and how you can reach the same goal</div>
+				<div class="v5-text">Pick your ideal job, see how others have gotten there, and learn what steps you can take to reach your goal.</div>
 				<div class="flat-button v5-button"><a href="/plan/">Start Planning</a></div>
 			</div>
 		
@@ -43,7 +48,7 @@
 			<!-- Next -->
 			<div class="third-container pull-left">
 				<div class="v5-header"><a href="/next/#?i1={{industry}}/">Next</a></div>
-				<div class="v5-text">See the tried and true options for switching from your current industry to another</div>
+				<div class="v5-text">See the tried and true options for switching from your current industry to another.</div>
 				<div class="flat-button v5-button"><a href="/next/#?i1={{industry}}">What's Next</a></div>
 			</div>
 			<div class="clear"></div>

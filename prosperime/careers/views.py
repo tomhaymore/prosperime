@@ -25,7 +25,7 @@ from django.db.models import Count, Q
 
 def home(request):
 	if not request.user.is_authenticated():
-		return HttpResponseRedirect('welcome')
+		return HttpResponseRedirect('/welcome/')
 	data = {}
 	user = request.user
 
@@ -205,7 +205,7 @@ def next(request):
 
 	## Plain Page ##
 	else:
-		return render_to_response('careers/next.html',data,context_instance=RequestContext(request))
+		return render_to_response('careers/next_v2.html',data,context_instance=RequestContext(request))
 
 
 # constructs the return data structure for a single industry view

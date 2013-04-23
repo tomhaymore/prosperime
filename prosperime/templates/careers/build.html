@@ -310,7 +310,6 @@
 	var get_and_render_options = function(ideal_id,pos_id) {
 
 		options = get_options(ideal_id,pos_id)
-		console.log("Rendering: ")
 		console.log(options)
 		render_options(options)
 
@@ -346,7 +345,7 @@
 			option_dot.data("entity_text_id", option_entity_name.id)
 			option_dot.data("pos_id", options[i].pos_id)
 			option_dot.data("ideal_id", options[i].ideal_id)
-			console.log(option_dot.data("ideal_id"))
+
 			// Update data structure
 			options_data.push({'dot_id':option_dot.id, 'position_id':options[i].id, 'title_text_id': option_title.id, 'entity_text_id': option_entity_name.id})
 

@@ -4,7 +4,8 @@
 }
 
 .header {
-	font-size:1.6em;
+	font-size:1.8em;
+	line-height:28px;
 	border-bottom:1px solid midnightblue;
 	padding:15px;
 	max-width:100px;
@@ -14,8 +15,9 @@
 
 
 .content {
-	margin-top:25px;
-	line-height:25px;
+	margin-top:28px;
+	line-height:28px;
+	font-size:1.2em;
 }
 
 .main-container {
@@ -23,12 +25,13 @@
 }
 
 .name {
-	font-weight:600;
-	display:inline-block;
+	font-weight:700;
+	margin-bottom:15px;
 }
 
 .description {
 	display:inline-block;
+	font-weight:200;
 }
 
 .dummy {
