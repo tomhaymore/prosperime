@@ -112,9 +112,7 @@ $(document).ready(function() {
 			if (data["success"] == true) {
 				// check to see what page we're on; redirect to next personalization page or back to home
 
-				// EDIT: Actually, let's redirect to the proper 'what's next' page if the user has a current industry
-				if (data['industries']) window.location = "/next/#?i1=" + data['industries']
-				else window.location = "/home";
+				window.location = "/"
 			} else {
 				var warning = "<div id='messages'>";
 				warning += "<ul class='messages'>";

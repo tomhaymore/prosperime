@@ -325,7 +325,7 @@ def profile(request, user_id):
 
 	user = User.objects.get(id=user_id)
 	if user.profile.status == "dormant":
-		HttpResponseRedirect("/home")
+		HttpResponseRedirect("/home/")
 	profile = user.profile
 	profile_pic = user.profile.default_profile_pic()
 	
@@ -719,6 +719,9 @@ def _ideal_position_to_json(position):
 # Takes a queryset of user's positions and returns 
 #	information needed for timeline creation
 def _prepare_positions_for_timeline(positions):
+
+	if len(positions) == 0:
+		return [], None, None, None, None
 
 	formatted_positions = []
 	current = None
