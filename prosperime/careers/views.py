@@ -25,7 +25,7 @@ from django.db.models import Count, Q
 
 def home(request):
 	if not request.user.is_authenticated():
-		return HttpResponseRedirect('welcome')
+		return HttpResponseRedirect('/')
 	data = {}
 	user = request.user
 
