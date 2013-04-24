@@ -282,9 +282,6 @@ $(function(){
 
 			});
 
-		
-
-
 			return this;
 		},
 
@@ -310,6 +307,70 @@ $(function(){
 	});
 
 
+	window.DotLvl1View = Backbone.View.extend({
+
+		el:$('#search-results-container'),
+
+
+		initialize: function() {
+			_.bindAll(this,'render', 'industryClicked', 'back');
+			this.collection.on('change', this.render, this);
+			this.collection.on('reset',this.render, this);
+
+		},
+
+		render: function() {
+			console.log(this.collection)
+			render_dot_lvl1_viz(this.collection, this.industryClicked)
+		},
+
+		back: function(data, dot, paper) {
+
+			// First, delete existing stuff
+			var paperDom = paper.canvas;
+    		paperDom.parentNode.removeChild(paperDom); // From StackOverflow... 
+    		paper.remove()
+    		dot_ids.length = 0
+
+			// Then, re-draw...
+			//	TODO: fix - this hits HTTP (although cached), not needed
+			window.changes.fetch()
+		},
+
+		industryClicked:function(i2_data, dot_clicked, paper) {
+
+			// First, delete all other options
+			for (var j = 0; j < dot_ids.length; j++) {
+				if (dot_ids[j] != dot_clicked.id) {
+					// Delete line, number, label, then dot
+					var dot = paper.getById(dot_ids[j])
+					paper.getById(dot.data("line_id")).remove()
+					paper.getById(dot.data("label_id")).remove()
+					paper.getById(dot.data("number_id")).remove()
+					dot.remove()
+				} else {
+					// Delete line, label
+					paper.getById(dot_clicked.data("line_id")).remove()
+					paper.getById(dot_clicked.data("label_id")).remove()
+				}
+			};
+
+			// Reset dot_ids to only include chosen dot
+			// NOTE: may be faster and hide and move rather than delete and redraw
+			dot_ids = [dot_clicked.id]
+
+			// Next, animate chosen industry to other side
+			animate_clicked_dot(dot_clicked, paper, i2_data[0], this.back)
+
+			// Finally, connect dots
+			draw_lvl2_connections(i2_data, paper)
+		},
+
+	
+
+	});
+
+
 	//---------------//
 	// ** Routers ** //
 	//---------------//
@@ -323,6 +384,7 @@ $(function(){
 
 		initialize: function() {
 			this.changes = window.changes;
+
 		},
 
 		empty: function() {
@@ -331,12 +393,14 @@ $(function(){
 
 		singleQuery: function(query) {
 			console.log('single query: ' + query)
-			this.filterView = new FiltersView({collection:this.changes})
-			this.lvl1view = new Lvl1View({collection:this.changes})
+			// this.filterView = new FiltersView({collection:this.changes})
+			// this.lvl1view = new Lvl1View({collection:this.changes})
 
-			// Keep this call last
-			this.headerview = new HeaderView({collection:this.changes})
+			// // Keep this call last
+			// this.headerview = new HeaderView({collection:this.changes})
 
+
+			this.dot1View = new DotLvl1View({collection:this.changes})
 			this.changes._meta['q1'] = query
 			this.changes._meta['q2'] = null
 			this.changes.fetch()
@@ -347,7 +411,6 @@ $(function(){
 			console.log('double query: ' + q1 + ' ' + q2)
 
 			if (q2 == 'undefined') {
-				console.log('here')
 				App.history.back()
 				App.history.back()
 				return
@@ -360,9 +423,6 @@ $(function(){
 			this.changes.fetch()
 
 		},
-
-		
-		
 	});
 
 
@@ -372,6 +432,215 @@ $(function(){
 	// window.App = new SavedPathRouter({pushState:true});
 	Backbone.history.start();
 });
+
+
+/* Constants */
+var start_dot_r = 50
+var paper_w = 1000
+var paper_h = 400
+var midline = paper_h / 2
+var max_r = get_max_radius()
+var y_range = paper_h - (2 * max_r) // set in helpers.js = 50
+var y_max = y_range / 2
+var y_offset = Math.ceil(y_range/4)
+var text_buffer = 15
+var start_x = 150
+var options_x = 400
+var max_options = 5 // max # industries to show
+var max_names = 3 // max # names of related people to show
+var i2_x = 825
+var header_y = 25
+var l2_line_length = 25
+var l2_p1 = start_x+200
+var l2_p2 = i2_x-200
+
+/* Containers */
+var dot_ids = []
+
+/* Attributes */
+var chosen_dot_attributes = {
+	'fill':'rgb(41,98,152)',
+	'stroke-width':0,
+	'cursor':'pointer'
+};
+
+var option_dot_attributes = {
+	'fill':'#679FD2',
+	'stroke-width':0,
+	'cursor':'pointer'
+};
+
+var number_attributes = {
+	'stroke':'#fffffe',
+	'font-size':14,
+	'cursor':'pointer',
+	'font-fmamily':"'Source Sans Pro', 'Helvetica'"
+}
+
+var label_attributes = {
+	'font-size':24,
+	'font-family':"'Source Sans Pro', 'Helvetica'"
+}
+
+
+var option_label_attributes = {
+	'text-anchor':'start',
+	'font-size':14,
+}
+
+var l2_text_attributes = {
+	'font-size':14,
+	'font-family':'"Source Sans Pro", "Helvetica"',
+	'cursor':'pointer'
+}
+
+
+var render_dot_lvl1_viz = function(collection, clickhandler) {
+
+	var paper = new Raphael('search-results-container',paper_w,paper_h)
+
+
+	// Create paper, sort transitions by num people
+	var data = collection.models[0].attributes
+	transitions = _.sortBy(data['transitions'], function(value) {return -value[1];})
+	var length = (transitions.length > max_options) ? max_options : transitions.length
+
+	for (var i = 0; i < length; i++) {
+		// Calls helper to size dot relative to total_people 
+		var dot_r = size_dot(data['total_people'], transitions[i][1])
+
+		// Construct dot w/ number in the middle
+		var y = midline - y_max + (y_offset * i)
+		var dot = paper.circle(options_x,y,dot_r).attr(option_dot_attributes)
+		var number = paper.text(options_x,y,transitions[i][1]).attr(number_attributes)
+	
+		// Construct line to dot
+		var hinge = (y > midline)? y + 10 : y - 10
+		var line = paper.path("M"+start_x+', '+midline+"Q125, " + hinge  + " " + (options_x-dot_r) + "," + y)
+	
+		// Construct labels of related people
+		var people_keys = Object.keys(transitions[i][2])
+		var names_length = (people_keys.length > max_names) ? max_names : people_keys.length
+		var label_text = transitions[i][0] + "    ("
+		for (var j = 0; j < names_length; j++) {
+			var name = transitions[i][2][people_keys[j]][0]
+			if (j < names_length - 1) label_text += name + ', '
+			else label_text += name + ')'
+		}
+		var label = paper.text(options_x+dot_r+text_buffer, y, label_text).attr(option_label_attributes)
+		
+		// Set click handlers
+		set_click_handlers(dot, number, transitions[i], clickhandler, paper)
+
+		// Set data on dot element, push id to DST
+		dot.data('label_id', label.id)
+		dot.data('number_id', number.id)
+		dot.data('line_id', line.id)
+		dot_ids.push(dot.id)
+	}
+
+	/* Construct SVG for Start Industry Last (highest Z value) */
+ 	var start_dot = paper.circle(start_x,midline,start_dot_r).attr(chosen_dot_attributes)
+	var start_num = paper.text(start_x,midline,data["total_people"]).attr(number_attributes)
+	var start_label = paper.text(start_x,header_y,"From: " +  data["start_name"]).attr(label_attributes)
+};
+
+// Helper method to set click handlers, needed for namespacing issues
+var set_click_handlers = function(dot, number, data, handler, paper) {
+	dot.click(function() {
+		handler(data, dot, paper)
+	});
+	number.click(function() {
+		handler(data, dot, paper)
+	});
+};
+
+// Animates clicked dot to the right side of the screen, increases
+//	its size, changes color, and adds an industry label
+var animate_clicked_dot = function(dot, paper, industry_name, back_handler) {
+	
+	// Animate dot and number
+	paper.getById(dot.data("number_id")).animate({'x':i2_x, 'y':midline}, '2e1')
+	dot.animate({'cx':i2_x, 'cy':midline}, '2e1')
+	dot.attr(chosen_dot_attributes)
+	dot.attr("r",start_dot_r)
+
+	// Create new industry label, add id to dot
+	var industry_label = paper.text(i2_x, header_y, "To: " + industry_name).attr(label_attributes)
+	dot.data("industry_label_id", industry_label.id)
+
+	// ? var back_arrow = paper.path("M"+(i2_x-10)+"," +header_y+" L"+(i2_x-5)+","+(header_y-5)+" L"+(i2_x-5)+","+(header_y+5)).attr({'stroke-width':10});
+
+	// Unbind old click events and bind "back" handler
+	unbind_events(dot)
+	unbind_events(paper.getById(dot.data("number_id")))
+	set_click_handlers(dot, paper.getById(dot.data("number_id")), [], back_handler, paper)
+};
+
+
+var draw_lvl2_connections = function(data, paper) {
+
+	var keys = Object.keys(data[2])
+	var length = (keys.length > 5) ? 5 : keys.length;
+
+	var p1_start = start_x + start_dot_r + l2_line_length
+	var p2_start = i2_x - start_dot_r - l2_line_length
+
+	var line_left = paper.path("M" + (start_x + start_dot_r) + ", " + midline + " L" +p1_start+ ", "+midline)
+	var line_right = paper.path("M" + (i2_x - start_dot_r) + ", " + midline + " L" +p2_start+ ", "+midline)
+
+	// Iterate through, add line segments, dots, and text
+	for (var i = 0; i < length; i++) {
+
+		var transition = data[2][keys[i]]
+		console.log(transition)
+		var y = midline - y_max + (y_offset * i)
+		
+		// TODO: middle line needs to be straight
+		if (y != midline)
+			var hinge = (y > midline)? y + 10 : y - 10
+		else
+			var hinge = midline
+
+
+		var l1 = paper.path("M"+p1_start+', '+midline+" Q" + (p1_start+l2_line_length) + ", " + hinge  + " " + (l2_p1) + "," + y)
+		var node1 = paper.circle(l2_p1, y, 8).attr(option_dot_attributes)
+		var l2 = paper.path("M"+p2_start+", "+midline+" Q"+ (p2_start-l2_line_length)+", "+hinge+" "+(l2_p2)+","+y)
+		var node2 = paper.circle(l2_p2, y, 8).attr(option_dot_attributes)
+		var connector_line = paper.path("M" + (l2_p1 + 8) + ", " + y + " L" + (l2_p2 - 8) + ", " + y)
+	
+		// Start Entity, End Entity, Person Name
+		var node1_text = paper.text(l2_p1, y - 18, transition[1]['start_entity_name']).attr(l2_text_attributes)
+		var node2_text = paper.text(l2_p2, y - 18, transition[1]['end_entity_name']).attr(l2_text_attributes)
+		var connector_text = paper.text((start_x + i2_x) / 2, y+14, transition[0]).attr(l2_text_attributes);
+		
+		var handler = function(id) { window.location="/profile/" + id }
+		set_handlers([node1_text, node2_text, connector_text], handler, keys[i])
+	};
+
+};
+
+// Expects an array of items
+var set_handlers = function(items, handler, data) {
+	console.log('gets here')
+	for (var n = 0; n < items.length; n++) {
+		items[n].click(function() {
+			handler(data)
+		})
+	}
+};
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

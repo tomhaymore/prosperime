@@ -188,6 +188,7 @@ $(function(){
 			if (this.collection.models.length == 0) {
 
 				var newHTML = "Have a dream job? Start your path to the top by entering it below."
+				newHTML += "<br/>&nbsp;&nbsp;&nbsp;Examples: VP of Product, Attorney, Director of Engineering"
 				$('#personalize-goal-positions-prompt').removeClass("personalize").addClass("no-positions").html(newHTML)
 				$('#personalize-goal-positions').show().removeClass("personalize").addClass("no-positions")
 
@@ -315,7 +316,8 @@ $(function(){
 			// If no careers, render differently
 			if (this.collection.models.length == 0) {
 
-				var newHTML = "Want to learn more about a particular career? Start typing below to get more information."
+				var newHTML = "Want to learn more about a particular career? Start typing below to get more information.<br/>"
+				newHTML += "&nbsp; &nbsp; &nbsp;Examples: Civil Engineers, Marketing and Sales Managers, Data Scientists and Analysts"
 				$('#personalize-goal-careers-prompt').removeClass("personalize").addClass("no-positions").html(newHTML)
 				$('#personalize-goal-careers').show().removeClass("personalize").addClass("no-positions")
 
@@ -476,7 +478,7 @@ $(function(){
 
 			// If no queue, return!
 			if (this.collection.models.length == 0) {
-				this.$el.html("<div class='empty-tab'>You haven't indicated interest in any positions... yet.</div>")
+				this.$el.html("<div class='empty-tab'>Head on over to <a href='/build/'>Build</a> to learn about positions relevant to you. </div>")
 				return this;
 			}
 

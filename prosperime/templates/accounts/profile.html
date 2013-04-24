@@ -23,7 +23,7 @@
 	var positions = {{positions|safe}}
 	var total_start_date = "{{start_date|safe}}"
 	var total_end_date = "{{end_date|safe}}"
-	var total_time = {{total_time|safe}}
+	var total_time = "{{total_time}}"
 </script>
 
 <script type='text/javascript' src='{{ STATIC_URL }}js/backbone.js'></script>
@@ -86,11 +86,11 @@ $.ajaxSetup({
 			<img class="logo-preview" src="{{profile.default_profile_pic}}" />
 		</span>
 
-		{% if not is_connected %}
+		<!-- {% if not is_connected %}
 		<div class="pull-right">
 			<span class="flat-button blue-button button-large connect-button" onclick="connect(this, {{profile.id}})">Connect</span>
 		</div>
-		{% endif %}
+		{% endif %} -->
 
 
 		<!-- <p class="main-sub-header">{{profile.headline}}</p> -->
@@ -517,11 +517,13 @@ $.ajaxSetup({
 
 	   
 	    /* Condense the info container if own profile */
-	    if ({{own_profile_javascript}}) {
+	    if ({{own_profile_javascript}} && positions.length > 0) {
 	    	$('#timeline-info-container').addClass("container-condensed")
 	    	$('#timeline-header-container').html("<br/>Hover over one of your positions to see more")
-	    } else {
+	    } else if (positions.length > 0) {
 	    	$('#timeline-header-container').html("<br/><br/>Hover over a position to learn more")
+	    } else {
+	    	$('#timeline-header-container').html("No positions available.")
 	    }
 
 
@@ -645,7 +647,10 @@ $.ajaxSetup({
 		
 
 		var num_positions = positions.length
-		var offset = Math.floor(775/total_time)
+		if (total_time != "None")
+			var offset = Math.floor(775/parseInt(total_time))
+		else
+			var offset = 0
 
 		// // Convenience Print-outs
 		// start date: ' + total_start_date)

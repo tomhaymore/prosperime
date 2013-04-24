@@ -126,7 +126,6 @@ def finish_login(request):
 		form = FinishAuthForm(request.POST)
 		if form.is_valid():
 
-			
 			# grab cleaned values from form
 			username = form.cleaned_data['username']
 			email = form.cleaned_data['email']
@@ -140,7 +139,10 @@ def finish_login(request):
 
 			# check to see if dormant user already exists
 			try: 
+				print 'before try'
 				user = User.objects.get(profile__status="dormant",account__uniq_id=linkedin_user_info['id'])
+				print 'after try'
+				print user
 				existing = True
 				user.profile.status = "active"
 				user.profile.save()
@@ -149,6 +151,7 @@ def finish_login(request):
 				user.save()
 				print "user already exists"
 			except:
+				print 'exception'
 				# create user
 				user = User.objects.create_user(username,email,password)
 				user.save()
@@ -157,7 +160,6 @@ def finish_login(request):
 				user.profile.status = "active"
 				user.profile.save()
 				print "created new user"
-
 			# make sure using right backend
 			request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
 			# log user in
@@ -165,6 +167,7 @@ def finish_login(request):
 			
 			# make sure authentication worked
 			if user is not None:
+				print 'in to auth login'
 				auth_login(request,user)
 			else:
 				# try logging in now with LinkedIn
@@ -177,6 +180,7 @@ def finish_login(request):
 				# somehow authentication failed, redirect with error message
 				messages.error(request, 'Something went wrong. Please try again.')
 				return render_to_response('accounts/finish_login.html',{'form':form},context_instance=RequestContext(request))
+
 
 
 			# update user profile
