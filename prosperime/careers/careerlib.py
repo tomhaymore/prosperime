@@ -1017,6 +1017,7 @@ class CareerMapBase():
 		import string
 		if title:
 			remove_punctuation_map = dict((ord(char), None) for char in string.punctuation)
+			# print remove_punctuation_map
 			# remove all punctuation 
 			# title = title.translate(string.maketrans("",""),string.punctuation)
 			# title = " ".join([w.translate(remove_punctuation_map) for w in title])
@@ -1024,6 +1025,7 @@ class CareerMapBase():
 			tokens = title.split(" ")
 			# reduce all strings to lower case
 			tokens = [t.lower() for t in tokens]
+			# print tokens
 			tokens = [w.translate(remove_punctuation_map) for w in tokens]
 			return tokens
 		return None
@@ -1121,36 +1123,60 @@ class CareerMapBase():
 
 		# loop through ngrams to match
 		if title_ngrams is not None:
-			for t in title_ngrams:
-				if t is not None:
-					# check stop list
-					if t not in self.STOP_LIST:
-						for k,v in self.positions_to_ideals_map.items():
-							# loop through each dict in matches
-							for m in v:
-								# initiate flag to test for match
-								is_match = False
-								# check to see if text matches
-								if t == m['title'] and k not in ideals:
-									is_match = True
-									# ideals.append(k)
-									# check for industry qualifiers
-									if 'industries' in m and industries is not None:
-										if m['industries']:
-											if not (set(industries) & set(m['industries'])):
-												is_match = False
-												continue
-									# check for entity qualifiers
-									if 'entities' in m:
-										if pos.entity.id not in m['entities']:
-											is_match = False
-											continue
-									if is_match == True:
-										ideals.append(k)	
-										print "Initial match: " + t + ": " + m['title']						
+			ideals = self._get_matching_ideals(title_ngrams,industries)
+			# for t in title_ngrams:
+			# 	if t is not None:
+			# 		# check stop list
+			# 		if t not in self.STOP_LIST:
+			# 			for k,v in self.positions_to_ideals_map.items():
+			# 				# loop through each dict in matches
+			# 				for m in v:
+			# 					# initiate flag to test for match
+			# 					is_match = False
+			# 					# check if it's a wild match
+			# 					if 'type' in m: 
+			# 						if m['type'] == 'wild':
+			# 							# check for regex match with wild token
+			# 							p = re.compile(r"\b%s\b"%m['token'],flags=re.IGNORECASE)
+			# 							match = re.search(p,t)
+			# 							# check to see if the token matches and the base string is in the title
+			# 							if m['title'] in t and match:
+			# 								is_match = True
+			# 								if 'industries' in m and industries is not None:
+			# 									if m['industries']:
+			# 										if not (set(industries) & set(m['industries'])):
+			# 											is_match = False
+			# 											continue
+			# 								# check for entity qualifiers
+			# 								if 'entities' in m:
+			# 									if pos.entity.id not in m['entities']:
+			# 										is_match = False
+			# 										continue
+			# 								if is_match == True:
+			# 									ideals.append(k)	
+			# 									print "Initial match: " + t + ": " + m['title']		
+			# 					# check to see if text matches
+			# 					else:
+			# 						if t == m['title'] and k not in ideals:
+			# 							is_match = True
+			# 							# ideals.append(k)
+			# 							# check for industry qualifiers
+			# 							if 'industries' in m and industries is not None:
+			# 								if m['industries']:
+			# 									if not (set(industries) & set(m['industries'])):
+			# 										is_match = False
+			# 										continue
+			# 							# check for entity qualifiers
+			# 							if 'entities' in m:
+			# 								if pos.entity.id not in m['entities']:
+			# 									is_match = False
+			# 									continue
+			# 							if is_match == True:
+			# 								ideals.append(k)	
+			# 								print "Initial match: " + t + ": " + m['title']						
 		if ideals:
 			# fetch all matched ideal positions, sorted by length of title
-			ideals_objects = IdealPosition.objects.filter(pk__in=ideals).extra(order_by=[len("title")])
+			ideals_objects = IdealPosition.objects.filter(pk__in=ideals).extra(order_by=[len("-title")])
 
 		if not test:
 			if ideals_objects:
@@ -1179,6 +1205,72 @@ class CareerMapBase():
 					if t in v:
 						career = Career.objects.get(pk=k)
 						print title + " matches " + career.name
+
+	def _get_matching_ideals(self,title_ngrams,industries):
+		ideals = []
+		if title_ngrams is not None:
+			for t in title_ngrams:
+				# check stop list
+				if t not in self.STOP_LIST:
+					for k,v in self.positions_to_ideals_map.items():
+						# loop through each dict in matches
+						for m in v:
+							# initiate flag to test for match
+							is_match = False
+							# check if it's a wild match
+							if 'type' in m:
+								if m['type'] == 'wild':
+									# check for regex match with wild token
+									p = re.compile(r"\b%s\b"%m['token'],flags=re.IGNORECASE)
+									match = re.search(p,t)
+									# check to see if the token matches and the base string is in the title
+									if m['title'] in t and match:
+										is_match = True
+										if 'industries' in m and industries is not None:
+											if m['industries']:
+												if not (set(industries) & set(m['industries'])):
+													is_match = False
+													continue
+										# check for entity qualifiers
+										if 'entities' in m:
+											if pos.entity.id not in m['entities']:
+												is_match = False
+												continue
+										if is_match == True:
+											ideals.append(k)	
+											print "Initial match: " + t + ": " + m['title']		
+							# check to see if text matches
+							else:
+								if t == m['title'] and k not in ideals:
+									is_match = True
+									# ideals.append(k)
+									# check for industry qualifiers
+									if 'industries' in m and industries is not None:
+										if m['industries']:
+											if not (set(industries) & set(m['industries'])):
+												is_match = False
+												continue
+									# check for entity qualifiers
+									if 'entities' in m:
+										if pos.entity.id not in m['entities']:
+											is_match = False
+											continue
+									if is_match == True:
+										ideals.append(k)	
+										print "Initial match: " + t + ": " + m['title']	
+		return ideals
+
+	def test_match_position_to_ideals(self,title,industries=[]):
+		title_ngrams = self.extract_ngrams(self.tokenize_position(title))
+		ideals = []
+		ideals.extend(self._get_matching_ideals(t,industries))
+
+		if ideals:
+			# fetch all matched ideal positions, sorted by length of title
+			ideals_objects = IdealPosition.objects.filter(pk__in=ideals).extra(order_by=[len("-title")])
+			return ideals_objects
+		else:
+			return 'no match'
 
 	def test_match_careers_to_position(self,title=None):
 

@@ -1,3 +1,5 @@
+# from prospere
+from accounts.models import Account
 # from Django
 from django.test import TestCase
 from django.utils import unittest
@@ -10,7 +12,6 @@ class AuthTest(TestCase):
 	from django.test.client import Client
 	# instantiate client
 	c = Client()
-	
 
 	def test_standard_auth(self):
 		# create new user
@@ -21,20 +22,22 @@ class AuthTest(TestCase):
 			result = True
 		self.assertEqual(result,True)
 
-	# def test_dup_usernames(self):
-	# 	# set flag to false
-	# 	error_ocurred = False
-	# 	# create new user with duplicate username
-	# 	try:
-	# 		result = User.objects.create_user(username="ahamilton",password="gwashington")
-	# 	except IntegrityError:
-	# 		error_ocurred = True
-	# 	self.assertTrue(error_ocurred)
+	def test_linkedin_auth(self):
+		# create new user
+		default_user = User.objects.create_user(username="ahamilton",password="aburr")
+		# add LI info
+		acct = Account(owner=default_user,service="linkedin",uniq_id="1e3r5y78i!")
+		acct.save()
+		# test auth
+		result = self.c.login(acct_id=acct.uniq_id)
+		if result is not None:
+			result = True
+		self.assertEqual(result,True)
 
 	def test_auth_form(self):
 		# create new user
 		default_user = User.objects.create_user(username="ahamilton",password="aburr")
-		
+
 		# ensure that empty form is rejected
 		resp = self.client.post('/account/finish/')
 		self.assertEqual(resp.status_code,200)
@@ -51,11 +54,4 @@ class AuthTest(TestCase):
 		self.assertEqual(resp.context['form']['email'].errors,['Enter a valid e-mail address.'])
 
 
-		
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.assertEqual(1 + 1, 2)

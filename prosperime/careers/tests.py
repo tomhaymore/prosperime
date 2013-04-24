@@ -23,6 +23,7 @@ class IdealPositionTest(TestCase):
 		for p in positions:
 			if self.careerlib.match_position_to_ideals(p):
 				matches = True
+				break
 		self.assertTrue(matches)
 
 
