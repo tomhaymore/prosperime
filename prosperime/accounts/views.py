@@ -143,23 +143,26 @@ def finish_login(request):
 				user = User.objects.get(profile__status="dormant",account__uniq_id=linkedin_user_info['id'])
 				existing = True
 				user.profile.status = "active"
-
+				user.profile.save()
+				user.set_password(password)
+				user.username = username
+				user.save()
+				print "user already exists"
 			except:
 				# create user
 				user = User.objects.create_user(username,email,password)
 				user.save()
-				user.set_password(password)
-				user.username = username
-				user.save()
+				
 				existing = False
 				user.profile.status = "active"
 				user.profile.save()
+				print "created new user"
 
-			
-			# log user in
-			user = authenticate(username=username,password=password)
 			# make sure using right backend
 			request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
+			# log user in
+			user = authenticate(username=username,password=password)
+			
 			# make sure authentication worked
 			if user is not None:
 				auth_login(request,user)
@@ -173,7 +176,7 @@ def finish_login(request):
 			else:
 				# somehow authentication failed, redirect with error message
 				messages.error(request, 'Something went wrong. Please try again.')
-				return render_to_response('accounts/finish_login.html',{'form':form,'error_message':error_message},context_instance=RequestContext(request))
+				return render_to_response('accounts/finish_login.html',{'form':form},context_instance=RequestContext(request))
 
 
 			# update user profile
