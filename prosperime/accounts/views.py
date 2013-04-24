@@ -120,14 +120,10 @@ def linkedin_authenticate(request):
 def finish_login(request):
 	# TODO: redirect if not not authenticated through LinkedIn already
 	
-	if request.POST:
-
+	# if request.POST:
+	if request.method == "POST":
 		# form submitted
-		linkedin_user_info = request.session['linkedin_user_info']
-		access_token = request.session['access_token']
-
 		form = FinishAuthForm(request.POST)
-		
 		if form.is_valid():
 
 			# grab cleaned values from form
@@ -136,6 +132,10 @@ def finish_login(request):
 			location = form.cleaned_data['location']
 			headline = form.cleaned_data['headline']
 			password = form.cleaned_data['password']
+
+			# fetch LI data
+			linkedin_user_info = request.session['linkedin_user_info']
+			access_token = request.session['access_token']
 
 			# check to see if dormant user already exists
 			try: 
@@ -151,20 +151,30 @@ def finish_login(request):
 				# create user
 				user = User.objects.create_user(username,email,password)
 				user.save()
+				user.set_password(password)
+				user.username = username
+				user.save()
 				existing = False
 				user.profile.status = "active"
-				print 'new user created (not what we want)'
+				user.profile.save()
 
-			# make sure using right backend
-			request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
+			
 			# log user in
 			print 'username: ' + username + ' password: ' + password
 			user = authenticate(username=username,password=password)
-			print 'after authenticate'
-			print user
+
+			# make sure using right backend
+			request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
 			# make sure authentication worked
 			if user is not None:
 				print 'in to auth login'
+				auth_login(request,user)
+			else:
+				# try logging in now with LinkedIn
+				request.session['_auth_user_backend'] = 'prosperime.accounts.backends.LinkedinBackend'
+				user = authenticate(acct_id=linkedin_user_info['id'])
+				
+			if user is not None:
 				auth_login(request,user)
 			else:
 				# somehow authentication failed, redirect with error message

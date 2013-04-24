@@ -1117,6 +1117,7 @@ class CareerMapBase():
 		industries = [i.id for i in pos.entity.domains.all()]
 		# initialize careers array
 		ideals = []
+		ideals_objects = []
 
 		# loop through ngrams to match
 		if title_ngrams is not None:
@@ -1146,17 +1147,23 @@ class CareerMapBase():
 											continue
 									if is_match == True:
 										ideals.append(k)	
-										print t + ": " + m['title']						
-		
+										print "Initial match: " + t + ": " + m['title']						
+		if ideals:
+			# fetch all matched ideal positions, sorted by length of title
+			ideals_objects = IdealPosition.objects.filter(pk__in=ideals).extra(order_by=[len("title")])
+
 		if not test:
-			if ideals:
-				# fetch all matched ideal positions, sorted by length of title
-				ideals_objects = IdealPosition.objects.filter(pk__in=ideals).extra(order_by=[len("title")])
+			if ideals_objects:
 				pos.ideal_position = ideals_objects[0]
 				pos.save()
 				return True
 			else:
 				return False
+		else:
+			if ideals_objects:
+				print "Final match: " + pos.title + " (" + str(ideals_objects[0]) + ") " + str(ideals)
+			else:
+				print pos.title + ": no match"
 
 	def test_position(self,title):
 

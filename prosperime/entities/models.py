@@ -319,6 +319,8 @@ class Industry(models.Model):
 	description = models.TextField(blank=True,null=True)
 	li_code = models.CharField(max_length=5,null=True)
 	li_group = models.CharField(max_length=15,null=True)
+	created = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
 
 	def __unicode__(self):
 		return self.name
