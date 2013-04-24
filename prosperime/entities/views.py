@@ -39,13 +39,19 @@ import careers.careerlib as careerlib
 
 # 	return render_to_response('home.html',data,context_instance=RequestContext(request))
 
+
 def contact(request):
-
 	data = {}
-
 	return render_to_response('contact.html', data, context_instance=RequestContext(request))
 
 
+def about(request):
+	data = {}
+	return render_to_response('about.html', data, context_instance = RequestContext(request))
+
+def meet(request):
+	data = {}
+	return render_to_response('meet.html', data, context_instance = RequestContext(request))
 
 def welcome(request):
 	if request.user.is_authenticated():

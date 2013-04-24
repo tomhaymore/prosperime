@@ -49,6 +49,8 @@ div.no-positions {
 	display:block;
 	margin-left:50px;
 	margin-top:10px;
+	font-size:1.1em;
+	line-height:28px;
 }
 
 div#goal-careers-container table {
@@ -132,8 +134,8 @@ div.profile-brief-info {
 div.empty-tab {
 	text-align:left;
 	margin-left:25px;
-	font-size:1.2em;
-	line-height:24px;
+	font-size:1.1em;
+	line-height:28px;
 }
 
 

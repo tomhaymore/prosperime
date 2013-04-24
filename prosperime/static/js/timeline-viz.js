@@ -1,7 +1,7 @@
 
 
 var timeline_box_titles_data = []
-var debug = true;
+var debug = false;
 
 var constants = {
 
@@ -51,7 +51,6 @@ var reposition_titles = function(paper) {
     
     for (var y = 0; y < timeline_box_titles_data.length; y++) {
         var current_text = paper.getById(timeline_box_titles_data[y].id)
-        console.log(current_text.attr("font-size"))
         if (y % 2 == 0) {
             if (debug) console.log("Current start: " + (timeline_box_titles_data[y]['start_offset'] - (current_text.getBBox().width / 2)) + " | Previous End: " + previous_x_above)
 
