@@ -129,6 +129,7 @@ def finish_login(request):
 		form = FinishAuthForm(request.POST)
 		
 		if form.is_valid():
+
 			# grab cleaned values from form
 			username = form.cleaned_data['username']
 			email = form.cleaned_data['email']
@@ -138,27 +139,37 @@ def finish_login(request):
 
 			# check to see if dormant user already exists
 			try: 
+				print 'before try'
 				user = User.objects.get(profile__status="dormant",account__uniq_id=linkedin_user_info['id'])
+				print 'after try'
+				print user
 				existing = True
 				user.profile.status = "active"
 
 			except:
+				print 'exception'
 				# create user
 				user = User.objects.create_user(username,email,password)
 				user.save()
 				existing = False
 				user.profile.status = "active"
+				print 'new user created (not what we want)'
 
 			# make sure using right backend
 			request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
 			# log user in
+			print 'username: ' + username + ' password: ' + password
 			user = authenticate(username=username,password=password)
+			print 'after authenticate'
+			print user
 			# make sure authentication worked
 			if user is not None:
+				print 'in to auth login'
 				auth_login(request,user)
 			else:
 				# somehow authentication failed, redirect with error message
-				messages.error(request, 'Something went wrong. Please try again.')
+				messages.error(request, 'Something be wrong. Please try again.')
+				error_message = "Something went wrong. Please try again."
 				return render_to_response('accounts/finish_login.html',{'form':form,'error_message':error_message},context_instance=RequestContext(request))
 
 
