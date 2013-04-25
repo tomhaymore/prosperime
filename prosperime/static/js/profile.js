@@ -197,7 +197,8 @@ $(function(){
 
 
 			var collection = this // important! (context)
-			var html = "<table id='goal-position-table' class='table left-half'>"
+			// var html = "<table id='goal-position-table' class='table left-half'>"
+			var html = "<table id='goal-position-table' class='table'>"
 
 			this.collection.each(function(goalPosition) {
 

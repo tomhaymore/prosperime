@@ -33,7 +33,7 @@ div.h-header {
 	padding-bottom:8px;
 	padding-right:12px;
 	padding-left:12px;
-	border-radius:4px 4px 0 0;
+	border-radius:2px 2px 0 0;
 	line-height:20px;
 	cursor: pointer;
 	text-decoration: none;
@@ -75,9 +75,13 @@ div.header-large {
 	color:#fffffe;
 }
 
-.blue-button {
+/*.blue-button {
 	background-color: #265f98;
 	color:#fffffe;
+}*/
+
+.inline-button {
+	display:inline-block;
 }
 
 .button-small {
@@ -109,7 +113,7 @@ html, body {
 body {
 	/*padding-top:40px;*/
 	/*background-color:whitesmoke;*/
-	font-family: "Source Sans Pro", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+	font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 	margin: 0;
 	/*margin-bottom:0px;*/
 }
@@ -939,10 +943,19 @@ button.general-add-button:active {
 }
 
 .flat-input {
-	width: 350px;
-	border-radius: 0px;
-	/*margin-top: 7px;*/
-	height: 20px;
+	width: 350px !important; 
+	border-radius: 0px !important; 
+	margin-top: 5px !important; 
+	margin-bottom:0px !important; 
+	height: 26px !important; 
+}
+
+.flat-input-med {
+	width: 225px !important; 
+	border-radius: 0px !important; 
+	margin-top: 5px !important; 
+	margin-bottom:0px !important; 
+	height: 26px !important; 
 }
 
 /*CLAYTON's PATH VIZ */
