@@ -161,10 +161,7 @@ ul.industry-options-container a {
 	margin-bottom:45px;
 }
 
-.inline {
-	display:inline-block;
-	vertical-align:middle;
-}
+
 
 
 .autocomplete-suggestions {
@@ -175,8 +172,25 @@ ul.industry-options-container a {
 	width:250px !important; /* normally, no, but this is a 3rd party library*/  
 }
 
+
+/* Modifiers */
+
 .hide {
 	visibility: none;
+}
+
+.inline {
+	display:inline-block;
+	vertical-align:middle;
+}
+
+.center {
+	display:inline-block;
+	margin:0 auto;
+}
+
+.button-inactive {
+
 }
 
 

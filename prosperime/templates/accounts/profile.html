@@ -727,6 +727,7 @@ $.ajaxSetup({
 					break;
 			};
 
+
 			// Inner Dot
 			var dot = paper.circle(constants.timeline_start + start_offset, constants.timeline_y, constants.inner_dot_radius).attr({
 				'stroke-width':1,
@@ -1071,8 +1072,12 @@ $.ajaxSetup({
 
 	// Compares two dates of format "MM/YY"
 	var months_difference_js = function(start, end) {
-		var diff = 12 * (parseInt(end.substring(3)) - parseInt(start.substring(3)))
-		diff += (parseInt(end.substring(0,2)) - parseInt(start.substring(0,2)))
+		console.log(parseInt(end.substring(3), 10))
+		console.log(parseInt(start.substring(3), 10))
+		var diff = 12 * (parseInt(end.substring(3), 10) - parseInt(start.substring(3), 10))
+		// console.log(diff)
+		diff += (parseInt(end.substring(0,2), 10) - parseInt(start.substring(0,2), 10))
+		// console.log(diff)
 		return Math.ceil(diff)
 	}
 
