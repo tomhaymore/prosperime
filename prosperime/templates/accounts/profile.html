@@ -95,7 +95,7 @@ $.ajaxSetup({
 				{% if top_careers %}
 				<ul class="profile-careers-list flat">
 					{% for c in top_careers %}
-						<li class="profile-career"><a class="profile-button" href="/career/{{c.id}}">{{c.long_name}}</a></li>
+						<li class="profile-career"><a class="profile-button" href="/career/{{c.id}}">{{c.short_name}}</a></li>
 					{% endfor %}
 				</ul>
 				{% endif %}

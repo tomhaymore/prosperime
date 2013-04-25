@@ -918,7 +918,7 @@ class CareerPathBase(CareerBase):
 
 	def get_focal_careers(self,user,limit=5):
 
-		careers = Career.objects.prefetch_related('positions').annotate(num=Count('positions__pk')).order_by('-num').distinct()[:limit]
+		careers = Career.objects.prefetch_related('positions').filter(ideal_positions__position__person=user).annotate(num=Count('positions__pk')).order_by('-num').distinct()[:limit]
 
 		return careers
 
