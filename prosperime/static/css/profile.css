@@ -30,18 +30,19 @@ div#timeline-description-container {
 div#timeline-header-container {
 }
 
-div#goal-careers-container {
-/*	width:50%;
-*/}
+div#goal-careers-container, div#goal-positions-container {
+	float:left;
+	width:60%;
+}
 
 div#goal-careers-header {
 }
 
 div.personalize {
 	display:inline;
-	font-weight:600;
+	font-weight:500;
 	float:right;
-	margin-right:150px;
+	/*margin-right:150px;*/
 	max-height:20px;
 }
 
@@ -54,7 +55,7 @@ div.no-positions {
 }
 
 div#goal-careers-container table {
-	margin-top:25px;
+	/*margin-top:25px;*/
 	margin-bottom:25px;
 }
 
@@ -65,6 +66,10 @@ div#goal-careers-container table td {
 div#saved-paths-container .timeline-header {
 	margin-bottom:25px;
 	margin-top:25px;
+}
+
+#saved-careers-table,#goal-position-table {
+	width:100%;
 }
 
 div.profile-header-container {
@@ -84,6 +89,9 @@ span.splash-slug {
 	color:rgb(41,98,152);
 }
 
+div.profile-details-container {
+	margin-left:10px;
+}
 
 #profile-careers-container {
 	width:92%;
@@ -102,11 +110,14 @@ ul.profile-careers-list li {
 }
 
 a.profile-button {
+	font-size:14px;
 	display:inline-block;
 	padding: 2px 4px 2px 4px;
 	background-color: rgb(41,98,152);
 	color:#fff;
 	cursor:pointer;
+	border-radius:1px;
+	font-weight: 300;
 }
 
 a.profile-button:hover {
@@ -118,6 +129,9 @@ div.profile-nav-container {
 	padding-bottom: 0px;
 }
 
+p.profile-subheader {
+	font-size: 16px;
+}
 
 div.profile-info-top {
 	margin-top:10px;
@@ -125,6 +139,10 @@ div.profile-info-top {
 
 div.profile-img-holder {
 	margin-left:15px;
+}
+
+img.profile-image {
+	width:75px;
 }
 
 div.profile-brief-info {
@@ -287,6 +305,10 @@ div.personalize-button {
 	position:relative;
 	top:4px;
 	left:4px;
+}
+
+div.personalize-prompt-container {
+	width:350px;
 }
 
 

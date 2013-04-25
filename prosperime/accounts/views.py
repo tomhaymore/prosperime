@@ -360,9 +360,9 @@ def profile(request, user_id):
 	goal_positions = None
 
 	# career_map = profile.all_careers
-	#top_careers = profile.top_careers
+	top_careers = profile.get_all_careers(3)
 	career_map = None
-	top_careers = None
+	# top_careers = None
 
 	# Convert positions to timeline info
 	positions = Position.objects.filter(person=user).select_related('careerDecision')
@@ -440,7 +440,7 @@ def profile(request, user_id):
 		'end_date':end_date,
 		'total_time':total_time,
 		# 'career_map':career_map,
-		# 'top_careers':top_careers,
+		'top_careers':top_careers,
 		'career_decision_prompt':career_decision_position,
 		'own_profile':own_profile,
 		'own_profile_javascript':own_profile_javascript, # b/c js has true/false, not True/False

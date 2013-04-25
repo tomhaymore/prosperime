@@ -82,9 +82,26 @@ $.ajaxSetup({
 			<span class="splash-slug">{{profile.first_name}} {{profile.last_name}}</span>
 		</div>
 
-		<span>
-			<img class="logo-preview" src="{{profile.default_profile_pic}}" />
-		</span>
+		<div class="profile-image-container pull-left">
+			<img class="profile-image" src="{{profile.default_profile_pic}}" />
+		</div>
+		<div class="profile-details-container pull-left">
+			{% if profile.headline %}
+				<p class="profile-subheader">{{profile.headline}}</p>
+			{% else %}
+				<p class="profile-subheader">{{profile.latest_position.safe_title}}</p>
+			{% endif %}
+			<span class="profile-careers">
+				{% if top_careers %}
+				<ul class="profile-careers-list flat">
+					{% for c in top_careers %}
+						<li class="profile-career"><a class="profile-button" href="/career/{{c.id}}">{{c.long_name}}</a></li>
+					{% endfor %}
+				</ul>
+				{% endif %}
+			</span>
+		</div>
+		<div class="clear"></div>
 
 		<!-- {% if not is_connected %}
 		<div class="pull-right">
@@ -159,25 +176,35 @@ $.ajaxSetup({
 			<div class="tab-pane active" id="goal-careers">
 
 				<!-- Header -->
-				<a name="goal-careers-anchor">
+				<!-- <a name="goal-careers-anchor">
 					<div id="goal-careers-header" class="timeline-header anchor inline"></div>
-				</a>
+				</a> -->
 				
-				<!-- Not what you're looking for? -->
-				<div id="personalize-goal-careers-prompt" class="personalize" >
-					Interested in something else? Explore your options <a onclick="revealPersonalization('goalCareer')">here.</a>
-				</div>
-				<div id="personalize-goal-careers" class="personalize" style="display:none">
-					<div class="input-append inline">
-						<input id="personalize-goal-careers-box" type="text">
-						<span id="personalize-goal-careers-add" class="add-on"> Add </span>
-					</div>
-					<div class="flat-button inline personalize-button" onclick="hidePersonalization('goalCareer')"> Back </div>
-				</div>
+				
 
 				<!-- Careers container -->
 				<div id="goal-careers-container" class="item-container">
 					<!-- Backbone here -->
+				</div>
+
+				<!-- Not what you're looking for? -->
+				<div class="pull-left personalize-prompt-container">
+					<!-- <div id="personalize-goal-careers-prompt" class="personalize">Interested in something else? Explore your options <a onclick="revealPersonalization('goalCareer')">here.</a> -->
+					<div id="personalize-goal-careers-prompt">Add other careers:</a>
+					</div>
+					<!-- <div id="personalize-goal-careers" class="personalize">
+						<div class="input-append inline">
+							<input id="personalize-goal-careers-box" type="text">
+							<span id="personalize-goal-careers-add" class="add-on"> Add </span>
+						</div>
+						<div class="flat-button inline personalize-button" onclick="hidePersonalization('goalCareer')"> Back </div>
+					</div> -->
+					<div id="personalize-goal-careers" class="">
+						<div class="">
+							<input id="personalize-goal-careers-box" class="flat-input-med" type="text" />
+							<span id="personalize-goal-careers-add" class="flat-button inline-button blue-button"> Add </span>
+						</div>
+					</div>
 				</div>
 			</div>
 
@@ -185,12 +212,26 @@ $.ajaxSetup({
 			<div class="tab-pane" id="goal-positions">
 
 				<!-- Header -->
-				<a name="goal-positions-anchor">
+				<!-- <a name="goal-positions-anchor">
 					<div id="goal-positions-header" class="timeline-header anchor inline"></div>
-				</a>
+				</a> -->
 
+
+				<!-- Positions Container -->
+				<div id="goal-positions-container" class="item-container">
+					<!-- Backbone here -->
+				</div> 
 				<!-- Not what you're looking for? -->
-				<div id="personalize-goal-positions-prompt" class="personalize">
+				<div class="pull-left personalize-prompt-container">
+					<div id="personalize-goal-positions-prompt personalize-prompt">Add other positions:</div>
+					<div id="personalize-goal-positions">
+						<div>
+							<input id="personalize-goal-positions-box" class="flat-input-med" type="text">
+							<span id="personalize-goal-positions-add" class="flat-button inline-button blue-button">Add</span>
+						</div>
+					</div>
+					
+				<!-- <div id="personalize-goal-positions-prompt" class="personalize">
 					Interested in something else? Explore your options <a onclick="revealPersonalization('goalPosition')">here.</a>
 				</div>
 				<div id="personalize-goal-positions" class="personalize" style="display:none">
@@ -200,11 +241,8 @@ $.ajaxSetup({
 					</div>
 					<div class="flat-button inline personalize-button" onclick="hidePersonalization('goalPosition')"> Back </div>
 
+				</div> -->
 				</div>
-				<!-- Positions Container -->
-				<div id="goal-positions-container" class="item-container">
-					<!-- Backbone here -->
-				</div> 
 			</div>
 
 			<!-- Interested Positions -->
@@ -282,7 +320,7 @@ $.ajaxSetup({
 	    	}
 	    });
 
-	    $('#personalize-goal-positions .add-on').click(function(ev) {
+	    $('#personalize-goal-positions #personalize-goal-positions-add').click(function(ev) {
 
 	    	// First, make sure not alread a goal pos
 	    	for (var g = 0; g < backbone_goal_positions_init_data.length; g++) {
@@ -306,7 +344,7 @@ $.ajaxSetup({
 	    	}, "json");
 	    })
 
-	    $('#personalize-goal-careers .add-on').click(function(ev) {
+	    $('#personalize-goal-careers #personalize-goal-careers-add').click(function(ev) {
 
 	    	// First, make sure not already saved
 	    	for (var h = 0; h < backbone_careers_init_data.length; h++) {

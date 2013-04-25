@@ -1,8 +1,11 @@
 # from Python
 from datetime import datetime, timedelta
+import operator 
 # from Django
-from django.db import Q
+from django.db.models import Q
+from django.contrib.auth.models import User
 # from Prosperime
+from careers.models import SavedPath, SavedCareer, GoalPosition
 
 class FeedBase():
 	
@@ -22,15 +25,17 @@ class FeedBase():
 		stop = datetime.now() - timedelta(hours = timeline)
 
 		# get user connections and educations
-		connections = [u.id for u in user.connections.all()]
-		educations = [u.id for u in User.objects.filter(positions__entity_id__in=user.educations(),positions__type="education")]
+		connections = [u.id for u in user.profile.connections.all()]
+		educations = [u.id for u in User.objects.filter(positions__entity_id__in=user.profile.educations(),positions__type="education")]
 		# retrieve data
 		paths = SavedPath.objects.filter(Q(owner__in=connections) | Q(owner__in=educations)).filter(date_modified__gte=stop)
+		careers = SavedCareer.objects.filter(Q(owner__in=connections) | Q(owner__in=educations)).filter(updated__gte=stop)
 		positions = GoalPosition.objects.filter(Q(owner__in=connections) | Q(owner__in=educations)).filter(updated__gte=stop)
 
 		# concatenate into one list
 		unordered_feed = [{'type':'careerpath','id':p.id,'user_id':p.owner_id,'user_name':p.owner.profile.full_name(),'title':p.title,'date':p.date_modified} for p in paths]
-		unordered_feed.extend([{'type':'goalposition','id':p.id,'user_id':p.owner_id,'user_name':p.owner.profile.full_name(),'title':p.title,'date':p.updated} for p in positions])
+		unordered_feed.extend([{'type':'savedcareer','id':c.id,'user_id':c.owner_id,'user_name':c.owner.profile.full_name(),'title':c.title,'date':c.updated} for c in careers])
+		unordered_feed.extend([{'type':'goalposition','id':p.id,'user_id':p.owner_id,'user_name':p.owner.profile.full_name(),'title':p.position.title,'date':p.updated} for p in positions])
 
 		ordered_feed = sorted(unordered_feed, key=operator.itemgetter('date'),reverse=True)
 
