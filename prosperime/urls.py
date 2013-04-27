@@ -17,6 +17,9 @@ urlpatterns = patterns('',
     url(r'^about/$', 'entities.views.about'),
     url(r'^meet/$', 'entities.views.meet'),
 
+    # tmp
+    url(r'^feed/$', 'careers.views.feed'),
+
     url(r'^build/$', 'careers.views.build'),
     url(r'^build/(\d+)/$', 'careers.views.modify_saved_path'),
     url(r'^plan/$', 'careers.views.plan'),

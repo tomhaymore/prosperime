@@ -172,6 +172,14 @@ ul.industry-options-container a {
 	width:250px !important; /* normally, no, but this is a 3rd party library*/  
 }
 
+div#this-make-take-awhile {
+
+}
+
+div#header-container > h1 {
+	color:rgb(41,98,152);
+}
+
 
 /* Modifiers */
 
