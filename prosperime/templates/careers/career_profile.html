@@ -134,11 +134,11 @@
 				<ul class="career-profile-paths-list flat">
 				{% for k,v in paths.network.items|slice:":10" %}
 					<li class="career-profile-paths-item">
-						{% if v.pic %}
+					<!-- 	{% if v.pic %}
 							<img class="career-profile-preview" src="{{ MEDIA_URL }}{{v.pic}}" />
 						{% else %}
 							<img class="career-profile-preview" src="{{ MEDIA_URL }}/pictures/anon.jpg" />
-						{% endif %}
+						{% endif %} -->
 						
 						<p class="career-profile-preview-name"><a href="/profile/{{k}}">{{v.full_name}}</a></p>
 					</li>
