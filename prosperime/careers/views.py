@@ -1365,6 +1365,9 @@ def show_paths(request):
 def get_next_build_step(request):
 	# check if GET parameters were sent
 	if request.GET.getlist('id'):
+		# initialize class
+		career_path = careerlib.CareerBuild()
+
 		# initiate next and finished flag
 		next = []
 		finished = []
@@ -1375,46 +1378,9 @@ def get_next_build_step(request):
 		start_ideal_id = request.GET.getlist('id')[0]
 		start_pos_id = request.GET.getlist('pos_id')[0]
 
-		# get ideal position object
-		ideal_pos = IdealPosition.objects.get(pk=start_ideal_id)
+		positions = career_path.get_next_build_step(start_ideal_id,start_pos_id)
 
-		# get all user positions of users that have had this ideal position
-		users = User.objects.values('id','positions__id','positions__type','positions__degree','positions__ideal_position_id','positions__ideal_position__level','positions__title','positions__entity__name','positions__type').filter(positions__ideal_position_id=start_ideal_id).order_by('-positions__start_date').distinct()
-		
-		# init is_ed flag
-		is_ed = False
-		# loop through
-		for u in users:
-			
-			# filter out various ineligible positions
-			if u['positions__ideal_position__level'] is not None and is_ed is True and int(u['positions__ideal_position__level']) == int(ideal_pos.level):
-				# print "same level ed @ build"
-				continue
-			if u['positions__ideal_position__level'] and int(u['positions__ideal_position__level']) < int(ideal_pos.level):
-				# print "same ideal pos level @ build"
-				continue
-			if u['positions__type'] == 'education' and u['positions__degree'] is None:
-				continue
-			# if u['positions__type'] is not "education" and u['positions__title'] is not "Student":
-				# # print u['positions__ideal_position_id']
-				# print "'" + u['positions__title'] + "'"
-			if u['id'] in next and u['id'] not in finished and int(u['positions__id']) != int(start_pos_id):
-				pos.append({'pos_id':u['positions__id'],'ideal_id':u['positions__ideal_position_id'],'title':u['positions__title'],'entity_name':u['positions__entity__name']})
-				finished.append(u['id'])
-			if u['positions__ideal_position_id'] == int(start_ideal_id):
-				# print 'match'
-				next.append(u['id'])
-			if u['positions__type'] == "education":
-				is_ed = True
-			else:
-				is_ed = False
-			# set career flag
-			prev_career = None
-			# add to processed positions array
-			
-		pos = pos[:5] # limit responses to 5
-
-		return HttpResponse(json.dumps(pos))
+		return HttpResponse(json.dumps(positions[:5]))
 	
 # AJAX for returning a JSON of ideal position paths
 def get_ideal_pos_paths(request):

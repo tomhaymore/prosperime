@@ -18,6 +18,12 @@ from django.core.exceptions import MultipleObjectsReturned
 from django.core import management
 from django.db.models import Count, Q
 
+def safe_int(data):
+	if data is not None:
+		return int(data)
+	else:
+		return None
+
 def import_initial_ideals(path):
 	career_import = CareerImportBase()
 	career_import.import_initial_ideals(path)
@@ -40,217 +46,6 @@ def avg_duration_all(career):
 	career_path = CareerPathBase()
 	return career_path.avg_duration_all(career)
 
-# def _get_users_in_network(user,**filters):
-
-# 	# get schools from user
-# 	schools = Entity.objects.filter(li_type="school",positions__person=user,positions__type="education").distinct()
-	
-# 	# get all connected users and those from the same schools
-	
-# 	users = User.objects.select_related('profile','pictures').values('pk','positions__careers','profile__first_name','profile__last_name','profile__pictures__pic').filter(Q(profile__in=user.profile.connections.all()) | (Q(positions__entity__in=schools))).distinct()
-# 	# if filters['positions']:
-# 	# 	users = users.filter(positions__title__in=filters['positions'])
-# 	# if filters['locations']:
-# 	# 	users = users.filter(positions__entity__office__city__in=filters['locations'])
-	
-# 	users_list = [{'id':u['pk'],'first_name':u['profile__first_name'],'last_name':u['profile__last_name'],'profile_pic':u['profile__pictures__pic'],'careers':u['positions__careers']} for u in users]	
-# 	user_ids = [u['id'] for u in users_list]
-
-# 	user_ids = set(user_ids)
-# 	return (users_list, user_ids)
-
-# def _get_paths_in_career_alt(user, career):
-
-# 	paths = {}
-# 	overview = {}
-
-# 	# Need: positions related to query
-# 	career_singleton_array = [career] #needed to make this query work
-# 	positions_in_career = Position.objects.filter(careers__in=career_singleton_array).select_related('entity', 'person', 'person__profile')
-
-# 	# Check this fxn to see how it works
-# 	users_list, user_ids = _get_users_in_network(user)
-
-# 	## ** DST's ** ##
-
-# 	# Used to get length of sets
-# 	all_user_set = set()
-# 	all_co_set = set()
-# 	network_user_set = set()
-# 	network_pos_counter = 0
-# 	network_co_set = set()
-
-# 	# Return DST's for 'Network'
-# 	network_people = []
-# 	network_cos = []
-# 	network_pos = []
-
-# 	# Return DST's for 'Prosperime Community'
-# 	all_people = []
-# 	all_cos = []
-# 	all_pos = []
-
-# 	# Used for Big Players
-# 	network_entities_dict = {}
-# 	all_entities_dict = {}
-
-# 	for pos in positions_in_career:
-
-# 		pos_data = {
-# 			'id':pos.id,
-# 			'title':pos.title,
-# 			'co_name':pos.entity.name,
-# 			'owner':pos.person.profile.full_name(),
-# 			'owner_id':pos.person.id,
-# 			'logo_path':pos.entity.default_logo(),
-# 			# 'logo_path':pos.entity.logo,
-# 		}
-
-# 		co_data = {
-# 			# count logo id people name
-# 			'name':pos.entity.name,
-# 			'id':pos.entity.id,
-# 			'logo_path':pos.entity.default_logo(),
-# 			# 'logo_path':pos.entity.logo,
-# 			'people':None,
-# 		}
-
-# 		# Format End Dates for person_data object
-# 		if pos.start_date is not None:
-# 			start_date = pos.start_date.strftime("%m/%Y")
-# 		else:
-# 			start_date = None
-
-# 		if pos.end_date is not None:
-# 			end_date = pos.end_date.strftime("%m/%Y")
-# 		else:
-# 			end_date = "Current"
-
-# 		person_data = {
-# 			'name':pos.person.profile.full_name(),
-# 			'id':pos.person.id,
-# 			#'latest_position':pos.person.profile.latest_position(),
-# 			'pos_title':pos.title,
-# 			'pos_co_name':pos.entity.name,
-# 			'pos_id':pos.id,
-# 			'pos_start_date':start_date,
-# 			'pos_end_date':end_date,
-# 			'profile_pic':pos.person.profile.default_profile_pic(),
-# 			# 'profile_pic':pos.person.profile.profile_pic,
-# 		}
-
-# 		# Network & All
-# 		if pos.person.id in user_ids:
-			
-# 			# Positions
-# 			network_pos_counter += 1
-# 			network_pos.append(pos_data)
-# 			all_pos.append(pos_data)
-
-# 			# People
-# 			network_user_set.add(pos.person.id) 
-# 			all_user_set.add(pos.person.id)
-# 			network_people.append(person_data)
-# 			all_people.append(person_data)
-
-# 			# Companies
-			
-# 			# No Duplicates
-# 			if pos.entity.name not in network_co_set:
-# 				network_cos.append(co_data)
-# 			if pos.entity.name not in all_co_set:
-# 				all_cos.append(co_data)
-			
-# 			# network_co_set.add(pos.entity.id) # should be id, but crappy db data
-# 			#all_co_set.add(pos.entity.id) # should be id, but crappy db data
-# 			network_co_set.add(pos.entity.name)
-# 			all_co_set.add(pos.entity.name)
-
-# 			# Entities Dict for BigPlayers
-# 			## Could rearrange this loop structure for minor boost
-# 			if pos.entity.id in network_entities_dict:
-# 				network_entities_dict[pos.entity.id]['count'] += 1
-# 			else:
-# 				network_entities_dict[pos.entity.id] = {
-# 					'count':1,
-# 					'name':pos.entity.name,
-# 					'id':pos.entity.id,
-# 				}
-
-# 			if pos.entity.id in all_entities_dict:
-# 				all_entities_dict[pos.entity.id]['count'] += 1
-# 			else:
-# 				all_entities_dict[pos.entity.id] = {
-# 					'count':1,
-# 					'name':pos.entity.name,
-# 					'id':pos.entity.id,
-# 				}
-
-# 		# Only All
-# 		else:
-
-# 			# Positions
-# 			all_pos.append(pos_data)
-
-# 			# People
-# 			all_user_set.add(pos.person.id)
-# 			all_people.append(person_data)
-
-# 			# Companies
-# 			if pos.entity.name not in all_co_set:
-# 				all_cos.append(co_data)
-
-# 			# all_co_set.add(pos.entity.id) # should be id, but crappy db data
-# 			all_co_set.add(pos.entity.name)
-
-# 			# Entities Dict for BigPlayers
-# 			if pos.entity.id in all_entities_dict:
-# 				all_entities_dict[pos.entity.id]['count'] += 1
-# 			else:
-# 				all_entities_dict[pos.entity.id] = {
-# 					'count':1,
-# 				}
-
-# 	# People
-# 	paths['network'] = network_people
-# 	paths['all'] = all_people
-
-# 	# Positions
-# 	paths['networkPositions'] = network_pos
-# 	paths['allPositions'] = all_pos
- 
-# 	# Companies
-# 	paths['networkCompanies'] = network_cos
-# 	paths['allCompanies'] = all_cos	
-
-# 	## Overview
-# 	overview['network'] = {
-# 		'num_people': len(network_user_set),
-# 		'num_pos': network_pos_counter,
-# 		'num_cos': len(network_co_set),
-# 	}
-
-# 	overview['all'] = {
-# 		'num_people':len(all_user_set),
-# 		'num_pos':len(positions_in_career),
-# 		'num_cos':len(all_co_set),
-# 	}
-
-# 	# Big Players
-# 	network_entities_dict = sorted(network_entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
-# 	overview['network']['bigplayers'] = network_entities_dict[:3]
-
-# 	all_entities_dict = sorted(all_entities_dict.iteritems(), key=lambda x: x[1]['count'], reverse=True)
-# 	overview['all']['bigplayers'] = all_entities_dict[:3]
-
-# 	# Add Overview to Paths
-# 	paths['overview'] = {
-# 		'network' : overview['network'],
-# 		'all': overview['all'],
-# 	}
-
-# 	return paths
-
 def get_paths_in_career(user,career):
 	career_path = CareerPathBase()
 	return career_path.get_paths_in_career(user,career)
@@ -259,47 +54,6 @@ def match_careers_to_position(pos):
 	career_mapper = CareerMapBase()
 	careers = career_mapper.match_careers_to_position(pos)
 	return careers
-
-# def test_position(title):
-
-# 	title_ngrams = _extract_ngrams(_tokenize_position(title))
-	
-# 	print title_ngrams
-
-# 	for t in title_ngrams:
-# 		# make sure position title is not in stop list, e.g., "Manager" or "Director" or something equally generic
-# 		if t not in STOP_LIST:
-# 			for k,v in careers_to_positions_map.items():
-# 				# print v
-# 				if t in v:
-# 					career = Career.objects.get(pk=k)
-# 					print title + " matches " + career.name
-
-# def test_match_careers_to_position(title=None):
-
-# 	positions = Position.objects.all()
-
-# 	for p in positions:
-# 		careers = []
-
-# 		if p.title:
-# 			# print 'yes title'
-# 			title_ngrams = _extract_ngrams(_tokenize_position(p.title))
-
-# 			# print title_ngrams
-
-# 			for t in title_ngrams:
-# 				# make sure position title is not in stop list, e.g., "Manager" or "Director" or something equally generic
-# 				if t not in STOP_LIST:
-# 					# print 'not in stop list'
-# 					for k,v in careers_to_positions_map.items():
-# 						# print v
-# 						if t in v and k not in careers:
-# 							print t + " : " + str(v)
-# 							careers.append(k)
-# 							career = Career.objects.get(pk=k)
-# 							# print str(k) + ": " + t
-# 		# print str(p.title) + " : " + str(careers)
 
 class CareerBase():
 
@@ -918,7 +672,7 @@ class CareerPathBase(CareerBase):
 
 	def get_focal_careers(self,user,limit=5):
 
-		careers = Career.objects.prefetch_related('positions').annotate(num=Count('positions__pk')).order_by('-num').distinct()[:limit]
+		careers = Career.objects.prefetch_related('positions').filter(ideal_positions__position__person=user).annotate(num=Count('positions__pk')).order_by('-num').distinct()[:limit]
 
 		return careers
 
@@ -966,6 +720,63 @@ class CareerPathBase(CareerBase):
 		careers = sorted(careers_dict.iteritems(),key=lambda (k,v):v['num_people'],reverse=True)
 
 		return careers
+
+class CareerBuild(CareerPathBase):
+
+	def get_position_paths_from_ideal(self,ideal_id):
+		# fetch all users / positions that have the ideal position in their career
+		users = User.objects.values('id','positions__id','positions__type','positions__degree','positions__ideal_position_id','positions__ideal_position__level','positions__title','positions__degree','positions__entity__name','positions__entity_id','positions__type').filter(positions__ideal_position_id=ideal_id).order_by('positions__start_date').distinct()
+		# init array
+		paths = {}
+		# collapse and sort by user
+		for user in users:
+			paths[user['id']] = [{'id':safe_int(u['id']),'title':u['positions__title'],'entity_id':safe_int(u['positions__entity_id']),'entity_name':u['positions__entity__name'],'ideal_id':safe_int(u['positions__ideal_position_id']),'pos_id':safe_int(u['positions__id']),'level':safe_int(u['positions__ideal_position__level']),'type':u['positions__type'],'degree':u['positions__degree']} for u in users if u['id'] == user['id']]
+
+		return paths
+
+	def get_next_build_step(self,ideal_id,pos_id):
+		# get ideal position object
+		ideal_pos = IdealPosition.objects.get(pk=ideal_id)
+		# get paths
+		paths = self.get_position_paths_from_ideal(ideal_id)
+		# init arrays
+		next = []
+		finished = []
+		positions = []
+		# init is_ed flag
+		is_ed = False
+		# loop through each user
+		for k,v in paths.iteritems():
+			# loop through position for each user 
+			for p in v:
+				# filter out various ineligible positions
+				if p['level'] is not None and is_ed is True and int(p['level']) == int(ideal_pos.level):
+					print "same level ed @ build"
+					continue
+				if p['level'] and int(p['level']) < int(ideal_pos.level):
+					print "same ideal pos level @ build"
+					continue
+				if p['type'] == 'education' and p['degree'] is None:
+					print "education with no degree @ build"
+					continue
+				# if u['positions__type'] is not "education" and u['positions__title'] is not "Student":
+					# # print u['positions__ideal_position_id']
+					# print "'" + u['positions__title'] + "'"
+				if p['id'] in next and p['id'] not in finished and int(p['pos_id']) != int(pos_id):
+					positions.append({'pos_id':p['pos_id'],'ideal_id':p['ideal_id'],'title':p['title'],'entity_name':p['entity_name'],'level':p['level']})
+					# add to processed positions array
+					finished.append(p['id'])
+				if p['ideal_id'] == int(ideal_id):
+					# print 'match'
+					next.append(p['id'])
+				if p['type'] == "education":
+					is_ed = True
+				else:
+					is_ed = False
+				# set career flag
+				prev_career = None
+		return positions
+				
 
 class CareerMapBase():
 
@@ -1124,56 +935,7 @@ class CareerMapBase():
 		# loop through ngrams to match
 		if title_ngrams is not None:
 			ideals = self._get_matching_ideals(title_ngrams,industries)
-			# for t in title_ngrams:
-			# 	if t is not None:
-			# 		# check stop list
-			# 		if t not in self.STOP_LIST:
-			# 			for k,v in self.positions_to_ideals_map.items():
-			# 				# loop through each dict in matches
-			# 				for m in v:
-			# 					# initiate flag to test for match
-			# 					is_match = False
-			# 					# check if it's a wild match
-			# 					if 'type' in m: 
-			# 						if m['type'] == 'wild':
-			# 							# check for regex match with wild token
-			# 							p = re.compile(r"\b%s\b"%m['token'],flags=re.IGNORECASE)
-			# 							match = re.search(p,t)
-			# 							# check to see if the token matches and the base string is in the title
-			# 							if m['title'] in t and match:
-			# 								is_match = True
-			# 								if 'industries' in m and industries is not None:
-			# 									if m['industries']:
-			# 										if not (set(industries) & set(m['industries'])):
-			# 											is_match = False
-			# 											continue
-			# 								# check for entity qualifiers
-			# 								if 'entities' in m:
-			# 									if pos.entity.id not in m['entities']:
-			# 										is_match = False
-			# 										continue
-			# 								if is_match == True:
-			# 									ideals.append(k)	
-			# 									print "Initial match: " + t + ": " + m['title']		
-			# 					# check to see if text matches
-			# 					else:
-			# 						if t == m['title'] and k not in ideals:
-			# 							is_match = True
-			# 							# ideals.append(k)
-			# 							# check for industry qualifiers
-			# 							if 'industries' in m and industries is not None:
-			# 								if m['industries']:
-			# 									if not (set(industries) & set(m['industries'])):
-			# 										is_match = False
-			# 										continue
-			# 							# check for entity qualifiers
-			# 							if 'entities' in m:
-			# 								if pos.entity.id not in m['entities']:
-			# 									is_match = False
-			# 									continue
-			# 							if is_match == True:
-			# 								ideals.append(k)	
-			# 								print "Initial match: " + t + ": " + m['title']						
+			
 		if ideals:
 			# fetch all matched ideal positions, sorted by length of title
 			ideals_objects = IdealPosition.objects.filter(pk__in=ideals).extra(order_by=[len("-title")])
@@ -1539,7 +1301,3 @@ class CareerExportBase():
 		careers = Career.objects.values_list('id','short_name','long_name','soc_code','census_code','description','parent','pos_titles').all()
 
 		stdout.write(list(careers))
-
-
-# init_careers_to_positions_map()
-# _load_stop_list()

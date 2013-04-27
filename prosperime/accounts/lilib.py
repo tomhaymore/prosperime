@@ -954,7 +954,8 @@ class LIConnections(LIBase):
 
 		# c = {first_name, last_name, id, public_profile_url, picture_url}
 		for c in connections:
-
+			# initiate partial flag
+			partial = False
 			# first, check if user settings are private
 			if c['firstName'] == 'private' and c['lastName'] == 'private':
 				if self.logging:
@@ -965,17 +966,27 @@ class LIConnections(LIBase):
 				# check to see if new user based on LI uniq id
 				try:
 					user = User.objects.get(account__uniq_id=c['id'],account__service="linkedin")
+				except ObjectDoesNotExist:
+					try:
+						user = User.objects.get(username__icontains=c['id'])
+						partial = True
+					except ObjectDoesNotExist:
+						user = None
 				except:
 					user = None
 
 				# If new, create new user from this connection
-				if user is not None:
+				if user is not None and partial is False:
 					if self.logging:
-						print "@process_connections: user already exists: " + c['id']
+						print "@process_connections: user already exists: " + c['firstName'] + ' ' + c['lastName']
 
+				elif user is not None and partial is True:
+					if self.logging:
+						print "@process_connections: user is partial, create rest" + c['firstName'] + ' ' + c['lastName']
+					user = self.process_connection_and_finish_user(user,c)
 				else:
 					if self.logging:
-						print "@process_connections: create new user: " + c['id']
+						print "@process_connections: create new user: " + c['firstName'] + ' ' + c['lastName']
 					user = self.process_connection_and_create_user(c)
 				
 				# Either way, create the connection object
@@ -1054,6 +1065,62 @@ class LIConnections(LIBase):
 		else:
 			return None
 
+	def process_connection_and_finish_user(self, user, user_info):
+
+		## add LI account
+		acct = Account()
+		acct.owner = user
+		acct.service = 'linkedin'
+		acct.uniq_id = user_info['id']
+		if 'publicProfileUrl' in user_info:
+			acct.public_url = user_info['publicProfileUrl']
+		acct.status = 'unlinked'
+		acct.save()
+
+		## Edge case that showed up in production
+		if 'publicProfileUrl' not in user_info:
+			return user
+		
+		## parse public page
+		self.process_public_page_existing(user_info['publicProfileUrl'], user)
+
+		return user
+
+	## processing for users who were partially created
+	def process_public_page_existing(self,url,user):
+		try:
+			html = urllib2.urlopen(url)
+		except:
+			print "ERROR PROCESSING PUBLIC PAGE - HTML OPEN FAILED: " + url
+			return None
+		soup = BeautifulSoup(html)
+
+		# GET First Name, Last Name, Headline
+		first_name = soup.find_all("span", class_="given-name")[0].contents[0].strip()
+		last_name = soup.find_all("span", class_="family-name")[0].contents[0].strip()
+		# headline = soup.find_all("p", class_="headline-title")[0].contents[0].strip()
+		
+		if self.logging:
+			"@process_public_page_existing: beginning crawl of: " + first_name + ' ' + last_name
+
+		# GET Orgs/Positions
+		experience = soup.find_all("div", id="profile-experience")
+		if len(experience) > 0:
+			positions = self.extract_pos_from_public_page(experience[0])
+
+			for p in positions:
+				# check to see if a co uniq was returned
+				if p['co_uniq_name'] is not None:
+					self.process_org_position(p, user)
+
+			
+		# GET Institutions/Eds
+		educations = soup.find_all("div", id="profile-education")
+		if len(educations) > 0:
+			ed_positions = self.extract_ed_pos_from_public_page(educations[0])
+
+			for p in ed_positions:
+				self.process_ed_position(p, user)
 
 	## V2 CODE TAKES INTO ACCOUNT ADDITIONAL FIELDS
 	def process_public_page_full(self, url, user_id):
