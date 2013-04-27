@@ -331,6 +331,8 @@ $(function(){
     		paperDom.parentNode.removeChild(paperDom); // From StackOverflow... 
     		paper.remove()
     		dot_ids.length = 0
+    		option_dot_ids.length = 0
+    		lvl2_elem_ids.length = 0
 
 			// Then, re-draw...
 			//	TODO: fix - this hits HTTP (although cached), not needed
@@ -437,8 +439,8 @@ $(function(){
 /* Constants */
 var start_dot_r = 50
 var paper_w = 1000
-var paper_h = 400
-var midline = paper_h / 2
+var paper_h = 450
+var midline = (paper_h / 2) + 25
 var max_r = get_max_radius()
 var y_range = paper_h - (2 * max_r) // set in helpers.js = 50
 var y_max = y_range / 2
@@ -453,9 +455,14 @@ var header_y = 25
 var l2_line_length = 25
 var l2_p1 = start_x+200
 var l2_p2 = i2_x-200
+var p1_start = start_x + start_dot_r + l2_line_length
+var p2_start = i2_x - start_dot_r - l2_line_length
 
 /* Containers */
 var dot_ids = []
+var option_dot_ids = []
+var industry_dot_ids = []
+var lvl2_elem_ids = []
 
 /* Attributes */
 var chosen_dot_attributes = {
@@ -494,54 +501,38 @@ var l2_text_attributes = {
 	'cursor':'pointer'
 }
 
+// Convenience, holds major data structures needed to redraw svg
+var svg_wrapper = {
+	'paper':null,
+	'collection':null,
+	'transitions':null,
+	'transition_data':null,
+	'lvl1_index':0,
+	'lvl2_index':0
+};
+
 
 var render_dot_lvl1_viz = function(collection, clickhandler) {
 
-	var paper = new Raphael('search-results-container',paper_w,paper_h)
-
 
 	// Create paper, sort transitions by num people
+	var paper = new Raphael('svg-main-container',paper_w,paper_h)
 	var data = collection.models[0].attributes
 	transitions = _.sortBy(data['transitions'], function(value) {return -value[1];})
 	var length = (transitions.length > max_options) ? max_options : transitions.length
 
-	for (var i = 0; i < length; i++) {
-		// Calls helper to size dot relative to total_people 
-		var dot_r = size_dot(data['total_people'], transitions[i][1])
+	// Set wrapper variables
+	svg_wrapper['paper'] = paper
+	svg_wrapper['collection'] = collection
+	svg_wrapper['transitions'] = transitions
+	svg_wrapper['lvl1_index'] = length
+	svg_wrapper['clickhandler'] = clickhandler
 
-		// Construct dot w/ number in the middle
-		var y = midline - y_max + (y_offset * i)
-		var dot = paper.circle(options_x,y,dot_r).attr(option_dot_attributes)
-		var number = paper.text(options_x,y,transitions[i][1]).attr(number_attributes)
-	
-		// Construct line to dot
-		var hinge = (y > midline)? y + 10 : y - 10
-		var line = paper.path("M"+start_x+', '+midline+"Q125, " + hinge  + " " + (options_x-dot_r) + "," + y)
-	
-		// Construct labels of related people
-		var people_keys = Object.keys(transitions[i][2])
-		var names_length = (people_keys.length > max_names) ? max_names : people_keys.length
-		var label_text = transitions[i][0] + "    ("
-		for (var j = 0; j < names_length; j++) {
-			var name = transitions[i][2][people_keys[j]][0]
-			if (j < names_length - 1) label_text += name + ', '
-			else label_text += name + ')'
-		}
-		var label = paper.text(options_x+dot_r+text_buffer, y, label_text).attr(option_label_attributes)
-		
-		// Set click handlers
-		set_click_handlers(dot, number, transitions[i], clickhandler, paper)
-
-		// Set data on dot element, push id to DST
-		dot.data('label_id', label.id)
-		dot.data('number_id', number.id)
-		dot.data('line_id', line.id)
-		dot_ids.push(dot.id)
-	}
+	// Draw dots, lines, and text
+	draw_lvl1_elems(clickhandler, length, 0)
 
 	/* Construct SVG for Start Industry Last (highest Z value) */
- 	var start_dot = paper.circle(start_x,midline,start_dot_r).attr(chosen_dot_attributes)
-	var start_num = paper.text(start_x,midline,data["total_people"]).attr(number_attributes)
+	draw_start_elems(data["total_people"], paper)
 	var start_label = paper.text(start_x,header_y,"From: " +  data["start_name"]).attr(label_attributes)
 };
 
@@ -583,25 +574,192 @@ var draw_lvl2_connections = function(data, paper) {
 	var keys = Object.keys(data[2])
 	var length = (keys.length > 5) ? 5 : keys.length;
 
-	var p1_start = start_x + start_dot_r + l2_line_length
-	var p2_start = i2_x - start_dot_r - l2_line_length
+	if (keys.length > 5) render_option_dots(paper, true, 2)
+	else render_option_dots(paper, false, 2)
 
 	var line_left = paper.path("M" + (start_x + start_dot_r) + ", " + midline + " L" +p1_start+ ", "+midline)
 	var line_right = paper.path("M" + (i2_x - start_dot_r) + ", " + midline + " L" +p2_start+ ", "+midline)
 
+	svg_wrapper["transition_data"] = data
+	svg_wrapper["lvl2_index"] = length
+
+
+	draw_lvl2_elems(data, keys, length, 0)
+
+
+};
+
+// Expects an array of items
+var set_handlers = function(items, handler, data) {
+	for (var n = 0; n < items.length; n++) {
+		items[n].click(function() {
+			handler(data)
+		})
+	}
+};
+
+var render_option_dots = function(paper, is_active, level) {
+
+	// Render dots for the first time
+	if (option_dot_ids.length == 0) {
+		var dot = paper.circle((start_x + i2_x) / 2, 25, 21).attr({
+			'fill':'#C0392B',
+			'stroke-width':0,
+		});
+
+		var chevron = paper.path("M"+((start_x+i2_x)/2 - 10)+","+(20)+"L"+((start_x+i2_x)/2)+","+(35)+" L"+((start_x+i2_x)/2 + 10)+","+20+" L"+((start_x+i2_x)/2 -10)+","+20).attr({
+			'stroke':'#fffffe',
+			'fill':'#fffffe'
+		});
+
+		// Add data to dot and update DST
+		dot.data("chevron_id",chevron.id)
+		option_dot_ids.push(dot.id)
+
+
+		// Add click handlers
+		set_handlers([dot,chevron], option_handler, level)
+	
+
+	// Or, update to active
+	} else if (is_active) {
+		// unbind old events
+		var dot = paper.getById(option_dot_ids[0])
+		unbind_events(dot)
+		unbind_events(paper.getById(dot.data("chevron_id")))
+
+		// bind new events
+		set_handlers([dot, paper.getById(dot.data("chevron_id"))], option_handler, level)
+
+	// Or, update to inactive
+	} else { 
+		// unbind events
+		var dot = paper.getById(option_dot_ids[0])
+		unbind_events(dot)
+		unbind_events(paper.getById(dot.data("chevron_id")))
+
+		// change color of dot
+		dot.attr('fill','#ECF0F1')
+
+	}
+};
+
+// Click event on red option arrow
+var option_handler = function(level) {
+	console.log("option_handler called w/ level:" + level)
+
+	// Render more industry changes
+	if (level == 1) {
+
+		// Get metadata
+		var transitions = svg_wrapper["transitions"]
+		var current_index = svg_wrapper["lvl1_index"]
+
+		// Delete what's currently there
+		delete_lvl1()
+
+		// Redraw i2 dots & set index for next click
+		if (transitions.length >= current_index + 5) {
+			draw_lvl1_elems(svg_wrapper["clickhandler"], 5, current_index)
+			svg_wrapper["lvl1_index"] = current_index + 5
+		} else {
+			var remainder = transitions.length - current_index
+			draw_lvl1_elems(svg_wrapper["clickhandler"], remainder, current_index)
+			svg_wrapper["lvl1_index"] = 0
+		}
+
+		// Redraw start dot
+		draw_start_elems(svg_wrapper["collection"].models[0].attributes["total_people"], svg_wrapper["paper"])
+
+	// Render more people
+	} else {
+		// console.log("currently rendering: " + svg_wrapper["lvl2_index"])
+		var data = svg_wrapper["transition_data"]
+		var keys = Object.keys(data[2])
+		var current_index = svg_wrapper["lvl2_index"]
+
+		delete_lvl2()
+		console.log(current_index)
+		if (keys.length >= current_index + 5) {
+			draw_lvl2_elems(data, keys, 5, current_index)
+			svg_wrapper["lvl2_index"] = current_index + 5
+		} else {
+			var remainder = keys.length - current_index
+			draw_lvl2_elems(data, keys, remainder, current_index)
+			svg_wrapper["lvl2_index"] = 0
+		}
+	}
+};
+
+
+// Helper function draws transition lines, dots, numbers, and text
+var draw_lvl1_elems = function(clickhandler, length, start_index) {
+
+	var paper = svg_wrapper["paper"]
+	var data = svg_wrapper["collection"].models[0].attributes
+
+	if (transitions.length > 5) render_option_dots(paper, true, 1)
+	else render_option_dots(paper, false, 1)
+
+	for (var i = start_index; i < start_index + length; i++) {
+
+		// Used for original indexing (spacing, mostly)
+		var effective_i = i % 5
+
+		// Calls helper to size dot relative to total_people 
+		var dot_r = size_dot(data['total_people'], transitions[i][1])
+
+		// Construct dot w/ number in the middle
+		var y = midline - y_max + (y_offset * effective_i)
+		var dot = paper.circle(options_x,y,dot_r).attr(option_dot_attributes)
+		var number = paper.text(options_x,y,transitions[i][1]).attr(number_attributes)
+	
+		// Construct line to dot
+		var hinge = (y > midline)? y + 10 : y - 10
+		var line = paper.path("M"+start_x+', '+midline+"Q125, " + hinge  + " " + (options_x-dot_r) + "," + y)
+	
+		// Construct labels of related people
+		var people_keys = Object.keys(transitions[i][2])
+		var names_length = (people_keys.length > max_names) ? max_names : people_keys.length
+		var label_text = transitions[i][0] + "    ("
+		for (var j = 0; j < names_length; j++) {
+			var name = transitions[i][2][people_keys[j]][0]
+			if (j < names_length - 1) label_text += name + ', '
+			else label_text += name + ')'
+		}
+		var label = paper.text(options_x+dot_r+text_buffer, y, label_text).attr(option_label_attributes)
+		
+		// Set click handlers
+		set_click_handlers(dot, number, transitions[i], clickhandler, paper)
+
+		// Set data on dot element, push id to DST
+		dot.data('label_id', label.id)
+		dot.data('number_id', number.id)
+		dot.data('line_id', line.id)
+		dot_ids.push(dot.id)
+	}
+}
+
+var draw_lvl2_elems = function(data, keys, length, start_index) {
+
+	console.log(start_index)
+
+	var paper = svg_wrapper["paper"]
+
 	// Iterate through, add line segments, dots, and text
-	for (var i = 0; i < length; i++) {
+	for (var i = start_index; i < start_index + length; i++) {
+
+		var effective_i = i % 5
 
 		var transition = data[2][keys[i]]
 		console.log(transition)
-		var y = midline - y_max + (y_offset * i)
+		var y = midline - y_max + (y_offset * effective_i)
 		
 		// TODO: middle line needs to be straight
 		if (y != midline)
 			var hinge = (y > midline)? y + 10 : y - 10
 		else
 			var hinge = midline
-
 
 		var l1 = paper.path("M"+p1_start+', '+midline+" Q" + (p1_start+l2_line_length) + ", " + hinge  + " " + (l2_p1) + "," + y)
 		var node1 = paper.circle(l2_p1, y, 8).attr(option_dot_attributes)
@@ -616,21 +774,53 @@ var draw_lvl2_connections = function(data, paper) {
 		
 		var handler = function(id) { window.location="/profile/" + id }
 		set_handlers([node1_text, node2_text, connector_text], handler, keys[i])
+	
+		var ids = [l1.id, node1.id, l2.id, node2.id, connector_line.id, node1_text.id, node2_text.id, connector_text.id]
+		lvl2_elem_ids.push(ids)
+	};
+}
+
+// Deletes all dots, lines, numbers, and text
+var delete_lvl1 = function() {
+	var paper = svg_wrapper["paper"]
+	for (var l = 0; l < dot_ids.length; l++) {
+		var dot = paper.getById(dot_ids[l])
+		paper.getById(dot.data("label_id")).remove()
+		paper.getById(dot.data("number_id")).remove()
+		paper.getById(dot.data("line_id")).remove()
+		dot.remove()
+	};
+	dot_ids.length = 0
+
+	var start_dot = paper.getById(industry_dot_ids[0])
+	paper.getById(start_dot.data("number_id")).remove()
+	start_dot.remove()
+
+	industry_dot_ids.splice(0,1)
+}
+
+var delete_lvl2 = function() {
+
+	var paper = svg_wrapper["paper"]
+	for (var n = 0; n < lvl2_elem_ids.length; n++) {
+		var ids = lvl2_elem_ids[n]
+		for (var m = 0; m < ids.length; m++) {
+			paper.getById(ids[m]).remove()
+		}
 	};
 
-};
-
-// Expects an array of items
-var set_handlers = function(items, handler, data) {
-	console.log('gets here')
-	for (var n = 0; n < items.length; n++) {
-		items[n].click(function() {
-			handler(data)
-		})
-	}
+	lvl2_elem_ids.length = 0
 };
 
 
+var draw_start_elems = function(total_people, paper) {
+	var start_dot = paper.circle(start_x,midline,start_dot_r).attr(chosen_dot_attributes)
+	var start_num = paper.text(start_x,midline,total_people).attr(number_attributes)
+
+	// Add data to dot and add to DST (note added @ index 0)
+	start_dot.data("number_id", start_num.id)
+	industry_dot_ids.splice(0,0,start_dot.id)
+}
 
 
 
