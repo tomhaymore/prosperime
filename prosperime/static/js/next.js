@@ -8,6 +8,10 @@ $(function(){
 		// nothing... is this even needed?
 	});
 
+	window.IndustryData = Backbone.Model.extend({
+
+	})
+
 
 
 	//-------------------//
@@ -34,6 +38,9 @@ $(function(){
 	
 	// Instantiate Collections
 	window.changes = new IndustryChanges;
+	window.industries = new Backbone.Collection(industry_init_data, {
+		model: IndustryData,
+	})
 
 	//-------------//
 	// ** Views ** //
@@ -307,13 +314,82 @@ $(function(){
 	});
 
 
+	/* When user first comes to /next/ */
+	window.LandingView = Backbone.View.extend({
+
+		el:$('#landing-page-container'),
+		template:_.template($('#landing-page-template').html()),
+
+		initialize: function() {
+			_.bindAll(this, 'render')
+			this.collection.on('change', this.render, this);
+			this.collection.on('reset', this.render, this);
+		},
+
+		render:function() {
+
+			// For scope inside the the each loop
+			var collection = this.collection
+
+			// Create template (container element)
+			$(this.el).html(this.template());
+
+			// Attach variable to container, again, for scope
+			var $container = this.$('#industry-options')
+
+			// Roll through, appending industries to container
+			collection.each(function(industry) {
+				var view = new SingleIndustryView({
+					model:industry,
+				});
+				$container.append(view.render().el)
+			})
+
+			return this;
+		},
+
+	});
+
+	// Wraps industry data in 'a' and 'div' tags
+	window.SingleIndustryView = Backbone.View.extend({
+
+		tagName:"li",
+		className:"industry",
+		events: {
+			'click a':'linkClicked'
+		},
+
+		initialize: function() {
+			_.bindAll(this, 'render', 'linkClicked');
+		},
+
+		render:function() {
+			this.$el.html("<a href='/next/#?i1=" + this.model.get('id') + "'>" + this.model.get('name') + "</a>");
+			return this
+		},
+
+		/** NOTE **/
+		// This is going to create zombie views (mem leaks)... FIX IT
+		// b/c it leaves the other views intact
+		linkClicked: function(ev) {
+			console.log("called")
+			// $('#svg-main-container').append("<div id='loading-message'>Loading...</div>")
+		},
+
+	});
+
+
 	window.DotLvl1View = Backbone.View.extend({
 
 		el:$('#search-results-container'),
 
+		events: {
+			'click #explore-others':'backToLandingPage'
+		},
+
 
 		initialize: function() {
-			_.bindAll(this,'render', 'industryClicked', 'back');
+			_.bindAll(this,'render', 'industryClicked', 'back', 'backToLandingPage');
 			this.collection.on('change', this.render, this);
 			this.collection.on('reset',this.render, this);
 
@@ -370,6 +446,10 @@ $(function(){
 			draw_lvl2_connections(i2_data, paper)
 		},
 
+		backToLandingPage: function() {
+			console.log('huzzah')
+		}
+
 	
 
 	});
@@ -388,14 +468,25 @@ $(function(){
 
 		initialize: function() {
 			this.changes = window.changes;
-
+			this.industries = window.industries
 		},
 
 		empty: function() {
-			console.log('empty search')
+			$('#landing-page-container').show()
+			$('#svg-options-container').hide()
+			$('#svg-main-container').hide()
+			$('.container-header').css("display","none")
+			console.log("e")
+			this.landingView = new LandingView({collection:this.industries})
+			this.landingView.render()
 		},
 
 		singleQuery: function(query) {
+			$(".container-header").css("display", "block")
+			$('#landing-page-container').hide()
+			$('#svg-main-container').show()
+			$('#svg-option-container').show()
+
 			console.log('single query: ' + query)
 			// this.filterView = new FiltersView({collection:this.changes})
 			// this.lvl1view = new Lvl1View({collection:this.changes})
@@ -841,7 +932,6 @@ var clear_svg = function() {
 		paper.remove()
 		svg_wrapper['paper'] = null
 	}
-
 }
  
 

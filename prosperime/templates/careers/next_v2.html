@@ -18,6 +18,10 @@
 		https://github.com/devbridge/jQuery-Autocomplete -->
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.autocomplete.min.js"></script>
 
+<script type="text/javascript">
+	var industry_init_data = {{industries|safe}}
+	var all_industries = {{all_industries|safe}}
+</script>	
 
 
 
@@ -69,29 +73,28 @@ $.ajaxSetup({
 <div class="main-container content-container">
 
 	<div class='container-header'>
-		<h3>
-			<span class='sub-header'>What Next?  </span>
-			<span id='industry-header'></span>
-		</h3>
 
-		<div class="pull-right inline">
+		<div class='industry-options-header inline'>What Next?</div>
+		<div class='industry-options-sub-header inline'></div>
+
+		<div id="explore-others" class="pull-right inline">
 			Interested in investigating another industry?
-			<div class="flat-button blue-button">
-				Explore More
+			
+			<!-- This will cause page re-load... not needed -->
+			<div id="landing-page-link" class="flat-button blue-button">
+				Explore Others
 			</div>
-		</div>
-
-		<div id="this-may-take-awhile" class="pull-left inline">
-			This might take a few moments... We're crunching a lot of data.
-		</div>
-
-		
+		</div>		
 	</div>
 
 
 
 
 	<div id='search-filters-container'>
+		<!-- Backbone here -->
+	</div>
+
+	<div id="landing-page-container">
 		<!-- Backbone here -->
 	</div>
 
@@ -297,14 +300,49 @@ $.ajaxSetup({
 
 </script>
 
+<script type="text/template" id="landing-page-template">
+	
+	<div id="landing-page-container">	
+		<div class="industry-options-header">
+			What&#39;s Next?
+		</div>
+		<div class="industry-options-sub-header">
+			Select from this list of industries that we think are relevant to you, or search for your own.
+		</div>
+		<ul id="industry-options"></div>
+
+		<div id="alternate-industry-box" class="search-box">
+			<select id="industry-dropdown">
+				<% 
+					var length = all_industries.length
+					for (var n = 0; n < length; n++) {
+						%>
+							<option value="<%=all_industries[n]['id']%>">
+								<%=all_industries[n]["name"]%>
+							</option>
+						<%
+					}
+				%>
+			</select>
+			<div id="alternate-industry-button" class="flat-button blue-button inline" onclick="alternateIndustrySelected()">
+				View Industry
+			</div>
+		</div>
+	</div>
+
+	</div>
+
+</script>
+
 <script type="text/javascript">
 	
 	$(function() {
-
+		if ($("#landing-page-link").length > 0) {
+			$("#landing-page-link").click(function() {
+				App.navigate("", {trigger:true})
+			})
+		}
 	});
-
-
-
 
 	var id_selected = null
 
@@ -324,6 +362,13 @@ $.ajaxSetup({
 			window.location = ('/next/#?i1=' + id_selected)
 		});
 	})
+
+	var alternateIndustrySelected = function() {
+		var i1 = $("#industry-dropdown option:selected").val()
+		App.navigate("?i1="+i1, {trigger:true})
+	};
+
+
 
 
 

@@ -116,12 +116,12 @@ def plan(request,id=None):
 def feed(request):
 	data = {}
 
+	profile = request.user.profile
 
 
-	## will need... feed items...
-	random_profile = Profile.objects.get(pk=77)
+
 	data1 = {
-		'profile_pic':random_profile.default_profile_pic(),
+		'profile_pic':profile.default_profile_pic(),
 		'are_connected':'false',
 		'num_saved_paths':4,
 		'num_saved_positions':2,
@@ -138,7 +138,7 @@ def feed(request):
 		'user_id':17,
 		'user_name':'Richard Branson',
 		'title':'Earth, Owner',
-		'date':datetime.datetime.now(),
+		'date':datetime.datetime.today(),
 	})
 	feed.append({
 		'type':'newuser',
@@ -146,7 +146,7 @@ def feed(request):
 		'user_id':17,
 		'user_name':'Ramesh Pidikiti',
 		'title':'',
-		'date':datetime.datetime.now(),
+		'date':datetime.datetime.today(),
 	})
 	feed.append({
 		'type':'comment',
@@ -159,7 +159,7 @@ def feed(request):
 		'user_id':17,
 		'user_name':'Sara Lannin',
 		'title':'Director of Operations',
-		'date':datetime.datetime.now(),
+		'date':datetime.datetime.today(),
 	})
 	feed.append({
 		'type':'savedcareer',
@@ -167,10 +167,13 @@ def feed(request):
 		'user_id':17,
 		'user_name':'Penelope Haymore',
 		'title':'Fundraisers',
-		'date':datetime.datetime.now(),
+		'date':datetime.datetime.today(),
 	})
 
+	# format all days for timeline here:
 
+	data["user_profile_pic"] = profile.default_profile_pic()
+	data["user_id"] = request.user.id
 	data["person_data"] = person_data
 	data["feed"] = feed
 	return render_to_response("careers/feed.html", data, context_instance=RequestContext(request))
@@ -269,6 +272,33 @@ def next(request):
 
 	## Plain Page ##
 	else:
+		# Landing Page
+		formatted_industries = []
+		seen_before = set() ## to avoid duplicates... needed?
+		industries = request.user.profile._industries()
+		for i in industries:
+			if i.id in seen_before:
+				print "@/next/ and duplicate industry found. user id:" + str(request.user.id)
+			else:
+				formatted_industries.append({'id':i.id, 'name':i.name})
+				seen_before.add(i.id)
+		saved_industries = SavedIndustry.objects.filter(owner=request.user).select_related("industry")
+		for i in saved_industries:
+			if i.industry.id in seen_before:
+				print "@/next/ and duplicate industry found. user id:" + str(request.user.id)
+			else:
+				formatted_industries.append({'id':i.industry.id, 'name':i.industry.name})
+				seen_before.add(i.industry.id)
+
+		# Do something like... top industries in network?
+		all_industries = Industry.objects.all().values("name", "id").order_by("name")
+		formatted_all_industries = []
+
+		for i in all_industries:
+			formatted_all_industries.append({'id':i['id'], 'name':str(i['name'])})
+
+		data["all_industries"] = json.dumps(formatted_all_industries)
+		data["industries"] = json.dumps(formatted_industries)
 		return render_to_response('careers/next_v2.html',data,context_instance=RequestContext(request))
 
 
