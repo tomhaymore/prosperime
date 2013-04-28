@@ -321,6 +321,8 @@ $(function(){
 
 		render: function() {
 			console.log(this.collection)
+
+			clear_svg()
 			render_dot_lvl1_viz(this.collection, this.industryClicked)
 		},
 
@@ -444,7 +446,6 @@ var midline = (paper_h / 2) + 25
 var max_r = get_max_radius()
 var y_range = paper_h - (2 * max_r) // set in helpers.js = 50
 var y_max = y_range / 2
-var y_offset = Math.ceil(y_range/4)
 var text_buffer = 15
 var start_x = 150
 var options_x = 400
@@ -502,18 +503,20 @@ var l2_text_attributes = {
 }
 
 // Convenience, holds major data structures needed to redraw svg
+//	keeps us from having to pass variables between svg methods and
+//	backbone (messy)
 var svg_wrapper = {
 	'paper':null,
 	'collection':null,
 	'transitions':null,
 	'transition_data':null,
 	'lvl1_index':0,
-	'lvl2_index':0
+	'lvl2_index':0,
+	'clickhandler':null,
 };
 
 
 var render_dot_lvl1_viz = function(collection, clickhandler) {
-
 
 	// Create paper, sort transitions by num people
 	var paper = new Raphael('svg-main-container',paper_w,paper_h)
@@ -536,15 +539,7 @@ var render_dot_lvl1_viz = function(collection, clickhandler) {
 	var start_label = paper.text(start_x,header_y,"From: " +  data["start_name"]).attr(label_attributes)
 };
 
-// Helper method to set click handlers, needed for namespacing issues
-var set_click_handlers = function(dot, number, data, handler, paper) {
-	dot.click(function() {
-		handler(data, dot, paper)
-	});
-	number.click(function() {
-		handler(data, dot, paper)
-	});
-};
+
 
 // Animates clicked dot to the right side of the screen, increases
 //	its size, changes color, and adds an industry label
@@ -589,14 +584,7 @@ var draw_lvl2_connections = function(data, paper) {
 
 };
 
-// Expects an array of items
-var set_handlers = function(items, handler, data) {
-	for (var n = 0; n < items.length; n++) {
-		items[n].click(function() {
-			handler(data)
-		})
-	}
-};
+
 
 var render_option_dots = function(paper, is_active, level) {
 
@@ -618,8 +606,10 @@ var render_option_dots = function(paper, is_active, level) {
 
 
 		// Add click handlers
-		set_handlers([dot,chevron], option_handler, level)
-	
+		if (is_active)
+			set_handlers([dot,chevron], option_handler, level)
+		else
+			dot.attr('fill', '#ECF0F1')
 
 	// Or, update to active
 	} else if (is_active) {
@@ -630,6 +620,8 @@ var render_option_dots = function(paper, is_active, level) {
 
 		// bind new events
 		set_handlers([dot, paper.getById(dot.data("chevron_id"))], option_handler, level)
+
+		dot.attr('fill', '#C0392B')
 
 	// Or, update to inactive
 	} else { 
@@ -701,21 +693,31 @@ var draw_lvl1_elems = function(clickhandler, length, start_index) {
 	if (transitions.length > 5) render_option_dots(paper, true, 1)
 	else render_option_dots(paper, false, 1)
 
+	// Main loop for drawing dots
 	for (var i = start_index; i < start_index + length; i++) {
 
 		// Used for original indexing (spacing, mostly)
 		var effective_i = i % 5
+		var y_offset = Math.ceil(y_range/(length - 1))
+
+		// Construct line to dot
+		if (length == 1) {
+			var hinge = midline
+			var y = midline
+		} else {
+			var y = midline - y_max + (y_offset * effective_i)
+			var hinge = (y > midline)? y + 10 : y - 10
+		}
+
 
 		// Calls helper to size dot relative to total_people 
 		var dot_r = size_dot(data['total_people'], transitions[i][1])
 
 		// Construct dot w/ number in the middle
-		var y = midline - y_max + (y_offset * effective_i)
 		var dot = paper.circle(options_x,y,dot_r).attr(option_dot_attributes)
 		var number = paper.text(options_x,y,transitions[i][1]).attr(number_attributes)
 	
-		// Construct line to dot
-		var hinge = (y > midline)? y + 10 : y - 10
+		
 		var line = paper.path("M"+start_x+', '+midline+"Q125, " + hinge  + " " + (options_x-dot_r) + "," + y)
 	
 		// Construct labels of related people
@@ -742,24 +744,24 @@ var draw_lvl1_elems = function(clickhandler, length, start_index) {
 
 var draw_lvl2_elems = function(data, keys, length, start_index) {
 
-	console.log(start_index)
-
 	var paper = svg_wrapper["paper"]
 
 	// Iterate through, add line segments, dots, and text
 	for (var i = start_index; i < start_index + length; i++) {
 
 		var effective_i = i % 5
+		var y_offset = Math.ceil(y_range/(length - 1))
 
 		var transition = data[2][keys[i]]
 		console.log(transition)
-		var y = midline - y_max + (y_offset * effective_i)
-		
-		// TODO: middle line needs to be straight
-		if (y != midline)
-			var hinge = (y > midline)? y + 10 : y - 10
-		else
+
+		if (length == 1) {
+			var y = midline
 			var hinge = midline
+		} else {
+			var y = midline - y_max + (y_offset * effective_i)
+			var hinge = (y > midline)? y + 10 : y - 10
+		}
 
 		var l1 = paper.path("M"+p1_start+', '+midline+" Q" + (p1_start+l2_line_length) + ", " + hinge  + " " + (l2_p1) + "," + y)
 		var node1 = paper.circle(l2_p1, y, 8).attr(option_dot_attributes)
@@ -799,6 +801,7 @@ var delete_lvl1 = function() {
 	industry_dot_ids.splice(0,1)
 }
 
+// Deletes all dots, lines, node text, and connector text
 var delete_lvl2 = function() {
 
 	var paper = svg_wrapper["paper"]
@@ -813,6 +816,7 @@ var delete_lvl2 = function() {
 };
 
 
+// Draws i1 dot and number on the left side of the screen
 var draw_start_elems = function(total_people, paper) {
 	var start_dot = paper.circle(start_x,midline,start_dot_r).attr(chosen_dot_attributes)
 	var start_num = paper.text(start_x,midline,total_people).attr(number_attributes)
@@ -823,6 +827,46 @@ var draw_start_elems = function(total_people, paper) {
 }
 
 
+var clear_svg = function() {
+	dot_ids.length = 0;
+	option_dot_ids.length = 0;
+	industry_dot_ids.length = 0;
+	lvl2_elem_ids.length = 0;
+
+	var paper = svg_wrapper["paper"]
+	console.log(paper)
+	if (paper && paper.width > 0) {
+		var paperDom = paper.canvas;
+		paperDom.parentNode.removeChild(paperDom); // From StackOverflow... 
+		paper.remove()
+		svg_wrapper['paper'] = null
+	}
+
+}
+ 
+
+
+
+/* Helpers (no knowledge of instance variables, dom) */
+
+// Helper method to set click handlers, needed for namespacing issues
+var set_click_handlers = function(dot, number, data, handler, paper) {
+	dot.click(function() {
+		handler(data, dot, paper)
+	});
+	number.click(function() {
+		handler(data, dot, paper)
+	});
+};
+
+// Expects an array of items
+var set_handlers = function(items, handler, data) {
+	for (var n = 0; n < items.length; n++) {
+		items[n].click(function() {
+			handler(data)
+		})
+	}
+};
 
 
 

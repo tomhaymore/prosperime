@@ -1,0 +1,123 @@
+
+
+/* Main Container */
+div#feed-container {
+	height:500px;
+	margin-bottom:25px;
+}
+
+div#feed-body-container {
+	height:100%;
+	margin:0 auto;
+	margin-top:0px;
+}
+
+div#feed-body-container .column {
+	height:100%;
+}
+
+/* Header Container */
+
+div#header-container > h1 {
+	color:rgb(41,98,152);
+	margin-left:25px;
+	padding:5px 0px 15px 0px;
+	display:inline-block;
+}
+
+div#header-container {
+	border-bottom:2px solid #333;
+	margin-bottom:0px;
+}
+
+div#feed-link-container {
+	display:inline;
+	margin-right:250px;
+	margin-top:0px;
+}
+
+div#feed-link-container .link{
+	display:inline;
+	height:25px;
+	font-size:1.2em;
+	color:#f0f0f0;
+	padding:10px 14px 8px 24px;
+	height:25px;
+	margin-left:0px;
+	margin-right:0px;
+}
+
+div#quick-links-container {
+	background-color:#4CA4FE;
+	width:100px;
+}
+
+div#build-link-container {
+	background-color:#389AFF;
+	width:50px;
+}
+
+div#next-link-container {
+	background-color:#288BF3;
+	width:50px;
+}
+
+/* Left Sidebar */
+div#user-image-container {
+	width:75px;
+	height:75px;
+	border:1px solid black;
+	margin-left:25px;
+}
+
+
+
+/* Feed */
+div.feed-item {
+	font-size:1.2em;
+	padding:10px 14px;
+	display:inline-block;
+}
+
+div.feed-item-timestamp {
+	color:#777;
+	font-size:.9em;
+	display:inline-block;
+}
+
+div#more {
+	text-align:center;
+	font-size:1.2em;
+	margin-top:100px;
+}
+
+/* Thumbnail View (Right Sidebar) */
+div.thumbnail-image-container {
+	width:75px;
+	height:75px;
+	border:1px solid black;
+	display:inline-block;
+	margin-bottom:25px;
+	margin-left:20px;
+	margin-top:10px;
+}
+
+div.connect-button {
+	display:inline-block;
+	margin-right:45px;
+	margin-top:25px;
+}
+div.thumbnail-info {
+	margin-left:20px;
+	padding:0px 8px;
+}
+
+
+
+/* Modifiers */
+
+
+div.bordered {
+	border-left:2px solid #777;
+	border-right:2px solid #777;
+}

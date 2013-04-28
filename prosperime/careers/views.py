@@ -113,6 +113,69 @@ def plan(request,id=None):
 	return render_to_response("careers/plan.html", data, context_instance=RequestContext(request))
 
 @login_required
+def feed(request):
+	data = {}
+
+
+
+	## will need... feed items...
+	random_profile = Profile.objects.get(pk=77)
+	data1 = {
+		'profile_pic':random_profile.default_profile_pic(),
+		'are_connected':'false',
+		'num_saved_paths':4,
+		'num_saved_positions':2,
+	}
+
+	person_data = {17:data1}
+
+
+
+	feed = []
+	feed.append({
+		'type':'careerpath',
+		'id':7,
+		'user_id':17,
+		'user_name':'Richard Branson',
+		'title':'Earth, Owner',
+		'date':datetime.datetime.now(),
+	})
+	feed.append({
+		'type':'newuser',
+		'id':-1,
+		'user_id':17,
+		'user_name':'Ramesh Pidikiti',
+		'title':'',
+		'date':datetime.datetime.now(),
+	})
+	feed.append({
+		'type':'comment',
+		'data':json.dumps(data1),
+		## what else ## 
+	})
+	feed.append({
+		'type':'goalposition',
+		'id':77,
+		'user_id':17,
+		'user_name':'Sara Lannin',
+		'title':'Director of Operations',
+		'date':datetime.datetime.now(),
+	})
+	feed.append({
+		'type':'savedcareer',
+		'id':46,
+		'user_id':17,
+		'user_name':'Penelope Haymore',
+		'title':'Fundraisers',
+		'date':datetime.datetime.now(),
+	})
+
+
+	data["person_data"] = person_data
+	data["feed"] = feed
+	return render_to_response("careers/feed.html", data, context_instance=RequestContext(request))
+
+@login_required
 def modify_saved_path(request,id):
 	
 	# get path object

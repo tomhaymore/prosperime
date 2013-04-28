@@ -1,0 +1,139 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<!-- CSS -->
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/feed.css" />
+
+
+<!-- JS -->
+<script type="text/javascript">
+
+	var person_data = {{person_data|safe}}
+
+</script>
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+<div id="feed-container" class="main-container">
+
+	<!-- Header -->
+	<div id="header-container">
+		<h1>Feed</h1>
+
+		<div id="feed-link-container" class="pull-right">
+	
+			<div id="quick-links-container" class="link">
+				Quick Links
+			</div>
+
+			<div id="build-link-container" class="link">
+				Build
+			</div>
+
+			<!-- No link to Plan right now -->
+<!-- 			<div id="plan-link-container" class="link">
+				Plan
+			</div> -->
+			
+			<div id="next-link-container" class="link">
+				Next
+			</div>
+		</div>
+	</div>
+
+	<!-- Body Container -->
+	<div class="row" id="feed-body-container">
+		<div class="span2 bordered column">
+			<div id="user-image-container">
+				<!-- img goes here -->
+			</div>
+		</div>
+
+		<!-- Feed (Main) Column -->
+		<div class="span7 column">
+			{% if feed|length > 0 %}
+				{% for f in feed %}
+					<div class="feed-item" onmouseover="render_thumbnail({{f.user_id}})" onmouseout="close_thumbnail()">
+						{% if f.type == "savedcareer" %}
+							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> is interested in <a href="/career/{{f.id}}/">{{f.title}}</a>
+						{% elif f.type == "careerpath" %}
+							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> created the career path <a href="/profile/{{f.user_id}}">{{f.title}}</a>
+						{% elif f.type == "goalposition" %}
+							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> is interestered in becoming a <a href="/position/{{f.id}}">{{f.title}}</a>
+						{% elif f.type == "newuser" %}
+							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> joined Prosperime!
+						{% elif f.type == "comment" %}
+							Someone commented on something
+						{% endif %}
+
+
+					</div>
+					<div class="feed-item-timestamp pull-right">
+							{{f.date}}
+					</div>
+				{% endfor %}
+				<div id="more">More</div>
+			{% else %}
+				<h3>Sorry, no updates available right now.</h3>
+			{% endif %}
+		</div>
+
+		<!-- Preview Column -->
+		<div class="span3 bordered column">
+			<div id="thumbnail-container">
+				<!-- Hover gets filled in here -->
+			</div>
+		</div>
+
+	</div>	
+	
+</div>
+{% endblock %}
+
+{% block templates %}
+
+
+
+
+<script type="text/javascript">
+
+
+	var render_thumbnail = function(user_id) {
+		var template = _.template($('#feed-item-thumbnail-template').html());
+		console.log(person_data[user_id])
+		if (user_id in person_data) 
+			$('#thumbnail-container').append(template(person_data[user_id]))
+	};
+
+	var close_thumbnail = function() {
+		$("#thumbnail-container").empty()
+	};
+
+
+</script>
+
+<script type="text/template" id="feed-item-thumbnail-template">
+	<div class="thumbnail-image-container">
+		<img class="profile-image" src="<%=profile_pic%>" />
+	</div>
+
+	<% if (are_connected) {
+		%><div class="flat-button green-button connect-button pull-right">Connect</div><%
+	} else {
+		%><div class="flat-button blue-button connect-button pull-right">Connected</div><%
+	} %>
+
+	<div class="thumbnail-info"><%= num_saved_paths %> saved paths</div>
+	<div class="thumbnail-info"><%= num_saved_positions %> saved positions</div>
+
+</script>
+
+
+
+{% endblock %}
