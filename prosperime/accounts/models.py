@@ -157,6 +157,9 @@ class Profile(models.Model):
         self.prefs = json.dumps(prefs)
         self.save()
 
+    def bio_simple(self):
+        return [{'title':p.title,'id':p.id} for p in self.user.positions.all()]
+
 class Picture(models.Model):
 
     # returns path for uploading pictures
