@@ -236,6 +236,9 @@ class SavedPath(models.Model):
 	positions = models.ManyToManyField(Position, through='SavedPosition')
 	last_index = models.CharField(max_length = 10, null=True)
 
+	def path_simple(self):
+		return [{'id':p.id,'title':p.title} for p in self.positions.all()]
+
 	def get_next_index(self):
 		return_val = int(self.last_index)
 		self.last_index = str(return_val + 1)

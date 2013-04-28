@@ -165,6 +165,7 @@ INSTALLED_APPS = (
     'djcelery',
     # 'saved_paths',
     'careers',
+    'social',
     # 'debug_toolbar'
     # 'south',
     'jsonify',
