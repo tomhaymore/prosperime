@@ -30,25 +30,25 @@ class Comment(models.Model):
 	updated = models.DateTimeField(auto_now=True, null=True)
 
 	def target_user(self):
-		if type == "path":
+		if self.type == "path":
 			return self.path.owner
-		elif type == "position":
+		elif self.type == "position":
 			return self.position.person
-		elif type == "goal_position":
+		elif self.type == "goal_position":
 			return self.goal_position.owner
 
 	def target_name(self):
-		if type == "path":
+		if self.type == "path":
 			return self.path.title
-		elif type == "position":
+		elif self.type == "position":
 			return self.position.title
-		elif type == "goal_position":
+		elif self.type == "goal_position":
 			return self.goal_position.position.title
 
 	def target_id(self):
-		if type == "path":
+		if self.type == "path":
 			return self.path.id
-		elif type == "position":
+		elif self.type == "position":
 			return self.position.id
-		elif type == "goal_position":
+		elif self.type == "goal_position":
 			return self.goal_position.id

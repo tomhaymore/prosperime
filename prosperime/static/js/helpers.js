@@ -39,3 +39,9 @@ var unbind_events = function(el) {
 		}
 	}
 };
+
+// From StackOverflow. Clears elements from a paper
+function clearPaper(paper){
+    var paperDom = paper.canvas;
+    paperDom.parentNode.removeChild(paperDom);
+}

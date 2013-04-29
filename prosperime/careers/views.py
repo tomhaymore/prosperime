@@ -1,5 +1,6 @@
 # Python
 import datetime
+from datetime import timedelta
 import json
 
 # Django
@@ -18,6 +19,7 @@ from accounts.models import Profile
 import careers.careerlib as careerlib
 from entities.models import Entity
 from django.db.models import Count, Q
+from social.feedlib import FeedBase
 
 ######################################################
 ################## CORE VIEWS ########################
@@ -118,63 +120,19 @@ def feed(request):
 
 	profile = request.user.profile
 
+	feedBase= FeedBase()
+	feed = feedBase.get_univ_feed(request.user)
 
+	for f in feed:
+		f["stub"] = json.dumps(f["stub"])
+		f["body"] = json.dumps(f["body"])
+		f["date"] = _format_date_for_feed(f["date"])
+		
+	# TODO -- format datetime objects for timeline here
 
-	data1 = {
-		'profile_pic':profile.default_profile_pic(),
-		'are_connected':'false',
-		'num_saved_paths':4,
-		'num_saved_positions':2,
-	}
-
-	person_data = {17:data1}
-
-
-
-	feed = []
-	feed.append({
-		'type':'careerpath',
-		'id':7,
-		'user_id':17,
-		'user_name':'Richard Branson',
-		'title':'Earth, Owner',
-		'date':datetime.datetime.today(),
-	})
-	feed.append({
-		'type':'newuser',
-		'id':-1,
-		'user_id':17,
-		'user_name':'Ramesh Pidikiti',
-		'title':'',
-		'date':datetime.datetime.today(),
-	})
-	feed.append({
-		'type':'comment',
-		'data':json.dumps(data1),
-		## what else ## 
-	})
-	feed.append({
-		'type':'goalposition',
-		'id':77,
-		'user_id':17,
-		'user_name':'Sara Lannin',
-		'title':'Director of Operations',
-		'date':datetime.datetime.today(),
-	})
-	feed.append({
-		'type':'savedcareer',
-		'id':46,
-		'user_id':17,
-		'user_name':'Penelope Haymore',
-		'title':'Fundraisers',
-		'date':datetime.datetime.today(),
-	})
-
-	# format all days for timeline here:
 
 	data["user_profile_pic"] = profile.default_profile_pic()
 	data["user_id"] = request.user.id
-	data["person_data"] = person_data
 	data["feed"] = feed
 	return render_to_response("careers/feed.html", data, context_instance=RequestContext(request))
 
@@ -2303,6 +2261,27 @@ def _date_to_int(date):
 		return year + '0' + month
 	else:
 		return year + month
+
+def _format_date_for_feed(date):
+
+	now = datetime.datetime.now()
+	one_day = timedelta(days=1)
+	two_days = timedelta(days=2)
+
+	if (now - date) < one_day:
+		if date.hour > 12:
+			return "Today at " + str(date.hour - 12) + ":" + str(date.minute) + ' p.m.'
+		else:
+			return "Today at " + str(date.hour) + ':' + str(date.minute) + ' a.m.'
+
+	elif (now - date) < two_days:
+		if date.hour > 12:
+			return "Yesterday at " + str(date.hour - 12) + ":" + str(date.minute) + " p.m."
+		else:
+			return "Yesterday at " + str(date.hour) + ":" + str(date.minute) + " a.m."
+
+	else:
+		return date
 
 #######################
 ###### Dev Only #######

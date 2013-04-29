@@ -125,8 +125,18 @@ div.thumbnail-info {
 	padding:0px 8px;
 }
 
+div.thumbnail-info-header {
+	margin-left:20px;
+	padding:0px 8px;
+	font-weight:bold;
+}
+
 div#thumbnail-column {
 	border-left:1px solid #a0a0a0;
+}
+
+div#thumbnail-secondary-container {
+	margin-top:25px;
 }
 
 
