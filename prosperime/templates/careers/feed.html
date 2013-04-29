@@ -29,29 +29,37 @@
 		<div id="feed-link-container" class="pull-right">
 	
 			<div id="quick-links-container" class="link">
-				Quick Links
+				Quick Links:
 			</div>
+			<a href="/build/">
+				<div id="build-link-container" class="link">
+					Build
+				</div>
+			</a>
 
-			<div id="build-link-container" class="link">
-				Build
-			</div>
-
-			<!-- No link to Plan right now -->
-<!-- 			<div id="plan-link-container" class="link">
-				Plan
-			</div> -->
-			
-			<div id="next-link-container" class="link">
-				Next
-			</div>
+			<a href="/next/">
+				<div id="next-link-container" class="link">
+					Next
+				</div>
+			</a>
 		</div>
 	</div>
 
 	<!-- Body Container -->
 	<div class="row" id="feed-body-container">
-		<div class="span2 bordered column">
+		<div class="span2 column">
 			<div id="user-image-container">
-				<!-- img goes here -->
+				<img class="profile-image" src="{{user_profile_pic}}" />
+			</div>
+
+			<div class="left-sidebar">
+				<div class="feed-item selected">Updates</div>
+				<a href="/profile/{{user_id}}/#goal-positions">
+					<div class="feed-item">Saved Positions</div>
+				</a>
+				<a href="/profile/{{user_id}}#saved-paths">
+					<div class="feed-item">Saved Paths</div>
+				</a>
 			</div>
 		</div>
 
@@ -85,7 +93,7 @@
 		</div>
 
 		<!-- Preview Column -->
-		<div class="span3 bordered column">
+		<div id="thumbnail-column" class="span3 column">
 			<div id="thumbnail-container">
 				<!-- Hover gets filled in here -->
 			</div>

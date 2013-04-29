@@ -1,3 +1,10 @@
+/* Main Container */
+div#search-results-container {
+
+}
+
+
+
 .main-header {
 	padding:15px;
 	padding-left:20px;
@@ -13,7 +20,7 @@
 }
 
 div.container-header {
-	/*border-bottom: 1px solid #333;*/
+	border-bottom: 1px solid #333;
 }
 
 .sub-header {
@@ -24,7 +31,7 @@ div.container-header {
 div#search-filters-container {
 	width:100%;
 	padding-bottom:15px;
-	border-bottom: 1px solid #333;
+	/*border-bottom: 1px solid #333;*/
 	margin-top:15px;
 	margin-bottom:15px;
 }
@@ -172,14 +179,61 @@ ul.industry-options-container a {
 	width:250px !important; /* normally, no, but this is a 3rd party library*/  
 }
 
-div#this-make-take-awhile {
-
+div#loading-message {
+	width:100%;
+	display:inline-block;
+	margin:0 auto;
+	text-align:center;
+	font-size:3em;
+	margin-top:150px;
 }
 
-div#header-container > h1 {
+div#explore-others {
+	margin-top:0px;
+	margin-bottom:50px;
+	display:inline-block;
+}
+
+
+/* Landing Page (/next/) */
+div#landing-page-container {
+	margin-left:50px;
+	margin-top:50px;
+}
+
+div.industry-options-header {
+	font-size:3em;
+	line-height:30px;
+	font-weight:600;
+	margin-bottom:15px;
 	color:rgb(41,98,152);
+	margin-top:15px;
 }
 
+div.industry-options-sub-header {
+	font-size:1.4em;
+	line-height:28px;
+}
+
+
+
+li.industry {
+	font-size:1.2em;
+	margin-left:15px;
+	padding-top:15px;
+}
+
+div#alternate-industry-box {
+	margin-left:62px;
+	margin-top:25px;
+}
+
+div#alternate-industry-button {
+	margin-left:5px;
+	vertical-align: top;
+	display: inline-block;
+	margin-top:-5px;
+}
 
 /* Modifiers */
 

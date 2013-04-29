@@ -4,6 +4,7 @@
 div#feed-container {
 	height:500px;
 	margin-bottom:25px;
+	margin-top:5px;
 }
 
 div#feed-body-container {
@@ -26,13 +27,12 @@ div#header-container > h1 {
 }
 
 div#header-container {
-	border-bottom:2px solid #333;
 	margin-bottom:0px;
 }
 
 div#feed-link-container {
 	display:inline;
-	margin-right:250px;
+	margin-right:100px;
 	margin-top:0px;
 }
 
@@ -66,10 +66,19 @@ div#next-link-container {
 div#user-image-container {
 	width:75px;
 	height:75px;
-	border:1px solid black;
 	margin-left:25px;
+	margin-bottom:15px;
 }
 
+div.left-sidebar {
+	margin-left:15px;
+	padding-right:10px;
+}
+
+div.left-sidebar a {
+	color:#333;
+	text-decoration: none;
+}
 
 
 /* Feed */
@@ -77,6 +86,11 @@ div.feed-item {
 	font-size:1.2em;
 	padding:10px 14px;
 	display:inline-block;
+}
+
+div.selected {
+	background-color: rgb(41,98,152);
+	color:#f0f0f0;
 }
 
 div.feed-item-timestamp {
@@ -95,7 +109,6 @@ div#more {
 div.thumbnail-image-container {
 	width:75px;
 	height:75px;
-	border:1px solid black;
 	display:inline-block;
 	margin-bottom:25px;
 	margin-left:20px;
@@ -110,6 +123,10 @@ div.connect-button {
 div.thumbnail-info {
 	margin-left:20px;
 	padding:0px 8px;
+}
+
+div#thumbnail-column {
+	border-left:1px solid #a0a0a0;
 }
 
 
