@@ -1025,7 +1025,7 @@ class CareerMapBase():
 	def test_match_position_to_ideals(self,title,industries=[]):
 		title_ngrams = self.extract_ngrams(self.tokenize_position(title))
 		ideals = []
-		ideals.extend(self._get_matching_ideals(t,industries))
+		ideals.extend(self._get_matching_ideals(title_ngrams,industries))
 
 		if ideals:
 			# fetch all matched ideal positions, sorted by length of title
