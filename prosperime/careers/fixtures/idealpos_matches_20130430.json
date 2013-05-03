@@ -1,0 +1,704 @@
+[
+	{
+		"title": "General Administrator",
+		"description":"",
+		"level":2,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"general administrator",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title": "Supervisor",
+		"description":"",
+		"level":2,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"supervisor",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title": "Capital Group Director",
+		"description":"",
+		"level":2,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"capital group director",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				}
+			]
+	},
+	{
+		"title":"Vice President, Business Development and Strategic Partnerships",
+		"description":"",
+		"level":4,
+		"careers":[547,548],
+		"matches":
+			[
+				{
+					"title":"vp head of bd and strategic partnerships",
+					"industries":null
+				},
+				{
+					"title":"vice president head of business development and strategic partnerships",
+					"industries":null
+				},
+				{
+					"title":"vice president head of bd and strategic partnerships",
+					"industries":null
+				},
+				{
+					"title":"vice president bd and strategic partnerships",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title": "Team Member",
+		"description":"",
+		"level":1,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"team member",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title": "CEO",
+		"description":"",
+		"level":5,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"coceo",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"BP&A Analyst",
+		"description":"",
+		"level":2,
+		"careers":[49,567],
+		"matches":
+			[
+				{
+					"title":"bpa",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Program Director",
+		"description":"",
+		"level":3,
+		"careers":[564],
+		"matches":
+			[
+				{
+					"title":"program director",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Consultant (nonprofit)",
+		"description":"",
+		"level":3,
+		"careers":[597],
+		"matches":
+			[
+				{
+					"title":"consultant",
+					"industries":["Philanthropy"]
+				}
+			]
+	},
+	{
+		"title":"Graduate Assistant",
+		"description":"",
+		"level":0,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"graduate assistant",
+					"industries":null
+				}
+		
+			]	
+	},
+	{
+		"title":"Designer",
+		"description":"",
+		"level":2,
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"graphics",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Engineer",
+		"description":"",
+		"level":1,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"CHP Specialist",
+		"description":"",
+		"level":1,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"chp specialist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Sports Analyst",
+		"description":"",
+		"level":1,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"analyst",
+					"industries":["Sports"]
+				}
+			]	
+	},
+	{
+		"title":"Student Athlete",
+		"description":"",
+		"level":1,
+		"careers":[149],
+		"matches":
+			[
+				{
+					"title":"athlete",
+					"industries":["Higher Education"]
+				},
+				{
+					"title":"student athlete",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"High School Math Teacher",
+		"description":"",
+		"level":2,
+		"careers":[137],
+		"matches":
+			[
+				{
+					"title":"high school match teacher",
+					"industries":null
+				},
+				{
+					"title":"math teacher, high school",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Accounting Intern",
+		"description":"",
+		"level":0,
+		"careers":[49],
+		"matches":
+			[
+				{
+					"title":"intern",
+					"industries":["Accounting"]
+				},
+				{
+					"title":"accounting intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Partnerships Coordinator",
+		"description":"",
+		"level":2,
+		"careers":[20],
+		"matches":
+			[
+				{
+					"title":"patnerships coordinator",
+					"industries":["Higher Education","Education Management"]
+				}
+			]	
+	},
+	{
+		"title":"PhD Student",
+		"description":"",
+		"level":2,
+		"careers":[595],
+		"matches":	
+			[
+				{
+					"title":"phd candidate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Peer Advisor",
+		"description":"",
+		"level":1,
+		"careers":[591],
+		"matches":
+			[
+				{
+					"title":"peer advisor",
+					"industries":null
+				}
+
+			]	
+	},
+	{
+		"title":"VP of Research",
+		"description":"",
+		"level":4,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"vp of research",
+					"industries":null
+				}
+
+			]	
+	},
+	{
+		"title":"Analyst (consulting)",
+		"description":"",
+		"level":1,
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"analyst",
+					"industries":["Management Consulting"]
+				}
+			]	
+	},
+	{
+		"title":"Environmental Protection Specialist",
+		"description":"",
+		"level":1,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"environmental protection specialist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Management Development Program",
+		"description":"",
+		"level":2,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"management development program",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate Director of Admissions",
+		"description":"",
+		"level":2,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"associate director of admissions",
+					"industries":null
+				},
+				{
+					"title":"associate director admissions",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director of Undergraduate Admissions",
+		"description":"",
+		"level":3,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"director of undergraduate admissions",
+					"industries":null
+				},
+				{
+					"title":"director of undergraduate admission",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Summer Associate (healthcare)",
+		"description":"",
+		"level":0,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"summer associate",
+					"industries":["Hospital & Health Care"]
+				}
+			]	
+	},
+	{
+		"title":"Assistant Director (higher education)",
+		"description":"",
+		"level":2,
+		"careers":[20],
+		"matches":
+			[
+				{
+					"title":"assistant director",
+					"industries":["Higher Education"]
+				}
+			]	
+	},
+	{
+		"title":"Associate Director (higher education)",
+		"description":"",
+		"level":2,
+		"careers":[20],
+		"matches":
+			[
+				{
+					"title":"associate director",
+					"industries":["Higher Education"]
+				}
+			]	
+	},
+	{
+		"title":"Residence Director",
+		"description":"",
+		"level":1,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"residence director",
+					"industries":null
+				}
+		
+			]	
+	},
+	{
+		"title":"Senior Assistant Director of Undergraduate Admissions",
+		"description":"",
+		"level":2,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"senior assistant director undergraduate international admission",
+					"industries":null
+				}
+		
+			]	
+	},
+	{
+		"title":"Manager",
+		"description":"",
+		"level":2,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"manager",
+					"industries":null
+				}
+		
+			]	
+	},
+	{
+		"title":"E-Commerce Manager",
+		"description":"",
+		"level":2,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"ecommerce manager",
+					"industries":null
+				}
+		
+			]	
+	},
+	{
+		"title":"Researcher (unspecified)",
+		"level":1,
+		"description":"",
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"researcher",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Executive",
+		"description":"",
+		"level":3,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"executive",
+					"industries":null
+				}
+		
+			]	
+	},
+	{
+		"title":"Information Systems Intern",
+		"level":0,
+		"description":"",
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"information systems intern",
+					"industries":null
+				}
+
+			]	
+	},
+	{
+		"title":"Executive Search and Assessment Professional",
+		"description":"",
+		"level":2,
+		"careers":[556,557],
+		"matches":
+			[
+				{
+					"title":"executive search and assessment professional",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Admissions Officer",
+		"description":"",
+		"level":2,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"admission officer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate Director of Undergraduate Academic Affairs",
+		"description":"",
+		"level":2,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"associate director of undergraduate academic affairs",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Community Coordinator",
+		"description":"",
+		"level":1,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"community coordinator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"System Design & Integration",
+		"description":"",
+		"level":1,
+		"careers":[603],
+		"matches":
+			[
+				{
+					"title":"system design integration",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Systems Engineer",
+		"description":"",
+		"level":1,
+		"careers":[603],
+		"matches":
+			[
+				{
+					"title":"systems engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Regional Sales Representative",
+		"description":"",
+		"level":2,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"regional sales representative",
+					"industries":null
+				},
+				{
+					"title":"regional financial institution sales",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Market Development Representative",
+		"description":"",
+		"level":1,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"market development rep",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"MBA Intern",
+		"description":"",
+		"level":0,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"mba intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Court clerk",
+		"description":"",
+		"careers":[297],
+		"matches":
+			[
+				{
+					"title":"clerk",
+					"industries":["Judiciary"]
+				}
+			]	
+	},
+	{
+		"title":"Director (law)",
+		"description":"",
+		"level":3,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"director, legal process",
+					"industries":null
+				},
+				{
+					"title":"director",
+					"industries":["Law Practice","Legal Services"]
+				}
+			]	
+	},
+	{
+		"title":"Investment Broker",
+		"description":"",
+		"level":1,
+		"careers":[278],
+		"matches":
+			[
+				{
+					"title":"investment broker",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Associate (market research)",
+		"description":"",
+		"level":1,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"associate",
+					"industries":["Market Research"]
+				}
+			]
+	},
+	{
+		"title":"Budget Coordinator",
+		"description":"",
+		"level":1,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"budget coordinator",
+					"industries":null
+				},
+				{
+					"title":"budget pricing coordinator",
+					"industries":null
+				}
+			]
+	}
+]
