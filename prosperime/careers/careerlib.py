@@ -14,7 +14,7 @@ import types
 from django.contrib.auth.models import User
 from entities.models import Industry, Entity
 from careers.models import Career, Position, IdealPosition
-from django.core.exceptions import MultipleObjectsReturned
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.core import management
 from django.db.models import Count, Q
 
@@ -1236,13 +1236,27 @@ class CareerImportBase():
 	def import_initial_ideals(self,path):
 		from careers.models import IdealPosition
 		"""
-		imports initial ideal positions, assumes empty table and will not check for duplicates
+		imports initial ideal positions, will do superficial checks for duplicates and add rather than overwriting
 		"""
 
 		ideals = json.loads(open(path).read())
-
+		# initiate existing flag
+		
 		for i in ideals:
-			ipos = IdealPosition(title=i['title'],description=i['description'])
+			existing = False
+			# check to see if ideal position already exists
+			try:
+				ipos = IdealPosition.objects.get(title=i['title'])
+				existing = True
+				print "@ import_initial_ideals() -- existing ideal, will update"
+			except MultipleObjectsReturned:
+				# already multiples, flag and return later
+				print "@ import_initial_ideals -- duplicate ideal position " + i['title']
+				continue
+			except ObjectDoesNotExist:
+				# create new ideal position
+				ipos = IdealPosition(title=i['title'],description=i['description'])
+				print "@ import_initial_ideals() -- new ideal"
 			
 			# loop through all the listed industries
 			for m in i['matches']:
@@ -1259,7 +1273,15 @@ class CareerImportBase():
 							new_industry.save()
 						industry_ids.append(new_industry.id)
 					m['industries'] = industry_ids
-			ipos.matches = json.dumps(i['matches'])
+			if existing:
+				print "@ import_initial_ideals() -- updating matches, skipping to next iteration"
+				old_matches = json.loads(ipos.matches)
+				new_matches = old_matches.extend(i['matches'])
+				ipos.matches = json.dumps(new_matches)
+				# go to next iteration
+				continue
+			else:
+				ipos.matches = json.dumps(i['matches'])
 			if 'level' in i:
 				ipos.level = i['level']
 			else:
@@ -1269,7 +1291,7 @@ class CareerImportBase():
 				career = Career.objects.get(pk=c)
 				ipos.careers.add(career)
 			ipos.save()
-			print "Added " + ipos.title
+			print "@ import_initial_ideals() -- added new ideal " + ipos.title
 
 class CareerExportBase():
 
