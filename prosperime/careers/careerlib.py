@@ -1260,7 +1260,7 @@ class CareerImportBase():
 			
 			# loop through all the listed industries
 			for m in i['matches']:
-				if m['industries']:
+				if 'industries' in m:
 					industry_ids = []
 					# replace industry names with ids
 					for industry in m['industries']:
