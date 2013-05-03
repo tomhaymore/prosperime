@@ -1261,18 +1261,19 @@ class CareerImportBase():
 			# loop through all the listed industries
 			for m in i['matches']:
 				if 'industries' in m:
-					industry_ids = []
-					# replace industry names with ids
-					for industry in m['industries']:
-						try:
-							new_industry = Industry.objects.get(name=industry)
-						except MultipleObjectsReturned:
-							new_industry = Industry.objects.filter(name=industry)[0]
-						except:
-							new_industry = Industry(name=industry)
-							new_industry.save()
-						industry_ids.append(new_industry.id)
-					m['industries'] = industry_ids
+					if m['industries']:
+						industry_ids = []
+						# replace industry names with ids
+						for industry in m['industries']:
+							try:
+								new_industry = Industry.objects.get(name=industry)
+							except MultipleObjectsReturned:
+								new_industry = Industry.objects.filter(name=industry)[0]
+							except:
+								new_industry = Industry(name=industry)
+								new_industry.save()
+							industry_ids.append(new_industry.id)
+						m['industries'] = industry_ids
 			if existing:
 				print "@ import_initial_ideals() -- updating matches, skipping to next iteration"
 				old_matches = json.loads(ipos.matches)
