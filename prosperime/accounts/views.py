@@ -35,7 +35,7 @@ def login(request):
 	
 	# print request.session['_auth_user_backend']
 	if request.user.is_authenticated():
-		return HttpResponseRedirect('/')
+		return HttpResponseRedirect('/feed/')
 	if request.method == "POST":
 		# make sure using proper authentication backend
 		request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
@@ -46,7 +46,7 @@ def login(request):
 			if user is not None:
 				auth_login(request,user)
 				messages.success(request, 'You have successfully logged in.')
-				return HttpResponseRedirect('/')
+				return HttpResponseRedirect('/feed/')
 			
 	else:
 		form = AuthForm()
@@ -347,6 +347,7 @@ def profile(request, user_id):
 	user = User.objects.get(id=user_id)
 	if user.profile.status == "dormant":
 		HttpResponseRedirect("/home/")
+
 	profile = user.profile
 	profile_pic = user.profile.default_profile_pic()
 	
@@ -425,6 +426,16 @@ def profile(request, user_id):
 			is_connected = True
 		else:
 			is_connected = False
+
+
+		# Users Saved Paths
+		saved_path_queryset = SavedPath.objects.filter(owner__id=user_id).exclude(title='queue')
+		viewer_saved_paths = []
+		saved_path_ids = []
+		for path in saved_path_queryset:
+			viewer_saved_paths.append(_saved_path_to_json(path))
+			saved_path_ids.append([path.id, path.title])
+
 	else:
 		is_connected = True
 

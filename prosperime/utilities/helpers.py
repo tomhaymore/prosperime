@@ -4,6 +4,31 @@ import urllib2
 from django.utils import simplejson
 import math
 import datetime
+from datetime import timedelta
+
+
+def _formatted_date(date):
+
+    now = datetime.datetime.now()
+    one_day = timedelta(days=1)
+    two_days = timedelta(days=2)
+
+    if (now - date) < one_day:
+        if date.hour > 12:
+            return "Today at " + str(date.hour - 12) + ":" + str(date.minute) + ' p.m.'
+        else:
+            return "Today at " + str(date.hour) + ':' + str(date.minute) + ' a.m.'
+
+    elif (now - date) < two_days:
+        if date.hour > 12:
+            return "Yesterday at " + str(date.hour - 12) + ":" + str(date.minute) + " p.m."
+        else:
+            return "Yesterday at " + str(date.hour) + ":" + str(date.minute) + " a.m."
+
+    else:
+        return date
+
+
 
 
 def _months_from_now_json(start_date):

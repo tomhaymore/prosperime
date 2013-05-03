@@ -7,12 +7,13 @@
 
 
 <!-- JS -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/helpers.js"></script>
+
 <script type="text/javascript">
 
-	var person_data = {{person_data|safe}}
 
 </script>
-
 {% endblock %}
 
 
@@ -67,17 +68,27 @@
 		<div class="span7 column">
 			{% if feed|length > 0 %}
 				{% for f in feed %}
-					<div class="feed-item" onmouseover="render_thumbnail({{f.user_id}})" onmouseout="close_thumbnail()">
+					{% autoescape on %}
+					<div class="feed-item" onmouseover="render_thumbnail({{f.stub}}, '{{f.type}}', {{f.body}})"onmouseout="close_thumbnail()">
+					{% endautoescape %}
 						{% if f.type == "savedcareer" %}
 							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> is interested in <a href="/career/{{f.id}}/">{{f.title}}</a>
 						{% elif f.type == "careerpath" %}
-							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> created the career path <a href="/profile/{{f.user_id}}">{{f.title}}</a>
+							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> created the career path <a href="/path/{{f.id}}">{{f.title}}</a>
 						{% elif f.type == "goalposition" %}
 							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> is interestered in becoming a <a href="/position/{{f.id}}">{{f.title}}</a>
 						{% elif f.type == "newuser" %}
 							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> joined Prosperime!
 						{% elif f.type == "comment" %}
-							Someone commented on something
+							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> commented on 
+							
+							{% if user.id == f.target_user_id %}
+								your 
+							{% else %}
+								<a href="/profile/{{f.target_user_id}}">{{f.target_user_name}}'s</a>		
+							{% endif %}
+							
+							{{f.target_type}} {{f.target_name}}: {{f.body|slice:":30"}}"
 						{% endif %}
 
 
@@ -86,7 +97,7 @@
 							{{f.date}}
 					</div>
 				{% endfor %}
-				<div id="more">More</div>
+				<!-- <div id="more">More</div> -->
 			{% else %}
 				<h3>Sorry, no updates available right now.</h3>
 			{% endif %}
@@ -97,6 +108,11 @@
 			<div id="thumbnail-container">
 				<!-- Hover gets filled in here -->
 			</div>
+
+			<div id="thumbnail-svg-container">
+				<!-- SVG here -->
+			</div>
+
 		</div>
 
 	</div>	
@@ -111,16 +127,82 @@
 
 <script type="text/javascript">
 
+	var paper = null;
 
-	var render_thumbnail = function(user_id) {
+	var render_thumbnail = function(stub, type, body) {
+
+		// First empty
+		$('#thumbnail-container').empty()
+		if (paper != null) {
+			clearPaper(paper)
+			paper = null
+		}
+
 		var template = _.template($('#feed-item-thumbnail-template').html());
-		console.log(person_data[user_id])
-		if (user_id in person_data) 
-			$('#thumbnail-container').append(template(person_data[user_id]))
+
+		var data = {
+			'are_connected':stub["connected"],
+			'profile_pic':stub["user_pic"],
+			'num_saved_paths':stub["saved_paths"],
+			'num_saved_positions':stub["saved_positions"],
+			'user_name':stub["user_name"],
+			'user_id':stub["user_id"]
+		}
+
+		$('#thumbnail-container').append(template(data))
+
+		var secondary_template = null;
+
+		switch(type) {
+			case "savedcareer":
+				secondary_template = _.template($('#saved-career-thumbnail-template').html());
+				data = {
+					"career_id":stub["career"]["id"],
+					"career_title":stub["career"]["title"],
+				}
+				break;
+
+			case "goalposition":
+				secondary_template = _.template($('#goal-position-thumbnail-template').html());
+				data = {
+					"position_id":stub["id"],
+					"position_title":stub["title"],
+				}
+				console.log(stub["position"])
+				break;
+
+			case "comment":
+				secondary_template = _.template($('#comment-thumbnail-template').html());
+
+				data = {
+					'body':body,
+				}
+
+				break;
+
+			case "careerpath":
+				secondary_template = _.template($('#career-path-thumbnail-template').html());
+
+				// If this is first career path, create paper
+				if (!paper) 
+					paper = new Raphael("thumbnail-svg-container", 250, 200)
+
+				data["paper"] = paper
+				data["path"] = stub["path"]
+
+				break;
+
+			case "newuser":
+				console.log("newuser")
+				break;
+		};
+		if (secondary_template) {
+			$('#thumbnail-secondary-container').append(secondary_template(data))
+		}
 	};
 
 	var close_thumbnail = function() {
-		$("#thumbnail-container").empty()
+		// $("#thumbnail-container").empty()
 	};
 
 
@@ -132,16 +214,69 @@
 	</div>
 
 	<% if (are_connected) {
-		%><div class="flat-button green-button connect-button pull-right">Connect</div><%
-	} else {
 		%><div class="flat-button blue-button connect-button pull-right">Connected</div><%
+	} else {
+		%><div class="flat-button green-button connect-button pull-right">Connect</div><%
 	} %>
 
+	<div class="thumbnail-info-header"><a href="/profile/<%=user_id%>"><%= user_name%></a></div>
 	<div class="thumbnail-info"><%= num_saved_paths %> saved paths</div>
 	<div class="thumbnail-info"><%= num_saved_positions %> saved positions</div>
 
+	<div id="thumbnail-secondary-container"></div>
+
+
 </script>
 
+<script type="text/template" id="saved-career-thumbnail-template">
 
+	<div class="thumbnail-info-header">View Career: <a href="/career/<%=career_id%>/"><%=career_title%></a></div>
+
+</script>
+
+<script type="text/template" id="goal-position-thumbnail-template">
+
+	<div class="thumbnail-info-header">View Position: <a href="/position/<%=position_id%>/"><%=position_title%></a></div>
+
+</script>
+
+<script type="text/template" id="comment-thumbnail-template">
+	
+	<div class="thumbnail-info">"<%=body%>"</div>
+
+</script>
+
+<script type="text/template" id="career-path-thumbnail-template">
+
+	<%
+		for (var n = 0; n < path.length; n++) {
+			paper.circle(50, 12 + (36*n), 12).attr({
+				'fill':'rgb(52,152,219)',
+				'stroke-width':0,
+			})
+
+			// Make sure text will fit
+			if (path[n].title.length > 30) {
+				// Find nearest word
+				var split_index = path[n].title.substring(0,30).lastIndexOf(" ")
+
+				path[n].title = path[n].title.substring(0,split_index) + "\n" + path[n].title.substring(split_index)
+			}
+
+			paper.text(75, 12 + (36*n), path[n].title).attr({
+				'font-size':12,
+				'text-anchor':'start'
+			})
+
+			if (n > 0) {
+				var prev_y = 12 + (36*(n-1)) + 12
+				paper.path("M50,"+prev_y+" L50,"+(36*n)).attr({
+					'stroke':'#777'
+				})
+			}
+		}
+	%>
+
+</script>
 
 {% endblock %}

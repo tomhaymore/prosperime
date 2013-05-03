@@ -1,7 +1,7 @@
 
 div#path-container {
 	overflow:scroll;
-	width:800px;
+	width:950px;
 }
 
 div.build-header {
@@ -15,21 +15,26 @@ span.build-header-name {
 	color:#aaa;
 }
 
+span.build-header-name a {
+	color:#aaa;
+	text-decoration: none;
+}
+
 div#are-you-sure-prompt {
 	max-width:250px;
 	background-color:#e74c3c;
 	position:relative;
 	color:#fffffe;
-	bottom:115px;
-	left:160px;
+	bottom:60px;
+	left:370px;
 	border-radius:4px;
 	padding:6px 8px;
 	text-align:center;
-
+	display:inline-block;
 }
 
 div.call-out-text {
-	font-size:1.4em;
+	font-size:1.2em;
 	margin-bottom:25px;
 	line-height:27px;
 }
@@ -47,13 +52,18 @@ div.build-sub-header {
 }
 
 div.build-positions-search {
-	margin-top:50px;
+	margin-top:0px;
 	margin-bottom:50px;
-	margin-left: 15px;
+	margin-left: 0px;
+}
+
+div.main-column {
+	padding-left:0px;
+	padding-right:0px;
 }
 
 input#build-positions-search-box {
-	width:350px;
+	width:425px;
 }
 
 
@@ -70,6 +80,7 @@ span#add-build-position-button {
 	color:#fffffe;
 	background-color:rgb(41,98,152);
 	text-shadow:none;
+	width:50px;
 }
 
 div.save-button {
@@ -103,9 +114,37 @@ input.build-input {
 	background: #FFF;
 	overflow: auto;
 	width:400px !important; /* normally, no, but this is a 3rd party library */ 
-
 }
 
+
+/* Comments Module */
+div#comments-container {
+	/*width:50%;*/
+}
+
+div.comment-inline {
+	padding:4px 6px;
+}
+
+span.comment-name {
+	font-weight:bold;
+	font-size:.9em;
+}
+
+span.comment-body {
+	font-size:.9em;
+}
+
+span.comment-date {
+	font-size:.8em;
+	color:#999;
+}
+
+#comment-textarea {
+	resize:none;
+	width:400px;
+	color:#333;
+}
 
 
 

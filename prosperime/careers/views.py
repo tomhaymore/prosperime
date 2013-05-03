@@ -1,5 +1,6 @@
 # Python
 import datetime
+from datetime import timedelta
 import json
 
 # Django
@@ -18,6 +19,8 @@ from accounts.models import Profile
 import careers.careerlib as careerlib
 from entities.models import Entity
 from django.db.models import Count, Q
+from social.feedlib import FeedBase
+from social.models import Comment
 
 ######################################################
 ################## CORE VIEWS ########################
@@ -79,9 +82,30 @@ def build(request):
 		'current_positions_json':json.dumps(current_positions),
 		'path_id':-1,
 		'path_steps':None,
+		'viewer_is_owner':"true",
 	}
 
 	return render_to_response("careers/build.html", data, context_instance=RequestContext(request))
+
+@login_required
+def viewPath(request,path_id):
+
+	path = SavedPath.objects.get(id=path_id)
+	path_steps = []
+	for p in path.positions.all():
+		path_steps.append({'pos_id':p.id,'ideal_id':p.ideal_position_id,'title':p.title,'entity_name':p.entity.name})
+
+	data = {
+		'user_name':path.owner.profile.full_name(),
+		'user_id':path.owner.id,
+		'path_id':path_id,
+		'title':path.title,
+		'comments':[{'body':c.body, 'profile_pic':c.owner.profile.default_profile_pic(), 'date_created':_format_date_for_feed(c.created), 'user_name':c.owner.profile.full_name(), 'user_id':c.owner.id} for c in Comment.objects.filter(path=path)],
+		'path_steps':json.dumps(path_steps),
+	}
+
+	return render_to_response("careers/path.html", data, context_instance=RequestContext(request))
+
 
 @login_required
 def plan(request,id=None):
@@ -118,72 +142,28 @@ def feed(request):
 
 	profile = request.user.profile
 
+	feedBase= FeedBase()
+	feed = feedBase.get_univ_feed(request.user)
 
+	for f in feed:
+		f["stub"] = json.dumps(f["stub"])
+		f["body"] = json.dumps(f["body"])
+		f["date"] = _format_date_for_feed(f["date"])
+		
+	# TODO -- format datetime objects for timeline here
 
-	data1 = {
-		'profile_pic':profile.default_profile_pic(),
-		'are_connected':'false',
-		'num_saved_paths':4,
-		'num_saved_positions':2,
-	}
-
-	person_data = {17:data1}
-
-
-
-	feed = []
-	feed.append({
-		'type':'careerpath',
-		'id':7,
-		'user_id':17,
-		'user_name':'Richard Branson',
-		'title':'Earth, Owner',
-		'date':datetime.datetime.today(),
-	})
-	feed.append({
-		'type':'newuser',
-		'id':-1,
-		'user_id':17,
-		'user_name':'Ramesh Pidikiti',
-		'title':'',
-		'date':datetime.datetime.today(),
-	})
-	feed.append({
-		'type':'comment',
-		'data':json.dumps(data1),
-		## what else ## 
-	})
-	feed.append({
-		'type':'goalposition',
-		'id':77,
-		'user_id':17,
-		'user_name':'Sara Lannin',
-		'title':'Director of Operations',
-		'date':datetime.datetime.today(),
-	})
-	feed.append({
-		'type':'savedcareer',
-		'id':46,
-		'user_id':17,
-		'user_name':'Penelope Haymore',
-		'title':'Fundraisers',
-		'date':datetime.datetime.today(),
-	})
-
-	# format all days for timeline here:
 
 	data["user_profile_pic"] = profile.default_profile_pic()
 	data["user_id"] = request.user.id
-	data["person_data"] = person_data
 	data["feed"] = feed
 	return render_to_response("careers/feed.html", data, context_instance=RequestContext(request))
 
 @login_required
 def modify_saved_path(request,id):
-	
+
 	# get path object
 	path = SavedPath.objects.get(pk=id)
-	
+
 	# initiate array for steps in saved path
 	path_steps = []
 	
@@ -202,14 +182,28 @@ def modify_saved_path(request,id):
 	for e in educations:
 		current_positions.append({'pos_id':e.id,'ideal_id':e.ideal_position_id,'title':str(e.title),'entity_name':str(e.entity.name)})
 	
+	# get all comments on path
+	comments = [{'body':c.body, 'profile_pic':c.owner.profile.default_profile_pic(), 'date_created':_format_date_for_feed(c.created), 'user_name':c.owner.profile.full_name(), 'user_id':c.owner.id} for c in Comment.objects.filter(path=path)]
+
+
 	# collect data for template
 	data = {
 		'path_steps':json.dumps(path_steps),
 		'current_positions':current_positions,
 		'current_positions_json':json.dumps(current_positions),
 		'path_id':path.id,
-		'title':path.title
+		'title':path.title,
+		'comments':comments,
 	}
+
+
+	# If not your path, redirect to path view (rather than build)
+	if request.user.id != path.owner.id:
+		data['user_name'] = path.owner.profile.full_name()
+		data['user_id'] = path.owner.id 
+		return render_to_response("careers/path.html",data ,context_instance=RequestContext(request))
+
+
 
 	return render_to_response("careers/build.html", data, context_instance=RequestContext(request))
 
@@ -1410,7 +1404,9 @@ def get_next_build_step(request):
 
 		positions = career_path.get_next_build_step(start_ideal_id,start_pos_id)
 
-		return HttpResponse(json.dumps(positions[:5]))
+		print "Num Options Returned: " + str(len(positions))
+
+		return HttpResponse(json.dumps(positions))
 	
 # AJAX for returning a JSON of ideal position paths
 def get_ideal_pos_paths(request):
@@ -2303,6 +2299,27 @@ def _date_to_int(date):
 		return year + '0' + month
 	else:
 		return year + month
+
+def _format_date_for_feed(date):
+
+	now = datetime.datetime.now()
+	one_day = timedelta(days=1)
+	two_days = timedelta(days=2)
+
+	if (now - date) < one_day:
+		if date.hour > 12:
+			return "Today at " + str(date.hour - 12) + ":" + str(date.minute) + ' p.m.'
+		else:
+			return "Today at " + str(date.hour) + ':' + str(date.minute) + ' a.m.'
+
+	elif (now - date) < two_days:
+		if date.hour > 12:
+			return "Yesterday at " + str(date.hour - 12) + ":" + str(date.minute) + " p.m."
+		else:
+			return "Yesterday at " + str(date.hour) + ":" + str(date.minute) + " a.m."
+
+	else:
+		return date
 
 #######################
 ###### Dev Only #######
