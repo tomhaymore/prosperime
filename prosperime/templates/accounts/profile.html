@@ -262,7 +262,9 @@ $.ajaxSetup({
 
 		<br/><br/>
 
+	{% endif %}
 
+	{% if viewer_saved_paths %}
 		<!-- Tabs -->
 		<ul class="nav nav-tabs" id="saved-path-tabs">
 			{% if viewer_saved_paths %}
@@ -272,7 +274,7 @@ $.ajaxSetup({
 			{% endif %}
 		</ul>
 
-		<a href="#saved-paths"> 
+		<a href="#saved-paths"> </a>
 		<div class="tab-content" id="saved-paths-container">
 			
 			{% if viewer_saved_paths %}
@@ -290,7 +292,6 @@ $.ajaxSetup({
 			{% endif %}
 
 		</div>
-		</a>
 
 		
 	{% endif %}
@@ -639,11 +640,17 @@ $.ajaxSetup({
 		}
 
 		monospaced_timeline(saved_path_constants, positions, 'path-' + id)
-		// need to add 'delete' and 'edit' buttons
-		var prepend_html = "<div class='edit-path-button flat-button path-button'><a href='/build/"+ id + "'>Edit</a></div> <div class='delete-path-button flat-button path-button' data-id='"+ id + "'>Delete</div>"
 
-		$('#path-'+id).prepend(prepend_html)
-		$('#path-' + id + ' .delete-path-button').click(delete_path)
+		if ({{own_profile_javascript}}) {
+			// need to add 'delete' and 'edit' buttons
+			var prepend_html = "<div class='edit-path-button flat-button path-button'><a href='/build/"+ id + "'>Edit</a></div> <div class='delete-path-button flat-button path-button' data-id='"+ id + "'>Delete</div>"
+
+			$('#path-'+id).prepend(prepend_html)
+			$('#path-' + id + ' .delete-path-button').click(delete_path)
+		} else {
+			var prepend_html = "<a href='/path/"+id+"'><div class='flat-button path-button' data-id='"+id+"'>View</div></a>"
+			$('#path-'+id).prepend(prepend_html)
+		}
 	};
 
 
@@ -1111,8 +1118,6 @@ $.ajaxSetup({
 
 	// Compares two dates of format "MM/YY"
 	var months_difference_js = function(start, end) {
-		console.log(parseInt(end.substring(3), 10))
-		console.log(parseInt(start.substring(3), 10))
 		var diff = 12 * (parseInt(end.substring(3), 10) - parseInt(start.substring(3), 10))
 		// console.log(diff)
 		diff += (parseInt(end.substring(0,2), 10) - parseInt(start.substring(0,2), 10))

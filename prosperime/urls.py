@@ -10,20 +10,28 @@ urlpatterns = patterns('',
     url(r'^$', 'careers.views.home', name='home'),
     url(r'^home/$', 'careers.views.home'),
     url(r'^welcome/$','entities.views.welcome'),
+
+    # Accounts Views
     url(r'^privacy/$','accounts.views.privacy'),
     url(r'^terms/$','accounts.views.terms'),
     url(r'^copyright/$','accounts.views.copyright'),
+
+    # Entities Views
     url(r'^contact/$', 'entities.views.contact'),
     url(r'^about/$', 'entities.views.about'),
     url(r'^meet/$', 'entities.views.meet'),
 
-    # tmp
-    url(r'^feed/$', 'careers.views.feed'),
 
+
+    # Careers Views
+    url(r'^path/(\d+)/$', 'careers.views.viewPath'),
+    url(r'^feed/$', 'careers.views.feed'),
     url(r'^build/$', 'careers.views.build'),
     url(r'^build/(\d+)/$', 'careers.views.modify_saved_path'),
     url(r'^plan/$', 'careers.views.plan'),
     url(r'^plan/(\d+)/$', 'careers.views.plan'),
+
+
     # url(r'^personalize/$','careers.views.personalize_careers_jobs'),
     url(r'^personalize/careers/$','careers.views.personalize_careers'),
     url(r'^personalize/jobs/$','careers.views.personalize_jobs'),
@@ -71,6 +79,9 @@ urlpatterns = patterns('',
     url(r'^accounts/updateProfile/$', 'accounts.views.updateProfile'),
     url(r'^accounts/deleteItem/$', 'accounts.views.deleteItem'),
     url(r'^accounts/connect/$', 'accounts.views.connect'),
+
+    ## Social
+    url(r'^social/saveComment/$', 'social.views.saveComment'),
 
     url(r'^decisions/', 'careers.views.getDecisions'),
     url(r'^login/','accounts.views.login'),

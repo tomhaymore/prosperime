@@ -11,6 +11,8 @@
 	<script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>
 	<script async type="text/javascript" src="{{ STATIC_URL }}js/timeline-viz.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.autocomplete.min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/helpers.js"></script>
+
 
 {% endblock %}
 
@@ -20,6 +22,7 @@
 
 <div id="content-container" class="main-container">
 
+	<!-- Header --> 
 	<div class="build-header">
 		Build: 
 		{% if title == "Untitled" %}
@@ -28,6 +31,7 @@
 			<span class="build-header-name">{{title}}</span>
 		{% endif %}
 
+	<!-- Delete Button --> 
 		<div id="delete-button-container" class="pull-right flat-button">
 			{% if path_id > -1 %}
 				<div id="delete-button" onclick="delete_path()">
@@ -39,52 +43,83 @@
 
 	</div>
 
+	<!-- Sub Header -->
 	<div class="call-out-text">
 		Build a career path using one of your <a href="#current-positions">current positions</a> or a completely new starting point. Click on one of your <a href="#current-positions">current positions</a> below to get started, or use the search box to add any position you like.
+
+		<br/><br/>
+
+		Within a path, click on the most recent node to go back.
 	</div>
 
+	<!-- MAIN PATH CONTAINER -->
 	<div id="path-container">
 		<!-- SVG here -->
 	</div>
 
 
-	<div id="build-positions-container">
-
-		<div id="build-save-button" class="flat-button pull-left button-large save-button" onclick="save()">
-			Save
-		</div>
-		<div class="clear"></div>
-
-
-		<div class="pull-left" style="width:50%;">
-			<div class="build-sub-header">
-				Current Positions<a name="current-positions"></a>
-			</div>
-
+	<!-- Bottom Container -->
+	<div class="row">
+		<div id="build-positions-container" class="span12">
 			
+			<!-- If your path, show current positions -->
+			<div class="pull-left span6 main-column inline" style="margin-left:0px;">
 
-			<div id="are-you-sure-prompt"  class="">
-				<!-- Text here -->
+				<!-- Save Button -->
+				<div id="build-save-button" class="flat-button pull-right button-large save-button" onclick="save()">
+					Save
+				</div>
+
+				<div class="build-sub-header pull-left">
+					Current Positions<a name="current-positions"></a>
+				</div>
+
+				<!-- Warning Button -->
+				<div id="are-you-sure-prompt" style="visibility:hidden;"></div>
+		
+				<!-- Current Positions -->
+				<table id="build-positions-table" class="table">
+				{% for pos in current_positions %}
+					<tr><td class="build-start-position" data-pos_id="{{pos.pos_id}}" data-title="{{pos.title}}" data-entity_name="{{pos.entity_name}}" data-ideal_id="{{pos.ideal_id}}">
+						{{pos.title}} at {{pos.entity_name}}
+					</td></tr>
+				{% endfor %}
+				</table>
+
+				<!-- Search Box -->
+				<div class="build-positions-search pull-right">
+					<div class="input-append inline">
+						<input id="build-positions-search-box" type="text" placeholder="Search for a position">
+						<span id="add-build-position-button" class="add-on"> Add </span>
+					</div>
+				</div>
 			</div>
+		
 
-			<table id="build-positions-table" class="table">
-			{% for pos in current_positions %}
-				<tr><td class="build-start-position" data-pos_id="{{pos.pos_id}}" data-title="{{pos.title}}" data-entity_name="{{pos.entity_name}}" data-ideal_id="{{pos.ideal_id}}">
-					{{pos.title}} at {{pos.entity_name}}
-				</td></tr>
-			{% endfor %}
-			</table>
+
+			<!-- Comments -->
+			<div id="comments-container" class="pull-right inline span6" style="margin-left:0px; visibility:hidden;">
+				<div class="build-sub-header" id="comments-container-header">Comments</div>
+				{% if comments|length == 0 %}
+					{% if viewer_own_profile == "false" %}
+						Be the first one to leave a comment!
+					{% else %}
+						No comments yet
+					{% endif %}
+				{% else %}
+					{% for c in comments %}
+						<div class="comment-inline">
+							<img width="25" height="25" class="profile-image" src="{{c.profile_pic}}"/>
+							<span class="comment-name"><a href="/profile/{{c.user_id}}/">{{c.user_name}}</a></span>
+							<span class="comment-body">{{c.body}}</span>
+							<span class="comment-date">{{c.date_created}}</span>
+						</div>
+					{% endfor %}
+				{% endif %}
+
+				</div>
 		</div>
-
-		<div class="build-positions-search pull-right">
-			<div class="input-append inline">
-				<input id="build-positions-search-box" type="text" placeholder="Search for a position">
-				<span id="add-build-position-button" class="add-on"> Add </span>
-			</div>
-		</div>
-		<div class="clear"></div>
-	</div>
-
+	</div>	
 	
 </div>
 {% endblock %}
@@ -99,13 +134,12 @@
 
 	$(function() {
 
-		// If existing path, render it
+		// If existing path, render it and comment
 		if ({{path_id}} != -1) {
 			render_existing_path()
+			$('#comments-container').css("visibility", "visible")
 		}
 
-		// Hide "Are You Sure?" Prompt
-		$('#are-you-sure-prompt').hide()
 
 		// Hover handler - blue highlight 
 		$('#build-positions-table tr').hover(function(ev) {
@@ -149,6 +183,7 @@
 	    		current_pos.push({'entity_name':position_selected_entity_name, 'ideal_id':position_selected_ideal_id, 'pos_id':position_selected_pos_id, 'title':position_selected_title})
 	    	};
 	    });
+
 
 
 		// Title change handlers....
@@ -201,12 +236,61 @@
 
 	});
 
+    // For Comment Textarea Button show/hide
+    var checkCommentButton = function() {
+    	if ($('#comment-textarea').val().length > 0)
+    		$('#comment-button').css('visibility', 'visible')
+    	else 
+    		$('#comment-button').css('visibility', 'hidden')
+    }
 
+    // To Make Comment (AJAX)
+    var submitComment = function() {
+    	var comment = $('#comment-textarea').val()
+
+    	$.post("/social/saveComment/", {'path_id':{{path_id}}, 'body':comment, 'type':"path", 'csrfmiddlewaretoken':"{{csrf_token}}"},
+		function(response) {
+			if (response["result"] == "success") {
+				console.log("Success")
+
+				// Append new comment to comments
+				var template = _.template($('#inline-comment-template').html())
+
+				$('#comments-container-header').after(template({
+					'profile_pic':response["profile_pic"],
+					'user_name':response["user_name"],
+					'date_created':response["date_created"],
+					'body':comment,
+				}))
+
+				// Clear comment box
+				$('#comment-textarea').val("")
+
+			} else {
+				console.log("Failure: " + response["errors"])
+			}
+		},"json");
+    }
 
 </script>
 
+
+<script type="text/template" id="inline-comment-template">
+
+	<div class="comment-inline">
+		<img width="25" height="25" class="profile-image" src="<%=profile_pic%>"/>
+		<span class="comment-name"><%=user_name%></span>
+		<span class="comment-body"><%=body%></span>
+		<span class="comment-date"><%=date_created%></span>
+	</div>
+
+</script>
+
+
 <script type="text/javascript">
+	/****************/
 	/* SVG for Path */
+	/****************/
 
 	/* Constants & Instance Variables */
 	var options = null //{{options|safe}}
@@ -217,40 +301,48 @@
 	var options_data = []
 	var chosen_data = []
 	var line_data = []
+	var shuffle_button_id = -1
 
 	var paper_w = 1000
 	var paper_h = 250
 	var midline = 125
-	var dot_radius = 12
+	var dot_radius = 14 // 12
 	var y_range = 200
 	var y_max = y_range / 2
 	var y_offset = Math.ceil(y_range/(4)) // assuming 5 options...
 	var x_start = 125
 	var dot_distance = 125
-	var text_offset1 = 40
-	var text_offset2 = 25
+	var text_offset1 = 50 // 40
+	var text_offset2 = 30 //25
 	var text_offset3 = 10
 	var option_text_offset = 50
 	var current_rect_id = -1
+	var current_option_index = 0
 
 	/* Attributes */
 	var chosen_dot_attributes = {
-		'fill':'rgb(41,98,152)',
+		'fill':'#2980B9', //'fill':'rgb(41,98,152)',
 		'stroke-width':0
 	};
 
 	var option_dot_attributes = {
-		'fill':'#679FD2',
+		'fill':'#3498DB', //'fill':'#679FD2',
 		'stroke-width':0,
+		'fill-opacity':.6,
 	};
 
 	var saved_dot_attributes = {
-		'fill':'#043A68',
+		'fill':'#2980B9', //'fill':'#043A68',
+		// 'stroke-opacity':.5,
+		// 'stroke':'#3980B9',
+		// 'stroke-width':18,
 		'stroke-width':0,
 	};
 
 	var chosen_line_attributes = {
-		'stroke':'#777'
+		'stroke':'#c0c0c0',
+		'stroke-linecap':'round',
+		'stroke-opacity':'.8'
 	};
 
 	var option_line_attributes = {
@@ -258,12 +350,14 @@
 	};
 
 	var text_attributes = {
-		"font-size":12,
-		"font-family": '"Open Sans", "Helvetica"',
+		"font-size":14,
+		"font-family": '"Helvetica Neue", "Helvetica"',
+		"text-anchor": "middle",
+		"font-weight": "normal",
 	};
 
 	var option_text_attributes = {
-		"font-size":12,
+		"font-size":14,
 		"text-anchor":"start",
 		"font-family":'"Open Sans", "Helvetica"'
 	};
@@ -271,371 +365,7 @@
 	/* Create Paper */
 	var paper = new Raphael("path-container", paper_w, paper_h)
 
-
-	var add_first_position = function(pos_id, ideal_id, title, entity_name) {
-
-		// Check if this is being added or already in current pos
-		var match = false
-		for (var s = 0; s < current_pos.length; s++)
-			if (current_pos[s]['pos_id'] == pos_id) match = true
-
-		if (!match) add_position_to_current_table(pos_id, ideal_id, title, entity_name)
-
-		// Check if path already exists, in which case delete	
-		if (chosen_data.length > 0) {
-			clear_path()
-		}
-
-		/* Create SVG Elements */
-		var dot = paper.circle(x_start, midline, dot_radius).attr(chosen_dot_attributes)
-		var title_text = paper.text(x_start, midline - text_offset1, title).attr(text_attributes)
-		var entity_text = paper.text(x_start, midline - text_offset2, entity_name).attr(text_attributes)
-
-		/* Set relevant data on dot element */
-		dot.data("pos_id", pos_id)
-		dot.data("title_text_id", title_text.id)
-		dot.data("entity_text_id", entity_text.id)
-		dot.data("ideal_id", ideal_id)
-
-		/* Add 'back' to do */
-		dot.click(go_back)
-
-		/* Update data structure */
-		chosen_data.push({"dot_id":dot.id, "pos_id":pos_id, "ideal_id": ideal_id})
-
-		/* Get and render options */
-		get_and_render_options(ideal_id,pos_id)
-	};
-
-	var get_and_render_options = function(ideal_id,pos_id) {
-
-		options = get_options(ideal_id,pos_id)
-		console.log(options)
-		render_options(options)
-
-	};
-
-
-	var render_options = function(ideal_id) {
-
-		// Edge Case: only one result, render @ midline
-		if (options.length == 1) var flat = true
-
-		// Render options
-		for (var i = 0; i < options.length; i++) {
-
-			/* Set X,Y values for animation */
-			var x_1 = x_start + (dot_distance * (chosen_data.length - 1))
-			var y_1 = midline
-			var x_2 = x_start + (dot_distance * chosen_data.length)
-			var y_2 = (flat) ? midline : midline + y_max - (y_offset * i)
-			
-			/* Create SVG Elements */
-			var option_dot = paper.circle(x_1, y_1, dot_radius).attr(option_dot_attributes)
-			var option_title = paper.text(x_1, y_1, options[i].title).attr(option_text_attributes)
-			var option_entity_name = paper.text(x_1, y_1, options[i].entity_name).attr(option_text_attributes)
-
-			/* Animate SVG Elements */
-			option_dot.animate({"cx":x_2, "cy":y_2}, "2e2")
-			option_title.animate({"x":(x_2 + option_text_offset), "y":y_2 - text_offset3}, "2e2")
-			option_entity_name.animate({"x":(x_2 + option_text_offset), "y":(y_2 + text_offset3)}, "2e2")
-
-			/* Gather information needed for hover */
-			option_dot.data("title_text_id", option_title.id)
-			option_dot.data("entity_text_id", option_entity_name.id)
-			option_dot.data("pos_id", options[i].pos_id)
-			option_dot.data("ideal_id", options[i].ideal_id)
-
-			// Update data structure
-			options_data.push({'dot_id':option_dot.id, 'position_id':options[i].id, 'title_text_id': option_title.id, 'entity_text_id': option_entity_name.id})
-
-			/* Add hover handlers */
-			option_dot.hover(function() {
-				this.attr("r", 14)
-				paper.getById(this.data("title_text_id")).attr("font-weight","bold").attr("font-size","12")
-				paper.getById(this.data("entity_text_id")).attr("font-size","12").attr("font-weight","bold")
-
-			}, function() {
-				this.attr("r",dot_radius)
-				paper.getById(this.data("title_text_id")).attr("font-weight","normal").attr("font-size", "12")
-				paper.getById(this.data("entity_text_id")).attr("font-weight","normal").attr("font-size", "12")
-			});
-
-			/* Add Click handler */
-			option_dot.click(function() {
-				option_clicked(this)
-			})
-		}
-	
-	};
-
-	var save_attempted = false
-	var save = function() {
-
-		// Animate to show clicked
-		$('#build-save-button').fadeOut(100).fadeIn(100)
-
-		// Get Path Info
-		var title = $('.build-header-name').html()
-
-		// Check if they left the title box open, set
-		//	title accordingly
-		if ($('.build-input').length > 0) {
-			if ($('.build-input').val().length > 0)
-				title = $('.build-input').val()
-			else 
-				title = "Untitled"
-		}
-
-		var position_ids = []
-		for (var g = 0; g < chosen_data.length; g++) {
-			position_ids.push(chosen_data[g]["pos_id"])
-		}
-
-		// Don't allow path of length 0 to save
-		if (position_ids.length == 0) {
-			$('#are-you-sure-prompt').html("There are no positions in this path! Start adding positions below.").show();
-			return false;
-		} 
-
-
-		// If no title, prod the users for one
-		if (title == "Untitled" && !save_attempted) {
-			$('#are-you-sure-prompt').html("Want to give this path a title first? Click on the title above to give it a name.").show();
-			
-			save_attempted = true;
-			return false;
-		}
-
-	
-		console.log("Pre-save: [title:" + title + "] [position_ids:" + position_ids + "] [path_id:" + path_id + ']')
-
-		// Post to DB
-		$.post("/careers/saveBuildPath/",
-			{'title':title, 'position_ids':position_ids, 'path_id':path_id, 'csrfmiddlewaretoken':"{{csrf_token}}"},
-			function(response) {
-				if (response["result"] == "success") {
-					console.log("Success")
-					$('.save-button').html("Saved")
-
-					// Now that saved, cab be deleted
-					var delete_html = "<div id='delete-button'  onclick='delete_path()'>Delete</div>"
-					$('#delete-button-container').html(delete_html)
-
-					// Set new path id
-					path_id = response["path_id"]
-					console.log("new path id set to : " + path_id)
-
-				} else {
-					console.log("Failure: " + response["errors"])
-				}
-			},
-			"json"
-		)
-
-	};
-
-	var option_clicked = function(el) {
-		// Move selected elements && change styling
-		el.animate({'cy':midline, 'fill':'rgb(41,98,152)'}, '2e2')
-		var id = el.id
-
-		// Alternate location of text
-		if (chosen_data.length % 2 == 0) {
-			var title_y = midline - text_offset1
-			var entity_name_y = midline - text_offset2
-		}
-		else {
-			var title_y = midline + text_offset2
-			var entity_name_y = midline + text_offset1
-		}
-
-		var title_text = paper.getById(el.data("title_text_id"))
-		title_text.attr("text-anchor", "middle").attr("font-weight", "normal")
-		title_text.animate({"x":x_start + (dot_distance * chosen_data.length), "y": title_y}, '2e2')
-
-		var entity_text = paper.getById(el.data("entity_text_id"))
-		entity_text.attr("text-anchor", "middle").attr("font-weight", "normal")
-		entity_text.animate({"x":x_start + (dot_distance * chosen_data.length), "y": entity_name_y}, '2e2')
-
-
-		// Unbind Events
-		while(el.events.length) {
-			var e = el.events.pop()
-			e.unbind()
-		}
-
-		// Because most recent, bind "go back" event
-		el.click(go_back)		
-
-		// Remove clicks from previous dots
-		if (chosen_data.length > 0) {
-			for (var l = 0; l < chosen_data.length; l++) {
-				paper.getById(chosen_data[l]["dot_id"]).unclick(go_back)
-			}
-		}
-	
-		// Draw line to previous
-		var line = paper.path("M" + (x_start + ((chosen_data.length - 1) * dot_distance) + dot_radius) + ', ' + midline + ' L' + (x_start + (chosen_data.length * dot_distance) - dot_radius) + ','  + midline).attr(chosen_line_attributes)
-
-		// Remove other dots
-		for (var j = 0; j < options_data.length; j++) {
-			if (options_data[j]["dot_id"] != id) {
-				paper.getById(options_data[j]["dot_id"]).remove()
-				paper.getById(options_data[j]["title_text_id"]).remove()
-				paper.getById(options_data[j]["entity_text_id"]).remove()
-			}
-		}
-
-		// Update DST
-		chosen_data.push({"dot_id":el.id, "pos_id":el.data("pos_id"), "ideal_id": el.data("ideal_id")})
-		options_data.length = 0
-		line_data.push(line.id)
-		get_and_render_options(el.data("ideal_id"),el.data("pos_id"))
-	}
-
-	var normalize_rows = function() {
-		// Color all rows white
-		$('#build-positions-table tr').each(function() {
-			
-			// If it was already selected, unselect and re-add hover //		handler
-			if ($(this).hasClass("selected")) {
-				$(this).removeClass("selected").hover(function(ev) {
-					$(ev.currentTarget).toggleClass("info")
-				}, function(ev) {
-					$(ev.currentTarget).toggleClass("info")
-				});
-			}
-		})
-	};
-
-	var clear_path = function() {
-		// Delete dots, options for most recent dot
-		remove_chosen_dots()
-		remove_options()
-
-		// Delete lines
-		for (var d = 0; d < line_data.length; d++) {
-			paper.getById(line_data[d]).remove()
-		}
-
-		// Clear all data structures
-		line_data.length = 0
-	}
-
-	var go_back = function() {
-
-		/* Delete most recent dot */
-		var most_recent = paper.getById(chosen_data.pop()["dot_id"])
-		remove_dot_and_text(most_recent)
-		
-
-		/* Animate options backwards */
-		// var x = x_start + (chosen_data.length * dot_distance)
-		// for (var z = 0; z < options_data.length; z++) {
-
-		// 	// Callback - once completed, run the rest of go_back()
-		// 	paper.getById(options_data[z]["dot_id"]).animate({"cx":x, "cy":midline}, 500, go_back_part_2)
-		// }
-
-		
-		remove_options()
-
-		/* Remove its line */
-		if (line_data.length > 0)
-			paper.getById(line_data.pop()).remove()
-
-		/* Re-render off of previous dot, if there is one */
-		if (chosen_data.length > 0) {
-			get_and_render_options(chosen_data[chosen_data.length - 1]["ideal_id"],chosen_data[chosen_data.length - 1]["pos_id"])
-			
-			// And re-add click handler
-			paper.getById(chosen_data[chosen_data.length - 1]["dot_id"]).click(go_back)
-		} else {
-			// unselect starting point
-			normalize_rows()
-		}
-	};
-
-	/* Ghetto, but allows the animation to run */
-	var go_back_part_2 = function() {
-
-		remove_options()
-
-		/* Remove its line */
-		if (line_data.length > 0)
-			paper.getById(line_data.pop()).remove()
-
-		/* Re-render off of previous dot, if there is one */
-		if (chosen_data.length > 0) {
-			get_and_render_options(chosen_data[chosen_data.length - 1]["ideal_id"],chosen_data[chosen_data.length - 1]["pos_id"])
-			
-			// And re-add click handler
-			paper.getById(chosen_data[chosen_data.length - 1]["dot_id"]).click(go_back)
-		} else {
-			// unselect starting point
-			normalize_rows()
-		}
-	};
-
-	var remove_dot_and_text = function(dot) {
-		paper.getById(dot.data("title_text_id")).remove()
-		paper.getById(dot.data("entity_text_id")).remove()
-		dot.remove()
-	}
-
-	var remove_chosen_dots = function() {
-
-		// Remove in reverse order
-		for (var k = chosen_data.length - 1; k >= 0; k--) {
-			var dot = paper.getById(chosen_data[k]["dot_id"])
-			remove_dot_and_text(dot)
-		}
-		chosen_data.length = 0;
-	};
-
-	var callback = function() {
-		console.log("callback")
-
-		
-	}
-
-	var remove_options = function() {
-
-		// Delete option dots, titles, entity names
-		for (var j = 0; j < options_data.length; j++) {
-			paper.getById(options_data[j]["dot_id"]).remove()
-			paper.getById(options_data[j]["title_text_id"]).remove()
-			paper.getById(options_data[j]["entity_text_id"]).remove()
-		}
-		options_data.length = 0
-	}
-
-	var add_position_to_current_table = function(pos_id, ideal_id, title, entity_name) {
-		console.log('add to table')
-		normalize_rows();
-
-		var new_html = "<tr class='selected'><td class='build-start-position' data-pos_id='"+ pos_id + "' data-title='" + title + "' data-entity_name='" + entity_name + "' data-ideal_id='"+ ideal_id + "'>" + title + " at " + entity_name + " </td></tr>"
-		$('#build-positions-table > tbody:last').append(new_html)
-	};
-
-	var get_options = function(ideal_id,pos_id) {
-
-		/* NOTE: using synchronous AJAX call to hold the chain until
-			returns. Consider changing this to one big callback */
-
-		var ret_val = null
-		jQuery.ajaxSetup({async:false})
-
-		$.get("/careers/getNextBuildStep/", {'id':ideal_id,'pos_id':pos_id}, function(response) {
-			y_offset = Math.ceil(y_range/(response.length - 1)) // assuming 5 options...
-			ret_val = response
-		}, "json");
-
-		jQuery.ajaxSetup({async:true})
-		return ret_val
-	};
-
+	/* If existing path elements, render those first */
 	var render_existing_path = function() {
 
 		var positions = {{path_steps|safe}}
@@ -675,7 +405,7 @@
 
 			/* Draw connecting line */
 			if (e > 0) {
-				var line = paper.path("M" + (x_start + ((chosen_data.length - 2) * dot_distance) + dot_radius) + ', ' + midline + ' L' + (x_start + ((chosen_data.length - 1) * dot_distance) - dot_radius) + ','  + midline).attr(chosen_line_attributes)
+				var line = paper.path("M" + (x_start + ((chosen_data.length - 2) * dot_distance) + dot_radius + 4) + ', ' + midline + ' L' + (x_start + ((chosen_data.length - 1) * dot_distance) - dot_radius - 4) + ','  + midline).attr(chosen_line_attributes)
 				line_data.push(line.id)
 			}			
 		}
@@ -687,22 +417,193 @@
 		get_and_render_options(ideal_id,pos_id)
 	};
 
-	var delete_path = function(ev) {
 
-		$.post("/careers/deleteSavedPath/", {'id':path_id, 'csrfmiddlewaretoken': "{{csrf_token}}"}, function(response) {
-			if (response["result"] == "success") {
-				console.log("Success")
+	/* Responds to adding a new current position */
+	var add_first_position = function(pos_id, ideal_id, title, entity_name) {
 
-				$('#delete-button').fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)
+		// Check if this is being added or already in current pos
+		var match = false
+		for (var s = 0; s < current_pos.length; s++)
+			if (current_pos[s]['pos_id'] == pos_id) match = true
 
-				// Once deleted... go to a new path
-				window.location = "/build/"
-				
-			} else {
-				console.log("Failure: " + response["errors"])
-			}
-		}, "json");
+		if (!match) add_position_to_current_table(pos_id, ideal_id, title, entity_name)
+
+		// Check if path already exists, in which case delete	
+		if (chosen_data.length > 0) {
+			clear_path()
+		}
+
+		/* Create SVG Elements */
+		var dot = paper.circle(x_start, midline, dot_radius).attr(chosen_dot_attributes)
+		var title_text = paper.text(x_start, midline - text_offset1, title).attr(text_attributes)
+		var entity_text = paper.text(x_start, midline - text_offset2, entity_name).attr(text_attributes)
+
+		/* Set relevant data on dot element */
+		dot.data("pos_id", pos_id)
+		dot.data("title_text_id", title_text.id)
+		dot.data("entity_text_id", entity_text.id)
+		dot.data("ideal_id", ideal_id)
+
+		/* Add 'back' to do */
+		dot.click(go_back)
+
+		/* Update data structure */
+		chosen_data.push({"dot_id":dot.id, "pos_id":pos_id, "ideal_id": ideal_id})
+
+		/* Get and render options */
+		get_and_render_options(ideal_id,pos_id)
 	};
+
+	/* Just a way to decompose (and debug) two bigger methods */
+	var get_and_render_options = function(ideal_id,pos_id) {
+		options = get_options(ideal_id,pos_id)
+		console.log(options)
+		render_options(options)
+	};
+
+	/* Renders the options returned from AJAX call */
+	var render_options = function(ideal_id) {
+
+		// If no options returned... then do nothing!
+		if (!options) {
+			console.log("No options returned.")
+			if (shuffle_button_id > 0) deactivate_shuffle_button()
+			return false;
+		}
+
+		// Edge Case: only one result, render @ midline
+		if (options.length == 1) var flat = true;
+
+		// Set length
+		var length = (options.length > 5) ? 5 : options.length;
+
+		// Enable/Disable shuffle button
+		if (options.length > 5) {
+			if (shuffle_button_id > 0) activate_shuffle_button()
+			else {
+				create_shuffle_button(dot_distance * (chosen_data.length - 1), ideal_id)
+				activate_shuffle_button()
+			}
+		} else if (shuffle_button_id > 0) deactivate_shuffle_button()
+
+		console.log("rendering options: " + current_option_index + " --> " + (current_option_index + length))
+
+		// Render options
+		for (var i = current_option_index; i < current_option_index + length; i++) {
+
+			/* Set X,Y values for animation */
+			var x_1 = x_start + (dot_distance * (chosen_data.length - 1))
+			var y_1 = midline
+			var x_2 = x_start + (dot_distance * chosen_data.length)
+			var y_2 = (flat) ? midline : midline + y_max - (y_offset * (i % 5))
+			
+			/* Create SVG Elements */
+			var option_dot = paper.circle(x_1, y_1, dot_radius).attr(option_dot_attributes)
+			var option_title = paper.text(x_1, y_1, options[i].title).attr(option_text_attributes)
+			var option_entity_name = paper.text(x_1, y_1, options[i].entity_name).attr(option_text_attributes)
+
+			/* Animate SVG Elements */
+			option_dot.animate({"cx":x_2, "cy":y_2}, "2e2")
+			option_title.animate({"x":(x_2 + option_text_offset), "y":y_2 - text_offset3}, "2e2")
+			option_entity_name.animate({"x":(x_2 + option_text_offset), "y":(y_2 + text_offset3)}, "2e2")
+
+			/* Gather information needed for hover */
+			option_dot.data("title_text_id", option_title.id)
+			option_dot.data("entity_text_id", option_entity_name.id)
+			option_dot.data("pos_id", options[i].pos_id)
+			option_dot.data("ideal_id", options[i].ideal_id)
+
+			// Update data structure
+			options_data.push({'dot_id':option_dot.id, 'position_id':options[i].id, 'title_text_id': option_title.id, 'entity_text_id': option_entity_name.id})
+
+			/* Add hover handlers */
+			option_dot.hover(function() {
+				this.attr("r", 16).attr("fill-opacity",1)
+				paper.getById(this.data("title_text_id")).attr("font-weight","bold")
+				paper.getById(this.data("entity_text_id")).attr("font-weight","bold")
+
+			}, function() {
+				this.attr("r",dot_radius).attr("fill-opacity",.5)
+				paper.getById(this.data("title_text_id")).attr("font-weight","normal")
+				paper.getById(this.data("entity_text_id")).attr("font-weight","normal")
+			});
+
+			/* Add Click handler */
+			option_dot.click(function() {
+				option_clicked(this)
+			})
+		}
+
+		/* Reset current_index for next rendering */
+		current_option_index = current_option_index + length
+		if (current_option_index == options.length) current_option_index = 0
+	};
+
+	/* Creates shuffle button & sets its id to instance variable */
+	var create_shuffle_button = function(x, ideal_id) {
+
+		var shuffle_button = paper.rect(x_start - 65,0,125,40,2).attr({
+			'fill':'#34495E',
+			'stroke-width':0,
+			'cursor':'pointer',
+		})
+
+		var text = paper.text(x_start - 45,20,"More Options").attr({
+			'stroke':'#f0f0f0',
+			'font-size':14,
+			'font-family':"Helvetica",
+			'fill':'#f0f0f0',
+			'text-anchor':'start',
+			'cursor':'pointer',
+		})
+
+		shuffle_button_id = shuffle_button.id
+		shuffle_button.data("text_id", text.id)	
+		shuffle_button.data("ideal_id", ideal_id)
+	};
+
+	var activate_shuffle_button = function() {
+
+		// Set Color
+		var shuffle_button = paper.getById(shuffle_button_id)
+		shuffle_button.attr({
+			"fill": "#34495E",
+			"cursor": "pointer",
+			"fill-opacity":1,
+		})
+
+		// Remove Old Handlers
+		var shuffle_text = paper.getById(shuffle_button.data("text_id"))
+		unbind_events(shuffle_button)
+		unbind_events(shuffle_text)
+
+
+		// Add Click Handler
+		shuffle_button.click(shuffle_handler)
+		shuffle_text.click(shuffle_handler)
+
+	};
+
+	var deactivate_shuffle_button = function() {
+
+		// Set Color
+		var shuffle_button = paper.getById(shuffle_button_id)
+		shuffle_button.attr({
+			"fill-opacity": 0,
+			"cursor": "auto"
+		})
+
+		// Remove Handler
+		unbind_events(shuffle_button)
+		var shuffle_text = paper.getById(shuffle_button.data("text_id"))
+		unbind_events(shuffle_handler)
+	};
+
+
+
+	/******************/
+	/* Event Handlers */
+	/******************/
 
 	var current_position_clicked = function(ev) {
 
@@ -728,6 +629,331 @@
 		add_first_position(pos_id, ideal_id, title, entity_name)
 	}
 
+
+	var option_clicked = function(el) {
+		// Move selected elements && change styling
+		el.animate({'cy':midline, 'fill':'#2980b9'}, '2e2')
+		var id = el.id
+
+		// Alternate location of text
+		if (chosen_data.length % 2 == 0) {
+			var title_y = midline - text_offset1
+			var entity_name_y = midline - text_offset2
+		}
+		else {
+			var title_y = midline + text_offset2
+			var entity_name_y = midline + text_offset1
+		}
+
+		var title_text = paper.getById(el.data("title_text_id"))
+		title_text.attr(text_attributes)
+		
+		title_text.animate({"x":x_start + (dot_distance * chosen_data.length), "y": title_y}, '2e2')
+
+		var entity_text = paper.getById(el.data("entity_text_id"))
+		entity_text.attr(text_attributes)
+
+		entity_text.animate({"x":x_start + (dot_distance * chosen_data.length), "y": entity_name_y}, '2e2')
+
+
+		// Unbind Events
+		while(el.events.length) {
+			var e = el.events.pop()
+			e.unbind()
+		}
+
+		// Because most recent, bind "go back" event
+		el.click(go_back)		
+
+		// Remove clicks from previous dots
+		if (chosen_data.length > 0) {
+			for (var l = 0; l < chosen_data.length; l++) {
+				paper.getById(chosen_data[l]["dot_id"]).unclick(go_back)
+			}
+		}
+	
+		// Draw line to previous
+		var line = paper.path("M" + (x_start + ((chosen_data.length - 1) * dot_distance) + dot_radius + 4) + ', ' + midline + ' L' + (x_start + (chosen_data.length * dot_distance) - dot_radius - 4) + ','  + midline).attr(chosen_line_attributes)
+
+		// Remove other dots
+		for (var j = 0; j < options_data.length; j++) {
+			if (options_data[j]["dot_id"] != id) {
+				paper.getById(options_data[j]["dot_id"]).remove()
+				paper.getById(options_data[j]["title_text_id"]).remove()
+				paper.getById(options_data[j]["entity_text_id"]).remove()
+			}
+		}
+
+		// Update DST
+		chosen_data.push({"dot_id":el.id, "pos_id":el.data("pos_id"), "ideal_id": el.data("ideal_id")})
+		options_data.length = 0
+		line_data.push(line.id)
+		get_and_render_options(el.data("ideal_id"),el.data("pos_id"))
+	}
+
+
+
+	var go_back = function() {
+
+		/* Delete most recent dot */
+		var most_recent = paper.getById(chosen_data.pop()["dot_id"])
+		remove_dot_and_text(most_recent)
+		
+
+		/* Animate options backwards */
+		// var x = x_start + (chosen_data.length * dot_distance)
+		// for (var z = 0; z < options_data.length; z++) {
+
+		// 	// Callback - once completed, run the rest of go_back()
+		// 	paper.getById(options_data[z]["dot_id"]).animate({"cx":x, "cy":midline}, 500, go_back_part_2)
+		// }
+
+		
+		remove_options()
+
+		/* Remove its line */
+		if (line_data.length > 0)
+			paper.getById(line_data.pop()).remove()
+
+		/* Re-render off of previous dot, if there is one */
+		if (chosen_data.length > 0) {
+			get_and_render_options(chosen_data[chosen_data.length - 1]["ideal_id"],chosen_data[chosen_data.length - 1]["pos_id"])
+			
+			// And re-add click handler
+			paper.getById(chosen_data[chosen_data.length - 1]["dot_id"]).click(go_back)
+		} else {
+			// unselect starting point
+			normalize_rows()
+			if (shuffle_button_id > 0) deactivate_shuffle_button()
+		}
+	};
+
+	/* Ghetto, but allows the animation to run */
+	var go_back_part_2 = function() {
+
+		remove_options()
+
+		/* Remove its line */
+		if (line_data.length > 0)
+			paper.getById(line_data.pop()).remove()
+
+		/* Re-render off of previous dot, if there is one */
+		if (chosen_data.length > 0) {
+			get_and_render_options(chosen_data[chosen_data.length - 1]["ideal_id"],chosen_data[chosen_data.length - 1]["pos_id"])
+			
+			// And re-add click handler
+			paper.getById(chosen_data[chosen_data.length - 1]["dot_id"]).click(go_back)
+		} else {
+			// unselect starting point
+			normalize_rows()
+		}
+	};
+
+	var shuffle_handler = function() {
+		console.log("handler called")
+
+		// First, animate shuffle buttons away
+		for (var j = 0; j < options_data.length; j++) {
+			paper.getById(options_data[j]["dot_id"]).remove()
+			paper.getById(options_data[j]["title_text_id"]).remove()
+			paper.getById(options_data[j]["entity_text_id"]).remove()
+		}
+		options_data.length = 0
+
+		// Second, render the rest of the options
+		render_options(paper.getById(shuffle_button_id).data("ideal_id"))
+	};
+
+	
+
+	/**************/
+	/* AJAX Calls */
+	/**************/
+
+	var get_options = function(ideal_id,pos_id) {
+
+		/* NOTE: using synchronous AJAX call to hold the chain until
+			returns. Consider changing this to one big callback */
+
+		var ret_val = null
+		jQuery.ajaxSetup({async:false})
+
+		$.get("/careers/getNextBuildStep/", {'id':ideal_id,'pos_id':pos_id}, function(response) {
+
+			var length = (response.length > 5) ? 5 : response.length;
+			y_offset = Math.ceil(y_range/(length - 1)) // assuming 5 options...
+			ret_val = response
+		}, "json");
+
+		jQuery.ajaxSetup({async:true})
+		return ret_val
+	};
+
+
+	var save_attempted = false
+	var save = function() {
+
+		// Animate to show clicked
+		$('#build-save-button').fadeOut(100).fadeIn(100)
+
+		// Get Path Info
+		var title = $('.build-header-name').html()
+
+		// Check if they left the title box open, set
+		//	title accordingly
+		if ($('.build-input').length > 0) {
+			if ($('.build-input').val().length > 0)
+				title = $('.build-input').val()
+			else 
+				title = "Untitled"
+		}
+
+		var position_ids = []
+		for (var g = 0; g < chosen_data.length; g++) {
+			position_ids.push(chosen_data[g]["pos_id"])
+		}
+
+		// Don't allow path of length 0 to save
+		if (position_ids.length == 0) {
+			$('#are-you-sure-prompt').html("There are no positions in this path! Start adding positions below.").css("visibility", "visible");
+			return false;
+		} 
+
+
+		// If no title, prod the users for one
+		if (title == "Untitled" && !save_attempted) {
+			$('#are-you-sure-prompt').html("Want to give this path a title? Click on the title above to give it a name.").css("visibility", "visible");
+			
+			save_attempted = true;
+			return false;
+		}
+
+	
+		console.log("Pre-save: [title:" + title + "] [position_ids:" + position_ids + "] [path_id:" + path_id + ']')
+
+		// Post to DB
+		$.post("/careers/saveBuildPath/",
+			{'title':title, 'position_ids':position_ids, 'path_id':path_id, 'csrfmiddlewaretoken':"{{csrf_token}}"},
+			function(response) {
+				if (response["result"] == "success") {
+					console.log("Success")
+					$('.save-button').html("Saved")
+
+					// Now that saved, cab be deleted
+					var delete_html = "<div id='delete-button'  onclick='delete_path()'>Delete</div>"
+					$('#delete-button-container').html(delete_html)
+
+					$('#comments-container').css("visibility", "visible")
+
+					// Set new path id
+					path_id = response["path_id"]
+					console.log("new path id set to : " + path_id)
+
+					$('#are-you-sure-prompt').empty().css("visibility", "hidden")
+
+				} else {
+					console.log("Failure: " + response["errors"])
+				}
+			},
+			"json"
+		)
+
+	};
+
+
+	var delete_path = function(ev) {
+
+		$.post("/careers/deleteSavedPath/", {'id':path_id, 'csrfmiddlewaretoken': "{{csrf_token}}"}, function(response) {
+			if (response["result"] == "success") {
+				console.log("Success")
+
+				$('#delete-button').fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)
+
+				// Once deleted... go to a new path
+				window.location = "/build/"
+				
+			} else {
+				console.log("Failure: " + response["errors"])
+			}
+		}, "json");
+	};
+
+
+	/***********/
+	/* Helpers */
+	/***********/
+	var remove_options = function() {
+
+		// Delete option dots, titles, entity names
+		for (var j = 0; j < options_data.length; j++) {
+			paper.getById(options_data[j]["dot_id"]).remove()
+			paper.getById(options_data[j]["title_text_id"]).remove()
+			paper.getById(options_data[j]["entity_text_id"]).remove()
+		}
+		options_data.length = 0
+		current_option_index = 0
+	}
+
+	var add_position_to_current_table = function(pos_id, ideal_id, title, entity_name) {
+		console.log('add to table')
+		normalize_rows();
+
+		var new_html = "<tr class='selected'><td class='build-start-position' data-pos_id='"+ pos_id + "' data-title='" + title + "' data-entity_name='" + entity_name + "' data-ideal_id='"+ ideal_id + "'>" + title + " at " + entity_name + " </td></tr>"
+		$('#build-positions-table > tbody:last').append(new_html)
+	};
+
+	var remove_dot_and_text = function(dot) {
+		paper.getById(dot.data("title_text_id")).remove()
+		paper.getById(dot.data("entity_text_id")).remove()
+		dot.remove()
+	}
+
+	var remove_chosen_dots = function() {
+
+		// Remove in reverse order
+		for (var k = chosen_data.length - 1; k >= 0; k--) {
+			var dot = paper.getById(chosen_data[k]["dot_id"])
+			remove_dot_and_text(dot)
+		}
+		chosen_data.length = 0;
+	};
+
+	var normalize_rows = function() {
+		// Color all rows white
+		$('#build-positions-table tr').each(function() {
+			
+			// If it was already selected, unselect and re-add hover //		handler
+			if ($(this).hasClass("selected")) {
+				$(this).removeClass("selected").hover(function(ev) {
+					$(ev.currentTarget).toggleClass("info")
+				}, function(ev) {
+					$(ev.currentTarget).toggleClass("info")
+				});
+			}
+		});
+	};
+
+	var clear_path = function() {
+		// Delete dots, options for most recent dot
+		remove_chosen_dots()
+		remove_options()
+
+		// Delete lines
+		for (var d = 0; d < line_data.length; d++) {
+			paper.getById(line_data[d]).remove()
+		}
+
+		// Clear all data structures
+		line_data.length = 0
+	}
+
+	
 </script>
 
 {% endblock %}
+
+
+
+
+
+

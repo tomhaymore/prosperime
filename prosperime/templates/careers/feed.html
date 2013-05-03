@@ -74,14 +74,21 @@
 						{% if f.type == "savedcareer" %}
 							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> is interested in <a href="/career/{{f.id}}/">{{f.title}}</a>
 						{% elif f.type == "careerpath" %}
-							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> created the career path <a href="/profile/{{f.user_id}}">{{f.title}}</a>
+							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> created the career path <a href="/path/{{f.id}}">{{f.title}}</a>
 						{% elif f.type == "goalposition" %}
 							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> is interestered in becoming a <a href="/position/{{f.id}}">{{f.title}}</a>
 						{% elif f.type == "newuser" %}
 							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> joined Prosperime!
 						{% elif f.type == "comment" %}
-
-							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> commented on <a href="/profile/{{f.target_user_id}}">{{f.target_user_name}}'s</a> {{f.target_type}} {{f.target_name}}
+							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> commented on 
+							
+							{% if user.id == f.target_user_id %}
+								your 
+							{% else %}
+								<a href="/profile/{{f.target_user_id}}">{{f.target_user_name}}'s</a>		
+							{% endif %}
+							
+							{{f.target_type}} {{f.target_name}}: {{f.body|slice:":30"}}"
 						{% endif %}
 
 
