@@ -949,7 +949,7 @@ class CareerMapBase():
 				return False
 		else:
 			if ideals_objects:
-				print "Final match: " + pos.title + " (" + str(ideals_objects[0]) + ") " + str(ideals)
+				print "@ match_position_to_ideals() -- final match: " + pos.title + " (" + str(ideals_objects[0]) + ") " + str(ideals)
 			else:
 				print pos.title + ": no match"
 
@@ -973,40 +973,21 @@ class CareerMapBase():
 		if title_ngrams is not None:
 			for t in title_ngrams:
 				# check stop list
-				if t not in self.STOP_LIST:
-					for k,v in self.positions_to_ideals_map.items():
-						# loop through each dict in matches
-						for m in v:
-							# initiate flag to test for match
-							is_match = False
-							# check if it's a wild match
-							if 'type' in m:
-								if m['type'] == 'wild':
-									# check for regex match with wild token
-									p = re.compile(r"\b%s\b"%m['token'],flags=re.IGNORECASE)
-									match = re.search(p,t)
-									# check to see if the token matches and the base string is in the title
-									if m['title'] in t and match:
-										is_match = True
-										if 'industries' in m and industries is not None:
-											if m['industries']:
-												if not (set(industries) & set(m['industries'])):
-													is_match = False
-													continue
-										# check for entity qualifiers
-										if 'entities' in m:
-											if pos.entity.id not in m['entities']:
-												is_match = False
-												continue
-										if is_match == True:
-											ideals.append(k)	
-											print "Initial match: " + t + ": " + m['title']		
-							# check to see if text matches
-							else:
-								if t == m['title'] and k not in ideals:
+				# if t not in self.STOP_LIST:
+				for k,v in self.positions_to_ideals_map.items():
+					# loop through each dict in matches
+					for m in v:
+						# initiate flag to test for match
+						is_match = False
+						# check if it's a wild match
+						if 'type' in m:
+							if m['type'] == 'wild':
+								# check for regex match with wild token
+								p = re.compile(r"\b%s\b"%m['token'],flags=re.IGNORECASE)
+								match = re.search(p,t)
+								# check to see if the token matches and the base string is in the title
+								if m['title'] in t and match:
 									is_match = True
-									# ideals.append(k)
-									# check for industry qualifiers
 									if 'industries' in m and industries is not None:
 										if m['industries']:
 											if not (set(industries) & set(m['industries'])):
@@ -1019,7 +1000,27 @@ class CareerMapBase():
 											continue
 									if is_match == True:
 										ideals.append(k)	
-										print "Initial match: " + t + ": " + m['title']	
+										print "Initial match: " + t + ": " + m['title']		
+						# check to see if text matches
+						else:
+							# print "@ _get_matching_ideals() -- not a wild match"
+							if t == m['title'] and k not in ideals:
+								is_match = True
+								# ideals.append(k)
+								# check for industry qualifiers
+								if 'industries' in m and industries is not None:
+									if m['industries']:
+										if not (set(industries) & set(m['industries'])):
+											is_match = False
+											continue
+								# check for entity qualifiers
+								if 'entities' in m:
+									if pos.entity.id not in m['entities']:
+										is_match = False
+										continue
+								if is_match == True:
+									ideals.append(k)	
+									print "@ _get_matching_ideals() -- initial match: " + t + ": " + m['title']	
 		return ideals
 
 	def test_match_position_to_ideals(self,title,industries=[]):
@@ -1048,12 +1049,12 @@ class CareerMapBase():
 
 				for t in title_ngrams:
 					# make sure position title is not in stop list, e.g., "Manager" or "Director" or something equally generic
-					if t not in self.STOP_LIST:
-						for k,v in self.careers_to_positions_map.items():
-							if t in v and k not in careers:
-								careers.append(k)
-								career = Career.objects.get(pk=k)
-								print t + ": " + career.name
+					# if t not in self.STOP_LIST:
+					for k,v in self.careers_to_positions_map.items():
+						if t in v and k not in careers:
+							careers.append(k)
+							career = Career.objects.get(pk=k)
+							print t + ": " + career.name
 			print careers
 
 	def list_unmatched_positions(self):
