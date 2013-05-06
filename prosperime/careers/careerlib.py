@@ -1277,13 +1277,13 @@ class CareerImportBase():
 						m['industries'] = industry_ids
 			if existing:
 				old_matches = json.loads(ipos.matches)
-				print old_matches
+				print "Old matches: " + str(old_matches)
+				print "New matches: " + str(i['matches'])
 				if old_matches:
-					new_matches = old_matches.extend(i['matches'])
+					new_matches = old_matches + i['matches']
 				else:
 					new_matches = i['matches']
-				print i['matches']
-				print new_matches
+				print "Full matches: " + str(new_matches)
 				ipos.matches = json.dumps(new_matches)
 				# ipos.save()
 				# go to next iteration
