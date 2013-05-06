@@ -53,5 +53,9 @@ class AuthTest(TestCase):
 		self.assertEqual(resp.status_code,200)
 		self.assertEqual(resp.context['form']['email'].errors,['Enter a valid e-mail address.'])
 
+		# ensure that terms / privacypolicy must be checked
+		resp = self.client.post('/account/finish',{'username':'troysmith','email':'troy@smith.com','password':'helen','confirm_password':'helen'})
+		self.assertEqual(resp.status_code,200)
+		self.assertEqual(resp.context['form']['terms'].errors,['You must agree to the Terms of Service and Privacy Policy to use Prospr.me.'])
 
 
