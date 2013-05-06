@@ -1276,12 +1276,15 @@ class CareerImportBase():
 							industry_ids.append(new_industry.id)
 						m['industries'] = industry_ids
 			if existing:
-				print "@ import_initial_ideals() -- updating matches, skipping to next iteration"
 				old_matches = json.loads(ipos.matches)
-				new_matches = old_matches.extend(i['matches'])
+				if old_matches:
+					new_matches = old_matches.extend(i['matches'])
+				else:
+					new_matches = i['matches']
 				ipos.matches = json.dumps(new_matches)
+				# ipos.save()
 				# go to next iteration
-				continue
+				# continue
 			else:
 				ipos.matches = json.dumps(i['matches'])
 			if 'level' in i:
@@ -1290,10 +1293,16 @@ class CareerImportBase():
 				ipos.level = 1
 			ipos.save()
 			for c in i['careers']:
-				career = Career.objects.get(pk=c)
-				ipos.careers.add(career)
+				try:
+					career = Career.objects.get(pk=c)
+					ipos.careers.add(career)
+				except ObjectDoesNotExist:
+					print "@ import_initial_ideals() -- missing career: " + str(c)
 			ipos.save()
-			print "@ import_initial_ideals() -- added new ideal " + ipos.title
+			if existing:
+				print "@ import_initial_ideals() -- updated matches " + ipos.title
+			else:
+				print "@ import_initial_ideals() -- added new ideal " + ipos.title
 
 class CareerExportBase():
 
