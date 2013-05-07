@@ -9,6 +9,7 @@ div.build-header {
 	color:rgb(41,98,152);
 	margin-top:25px;
 	margin-bottom:25px;
+	font-family:"Helvetica Neue",Helvetica, "Lato";
 }
 
 span.build-header-name {
