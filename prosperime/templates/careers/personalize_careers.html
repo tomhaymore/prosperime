@@ -28,7 +28,7 @@
 {% csrf_token %}
 <div id="content-container" class="main-container">
 	<p class="splash-header">Personalize</p>
-	<p class="main-sub-header"><span class="callout-text">Prosperime</span> works best when you help it learn more about you. Based on your professional profile and network, the following careers and jobs seem like they'd be the most interesting to you. Please select which ones you're most interested in or enter your own.</p>
+	<p class="main-sub-header"><span class="callout-text">Prosperme</span> works best when you help it learn more about you. Based on your professional profile and network, the following careers seem like they'd be the most interesting to you. Please select which ones you're most interested in.</p>
 
 	<div id="careers-container">
 		<!-- <div class="general-nav-container">
@@ -70,7 +70,7 @@
 								<!-- <input type="checkbox" class="personalize-checkbox med-checkbox-input pull-left" id="personalize-career-{{c.id}}" data-career-id="{{c.id}}"/>-->
 								<span class="personalize-icon-container">&nbsp;<i class="icon-ok icon-white"></i></span>
 								<a class="careers-name">
-								{{c.1.long_name}}
+								{{c.1.short_name}}
 								</a>
 								<div class="clear"></div>
 							</div>
@@ -79,7 +79,10 @@
 					{% endfor %}
 					</ul>
 				
-			
+					<!-- <div class="left-indent">
+						<input id="personalize-goal-careers-box" class="" type="text" />
+						<span id="personalize-goal-careers-add" class="flat-button inline-button blue-button"> Add </span>
+					</div> -->
 			
 			</div>
 			

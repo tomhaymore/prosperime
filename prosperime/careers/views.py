@@ -1351,6 +1351,21 @@ def list_jobs(request):
 	jobs = json.dumps(jobs_list)
 	return HttpResponse(jobs, mimetype="application/json")
 
+@login_required
+def list_careers(request):
+	if request.GET:
+		params = request.GET['q']
+		# print params
+		careers = Career.objects.values('short_name','id').filter(Q(short_name__icontains=params) | Q(long_name__icontains=params))
+	else:
+		careers = Career.objects.values('short_name','id').all()
+
+	careers_list = [{'value':c['short_name'],'id':c['id']} for c in careers]
+
+	# jobs = json.dumps(list(jobs))
+	careers = json.dumps(careers_list)
+	return HttpResponse(careers, mimetype="application/json")
+
 # VIEW: display ALL user's paths
 def show_paths(request):
 
