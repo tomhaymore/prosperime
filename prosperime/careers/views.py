@@ -1274,15 +1274,17 @@ def personalize_careers(request):
 	careers_similar = career_sim.get_careers_brief_similar(request.user)
 
 	# get list of ids of similar careers to avoid duplication in network
-	careers_similar_ids = []
+	careers_similar_ids = [c.id for c in careers_similar]
 
-	for c in careers_similar:
-		careers_similar_ids.append(c.id)
+	careers = {
+		'network': careers_network,
+		'similar': careers_similar
+	}
 
-	careers = {}
+	# careers = {}
 
-	careers['network'] = careers_network
-	careers['similar'] = careers_similar
+	# careers['network'] = careers_network
+	# careers['similar'] = careers_similar
 
 	return render_to_response('careers/personalize_careers.html',{'data':data,'careers':careers,'careers_similar_ids':careers_similar_ids},context_instance=RequestContext(request))
 
