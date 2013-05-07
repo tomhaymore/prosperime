@@ -26,7 +26,7 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
 AWS_STORAGE_BUCKET_NAME = 'prosperme_images'
 # LI callback
-LI_CALLBACK = "http://www.prosperime.com/account/authenticate"
+LI_CALLBACK = "http://www.prospr.me/account/authenticate"
 
 DATABASES = {
     'default': {
