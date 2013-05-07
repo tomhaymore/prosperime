@@ -76,21 +76,23 @@ class Position(models.Model):
 		return self.entity.domains.all()
 
 class Career(models.Model):	
-	short_name = models.CharField(max_length=450,null=True)
+	short_name = models.CharField(max_length=450,null=True,blank=True)
 	long_name = models.CharField(max_length=450,null=True)
-	description = models.TextField(null=True)
-	parent = models.ForeignKey('self',related_name="children",null=True)
-	census_code = models.CharField(max_length=10,null=True)
-	soc_code = models.CharField(max_length=15,null=True)
-	industry_code = models.CharField(max_length=15,null=True)
-	industry = models.ManyToManyField(Industry)
-	pos_titles = models.TextField(null=True)
-	saved_people = models.ManyToManyField(User,related_name="saved_careers",through="SavedCareer")
-	status = models.CharField(max_length=15,default="active")
+	description = models.TextField(null=True,blank=True)
+	parent = models.ForeignKey('self',related_name="children",null=True,blank=True)
+	census_code = models.CharField(max_length=10,null=True,blank=True)
+	soc_code = models.CharField(max_length=15,null=True,blank=True)
+	industry_code = models.CharField(max_length=15,null=True,blank=True)
+	industry = models.ManyToManyField(Industry,blank=True)
+	pos_titles = models.TextField(null=True,blank=True)
+	saved_people = models.ManyToManyField(User,related_name="saved_careers",through="SavedCareer",blank=True)
+	status = models.CharField(max_length=15,default="active",blank=True)
 	created = models.DateTimeField(auto_now_add=True, null=True)
 	updated = models.DateTimeField(auto_now=True, null=True)
 
 	def __unicode__(self):
+		if self.short_name:
+			return self.short_name
 		return self.long_name
 
 	def get_pos_titles(self):
@@ -159,7 +161,19 @@ class Career(models.Model):
 		import careers.careerlib as careerlib
 		return careerlib.avg_duration_all(self)
 
+	def _number_of_positions(self):
+		"""
+		returns number of positions linked to this career
+		"""
+		positions = Position.objects.filter(ideal_position__careers=self).distinct()
+		return len(positions)
+
+	number_of_positions = property(_number_of_positions)
 	name = property(_name)
+
+	ordering = ['-number_of_positions']
+
+
 
 
 class SavedCareer(models.Model):
