@@ -807,7 +807,7 @@ class CareerMapBase():
 
 	def __init__(self):
 		# fill in career to positions map
-		self.init_career_to_positions_map()
+		# self.init_career_to_positions_map()
 		self.init_positions_to_ideals_map()
 		# self.load_stop_list()
 
