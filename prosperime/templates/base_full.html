@@ -51,32 +51,34 @@
 						<ul class="topbar-nav pull-right">
 							
                 			{% if user.is_authenticated %}
-	                		<li>
-	                			<a href="/profile/{{user.id}}"><!--{{user.profile.full_name}}-->Profile</a>
-	                		</li>
-	                		<li>
-								<a href="/feed/">Home</a>
-							</li>
-	                		<li>
-	                			<a href="/search/">Search</a>
-	                		</li>
-	                		<li>
-	                			<a href="/account/logout/">Logout</a>
-	                		</li>
+		                		<li>
+		                			<a href="/profile/{{user.id}}"><!--{{user.profile.full_name}}-->Profile</a>
+		                		</li>
+		                		<li>
+									<a href="/feed/">Home</a>
+								</li>
+		                		<li>
+		                			<a href="/search/">Search</a>
+		                		</li>
+		                		<li>
+		                			<a href="/account/logout/">Logout</a>
+		                		</li>
 	                		{% else %}
-							<li>
-								<a href="/account/login">Login</a>
-							</li>
-							<li>
-								<a href="/about/">About</a>
-							</li>
-	                		<li>
-								<a href="/contact/">Contact</a>
-							</li>
+								<li>
+									<a href="/account/login">Login</a>
+								</li>
+								<li>
+									<a href="/about/">About</a>
+								</li>
+		                		<li>
+									<a href="/contact/">Contact</a>
+								</li>
 	                		{% endif %}
 							
 						</ul>
+						<div class="clear"></div>
 					</div>
+					
 					<div class="clear"></div>
 				<!-- </div> -->
 			</div>
@@ -103,6 +105,11 @@
 			{% endblock %}
 
 		</div>
+		{% if user.is_authenticated %}
+		<!-- 	<div class="quick-links">
+				<span>Quick Links:</span> <a href="/build">Build</a> <span class="left-spacer"></span> <a href="/plan">Plan</a>
+			</div> -->
+		{% endif %}
 	   
 	    <div class="container-fluid splash-container">
 	        
