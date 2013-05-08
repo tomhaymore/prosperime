@@ -18,7 +18,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.utils import simplejson
-from accounts.forms import FinishAuthForm, AuthForm
+from accounts.forms import FinishAuthForm, AuthForm, RegisterForm
 from django.contrib import messages
 from lilib import LIProfile
 from accounts.tasks import process_li_profile, process_li_connections
@@ -64,6 +64,48 @@ def privacy(request):
 def copyright(request):
 
 	return render_to_response('copyright.html',context_instance=RequestContext(request))
+
+def register(request):
+
+	if request.user.is_authenticated():
+		return HttpResponseRedirect('/f')
+
+	if request.method == "POST":
+		form = RegisterForm(request.POST)
+
+		if form.is_valid():
+			# grab cleaned values from form
+			username = form.cleaned_data['username']
+			email = form.cleaned_data['email']
+			location = form.cleaned_data['location']
+			headline = form.cleaned_data['headline']
+			password = form.cleaned_data['password']
+
+			# create user
+			user = User.objects.create_user(username,email,password)
+			# user.save()
+
+			# create provile
+			user.profile.headline = headline
+			user.profile.location = location
+			user.profile.save()
+
+			# make sure using right backend
+			request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
+			
+			# log user in
+			user = authenticate(username=username,password=password)
+			
+			# make sure authentication worked
+			if user is not None:
+				auth_login(request,user)
+
+			# send to personalization
+			return HttpResponseRedirect('/personalize/careers/')
+	else:
+		form = RegisterForm()
+
+	return render_to_response('accounts/register.html',{'form':form},context_instance=RequestContext(request))
 
 @login_required
 def logout(request):

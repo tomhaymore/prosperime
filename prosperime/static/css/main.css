@@ -54,6 +54,9 @@ div.header-large {
 	font-size:1.6em;
 }
 
+/* General */
+
+
 
 /* Flat Button */
 .flat-button {
@@ -70,8 +73,19 @@ div.header-large {
 	text-align:center;
 	background-color:#fffffe;
 	border-radius:2px;
+	border:none;
 	cursor:pointer;
 	font-weight:500;
+}
+
+a.flat-button:hover {
+	text-decoration:none;
+	color:#fffffe;
+}
+
+.flat-button a:hover {
+	text-decoration:none;
+	color:#fffffe;
 }
 
 .green-button {
@@ -96,6 +110,15 @@ div.header-large {
 .blue-button {
 	background-color:rgb(41,98,152);
 	color:#fffffe;
+}
+
+.lightblue-button {
+	background-color:#6FB6D4;
+	color:#fffffe;
+}
+
+.wide-button {
+	width: 150px;
 }
 
 .button-large {
@@ -947,6 +970,10 @@ button.general-add-button:active {
 
 /* Forms */
 
+.errorlist {
+	color: #9E0101;
+}
+
 .large-text-input {
 	width: 300px;
 }
@@ -1245,7 +1272,17 @@ button.general-add-button:active {
 	padding:16px;
 	width:100%;
 	border-bottom:1px solid black;
+
 }
+.feature-page-header {
+	font-size:2.5em;
+	color:rgb(41,98,152);
+	margin-top:25px;
+	margin-bottom:25px;
+	font-family:"Helvetica Neue",Helvetica, "Lato";
+	
+}
+
 
 .page-header-title {
 	font-size: 1.5em;
