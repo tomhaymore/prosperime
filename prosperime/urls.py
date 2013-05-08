@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     url(r'^privacy/$','accounts.views.privacy'),
     url(r'^terms/$','accounts.views.terms'),
     url(r'^copyright/$','accounts.views.copyright'),
+    url(r'^use/$','accounts.views.use'),
 
     # Entities Views
     url(r'^contact/$', 'entities.views.contact'),

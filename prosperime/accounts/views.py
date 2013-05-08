@@ -66,6 +66,10 @@ def copyright(request):
 
 	return render_to_response('copyright.html',context_instance=RequestContext(request))
 
+def use(request):
+
+	return render_to_response('use.html',context_instance=RequestContext(request))
+
 def register(request):
 
 	if request.user.is_authenticated():

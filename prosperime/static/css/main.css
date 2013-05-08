@@ -1530,4 +1530,9 @@ div.third-container {
 }
 
 
+/* Terms */
 
+.terms-list li {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
