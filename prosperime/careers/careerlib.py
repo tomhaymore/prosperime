@@ -723,16 +723,93 @@ class CareerPathBase(CareerBase):
 
 class CareerBuild(CareerPathBase):
 
+	def keyfunc(self,tup):
+		key, d = tup
+		return d['count']
+
 	def get_position_paths_from_ideal(self,ideal_id):
 		# fetch all users / positions that have the ideal position in their career
-		users = User.objects.values('id','positions__id','positions__type','positions__degree','positions__ideal_position_id','positions__ideal_position__level','positions__title','positions__degree','positions__entity__name','positions__entity_id','positions__type').filter(positions__ideal_position_id=ideal_id).order_by('positions__start_date').distinct()
+		users = User.objects.values('id','positions__id','positions__type','positions__degree','positions__ideal_position_id','positions__ideal_position__title','positions__ideal_position__level','positions__title','positions__degree','positions__entity__name','positions__entity_id','positions__type').filter(positions__ideal_position_id=ideal_id).order_by('positions__start_date').distinct()
 		# init array
 		paths = {}
 		# collapse and sort by user
 		for user in users:
-			paths[user['id']] = [{'id':safe_int(u['id']),'title':u['positions__title'],'entity_id':safe_int(u['positions__entity_id']),'entity_name':u['positions__entity__name'],'ideal_id':safe_int(u['positions__ideal_position_id']),'pos_id':safe_int(u['positions__id']),'level':safe_int(u['positions__ideal_position__level']),'type':u['positions__type'],'degree':u['positions__degree']} for u in users if u['id'] == user['id']]
+			paths[user['id']] = [{'id':safe_int(u['id']),'title':u['positions__title'],'ideal_title':u['positions__ideal_position__title'],'entity_id':safe_int(u['positions__entity_id']),'entity_name':u['positions__entity__name'],'ideal_id':safe_int(u['positions__ideal_position_id']),'pos_id':safe_int(u['positions__id']),'level':safe_int(u['positions__ideal_position__level']),'type':u['positions__type'],'degree':u['positions__degree']} for u in users if u['id'] == user['id']]
 
 		return paths
+
+	def get_next_build_step_ideal(self,start_ideal_id,start_pos_id):
+		from operator import itemgetter
+		# get ideal position object
+		ideal_pos = IdealPosition.objects.get(pk=start_ideal_id)
+		# get paths
+		paths = self.get_position_paths_from_ideal(start_ideal_id)
+		# init arrays
+		next = []
+		finished = []
+		positions = {}
+		# init is_ed flag
+		is_ed = False
+		# loop through each user
+		for k,v in paths.iteritems():
+			# loop through position for each user 
+			for p in v:
+				level = p['level']
+				u_id = p['id']
+				type = p['type']
+				pos_id = p['pos_id']
+				ideal_id = p['ideal_id']
+				ideal_title = p['ideal_title']
+				entity_id = p['entity_id']
+				entity_name = p['entity_name']
+				title = p['title']
+				# filter out various ineligible positions
+				if p['level'] is not None and is_ed is True and int(p['level']) == int(ideal_pos.level):
+					print "same level ed @ build"
+					continue
+				if p['level'] and int(p['level']) < int(ideal_pos.level):
+					print "same ideal pos level @ build"
+					continue
+				if p['type'] == 'education' and p['degree'] is None:
+					print "education with no degree @ build"
+					continue
+				if p['id'] in next and p['id'] not in finished and int(p['pos_id']) != int(start_pos_id):
+					# next step in the path, add to array
+					if ideal_id in positions:
+						# increment counter
+						positions[ideal_id]['count'] += 1
+						# add to positions
+						positions[ideal_id]['positions'].append({'pos_id':pos_id,'ideal_id':ideal_id,'ideal_title':ideal_title,'title':title,'entity_name':entity_name,'level':level})
+						# see if this company is already in the array
+						if entity_id in positions[ideal_id]['orgs']:
+							positions[ideal_id]['orgs'][entity_id]['count'] += 1
+						else:
+							positions[ideal_id]['orgs'].append({entity_id:{'name':entity_name,'id':entity_id,'count':1}})
+					else:
+						positions[ideal_id] = {
+							'count':0,
+							'positions':None,
+							'orgs':None
+						}
+						positions[ideal_id]['count'] += 1
+						positions[ideal_id]['positions'] = [{'pos_id':pos_id,'ideal_id':ideal_id,'title':title,'ideal_title':ideal_title,'entity_name':entity_name,'level':level}]
+						positions[ideal_id]['orgs'] = [{entity_id:{'name':entity_name,'id':entity_id,'count':1}}]
+					# add to processed positions array
+					finished.append(u_id)
+				if ideal_id == int(start_ideal_id):
+					# print 'match'
+					next.append(u_id)
+				if type == "education":
+					is_ed = True
+				else:
+					is_ed = False
+		
+		# sort result by count
+		sorted_positions = sorted(positions.items(), key=self.keyfunc)
+
+		return sorted_positions
+
+	
 
 	def get_next_build_step(self,ideal_id,pos_id):
 		# get ideal position object
