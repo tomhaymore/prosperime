@@ -32,22 +32,26 @@ import utilities.helpers as helpers
 
 
 def login(request):
-	
+	# from django.contrib.auth.forms import AuthenticationForm
 	# print request.session['_auth_user_backend']
 	if request.user.is_authenticated():
 		return HttpResponseRedirect('/feed/')
 	if request.method == "POST":
 		# make sure using proper authentication backend
 		request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
-		form = AuthForm(request.POST)
-
+		print request.POST
+		form = AuthForm(request,request.POST)
+		print form.is_bound
 		if form.is_valid():
 			user = authenticate(username=form.cleaned_data['username'],password=form.cleaned_data['password'])
 			if user is not None:
 				auth_login(request,user)
 				messages.success(request, 'You have successfully logged in.')
 				return HttpResponseRedirect('/feed/')
-			
+		# else:
+		# 	# form.errors = {
+		# 	# 	'username':'Username and password combination do not match. Please try again.'
+		# 	# }
 	else:
 		form = AuthForm()
 

@@ -1,7 +1,9 @@
 # from Django
 from django import forms
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import AuthenticationForm
 from django.utils.safestring import mark_safe
+from django.contrib.auth import authenticate
 
 class TermsField(forms.BooleanField):
 	"Check that user agreed, return custom message."
@@ -86,9 +88,26 @@ class FinishAuthForm(forms.Form):
 		else:
 			return terms
 
-class AuthForm(forms.Form):
-	error_css_class = 'form_error'
-	required_css_class = 'form_required'
+class AuthForm(AuthenticationForm):
+	# error_css_class = 'form_error'
+	# required_css_class = 'form_required'
 
 	username = forms.CharField(label="Username or Email")
 	password = forms.CharField(widget=forms.PasswordInput,label="Password")
+
+	def check_for_test_cookie(self):
+		return None
+
+	# def clean(self):
+	# 	username = self.cleaned_data.get('username')
+	# 	password = self.cleaned_data.get('password')
+
+	# 	if username and password:
+	# 		self.user_cache = authenticate(username=username,
+ #                                           password=password)
+	# 		if self.user_cache is None:
+	# 			raise forms.ValidationError(self.error_messages['invalid_login'] % {'username': self.username_field.verbose_name})
+	# 		elif not self.user_cache.is_active:
+	# 			raise forms.ValidationError(self.error_messages['inactive'])
+	# 			return self.cleaned_data
+	# pass
