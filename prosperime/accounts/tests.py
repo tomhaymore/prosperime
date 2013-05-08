@@ -53,9 +53,22 @@ class AuthTest(TestCase):
 		self.assertEqual(resp.status_code,200)
 		self.assertEqual(resp.context['form']['email'].errors,['Enter a valid e-mail address.'])
 
-		# ensure that terms / privacypolicy must be checked
-		resp = self.client.post('/account/finish',{'username':'troysmith','email':'troy@smith.com','password':'helen','confirm_password':'helen'})
+		# ensure passwords match
+		resp = self.client.post('/account/finish',{'username':'ahamilaton','email':'ahamilton@colubmia.edu','password':'federalist','confirm_password':'anti-federalist'})
+		self.assertEqual(resp.status_code,200)
+		self.assertEqual(resp.context['form']['confirm_password'].errors,['Passwords must match. Please try re-entering your password.'])
+
+		# ensure that terms / privacy policy must be checked
+		resp = self.client.post('/account/finish',{'username':'troysmith','email':'troy@smith.com','password':'helen','confirm_password':'helen','terms':False})
 		self.assertEqual(resp.status_code,200)
 		self.assertEqual(resp.context['form']['terms'].errors,['You must agree to the Terms of Service and Privacy Policy to use Prospr.me.'])
 
+	def test_reg_form(self):
+		# create new user
+		default_user = User.objects.create_user(username="ahamilton",password="aburr")
+
+		# ensure that empty form is rejected
+		resp = self.client.post('/account/finish/')
+		self.assertEqual(resp.status_code,200)
+		self.assertEqual(resp.context['form']['username'].errors,['This field is required.'])
 
