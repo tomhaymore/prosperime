@@ -247,6 +247,22 @@ img.main-logo {
 	margin-top: 5px;
 }
 
+div.quick-links {
+	color: #fffffe;
+	top: 15px;
+	right: 100px;
+	border-bottom-right-radius: 2px;
+	border-bottom-left-radius: 2px;
+	background-color: rgb(48,91,152);
+	width: 235px;
+	height: 35px;
+	float: right;
+	right: 135px;
+	position: relative;
+	font-size: 16px;
+	padding: 5px 5px 5px 5px;
+}
+
 /* Footer */
 
 div.footer-container {
