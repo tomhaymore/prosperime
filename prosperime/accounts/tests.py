@@ -72,3 +72,27 @@ class AuthTest(TestCase):
 		self.assertEqual(resp.status_code,200)
 		self.assertEqual(resp.context['form']['username'].errors,['This field is required.'])
 
+	def test_login_form(self):
+		# create new user
+		default_user = User.objects.create_user(username="ahamilton",password="aburr")
+
+		# ensure that empty form is rejected
+		resp = self.client.post('/account/login')
+		self.assertEqual(resp.status_code,200)
+		self.assertEqual(resp.context['form']['username'].errors,['This field is required.'])
+
+		# ensure that incorrect username gets rejected
+		resp = self.client.post('/account/login',{'username':'ball','password':'aburr'})
+		self.assertEqual(resp.status_code,200)
+		self.assertEqual(resp.context['form'].errors['__all__'],['Please enter a correct username and password. Note that both fields are case-sensitive.'])
+
+		# ensure that incorrect password gets rejected
+		resp = self.client.post('/account/login',{'username':'ahamilton','password':'ball'})
+		self.assertEqual(resp.status_code,200)
+		self.assertEqual(resp.context['form'].errors['__all__'],['Please enter a correct username and password. Note that both fields are case-sensitive.'])
+
+		# ensure that correct combination results in login
+		resp = self.client.post('/account/login',{'username':'ahamilton','password':'aburr'},follow=True)
+		self.assertEqual(resp.status_code,200) # redirects to home page
+		self.assertEqual(resp.context['user'].is_authenticated(),True)
+
