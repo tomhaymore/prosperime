@@ -138,7 +138,7 @@ class Profile(models.Model):
         if self.pictures.all():
             return self.pictures.all()[0].pic.url
         else:
-            return "pictures/anon.jpg"
+            return "/media/pictures/anon.jpg"
 
     domains = property(_industries)
     
