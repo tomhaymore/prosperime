@@ -161,7 +161,6 @@
 	    	serviceUrl: '/careers/positionAutocomplete/',
 	    	minChars: 2,
 	    	onSelect: function(suggestion) {
-	    		console.log(suggestion.pos_id)
 				position_selected_pos_id = suggestion.pos_id
 				position_selected_title = suggestion.title
 				position_selected_entity_name = suggestion.entity_name
@@ -171,7 +170,6 @@
 
 		// Add click handler to search box
 	    $('#add-build-position-button').click(function(ev) {
-	    	console.log("Add button clicked")
 	    	// If there's something there
 	    	if ($('#build-positions-search-box').val().length > 0) {
 	    		add_first_position(position_selected_pos_id, position_selected_ideal_id, position_selected_title, position_selected_entity_name)
@@ -303,15 +301,15 @@
 	var line_data = []
 	var shuffle_button_id = -1
 
-	var paper_w = 1000
+	var paper_w = 1250
 	var paper_h = 250
 	var midline = 125
 	var dot_radius = 14 // 12
 	var y_range = 200
 	var y_max = y_range / 2
 	var y_offset = Math.ceil(y_range/(4)) // assuming 5 options...
-	var x_start = 125
-	var dot_distance = 125
+	var x_start = 150; //125
+	var dot_distance = 150; //125
 	var text_offset1 = 50 // 40
 	var text_offset2 = 30 //25
 	var text_offset3 = 10
@@ -465,17 +463,18 @@
 	var render_options = function(ideal_id) {
 
 		// If no options returned... then do nothing!
-		if (!options) {
+		if (!options || options.length == 0) {
 			console.log("No options returned.")
 			if (shuffle_button_id > 0) deactivate_shuffle_button()
 			return false;
 		}
 
-		// Edge Case: only one result, render @ midline
-		if (options.length == 1) var flat = true;
-
 		// Set length
-		var length = (options.length > 5) ? 5 : options.length;
+		var length = ((options.length - current_option_index) > 5) ? 5 : (options.length - current_option_index);
+
+		// Edge Case: length = 1
+		if (length == 1) var flat = true;
+
 
 		// Enable/Disable shuffle button
 		if (options.length > 5) {
@@ -496,8 +495,16 @@
 			// If more options, animate from the top, not the midline
 			var y_1 = (current_option_index > 0) ? 0 : midline; 
 			var x_2 = x_start + (dot_distance * chosen_data.length)
-			var y_2 = (flat) ? midline : midline + y_max - (y_offset * (i % 5))
-			
+
+			/* If rendering extra options and < 5, reset y_offset */
+			if (flat)
+				var y_2 = midline
+
+			else if (current_option_index > 1 && length < 5)
+				var y_2 = midline + y_max - (Math.ceil(y_range/(length - 1)) * (i % 5))
+			else
+				var y_2 = midline + y_max - (y_offset * (i % 5))
+
 			/* Create SVG Elements */
 			var option_dot = paper.circle(x_1, y_1, dot_radius).attr(option_dot_attributes)
 			var option_title = paper.text(x_1, y_1, options[i].title).attr(option_text_attributes)
@@ -518,6 +525,7 @@
 			options_data.push({'dot_id':option_dot.id, 'position_id':options[i].id, 'title_text_id': option_title.id, 'entity_text_id': option_entity_name.id})
 
 			/* Add hover handlers */
+			// Hover - make dot bigger, opacity=1, font-weight=bold
 			option_dot.hover(function() {
 				this.attr("r", 16).attr("fill-opacity",1)
 				paper.getById(this.data("title_text_id")).attr("font-weight","bold")
@@ -535,7 +543,7 @@
 			})
 		}
 
-		/* Reset current_index for next rendering */
+		/* Reset current_index for next rendering if < 5 options */
 		current_option_index = current_option_index + length
 		if (current_option_index == options.length) current_option_index = 0
 	};
@@ -670,9 +678,7 @@
 	
 		// Move selected elements && change styling
 		el.animate({'cy':midline, 'fill':'#2980b9'}, '500', '<>')
-
 		title_text.animate({"x":x_start + (dot_distance * chosen_data.length), "y": title_y}, '500','<>')
-
 		entity_text.animate({"x":x_start + (dot_distance * chosen_data.length), "y": entity_name_y}, '500','<>')
 
 
@@ -694,6 +700,9 @@
 		chosen_data.push({"dot_id":el.id, "pos_id":el.data("pos_id"), "ideal_id": el.data("ideal_id")})
 		options_data.length = 0
 		line_data.push(line.id)
+		current_option_index = 0
+
+		// Get and render next options
 		get_and_render_options(el.data("ideal_id"),el.data("pos_id"))
 	}
 
@@ -705,7 +714,15 @@
 		var most_recent = paper.getById(chosen_data.pop()["dot_id"])
 		remove_dot_and_text(most_recent)
 
-		if (options_data.length == 0) go_back_part_2()
+		/* Delete Line */
+		if (line_data.length > 0)
+			paper.getById(line_data.pop()).remove()
+	
+
+		if (options_data.length == 0) {
+			go_back_part_2()
+			return true;
+		}
 		
 		/* Animate options backwards */
 		var x = x_start + (chosen_data.length * dot_distance)
@@ -715,7 +732,6 @@
 			paper.getById(options_data[z]["dot_id"]).animate({"cx":x, "cy":midline}, 250, function() {
 
 				// Delete dot & increment public counter
-				console.log('callback')
 				go_back_part_2()
 				this.remove()
 			});
@@ -738,16 +754,11 @@
 			options_animated_counter++
 			return false;
 		}
-		console.log('exiting loop')
 		options_animated_counter = 0
 		options_data.length = 0
 		current_option_index = 0
 
 		// remove_options()
-
-		/* Remove its line */
-		if (line_data.length > 0)
-			paper.getById(line_data.pop()).remove()
 
 		/* Re-render off of previous dot, if there is one */
 		if (chosen_data.length > 0) {
@@ -922,7 +933,6 @@
 	}
 
 	var add_position_to_current_table = function(pos_id, ideal_id, title, entity_name) {
-		console.log('add to table')
 		normalize_rows();
 
 		var new_html = "<tr class='selected'><td class='build-start-position' data-pos_id='"+ pos_id + "' data-title='" + title + "' data-entity_name='" + entity_name + "' data-ideal_id='"+ ideal_id + "'>" + title + " at " + entity_name + " </td></tr>"
