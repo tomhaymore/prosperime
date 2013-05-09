@@ -17,7 +17,7 @@
 
 {% block content %}
 
-<div id="content-container" class="main-container">
+<div id="feed-content-container" class="main-container">
 	<div id="feed-container">
 
 		<!-- Header -->
@@ -44,93 +44,97 @@
 		</div>
 
 
-	<!-- Body Container -->
-	<div class="row" id="feed-body-container">
-		<div class="span2 column">
-			<div id="user-image-container">
-				<img class="profile-image" src="{{user_profile_pic}}" />
-			</div>
+		<!-- Body Container -->
+		<div class="row" id="feed-body-container">
+
+			<!-- Left Sidebar -->
+			<div class="span2 column">
+				<div id="user-image-container">
+					<img class="profile-image" src="{{user_profile_pic}}" />
+				</div>
 
 
-			<div>
-				<div class="feed-item selected">Updates</div>
-				<a href="/profile/{{user_id}}/#goal-positions">
-					<div class="feed-item">Saved Positions</div>
-				</a>
-				<a href="/profile/{{user_id}}#saved-paths">
-					<div class="feed-item">Saved Paths</div>
-				</a>
-			</div>
-		</div>
-
-		<!-- Feed (Main) Column -->
-		<div class="span7 column">
-			<!-- Carousel Container -->
-			<div id="popover-container"></div>
-
-			<div class="row" id="carousel-container">
-				<div class="span12">
-					<div id="carousel" class="carousel slide">
-						<ol id="seed-carousel-indicators" class="carousel-indicators">
-							<!-- JS Here -->
-						</ol>
-
-				
-						<!-- Items -->
-						<div id="seed-carousel-inner" class="carousel-inner">
-							<!-- JS Here -->
-						</div>
-
-						<!-- Nav -->
-						<a class="carousel-control left" href="#carousel" data-slide="prev">&lsaquo;</a>
-				 		<a class="carousel-control right" href="#carousel" data-slide="next">&rsaquo;</a>
-					</div>
+				<div>
+					<div class="feed-item selected">Updates</div>
+					<a href="/profile/{{user_id}}/#goal-positions">
+						<div class="feed-item">Saved Positions</div>
+					</a>
+					<a href="/profile/{{user_id}}#saved-paths">
+						<div class="feed-item">Saved Paths</div>
+					</a>
 				</div>
 			</div>
 
-			<div class="feed-main column">
-			{% if feed|length > 0 %}
-				{% for f in feed %}
-					{% autoescape on %}
-					<div class="feed-item" onmouseover="render_thumbnail({{f.stub}}, '{{f.type}}', {{f.body}})"onmouseout="close_thumbnail()">
-					{% endautoescape %}
-						{% if f.type == "savedcareer" %}
-							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> is interested in <a href="/career/{{f.id}}/">{{f.title}}</a>
-						{% elif f.type == "careerpath" %}
-							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> created the career path <a href="/path/{{f.id}}">{{f.title}}</a>
-						{% elif f.type == "goalposition" %}
-							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> is interestered in becoming a <a href="/position/{{f.id}}">{{f.title}}</a>
-						{% elif f.type == "newuser" %}
-							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> joined Prosperime!
-						{% elif f.type == "comment" %}
-							<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> commented on 
-							
-							{% if user.id == f.target_user_id %}
-								your 
-							{% else %}
-								<a href="/profile/{{f.target_user_id}}">{{f.target_user_name}}'s</a>		
-							{% endif %}
-							
-							{{f.target_type}} <a href="/build/{{f.target_id}}">{{f.target_name}}</a>: 
-							{% if f.body|length > 30 %}
-								{{f.body|slice:":30"}}..."
-							{% else %}
-								{{f.body}}
-							{% endif %}
-						{% endif %}
+			<!-- Feed (Main) Column -->
+			<div class="span7 column">
 
+				<!-- Carousel -->
+				<div id="popover-container"></div>
+				<div class="row" id="carousel-container">
+					<div class="span12">
+						<div id="carousel" class="carousel slide">
+							<ol id="seed-carousel-indicators" class="carousel-indicators">
+								<!-- JS Here -->
+							</ol>
+
+					
+							<!-- Items -->
+							<div id="seed-carousel-inner" class="carousel-inner">
+								<!-- JS Here -->
+							</div>
+
+							<!-- Nav -->
+							<a class="carousel-control left" href="#carousel" data-slide="prev">&lsaquo;</a>
+					 		<a class="carousel-control right" href="#carousel" data-slide="next">&rsaquo;</a>
 						</div>
-						<div class="feed-item-timestamp pull-right">
-								{{f.date}}
-						</div>
-					{% endfor %}
-					<!-- <div id="more">More</div> -->
-				{% else %}
-					<p>Sorry, no updates available right now.</p>
-				{% endif %}
+					</div>
+				</div>
+
+				<!-- Main Feed -->
+				<div class="feed-main column">
+				{% if feed|length > 0 %}
+					{% for f in feed %}
+						{% autoescape on %}
+						<div class="feed-item" onmouseover="render_thumbnail({{f.stub}}, '{{f.type}}', {{f.body}})"onmouseout="close_thumbnail()">
+						{% endautoescape %}
+							{% if f.type == "savedcareer" %}
+								<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> is interested in <a href="/career/{{f.id}}/">{{f.title}}</a>
+							{% elif f.type == "careerpath" %}
+								<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> created the career path <a href="/path/{{f.id}}">{{f.title}}</a>
+							{% elif f.type == "goalposition" %}
+								<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> is interestered in becoming a <a href="/position/{{f.id}}">{{f.title}}</a>
+							{% elif f.type == "newuser" %}
+								<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> joined Prosperime!
+							{% elif f.type == "comment" %}
+								<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> commented on 
+								
+								{% if user.id == f.target_user_id %}
+									your 
+								{% else %}
+									<a href="/profile/{{f.target_user_id}}">{{f.target_user_name}}'s</a>		
+								{% endif %}
+								
+								{{f.target_type}} <a href="/build/{{f.target_id}}">{{f.target_name}}</a>: 
+								{% if f.body|length > 30 %}
+									{{f.body|slice:":35"}}..."
+								{% else %}
+									{{f.body}}
+								{% endif %}
+							{% endif %}
+
+							</div>
+							<div class="feed-item-timestamp pull-right">
+									{{f.date}}
+							</div>
+						{% endfor %}
+						<!-- <div id="more">More</div> -->
+					{% else %}
+						<h5>Sorry, no updates available right now.</h5>
+					{% endif %}
+				</div>
 			</div>
 
-			<!-- Preview Column -->
+			<!-- Right Sidebar -->
 			<div id="thumbnail-column" class="span3 column">
 				<div id="thumbnail-container">
 					<!-- Hover gets filled in here -->
@@ -139,7 +143,6 @@
 				<div id="thumbnail-svg-container">
 					<!-- SVG here -->
 				</div>
-
 			</div>
 
 		</div>	
@@ -370,7 +373,7 @@
 				
 
 	};
-
+	var paper = null;
 	var render_thumbnail = function(stub, type, body) {
 
 		// First empty
@@ -408,9 +411,8 @@
 				secondary_template = _.template($('#goal-position-thumbnail-template').html());
 				data = {
 					"position_id":stub["id"],
-					"position_title":stub["title"],
+					"position_title":stub["position"],
 				}
-				console.log(stub["position"])
 				break;
 
 			case "comment":
@@ -427,7 +429,7 @@
 
 				// If this is first career path, create paper
 				if (!paper) 
-					paper = new Raphael("thumbnail-svg-container", 250, 200)
+					paper = new Raphael("thumbnail-svg-container", 250, 400)
 
 				data["paper"] = paper
 				data["path"] = stub["path"]

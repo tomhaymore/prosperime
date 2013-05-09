@@ -27,13 +27,14 @@ class SeedBase():
 		"Design":["jony_ive"],
 
 		"Entertainment":["reed_hastings",],
-		"Financial Services":["michael_bloomberg",],
+		"Financial Services":["michael_bloomberg", "mary_meeker"],
 		"Food & Beverages":["howard_schultz",],
+		"Fundraising":["mary_meeker",],
 		"Government Administration":["paul_clement","michael_bloomberg"],
 
 
-		"Internet":["elon_musk","reed_hastings",],
-		"Investment Banking/Venture":["michael_bloomberg",],
+		"Internet":["elon_musk","reed_hastings", "mary_meeker"],
+		"Investment Banking/Venture":["michael_bloomberg", "mary_meeker"],
 		"Investment Management":["michael_bloomberg",],
 
 		"Judiciary":["paul_clement",],
@@ -42,7 +43,7 @@ class SeedBase():
 		"Legal Services":["paul_clement",],
 		"Life Sciences":["eric_lander",],
 
-
+		"Market Research":["mary_meeker",],
 		"Marketing & Advertising":["howard_schultz",],
 		"Mechanical or Industrial Engineering":["jony_ive",],
 		"Medical Devices":["eric_lander",],
@@ -60,7 +61,7 @@ class SeedBase():
 
 		"Sports":["nate_silver"],
 		"Think Tanks":["eric_lander",],
-
+		"Venture Capital":["mary_meeker"],
 		"Writing & Editing":["nate_silver"],
 	}
 
@@ -80,12 +81,12 @@ class SeedBase():
 	def get_seeds(self,user,**opts):
 
 		## For Dev to test all industries
-		# ind_names = [str(i.name) for i in Industry.objects.all()]
+		ind_names = [str(i.name) for i in Industry.objects.all()]
 		
-		# Grab your related inds and saved inds
-		ind_names = [str(i.name) for i in user.profile._industries()]
-		saved_industries = [str(saved_ind.industry.name) for saved_ind in SavedIndustry.objects.filter(owner=user)]
-		ind_names.extend(saved_industries)
+		# # Grab your related inds and saved inds
+		# ind_names = [str(i.name) for i in user.profile._industries()]
+		# saved_industries = [str(saved_ind.industry.name) for saved_ind in SavedIndustry.objects.filter(owner=user)]
+		# ind_names.extend(saved_industries)
 		print ind_names
 
 		# Iterate through and return JSON people
