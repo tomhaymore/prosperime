@@ -670,11 +670,46 @@ class CareerPathBase(CareerBase):
 		# return paths, overview
 		return paths
 
+	CAREER_SCORE = {
+		0:1,
+		1:1.2,
+		2:1.4,
+		3:1.6,
+		4:1.8,
+		5:2.0
+	}
+
+	def focal_career_keyfunc(self,tup):
+		key, d = tup
+		return d['score']
+
 	def get_focal_careers(self,user,limit=5):
+		from operator import itemgetter
+		# get all user positions
+		positions = Position.objects.filter(person=user)
+		# init array
+		careers = {}
+		# loop through positions
+		for p in positions:
+			if p.ideal_position:
+				dur = p.duration_in_years() if p.duration_in_years() is not None else 1
+				level = p.ideal_position.level
+				score = self.CAREER_SCORE[level] * dur
+				# loop through each career attached to position
+				for c in p.ideal_position.careers.all():
+					# check to see if career is already in dict
+					if c.id in careers:
+						careers[c.id]['score'] += score
+					else:
+						careers[c.id] = {
+							'name':c.name,
+							'id':c.id,
+							'score':score
+						}
 
-		careers = Career.objects.prefetch_related('positions').filter(ideal_positions__position__person=user).annotate(num=Count('positions__pk')).order_by('-num').distinct()[:limit]
+		careers_sorted = sorted(careers.items(),key=self.focal_career_keyfunc,reverse=True)
 
-		return careers
+		return careers_sorted
 
 	def get_careers_brief_in_network(self,user,**filters):
 
@@ -1311,11 +1346,32 @@ class CareerImportBase():
 					career.add_pos_title(t)
 			career.save()
 
-	def import_initial_ideals(self,path):
+	def update_initial_careers(self,path):
 		from careers.models import IdealPosition
+
+		ideals = json.loads(open(path).read())
+
+		for i in ideals:
+			try:
+				ipos = IdealPosition.objects.get(title=i['title'])
+			except:
+				ipos = None
+
+			if ipos:
+				for c in i['careers']:
+					try:
+						career = Career.objects.get(pk=c)
+						ipos.careers.add(career)
+						ipos.save()
+						print "@ import_initial_ideals() -- added career: " + str(c)
+					except ObjectDoesNotExist:
+						print "@ import_initial_ideals() -- missing career: " + str(c)
+
+	def import_initial_ideals(self,path):
 		"""
 		imports initial ideal positions, will do superficial checks for duplicates and add rather than overwriting
 		"""
+		from careers.models import IdealPosition
 
 		ideals = json.loads(open(path).read())
 		# initiate existing flag

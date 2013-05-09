@@ -62,6 +62,11 @@ class Position(models.Model):
 		else:
 			return None
 
+	def duration_in_years(self):
+		if self.duration_in_months():
+			return round(float(self.duration_in_months()) / 12,2)
+		return None
+
 	def safe_start_time(self):
 		if self.start_date is not None:
 			return self.start_date.strftime("%b %Y")
