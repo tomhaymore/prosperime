@@ -1,13 +1,13 @@
-{% extends "base.html" %}
+{% extends "base_full.html" %}
 
 {% block sidebar %}
 
 {% endblock %}
 
 {% block content %}
-<div class="span6 offset2">
-<h3>Almost finished!</h3>
-<p>We just need a few more bits of information to register you. Please fill out the form below.</p>
+<div class="main-container" id="content-container">
+<p class="feature-page-header">Almost Finished!</p>
+<p>We just need a little bit more information to register you. Please fill out the form below.</p>
 <form action="" method="post" name="finish_login">
 	{% csrf_token %}
 	{{ form.as_p }}

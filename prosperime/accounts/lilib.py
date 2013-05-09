@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 from utilities.helpers import retry
 import dateutil
 from sys import stdout
-
+import json
 
 # from Django
 from django.utils import simplejson
@@ -1543,4 +1543,140 @@ class LITest(LIBase):
 				major = None
 			positions.append({'inst_uniq_id':inst_uniq_id,'inst_name':inst_name,'degree':degree,'fieldofStudy':major})
 		return positions
+
+class LITest(LIBase):
+	
+	access_token = {
+		'oauth_token_secret': '8b6f0d3c-07c4-473c-ae1d-861448af054c', 
+		'oauth_token': '3a966b90-a051-4c06-bc14-35e3628e4c98'
+	}
+
+	def test_profile(self):
+
+		fields = "(picture-url,email-address,headline,id,firstName,lastName,positions:(id,title),api-standard-profile-request:(url),public-profile-url,educations:(school-name,field-of-study,degree,start-date,end-date))"
+
+		api_url = "http://api.linkedin.com/v1/people/~:" + fields + "?format=json"
+
+		consumer = oauth.Consumer(self.linkedin_key, self.linkedin_secret)
+		 
+		token = oauth.Token(
+			key=self.access_token['oauth_token'], 
+			secret=self.access_token['oauth_token_secret'])
+
+		client = oauth.Client(consumer, token)
+
+		resp, content = client.request(api_url)
+
+		print content
+
+	def test_connections(self):
+
+		fields = "(public-profile-url,picture-url,educations:(id,school-name,field-of-study,start-date,end-date,degree),id,headline,firstName,lastName,positions:(start-date,end-date,title,is-current,summary,company:(id)))"
+
+		api_url = "http://api.linkedin.com/v1/people/~/connections:" + fields + "?count=20&format=json"
+
+		consumer = oauth.Consumer(linkedin_key, linkedin_secret)
+		 
+		token = oauth.Token(
+			key=self.access_token['oauth_token'], 
+			secret=self.access_token['oauth_token_secret'])
+
+		client = oauth.Client(consumer, token)
+
+		resp, content = client.request(api_url)
+
+		content = simplejson.loads(content)
+
+		print content
+
+	def test_company_profile(self):
+
+		fields = "(id,name,universal-name,company-type,ticker,website-url,industries,status,logo-url,blog-rss-url,twitter-id,employee-count-range,locations:(description,address:(street1,street2,city,state,country-code,postal-code)),description,stock-exchange)"
+
+		api_url = "http://api.linkedin.com/v1/companies/1337:" + fields + "?format=json"
+
+
+		consumer = oauth.Consumer(linkedin_key, linkedin_secret)
+		 
+		token = oauth.Token(
+			key=self.access_token['oauth_token'], 
+			secret=self.access_token['oauth_token_secret'])
+
+		client = oauth.Client(consumer, token)
+
+		resp, content = client.request(api_url)
+
+		# content = simplejson.loads(content)
+
+		print content
+
+	def test_education(self):
+
+		fields = "(educations:(id,school-name,field-of-study,start-date,end-date,degree))"
+
+		api_url = "http://api.linkedin.com/v1/people/~/connections:" + fields + "?format=json"
+
+		consumer = oauth.Consumer(self.linkedin_key, self.linkedin_secret)
+		 
+		token = oauth.Token(
+			key=self.access_token['oauth_token'], 
+			secret=self.access_token['oauth_token_secret'])
+
+		client = oauth.Client(consumer, token)
+
+		resp, content = client.request(api_url)
+
+		print content
+
+class LIUpdate(LIBase):
+
+	access_token = {
+		'oauth_token_secret': '8b6f0d3c-07c4-473c-ae1d-861448af054c', 
+		'oauth_token': '3a966b90-a051-4c06-bc14-35e3628e4c98'
+	}
+
+	def update_industry(self,co):
+
+		if co.li_uniq_id is None:
+			return None
+
+		fields = "(id,name,universal-name,industries)"
+
+		api_url = "http://api.linkedin.com/v1/companies/" + co.li_uniq_id + ":" + fields + "?format=json"
+
+		consumer = oauth.Consumer(self.linkedin_key, self.linkedin_secret)
+		 
+		token = oauth.Token(
+			key=self.access_token['oauth_token'], 
+			secret=self.access_token['oauth_token_secret'])
+
+		client = oauth.Client(consumer, token)
+		resp, content = client.request(api_url)
+
+		data = json.loads(content)
+
+		if 'industries' in data:
+			for i in data['industries']['values']:
+				# check to see if industry already exists
+				print i
+				industry = self.get_industry(i['name'],i['code'])
+				if industry:
+					# add industry to domain of company
+					co.domains.add(industry)
+					if self.logging:
+						print '@update_industry(), found existing industry'
+				else:
+					# create new industry
+					if self.logging:
+						print "@update_industry(), creating new industry: " + i['name'] + ' - ' + str(i['code'])
+
+					industry = Industry()
+					industry.name=i['name']
+					industry.li_code=int(i['code'])
+					if industry.li_code in self.industry_groups:
+						industry.li_group=self.industry_groups[industry.li_code]
+					industry.save()
+					# add to domain of company
+					co.domains.add(industry)
+
 

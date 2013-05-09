@@ -100,7 +100,7 @@ div#popover-container {
 
 div#header-container > h1 {
 	color:rgb(41,98,152);
-	margin-left:25px;
+	/*margin-left:25px;*/
 	padding:5px 0px 15px 0px;
 	display:inline-block;
 }
@@ -150,8 +150,9 @@ div#user-image-container {
 }
 
 div.left-sidebar {
-	margin-left:15px;
+	/*margin-left:15px;*/
 	padding-right:10px;
+	width:200px;
 }
 
 div.left-sidebar a {
@@ -161,6 +162,11 @@ div.left-sidebar a {
 
 
 /* Feed */
+
+div.feed-main {
+	width:650px;
+}
+
 div.feed-item {
 	font-size:1.2em;
 	padding:10px 14px;
@@ -210,7 +216,7 @@ div.thumbnail-info-header {
 }
 
 div#thumbnail-column {
-	border-left:1px solid #a0a0a0;
+	/*border-left:1px solid #a0a0a0;*/
 }
 
 div#thumbnail-secondary-container {

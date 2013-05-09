@@ -80,6 +80,11 @@ $(document).ready(function() {
             }
         }
     });
+    $("input#personalize-goal-careers-box").typeahead({
+    	name:'careers',
+    	remote:'/api/list_careers/?q=%QUERY',
+    	limit: 5
+    });
     $("input#personalize-job-name").typeahead({
     	name: 'jobs',
     	remote: '/careers/jobs?q=%QUERY',

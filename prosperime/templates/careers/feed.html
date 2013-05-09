@@ -17,31 +17,31 @@
 
 {% block content %}
 
+<div id="content-container" class="main-container">
+	<div id="feed-container">
 
-<div id="feed-container" class="main-container">
+		<!-- Header -->
+		<div id="header-container">
+			<h1>Feed</h1>
 
-	<!-- Header -->
-	<div id="header-container">
-		<h1>Feed</h1>
-
-		<div id="feed-link-container" class="pull-right">
-	
-			<div id="quick-links-container" class="link">
-				Quick Links:
-			</div>
-			<a href="/build/">
-				<div id="build-link-container" class="link">
-					Build
+			<!-- <div id="feed-link-container" class="pull-right">
+		
+				<div id="quick-links-container" class="link">
+					Quick Links:
 				</div>
-			</a>
+				<a href="/build/">
+					<div id="build-link-container" class="link">
+						Build
+					</div>
+				</a>
 
-			<a href="/next/">
-				<div id="next-link-container" class="link">
-					Next
-				</div>
-			</a>
+				<a href="/next/">
+					<div id="next-link-container" class="link">
+						Next
+					</div>
+				</a>
+			</div> -->
 		</div>
-	</div>
 
 
 	<!-- Body Container -->
@@ -51,7 +51,8 @@
 				<img class="profile-image" src="{{user_profile_pic}}" />
 			</div>
 
-			<div class="left-sidebar">
+
+			<div>
 				<div class="feed-item selected">Updates</div>
 				<a href="/profile/{{user_id}}/#goal-positions">
 					<div class="feed-item">Saved Positions</div>
@@ -87,7 +88,7 @@
 				</div>
 			</div>
 
-			
+			<div class="feed-main column">
 			{% if feed|length > 0 %}
 				{% for f in feed %}
 					{% autoescape on %}
@@ -118,32 +119,32 @@
 							{% endif %}
 						{% endif %}
 
-
-					</div>
-					<div class="feed-item-timestamp pull-right">
-							{{f.date}}
-					</div>
-				{% endfor %}
-				<!-- <div id="more">More</div> -->
-			{% else %}
-				<h3>Sorry, no updates available right now.</h3>
-			{% endif %}
-		</div>
-
-		<!-- Preview Column -->
-		<div id="thumbnail-column" class="span3 column">
-			<div id="thumbnail-container">
-				<!-- Hover gets filled in here -->
+						</div>
+						<div class="feed-item-timestamp pull-right">
+								{{f.date}}
+						</div>
+					{% endfor %}
+					<!-- <div id="more">More</div> -->
+				{% else %}
+					<p>Sorry, no updates available right now.</p>
+				{% endif %}
 			</div>
 
-			<div id="thumbnail-svg-container">
-				<!-- SVG here -->
+			<!-- Preview Column -->
+			<div id="thumbnail-column" class="span3 column">
+				<div id="thumbnail-container">
+					<!-- Hover gets filled in here -->
+				</div>
+
+				<div id="thumbnail-svg-container">
+					<!-- SVG here -->
+				</div>
+
 			</div>
 
-		</div>
-
-	</div>	
-	
+		</div>	
+		
+	</div>
 </div>
 {% endblock %}
 

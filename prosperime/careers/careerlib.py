@@ -14,7 +14,7 @@ import types
 from django.contrib.auth.models import User
 from entities.models import Industry, Entity
 from careers.models import Career, Position, IdealPosition
-from django.core.exceptions import MultipleObjectsReturned
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.core import management
 from django.db.models import Count, Q
 
@@ -670,11 +670,46 @@ class CareerPathBase(CareerBase):
 		# return paths, overview
 		return paths
 
+	CAREER_SCORE = {
+		0:1,
+		1:1.2,
+		2:1.4,
+		3:1.6,
+		4:1.8,
+		5:2.0
+	}
+
+	def focal_career_keyfunc(self,tup):
+		key, d = tup
+		return d['score']
+
 	def get_focal_careers(self,user,limit=5):
+		from operator import itemgetter
+		# get all user positions
+		positions = Position.objects.filter(person=user)
+		# init array
+		careers = {}
+		# loop through positions
+		for p in positions:
+			if p.ideal_position:
+				dur = p.duration_in_years() if p.duration_in_years() is not None else 1
+				level = p.ideal_position.level
+				score = self.CAREER_SCORE[level] * dur
+				# loop through each career attached to position
+				for c in p.ideal_position.careers.all():
+					# check to see if career is already in dict
+					if c.id in careers:
+						careers[c.id]['score'] += score
+					else:
+						careers[c.id] = {
+							'name':c.name,
+							'id':c.id,
+							'score':score
+						}
 
-		careers = Career.objects.prefetch_related('positions').filter(ideal_positions__position__person=user).annotate(num=Count('positions__pk')).order_by('-num').distinct()[:limit]
+		careers_sorted = sorted(careers.items(),key=self.focal_career_keyfunc,reverse=True)
 
-		return careers
+		return careers_sorted
 
 	def get_careers_brief_in_network(self,user,**filters):
 
@@ -723,16 +758,93 @@ class CareerPathBase(CareerBase):
 
 class CareerBuild(CareerPathBase):
 
+	def keyfunc(self,tup):
+		key, d = tup
+		return d['count']
+
 	def get_position_paths_from_ideal(self,ideal_id):
 		# fetch all users / positions that have the ideal position in their career
-		users = User.objects.values('id','positions__id','positions__type','positions__degree','positions__ideal_position_id','positions__ideal_position__level','positions__title','positions__degree','positions__entity__name','positions__entity_id','positions__type').filter(positions__ideal_position_id=ideal_id).order_by('positions__start_date').distinct()
+		users = User.objects.values('id','positions__id','positions__type','positions__degree','positions__ideal_position_id','positions__ideal_position__title','positions__ideal_position__level','positions__title','positions__degree','positions__entity__name','positions__entity_id','positions__type').filter(positions__ideal_position_id=ideal_id).order_by('positions__start_date').distinct()
 		# init array
 		paths = {}
 		# collapse and sort by user
 		for user in users:
-			paths[user['id']] = [{'id':safe_int(u['id']),'title':u['positions__title'],'entity_id':safe_int(u['positions__entity_id']),'entity_name':u['positions__entity__name'],'ideal_id':safe_int(u['positions__ideal_position_id']),'pos_id':safe_int(u['positions__id']),'level':safe_int(u['positions__ideal_position__level']),'type':u['positions__type'],'degree':u['positions__degree']} for u in users if u['id'] == user['id']]
+			paths[user['id']] = [{'id':safe_int(u['id']),'title':u['positions__title'],'ideal_title':u['positions__ideal_position__title'],'entity_id':safe_int(u['positions__entity_id']),'entity_name':u['positions__entity__name'],'ideal_id':safe_int(u['positions__ideal_position_id']),'pos_id':safe_int(u['positions__id']),'level':safe_int(u['positions__ideal_position__level']),'type':u['positions__type'],'degree':u['positions__degree']} for u in users if u['id'] == user['id']]
 
 		return paths
+
+	def get_next_build_step_ideal(self,start_ideal_id,start_pos_id):
+		from operator import itemgetter
+		# get ideal position object
+		ideal_pos = IdealPosition.objects.get(pk=start_ideal_id)
+		# get paths
+		paths = self.get_position_paths_from_ideal(start_ideal_id)
+		# init arrays
+		next = []
+		finished = []
+		positions = {}
+		# init is_ed flag
+		is_ed = False
+		# loop through each user
+		for k,v in paths.iteritems():
+			# loop through position for each user 
+			for p in v:
+				level = p['level']
+				u_id = p['id']
+				type = p['type']
+				pos_id = p['pos_id']
+				ideal_id = p['ideal_id']
+				ideal_title = p['ideal_title']
+				entity_id = p['entity_id']
+				entity_name = p['entity_name']
+				title = p['title']
+				# filter out various ineligible positions
+				if p['level'] is not None and is_ed is True and int(p['level']) == int(ideal_pos.level):
+					print "same level ed @ build"
+					continue
+				if p['level'] and int(p['level']) < int(ideal_pos.level):
+					print "same ideal pos level @ build"
+					continue
+				if p['type'] == 'education' and p['degree'] is None:
+					print "education with no degree @ build"
+					continue
+				if p['id'] in next and p['id'] not in finished and int(p['pos_id']) != int(start_pos_id):
+					# next step in the path, add to array
+					if ideal_id in positions:
+						# increment counter
+						positions[ideal_id]['count'] += 1
+						# add to positions
+						positions[ideal_id]['positions'].append({'pos_id':pos_id,'ideal_id':ideal_id,'ideal_title':ideal_title,'title':title,'entity_name':entity_name,'level':level})
+						# see if this company is already in the array
+						if entity_id in positions[ideal_id]['orgs']:
+							positions[ideal_id]['orgs'][entity_id]['count'] += 1
+						else:
+							positions[ideal_id]['orgs'].append({entity_id:{'name':entity_name,'id':entity_id,'count':1}})
+					else:
+						positions[ideal_id] = {
+							'count':0,
+							'positions':None,
+							'orgs':None
+						}
+						positions[ideal_id]['count'] += 1
+						positions[ideal_id]['positions'] = [{'pos_id':pos_id,'ideal_id':ideal_id,'title':title,'ideal_title':ideal_title,'entity_name':entity_name,'level':level}]
+						positions[ideal_id]['orgs'] = [{entity_id:{'name':entity_name,'id':entity_id,'count':1}}]
+					# add to processed positions array
+					finished.append(u_id)
+				if ideal_id == int(start_ideal_id):
+					# print 'match'
+					next.append(u_id)
+				if type == "education":
+					is_ed = True
+				else:
+					is_ed = False
+		
+		# sort result by count
+		sorted_positions = sorted(positions.items(), key=self.keyfunc)
+
+		return sorted_positions
+
+	
 
 	def get_next_build_step(self,ideal_id,pos_id):
 		# get ideal position object
@@ -807,7 +919,7 @@ class CareerMapBase():
 
 	def __init__(self):
 		# fill in career to positions map
-		self.init_career_to_positions_map()
+		# self.init_career_to_positions_map()
 		self.init_positions_to_ideals_map()
 		# self.load_stop_list()
 
@@ -949,7 +1061,7 @@ class CareerMapBase():
 				return False
 		else:
 			if ideals_objects:
-				print "Final match: " + pos.title + " (" + str(ideals_objects[0]) + ") " + str(ideals)
+				print "@ match_position_to_ideals() -- final match: " + pos.title + " (" + str(ideals_objects[0]) + ") " + str(ideals)
 			else:
 				print pos.title + ": no match"
 
@@ -973,40 +1085,21 @@ class CareerMapBase():
 		if title_ngrams is not None:
 			for t in title_ngrams:
 				# check stop list
-				if t not in self.STOP_LIST:
-					for k,v in self.positions_to_ideals_map.items():
-						# loop through each dict in matches
-						for m in v:
-							# initiate flag to test for match
-							is_match = False
-							# check if it's a wild match
-							if 'type' in m:
-								if m['type'] == 'wild':
-									# check for regex match with wild token
-									p = re.compile(r"\b%s\b"%m['token'],flags=re.IGNORECASE)
-									match = re.search(p,t)
-									# check to see if the token matches and the base string is in the title
-									if m['title'] in t and match:
-										is_match = True
-										if 'industries' in m and industries is not None:
-											if m['industries']:
-												if not (set(industries) & set(m['industries'])):
-													is_match = False
-													continue
-										# check for entity qualifiers
-										if 'entities' in m:
-											if pos.entity.id not in m['entities']:
-												is_match = False
-												continue
-										if is_match == True:
-											ideals.append(k)	
-											print "Initial match: " + t + ": " + m['title']		
-							# check to see if text matches
-							else:
-								if t == m['title'] and k not in ideals:
+				# if t not in self.STOP_LIST:
+				for k,v in self.positions_to_ideals_map.items():
+					# loop through each dict in matches
+					for m in v:
+						# initiate flag to test for match
+						is_match = False
+						# check if it's a wild match
+						if 'type' in m:
+							if m['type'] == 'wild':
+								# check for regex match with wild token
+								p = re.compile(r"\b%s\b"%m['token'],flags=re.IGNORECASE)
+								match = re.search(p,t)
+								# check to see if the token matches and the base string is in the title
+								if m['title'] in t and match:
 									is_match = True
-									# ideals.append(k)
-									# check for industry qualifiers
 									if 'industries' in m and industries is not None:
 										if m['industries']:
 											if not (set(industries) & set(m['industries'])):
@@ -1019,13 +1112,33 @@ class CareerMapBase():
 											continue
 									if is_match == True:
 										ideals.append(k)	
-										print "Initial match: " + t + ": " + m['title']	
+										print "Initial match: " + t + ": " + m['title']		
+						# check to see if text matches
+						else:
+							# print "@ _get_matching_ideals() -- not a wild match"
+							if t == m['title'] and k not in ideals:
+								is_match = True
+								# ideals.append(k)
+								# check for industry qualifiers
+								if 'industries' in m and industries is not None:
+									if m['industries']:
+										if not (set(industries) & set(m['industries'])):
+											is_match = False
+											continue
+								# check for entity qualifiers
+								if 'entities' in m:
+									if pos.entity.id not in m['entities']:
+										is_match = False
+										continue
+								if is_match == True:
+									ideals.append(k)	
+									print "@ _get_matching_ideals() -- initial match: " + t + ": " + m['title']	
 		return ideals
 
 	def test_match_position_to_ideals(self,title,industries=[]):
 		title_ngrams = self.extract_ngrams(self.tokenize_position(title))
 		ideals = []
-		ideals.extend(self._get_matching_ideals(t,industries))
+		ideals.extend(self._get_matching_ideals(title_ngrams,industries))
 
 		if ideals:
 			# fetch all matched ideal positions, sorted by length of title
@@ -1048,12 +1161,12 @@ class CareerMapBase():
 
 				for t in title_ngrams:
 					# make sure position title is not in stop list, e.g., "Manager" or "Director" or something equally generic
-					if t not in self.STOP_LIST:
-						for k,v in self.careers_to_positions_map.items():
-							if t in v and k not in careers:
-								careers.append(k)
-								career = Career.objects.get(pk=k)
-								print t + ": " + career.name
+					# if t not in self.STOP_LIST:
+					for k,v in self.careers_to_positions_map.items():
+						if t in v and k not in careers:
+							careers.append(k)
+							career = Career.objects.get(pk=k)
+							print t + ": " + career.name
 			print careers
 
 	def list_unmatched_positions(self):
@@ -1233,43 +1346,99 @@ class CareerImportBase():
 					career.add_pos_title(t)
 			career.save()
 
-	def import_initial_ideals(self,path):
+	def update_initial_careers(self,path):
 		from careers.models import IdealPosition
-		"""
-		imports initial ideal positions, assumes empty table and will not check for duplicates
-		"""
 
 		ideals = json.loads(open(path).read())
 
 		for i in ideals:
-			ipos = IdealPosition(title=i['title'],description=i['description'])
+			try:
+				ipos = IdealPosition.objects.get(title=i['title'])
+			except:
+				ipos = None
+
+			if ipos:
+				for c in i['careers']:
+					try:
+						career = Career.objects.get(pk=c)
+						ipos.careers.add(career)
+						ipos.save()
+						print "@ import_initial_ideals() -- added career: " + str(c)
+					except ObjectDoesNotExist:
+						print "@ import_initial_ideals() -- missing career: " + str(c)
+
+	def import_initial_ideals(self,path):
+		"""
+		imports initial ideal positions, will do superficial checks for duplicates and add rather than overwriting
+		"""
+		from careers.models import IdealPosition
+
+		ideals = json.loads(open(path).read())
+		# initiate existing flag
+		
+		for i in ideals:
+			existing = False
+			# check to see if ideal position already exists
+			try:
+				ipos = IdealPosition.objects.get(title=i['title'])
+				existing = True
+				print "@ import_initial_ideals() -- existing ideal, will update"
+			except MultipleObjectsReturned:
+				# already multiples, flag and return later
+				print "@ import_initial_ideals -- duplicate ideal position " + i['title']
+				continue
+			except ObjectDoesNotExist:
+				# create new ideal position
+				ipos = IdealPosition(title=i['title'],description=i['description'])
+				print "@ import_initial_ideals() -- new ideal"
 			
 			# loop through all the listed industries
 			for m in i['matches']:
-				if m['industries']:
-					industry_ids = []
-					# replace industry names with ids
-					for industry in m['industries']:
-						try:
-							new_industry = Industry.objects.get(name=industry)
-						except MultipleObjectsReturned:
-							new_industry = Industry.objects.filter(name=industry)[0]
-						except:
-							new_industry = Industry(name=industry)
-							new_industry.save()
-						industry_ids.append(new_industry.id)
-					m['industries'] = industry_ids
-			ipos.matches = json.dumps(i['matches'])
+				if 'industries' in m:
+					if m['industries']:
+						industry_ids = []
+						# replace industry names with ids
+						for industry in m['industries']:
+							try:
+								new_industry = Industry.objects.get(name=industry)
+							except MultipleObjectsReturned:
+								new_industry = Industry.objects.filter(name=industry)[0]
+							except:
+								new_industry = Industry(name=industry)
+								new_industry.save()
+							industry_ids.append(new_industry.id)
+						m['industries'] = industry_ids
+			if existing:
+				old_matches = json.loads(ipos.matches)
+				print "Old matches: " + str(old_matches)
+				print "New matches: " + str(i['matches'])
+				if old_matches:
+					new_matches = old_matches + i['matches']
+				else:
+					new_matches = i['matches']
+				print "Full matches: " + str(new_matches)
+				ipos.matches = json.dumps(new_matches)
+				# ipos.save()
+				# go to next iteration
+				# continue
+			else:
+				ipos.matches = json.dumps(i['matches'])
 			if 'level' in i:
 				ipos.level = i['level']
 			else:
 				ipos.level = 1
 			ipos.save()
 			for c in i['careers']:
-				career = Career.objects.get(pk=c)
-				ipos.careers.add(career)
+				try:
+					career = Career.objects.get(pk=c)
+					ipos.careers.add(career)
+				except ObjectDoesNotExist:
+					print "@ import_initial_ideals() -- missing career: " + str(c)
 			ipos.save()
-			print "Added " + ipos.title
+			if existing:
+				print "@ import_initial_ideals() -- updated matches " + ipos.title
+			else:
+				print "@ import_initial_ideals() -- added new ideal " + ipos.title
 
 class CareerExportBase():
 

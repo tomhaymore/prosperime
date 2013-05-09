@@ -1290,15 +1290,17 @@ def personalize_careers(request):
 	careers_similar = career_sim.get_careers_brief_similar(request.user)
 
 	# get list of ids of similar careers to avoid duplication in network
-	careers_similar_ids = []
+	careers_similar_ids = [c.id for c in careers_similar]
 
-	for c in careers_similar:
-		careers_similar_ids.append(c.id)
+	careers = {
+		'network': careers_network,
+		'similar': careers_similar
+	}
 
-	careers = {}
+	# careers = {}
 
-	careers['network'] = careers_network
-	careers['similar'] = careers_similar
+	# careers['network'] = careers_network
+	# careers['similar'] = careers_similar
 
 	return render_to_response('careers/personalize_careers.html',{'data':data,'careers':careers,'careers_similar_ids':careers_similar_ids},context_instance=RequestContext(request))
 
@@ -1364,6 +1366,21 @@ def list_jobs(request):
 	# jobs = json.dumps(list(jobs))
 	jobs = json.dumps(jobs_list)
 	return HttpResponse(jobs, mimetype="application/json")
+
+@login_required
+def list_careers(request):
+	if request.GET:
+		params = request.GET['q']
+		# print params
+		careers = Career.objects.values('short_name','id').filter(Q(short_name__icontains=params) | Q(long_name__icontains=params))
+	else:
+		careers = Career.objects.values('short_name','id').all()
+
+	careers_list = [{'value':c['short_name'],'id':c['id']} for c in careers]
+
+	# jobs = json.dumps(list(jobs))
+	careers = json.dumps(careers_list)
+	return HttpResponse(careers, mimetype="application/json")
 
 # VIEW: display ALL user's paths
 def show_paths(request):

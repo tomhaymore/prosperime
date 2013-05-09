@@ -10,7 +10,8 @@
 	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" />
 
 <!-- Fonts -->
-<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Source+Sans+Pro|Varela+Round">
+<!-- <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Source+Sans+Pro|Varela+Round"> -->
+<link href='http://fonts.googleapis.com/css?family=Lato|Arimo' rel='stylesheet' type='text/css'>
 <!-- Past Favorites: Lato, Arvo, -->
 <!-- JS -->
 	<script type="text/javascript" src="{{ STATIC_URL }}js/json2.js"></script>
@@ -33,7 +34,7 @@
 {% block head %} {% endblock %}
 <head> 
 	<title>
-		{% block title %}ProsperMe: Don't work, prosper {% endblock %}
+		{% block title %}ProsprMe: Don't work, prosper {% endblock %}
 	</title>
 </head>
 
@@ -45,38 +46,40 @@
 				<!-- <div class="row-fluid"> -->
 					<div class="log-container pull-left">
 						<!-- <a class="brand" href="/">Prosperime</a> -->
-						<a href="/feed/"><img class="main-logo" src="{{STATIC_URL}}img/logo_4.png" /></a>
+						<a href="/feed/"><img class="main-logo" src="{{STATIC_URL}}img/main_logo.png" /></a>
 					</div>
 					<div class="pull-right">
 						<ul class="topbar-nav pull-right">
 							
                 			{% if user.is_authenticated %}
-	                		<li>
-	                			<a href="/profile/{{user.id}}"><!--{{user.profile.full_name}}-->Profile</a>
-	                		</li>
-	                		<li>
-								<a href="/feed/">Home</a>
-							</li>
-	                		<li>
-	                			<a href="/search/">Search</a>
-	                		</li>
-	                		<li>
-	                			<a href="/account/logout/">Logout</a>
-	                		</li>
+		                		<li>
+		                			<a href="/profile/{{user.id}}"><!--{{user.profile.full_name}}-->Profile</a>
+		                		</li>
+		                		<li>
+									<a href="/feed/">Home</a>
+								</li>
+		                		<li>
+		                			<a href="/search/">Search</a>
+		                		</li>
+		                		<li>
+		                			<a href="/account/logout/">Logout</a>
+		                		</li>
 	                		{% else %}
-							<li>
-								<a href="/account/login">Login</a>
-							</li>
-							<li>
-								<a href="/about/">About</a>
-							</li>
-	                		<li>
-								<a href="/contact/">Contact</a>
-							</li>
+								<li>
+									<a href="/account/login">Login</a>
+								</li>
+								<li>
+									<a href="/about/">About</a>
+								</li>
+		                		<li>
+									<a href="/contact/">Contact</a>
+								</li>
 	                		{% endif %}
 							
 						</ul>
+						<div class="clear"></div>
 					</div>
+					
 					<div class="clear"></div>
 				<!-- </div> -->
 			</div>
@@ -103,6 +106,11 @@
 			{% endblock %}
 
 		</div>
+		{% if user.is_authenticated %}
+		<!-- 	<div class="quick-links">
+				<span>Quick Links:</span> <a href="/build">Build</a> <span class="left-spacer"></span> <a href="/plan">Plan</a>
+			</div> -->
+		{% endif %}
 	   
 	    <div class="container-fluid splash-container">
 	        

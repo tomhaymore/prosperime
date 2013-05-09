@@ -15,13 +15,12 @@ urlpatterns = patterns('',
     url(r'^privacy/$','accounts.views.privacy'),
     url(r'^terms/$','accounts.views.terms'),
     url(r'^copyright/$','accounts.views.copyright'),
+    url(r'^use/$','accounts.views.use'),
 
     # Entities Views
     url(r'^contact/$', 'entities.views.contact'),
     url(r'^about/$', 'entities.views.about'),
     url(r'^meet/$', 'entities.views.meet'),
-
-
 
     # Careers Views
     url(r'^path/(\d+)/$', 'careers.views.viewPath'),
@@ -30,7 +29,6 @@ urlpatterns = patterns('',
     url(r'^build/(\d+)/$', 'careers.views.modify_saved_path'),
     url(r'^plan/$', 'careers.views.plan'),
     url(r'^plan/(\d+)/$', 'careers.views.plan'),
-
 
     # url(r'^personalize/$','careers.views.personalize_careers_jobs'),
     url(r'^personalize/careers/$','careers.views.personalize_careers'),
@@ -55,7 +53,6 @@ urlpatterns = patterns('',
     url(r'^path/(\d+)/$','entities.views.path'),
     url(r'^careers/$','entities.views.careers'),
 
-
     ## Careers - AJAX calls
     url(r'^careers/addDecision/$', 'careers.views.addDecision'),
     url(r'^careers/addIndustry/$', 'careers.views.addIndustry'),
@@ -74,6 +71,7 @@ urlpatterns = patterns('',
     url(r'^careers/deleteSavedPath/$', 'careers.views.delete_path'),
     url(r'^careers/getIdealPosPath/$', 'careers.views.get_ideal_pos_paths'),
     url(r'^careers/getIdealMatches/$', 'careers.views.get_ideal_match_users'),
+    url(r'^api/list_careers/$', 'careers.views.list_careers'),
 
     ## Accounts - AJAX calls
     url(r'^accounts/updateProfile/$', 'accounts.views.updateProfile'),
@@ -85,6 +83,7 @@ urlpatterns = patterns('',
 
     url(r'^decisions/', 'careers.views.getDecisions'),
     url(r'^login/','accounts.views.login'),
+    url(r'^account/register','accounts.views.register'),
     url(r'^profile/(\d+)/$', 'accounts.views.profile'),
     url(r'^profile/org/(\d+)/$','entities.views.profile_org'),
     url(r'^account/authorize','accounts.views.linkedin_authorize'),

@@ -34,7 +34,7 @@ class Comment(models.Model):
 			return self.path.owner
 		elif self.type == "position":
 			return self.position.person
-		elif self.type == "goal_position":
+		elif self.type == "goalposition":
 			return self.goal_position.owner
 
 	def target_name(self):
@@ -42,7 +42,7 @@ class Comment(models.Model):
 			return self.path.title
 		elif self.type == "position":
 			return self.position.title
-		elif self.type == "goal_position":
+		elif self.type == "goalposition":
 			return self.goal_position.position.title
 
 	def target_id(self):
@@ -50,5 +50,5 @@ class Comment(models.Model):
 			return self.path.id
 		elif self.type == "position":
 			return self.position.id
-		elif self.type == "goal_position":
+		elif self.type == "goalposition":
 			return self.goal_position.id
