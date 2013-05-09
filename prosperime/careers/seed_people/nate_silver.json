@@ -1,0 +1,30 @@
+{
+	"name":"Nate Silver",
+	"headline":"Professor at M.I.T., Founder of the Whitehead Institute Center for Genomic Research",
+	"profile_pic":"/static/img/nate_silver.jpeg",
+	"path": [
+		{
+		"title":"B.A. Economics",
+		"type":"education",
+		"entity_name":"University of Chicago",
+		"meta":"highlight"
+		}, {
+		"title":"Economic Consultant",
+		"type":"position",
+		"entity_name":"KPMG",
+		"description":"When asked in 2009, \"What is your biggest regret in life?\" Silver responded, \"Spending four years of my life at a job I didn't like\""
+		}, {
+		"entity_name":"Baseball Prospectus",
+		"title":"Managing Partner",
+		"type":"position",
+		"meta":"pivot",
+		"description":"Nate created PECOTA, a system for predicting MLB player performance."
+		}, {
+		"entity_name":"FiveThirtyEight",
+		"type":"position",
+		"title":"Blogger & Political Analyst",
+		"meta":"pivot",
+		"description":"His work as a political statistician rose to prominence in 2012, in which Nate correctly predicted the winner of all 50 states, and the District of Columbia in the re-election of Barack Obama."
+		}
+	]
+}

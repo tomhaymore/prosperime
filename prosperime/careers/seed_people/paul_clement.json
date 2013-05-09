@@ -1,0 +1,63 @@
+{
+	"name":"Paul Clement",
+	"headline":"Former U.S. Solicitor General and current Professor at Georgetown University Law",
+	"profile_pic":"/static/img/paul_clement.jpeg",
+	"path": [
+		{
+		"title":"B.S.F.S.",
+		"type":"education",
+		"entity_name":"Georgetown University, School of Foreign Service"
+		},{
+		"title":"MPhil Economics",
+		"type":"education",
+		"entity_name":"Cambridge University"
+		},{
+		"title":"J.D.",
+		"type":"education",
+		"entity_name":"Harvard Law School",
+		"meta":"highlight"
+		}, {
+		"entity_name":"U.S. Court of Appeals, District of Columbia",
+		"title":"Law Clerk",
+		"type":"position",
+		"description":"Clerked for Judge Laurence H. Silberman and Associate Justice Antonin Scalia.",
+		"meta":"highlight"
+		}, {
+		"entity_name":"Kirkland & Ellis",
+		"title":"Associate",
+		"type":"position"
+		}, {
+		"entity_name":"U.S. Senate Judiciary Committee",
+		"title":"Chief Counsel",
+		"type":"position"
+		}, {
+		"entity_name":"King & Spalding",
+		"type":"position",
+		"title":"Partner"
+		}, {
+		"title":"Adjunct Professor",
+		"entity_name":"Georgetown University Law Center",
+		"type":"position"
+		}, {
+		"title":"Principal Deputy Solicitor General",
+		"entity_name":"U.S. Department of Justice",
+		"type":"position"
+		}, {	
+		"title":"Solicitor General",
+		"entity_name":"U.S. Department of Justice",
+		"type":"position",
+		"meta":"highlight"
+		}, {
+		"title":"Partner",
+		"entity_name":"King & Spalding",
+		"type":"position"
+		}, {
+		"title":"Partner",
+		"entity_name":"Bancroft PLLC",
+		"type":"position",
+		"meta":"highlight"
+		}
+	]
+}
+
+

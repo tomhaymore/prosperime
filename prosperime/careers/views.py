@@ -11,16 +11,21 @@ from django.contrib.auth.models import User
 from django.utils import simplejson
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
+from django.db.models import Count, Q
+
 
 # Prosperime
 from entities.models import Entity, Industry
 from careers.models import SavedPath, SavedPosition, Position, Career, GoalPosition, SavedCareer, IdealPosition, CareerDecision, SavedIndustry
 from accounts.models import Profile
-import careers.careerlib as careerlib
-from entities.models import Entity
-from django.db.models import Count, Q
-from social.feedlib import FeedBase
 from social.models import Comment
+
+import careers.careerlib as careerlib
+from careers.seedlib import SeedBase
+from social.feedlib import FeedBase
+
+import utilities.helpers as helpers
+
 
 ######################################################
 ################## CORE VIEWS ########################
@@ -100,7 +105,7 @@ def viewPath(request,path_id):
 		'user_id':path.owner.id,
 		'path_id':path_id,
 		'title':path.title,
-		'comments':[{'body':c.body, 'profile_pic':c.owner.profile.default_profile_pic(), 'date_created':_format_date_for_feed(c.created), 'user_name':c.owner.profile.full_name(), 'user_id':c.owner.id} for c in Comment.objects.filter(path=path)],
+		'comments':[{'body':c.body, 'profile_pic':c.owner.profile.default_profile_pic(), 'date_created':helpers._formatted_date(c.created), 'user_name':c.owner.profile.full_name(), 'user_id':c.owner.id} for c in Comment.objects.filter(path=path)],
 		'path_steps':json.dumps(path_steps),
 	}
 
@@ -148,11 +153,22 @@ def feed(request):
 	for f in feed:
 		f["stub"] = json.dumps(f["stub"])
 		f["body"] = json.dumps(f["body"])
-		f["date"] = _format_date_for_feed(f["date"])
+		f["date"] = helpers._formatted_date(f["date"])
 		
-	# TODO -- format datetime objects for timeline here
+	# seedbase returns filenames for relevant people
+	seed_base = SeedBase()
+	filenames = seed_base.get_seeds(request.user)
 
+	# load json files and send to template
+	seed_data = []
+	print filenames
+	for f in filenames:
+		json_person = open(f)
+		data = json.load(json_person)
+		seed_data.append(data)
+		json_person.close()
 
+	data["seeds"] = json.dumps(seed_data)
 	data["user_profile_pic"] = profile.default_profile_pic()
 	data["user_id"] = request.user.id
 	data["feed"] = feed
@@ -183,7 +199,7 @@ def modify_saved_path(request,id):
 		current_positions.append({'pos_id':e.id,'ideal_id':e.ideal_position_id,'title':str(e.title),'entity_name':str(e.entity.name)})
 	
 	# get all comments on path
-	comments = [{'body':c.body, 'profile_pic':c.owner.profile.default_profile_pic(), 'date_created':_format_date_for_feed(c.created), 'user_name':c.owner.profile.full_name(), 'user_id':c.owner.id} for c in Comment.objects.filter(path=path)]
+	comments = [{'body':c.body, 'profile_pic':c.owner.profile.default_profile_pic(), 'date_created':helpers._formatted_date(c.created), 'user_name':c.owner.profile.full_name(), 'user_id':c.owner.id} for c in Comment.objects.filter(path=path)]
 
 
 	# collect data for template
@@ -2317,26 +2333,7 @@ def _date_to_int(date):
 	else:
 		return year + month
 
-def _format_date_for_feed(date):
 
-	now = datetime.datetime.now()
-	one_day = timedelta(days=1)
-	two_days = timedelta(days=2)
-
-	if (now - date) < one_day:
-		if date.hour > 12:
-			return "Today at " + str(date.hour - 12) + ":" + str(date.minute) + ' p.m.'
-		else:
-			return "Today at " + str(date.hour) + ':' + str(date.minute) + ' a.m.'
-
-	elif (now - date) < two_days:
-		if date.hour > 12:
-			return "Yesterday at " + str(date.hour - 12) + ":" + str(date.minute) + " p.m."
-		else:
-			return "Yesterday at " + str(date.hour) + ":" + str(date.minute) + " a.m."
-
-	else:
-		return date
 
 #######################
 ###### Dev Only #######
