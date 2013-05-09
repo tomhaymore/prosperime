@@ -195,6 +195,7 @@ def finish_login(request):
 				user.profile.save()
 				user.set_password(password)
 				user.username = username
+				user.is_active = True
 				user.save()
 				print "user already exists"
 			except:
