@@ -23,19 +23,38 @@ div#feed-body-container .column {
 	height:100%;
 }
 
+div.feed-main-container {
+	width:550px;
+	margin-left:15px;
+	margin-top:25px;
+}
+
+div.feed-left-sidebar {
+	width:150px;
+}
+
 /* Carousel */
 #carousel {
-background-color:#ECF0F1;
-padding:25px;
-border-radius:8px;
-height:325px;
+/*background-color:#ECF0F1;*/
+/*padding:25px;*/
+/*border-radius:8px;*/
+/*height:325px;*/
 }
 
 div.carousel-inner {
 }
 
 a.carousel-control {
-	margin-top:125px;
+	margin-top:25px;
+	left:-7px;
+	background:none;
+	color:#181818;
+	border:none;
+
+}
+
+a.carousel-control:hover {
+	color:#181818;
 }
 
 div.carousel-inner .item {
@@ -48,16 +67,19 @@ div.carousel-inner .item {
 	font-weight:bold;
 }
 
-div.person-name {
-	font-size:1.7em;
+div.carousel-person-name {
+	font-size:1.3em;
 	line-height:35px;
 	color:rgb(41,98,152);
 	font-weight:bold;
+	font-family:"Helvetica Neue",Helvetica;
 }
 
-div.person-current {
-	font-size:1.2em;
+div.carousel-person-current {
+	font-size:1.1em;
 	line-height:24px;
+	font-family:"Helvetica Neue",Helvetica;
+	width:450px;
 }
 
 div.image-container {
@@ -65,9 +87,10 @@ div.image-container {
 	height:75px;
 }
 
-img.profile-image {
-/*	height:50px;
-*/}
+img.carousel-profile-image {
+/*	height:50px;*/
+	margin-right:10px;
+	}
 
 div#popover-container {
 	position:absolute;
@@ -170,11 +193,11 @@ div.left-sidebar a {
 /* Feed */
 
 div.feed-main {
-	width:650px;
+	/*width:650px;*/
 }
 
 div.feed-item {
-	font-size:1.2em;
+	font-size:1.1em;
 	padding:10px 14px;
 }
 
@@ -201,7 +224,8 @@ div.thumbnail-image-container {
 	height:75px;
 	display:inline-block;
 	margin-bottom:25px;
-	margin-left:20px;
+	/*margin-left:20px;*/
+	margin-right:25px;
 	margin-top:10px;
 }
 
@@ -211,19 +235,26 @@ div.connect-button {
 	margin-top:25px;
 }
 div.thumbnail-info {
-	margin-left:20px;
+	/*margin-left:20px;*/
 	padding:0px 8px;
 }
 
 div.thumbnail-info-header {
-	margin-left:20px;
+	/*margin-left:20px;*/
 	padding:0px 8px;
 	font-weight:bold;
 }
 
 div#thumbnail-column {
-	border-left:1px solid #a0a0a0;
+	/*border-left:1px solid #a0a0a0;*/
 	min-height:500px;
+	margin-left:25px;
+	width:250px;
+	margin-top:25px;
+}
+
+div#thumbnail-fixed {
+	position:fixed;
 }
 
 div#thumbnail-secondary-container {

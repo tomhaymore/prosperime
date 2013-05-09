@@ -1299,6 +1299,17 @@ button.general-add-button:active {
 	
 }
 
+.feature-page-subheader {
+	font-family: "Helvetica Neue";
+	font-size: 1.5em;
+	font-weight: 400;
+	color: rgb(48,91,152);
+	border-bottom: 1px solid black;
+	display: inline-block;
+	width: 85%;
+	padding-bottom: 7px;
+}
+
 
 .page-header-title {
 	font-size: 1.5em;
@@ -1545,6 +1556,14 @@ div.third-container {
 	text-decoration: none;
 }
 
+a.inline-link {
+	display:inline-block;
+	cursor: pointer;
+}
+
+a.inline-link:hover {
+	cursor:pointer;
+}
 
 /* Terms */
 .terms-list li {

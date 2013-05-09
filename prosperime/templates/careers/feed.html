@@ -10,45 +10,39 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/helpers.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/tooltip_and_popover.js"></script>
-
+<script type="text/javascript">
+$(function() {
+	$("a#close-spotlight").click(function(e) {
+		$("#carousel-container").hide();
+		e.preventDefault();
+	});
+});
+</script>
 {% endblock %}
 
 
 
 {% block content %}
 
-<div id="feed-content-container" class="main-container">
+<div id="content-container" class="main-container">
 	<div id="feed-container">
 
-		<!-- Header -->
-		<div id="header-container">
-			<h1>Feed</h1>
-
-			<!-- <div id="feed-link-container" class="pull-right">
-		
-				<div id="quick-links-container" class="link">
-					Quick Links:
-				</div>
-				<a href="/build/">
-					<div id="build-link-container" class="link">
-						Build
-					</div>
-				</a>
-
-				<a href="/next/">
-					<div id="next-link-container" class="link">
-						Next
-					</div>
-				</a>
-			</div> -->
-		</div>
 
 
 		<!-- Body Container -->
-		<div class="row" id="feed-body-container">
+		<div class="" id="feed-body-container">
+
+
+	
 
 			<!-- Left Sidebar -->
-			<div class="span2 column">
+			<div class="feed-left-sidebar pull-left column">
+				
+				<!-- Header -->
+				<div id="header-container">
+					<p class="feature-page-header">Feed</p>
+				</div>
+
 				<div id="user-image-container">
 					<img class="profile-image" src="{{user_profile_pic}}" />
 				</div>
@@ -66,12 +60,15 @@
 			</div>
 
 			<!-- Feed (Main) Column -->
-			<div class="span7 column">
+			<div class="feed-main-container pull-left column">
 
 				<!-- Carousel -->
 				<div id="popover-container"></div>
-				<div class="row" id="carousel-container">
-					<div class="span12">
+				<div class="" id="carousel-container">
+					<div class="">
+						<p class="feature-page-subheader pull-left">Spotlight</p>
+						<a id="close-spotlight" href="" class="inline-link pull-right">Close</a>
+						<div class="clear"></div>
 						<div id="carousel" class="carousel slide">
 							<ol id="seed-carousel-indicators" class="carousel-indicators">
 								<!-- JS Here -->
@@ -135,16 +132,18 @@
 			</div>
 
 			<!-- Right Sidebar -->
-			<div id="thumbnail-column" class="span3 column">
-				<div id="thumbnail-container">
-					<!-- Hover gets filled in here -->
-				</div>
+			<div id="thumbnail-column" class="pull-left column">
+				<div id="thumbnail-fixed">
+					<div id="thumbnail-container">
+						<!-- Hover gets filled in here -->
+					</div>
 
-				<div id="thumbnail-svg-container">
-					<!-- SVG here -->
+					<div id="thumbnail-svg-container">
+						<!-- SVG here -->
+					</div>
 				</div>
 			</div>
-
+			<div class="clear"></div>
 		</div>	
 		
 	</div>
@@ -254,9 +253,9 @@
 
 	// Constants
 	var paths = {{seeds|safe}}
-	var paper_w = 700; var paper_h = 200;
+	var paper_w = 550; var paper_h = 200;
 	var dot_radius = 12
-	var start_x = 80
+	var start_x = 20
 	var ed_y = 60
 	var pos_y = 100
 	var current_y = pos_y
@@ -276,6 +275,7 @@
 			x_offset = ((paper_w - (start_x * 2)) / (path.length + 1))
 			current_x = start_x + x_offset
 			current_y = pos_y
+			var prev_dot = null;
 
 
 
@@ -366,9 +366,13 @@
 				if (j > 0) {
 					var line = paper.path("M"+prev_x+","+prev_y+"L"+current_x+","+current_y).attr({'stroke':'#c0c0c0', 'stroke-linecap':'round', 'stroke-opacity':0.8})
 				}
+				dot.toFront();
 				prev_y = current_y; prev_x = current_x; 
 				current_x += x_offset
-
+				if (prev_dot != null) {
+					prev_dot.toFront();
+				}
+				prev_dot = dot;
 			};
 				
 
@@ -429,7 +433,7 @@
 
 				// If this is first career path, create paper
 				if (!paper) 
-					paper = new Raphael("thumbnail-svg-container", 250, 400)
+					paper = new Raphael("thumbnail-svg-container", 225, 400)
 
 				data["paper"] = paper
 				data["path"] = stub["path"]
@@ -463,7 +467,7 @@
 				)
 
 				// Add pic, headline, name
-				$("#seed-carousel-inner").append("<div class='active item'><div class='pull-left inline'> <img class='profile-image inline' width='75' src='" + seeds[i]['profile_pic'] + "' /></div> <div class='person-name inline'>" + seeds[i]['name'] + "</div><div class='person-current'>" + seeds[i]['headline'] + "</div><div id='seed-" + i + "' class='svg-container'></div></div>")
+				$("#seed-carousel-inner").append("<div class='active item'><div class='pull-left inline'> <img class='carousel-profile-image inline' width='75' src='" + seeds[i]['profile_pic'] + "' /></div> <div class='carousel-person-name inline'>" + seeds[i]['name'] + "</div><div class='carousel-person-current'>" + seeds[i]['headline'] + "</div><div id='seed-" + i + "' class='svg-container'></div></div>")
 
 			// Background panes
 			} else {
@@ -474,7 +478,7 @@
 				)
 
 				// Add pic, headline, name
-				$("#seed-carousel-inner").append("<div class='item'><div class='pull-left inline'> <img class='profile-image inline' width='75' height='75' src='" + seeds[i]['profile_pic'] + "' /></div> <div class='person-name inline'>" + seeds[i]['name'] + "</div><div class='person-current'>" + seeds[i]['headline'] + "</div><div id='seed-" + i + "' class='svg-container'></div></div>")			
+				$("#seed-carousel-inner").append("<div class='item'><div class='pull-left inline'> <img class='carousel-profile-image inline' width='75' height='75' src='" + seeds[i]['profile_pic'] + "' /></div> <div class='carousel-person-name inline'>" + seeds[i]['name'] + "</div><div class='carousel-person-current'>" + seeds[i]['headline'] + "</div><div id='seed-" + i + "' class='svg-container'></div></div>")			
 			}
 
 			// Now, add SVG
@@ -487,16 +491,16 @@
 </script>
 
 <script type="text/template" id="feed-item-thumbnail-template">
-	<div class="thumbnail-image-container">
+	<div class="thumbnail-image-container pull-left">
 		<img class="profile-image" src="<%=profile_pic%>" />
 	</div>
 
 	<% if (are_connected) {
-		%><div class="flat-button blue-button connect-button pull-right">Connected</div><%
+		%><div class="flat-button blue-button connect-button pull-left">Connected</div><%
 	} else {
-		%><div class="flat-button green-button connect-button pull-right">Connect</div><%
+		%><div class="flat-button green-button connect-button pull-left">Connect</div><%
 	} %>
-
+	<div class="clear"></div>
 	<div class="thumbnail-info-header"><a href="/profile/<%=user_id%>"><%= user_name%></a></div>
 	<div class="thumbnail-info"><%= num_saved_paths %> saved paths</div>
 	<div class="thumbnail-info"><%= num_saved_positions %> saved positions</div>
@@ -508,7 +512,7 @@
 
 <script type="text/template" id="saved-career-thumbnail-template">
 
-	<div class="thumbnail-info-header">View Career: <a href="/career/<%=career_id%>/"><%=career_title%></a></div>
+	<p class="thumbnail-info-header">View Career: <a href="/career/<%=career_id%>/"><%=career_title%></a></p>
 
 </script>
 
