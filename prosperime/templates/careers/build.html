@@ -493,7 +493,8 @@
 
 			/* Set X,Y values for animation */
 			var x_1 = x_start + (dot_distance * (chosen_data.length - 1))
-			var y_1 = midline
+			// If more options, animate from the top, not the midline
+			var y_1 = (current_option_index > 0) ? 0 : midline; 
 			var x_2 = x_start + (dot_distance * chosen_data.length)
 			var y_2 = (flat) ? midline : midline + y_max - (y_offset * (i % 5))
 			
@@ -503,9 +504,9 @@
 			var option_entity_name = paper.text(x_1, y_1, options[i].entity_name).attr(option_text_attributes)
 
 			/* Animate SVG Elements */
-			option_dot.animate({"cx":x_2, "cy":y_2}, "2e2")
-			option_title.animate({"x":(x_2 + option_text_offset), "y":y_2 - text_offset3}, "2e2")
-			option_entity_name.animate({"x":(x_2 + option_text_offset), "y":(y_2 + text_offset3)}, "2e2")
+			option_dot.animate({"cx":x_2, "cy":y_2}, '500', '<>')
+			option_title.animate({"x":(x_2 + option_text_offset), "y":y_2 - text_offset3}, '500', '<>')
+			option_entity_name.animate({"x":(x_2 + option_text_offset), "y":(y_2 + text_offset3)}, '500','<>')
 
 			/* Gather information needed for hover */
 			option_dot.data("title_text_id", option_title.id)
@@ -631,9 +632,25 @@
 
 
 	var option_clicked = function(el) {
-		// Move selected elements && change styling
-		el.animate({'cy':midline, 'fill':'#2980b9'}, '2e2')
+
 		var id = el.id
+
+		// Remove clicks from previous dots
+		if (chosen_data.length > 0) {
+			for (var l = 0; l < chosen_data.length; l++) {
+				paper.getById(chosen_data[l]["dot_id"]).unclick(go_back)
+			}
+		}
+
+		// Remove other dots
+		for (var j = 0; j < options_data.length; j++) {
+			if (options_data[j]["dot_id"] != id) {
+				paper.getById(options_data[j]["dot_id"]).remove()
+				paper.getById(options_data[j]["title_text_id"]).remove()
+				paper.getById(options_data[j]["entity_text_id"]).remove()
+			}
+		}
+
 
 		// Alternate location of text
 		if (chosen_data.length % 2 == 0) {
@@ -648,12 +665,15 @@
 		var title_text = paper.getById(el.data("title_text_id"))
 		title_text.attr(text_attributes)
 		
-		title_text.animate({"x":x_start + (dot_distance * chosen_data.length), "y": title_y}, '2e2')
-
 		var entity_text = paper.getById(el.data("entity_text_id"))
 		entity_text.attr(text_attributes)
+	
+		// Move selected elements && change styling
+		el.animate({'cy':midline, 'fill':'#2980b9'}, '500', '<>')
 
-		entity_text.animate({"x":x_start + (dot_distance * chosen_data.length), "y": entity_name_y}, '2e2')
+		title_text.animate({"x":x_start + (dot_distance * chosen_data.length), "y": title_y}, '500','<>')
+
+		entity_text.animate({"x":x_start + (dot_distance * chosen_data.length), "y": entity_name_y}, '500','<>')
 
 
 		// Unbind Events
@@ -665,25 +685,11 @@
 		// Because most recent, bind "go back" event
 		el.click(go_back)		
 
-		// Remove clicks from previous dots
-		if (chosen_data.length > 0) {
-			for (var l = 0; l < chosen_data.length; l++) {
-				paper.getById(chosen_data[l]["dot_id"]).unclick(go_back)
-			}
-		}
-	
+		
 		// Draw line to previous
 		var line = paper.path("M" + (x_start + ((chosen_data.length - 1) * dot_distance) + dot_radius + 4) + ', ' + midline + ' L' + (x_start + (chosen_data.length * dot_distance) - dot_radius - 4) + ','  + midline).attr(chosen_line_attributes)
 
-		// Remove other dots
-		for (var j = 0; j < options_data.length; j++) {
-			if (options_data[j]["dot_id"] != id) {
-				paper.getById(options_data[j]["dot_id"]).remove()
-				paper.getById(options_data[j]["title_text_id"]).remove()
-				paper.getById(options_data[j]["entity_text_id"]).remove()
-			}
-		}
-
+		
 		// Update DST
 		chosen_data.push({"dot_id":el.id, "pos_id":el.data("pos_id"), "ideal_id": el.data("ideal_id")})
 		options_data.length = 0
@@ -698,40 +704,46 @@
 		/* Delete most recent dot */
 		var most_recent = paper.getById(chosen_data.pop()["dot_id"])
 		remove_dot_and_text(most_recent)
-		
 
+		if (options_data.length == 0) go_back_part_2()
+		
 		/* Animate options backwards */
-		// var x = x_start + (chosen_data.length * dot_distance)
-		// for (var z = 0; z < options_data.length; z++) {
+		var x = x_start + (chosen_data.length * dot_distance)
+		for (var z = 0; z < options_data.length; z++) {
 
-		// 	// Callback - once completed, run the rest of go_back()
-		// 	paper.getById(options_data[z]["dot_id"]).animate({"cx":x, "cy":midline}, 500, go_back_part_2)
-		// }
+			// Callback - once completed, run the rest of go_back()
+			paper.getById(options_data[z]["dot_id"]).animate({"cx":x, "cy":midline}, 250, function() {
 
-		
-		remove_options()
+				// Delete dot & increment public counter
+				console.log('callback')
+				go_back_part_2()
+				this.remove()
+			});
 
-		/* Remove its line */
-		if (line_data.length > 0)
-			paper.getById(line_data.pop()).remove()
+			// Only animate dots, not text
+			paper.getById(options_data[z]["title_text_id"]).remove()
+			paper.getById(options_data[z]["entity_text_id"]).remove()
 
-		/* Re-render off of previous dot, if there is one */
-		if (chosen_data.length > 0) {
-			get_and_render_options(chosen_data[chosen_data.length - 1]["ideal_id"],chosen_data[chosen_data.length - 1]["pos_id"])
-			
-			// And re-add click handler
-			paper.getById(chosen_data[chosen_data.length - 1]["dot_id"]).click(go_back)
-		} else {
-			// unselect starting point
-			normalize_rows()
-			if (shuffle_button_id > 0) deactivate_shuffle_button()
 		}
 	};
 
-	/* Ghetto, but allows the animation to run */
+
+
+	/* Logic -- wait until all dots have been animated (by
+		incrementing counter), then proceed with rest of back process */
+	var options_animated_counter = 0
 	var go_back_part_2 = function() {
 
-		remove_options()
+		if (options_animated_counter < (options_data.length - 1) && options_data.length > 0) {
+			options_animated_counter++
+			return false;
+		}
+		console.log('exiting loop')
+		options_animated_counter = 0
+		options_data.length = 0
+		current_option_index = 0
+
+		// remove_options()
 
 		/* Remove its line */
 		if (line_data.length > 0)
@@ -750,14 +762,29 @@
 	};
 
 	var shuffle_handler = function() {
-		console.log("handler called")
 
-		// First, animate shuffle buttons away
+		var x_2 = x_start + (dot_distance * (chosen_data.length - 1))
 		for (var j = 0; j < options_data.length; j++) {
-			paper.getById(options_data[j]["dot_id"]).remove()
+
+			// Remove and animate dot
+			paper.getById(options_data[j]["dot_id"]).animate({"cy":paper_h, "cx":x_2}, '500', '<>', function() {
+				this.remove()
+			});
+			// // Remove and animate title
+			// paper.getById(options_data[j]["title_text_id"]).animate({"y":paper_h, "x":x_2}, '500', '<>', function() {
+			// 	this.remove()
+			// });
+			// // Remove and animate entity
+			// paper.getById(options_data[j]["entity_text_id"]).animate({"y":paper_h, "x":x_2}, '500', '<>', function() {
+			// 	this.remove()
+			// });
+
+			// Looks better just to animate the dots
 			paper.getById(options_data[j]["title_text_id"]).remove()
 			paper.getById(options_data[j]["entity_text_id"]).remove()
+
 		}
+
 		options_data.length = 0
 
 		// Second, render the rest of the options
@@ -843,7 +870,7 @@
 					var delete_html = "<div id='delete-button'  onclick='delete_path()'>Delete</div>"
 					$('#delete-button-container').html(delete_html)
 
-					$('#comments-container').css("visibility", "visible")
+					$('#comments-container').css("visibility", "visible").append("No comments yet")
 
 					// Set new path id
 					path_id = response["path_id"]

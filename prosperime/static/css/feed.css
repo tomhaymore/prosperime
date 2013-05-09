@@ -17,6 +17,85 @@ div#feed-body-container .column {
 	height:100%;
 }
 
+/* Carousel */
+#carousel {
+background-color:#ECF0F1;
+padding:25px;
+border-radius:8px;
+height:325px;
+}
+
+div.carousel-inner {
+}
+
+a.carousel-control {
+	margin-top:125px;
+}
+
+div.carousel-inner .item {
+	/*text-align:center;*/
+}
+
+.reason-for-seed {
+	text-align:center;
+	padding:10px;
+	font-weight:bold;
+}
+
+div.person-name {
+	font-size:1.7em;
+	line-height:35px;
+	color:rgb(41,98,152);
+	font-weight:bold;
+}
+
+div.person-current {
+	font-size:1.2em;
+	line-height:24px;
+}
+
+div.image-container {
+	width:75px;
+	height:75px;
+}
+
+img.profile-image {
+/*	height:50px;
+*/}
+
+div#popover-container {
+	position:absolute;
+}
+
+/* Customer Popover Styling */
+.popover-title {
+	background-color:#2980B9;
+	color:#fffffe;
+	padding:6px 0px;
+	border:none;
+}
+
+.popover {
+	background-color:#2980B9;
+	border:none;
+	box-shadow:none;
+	-webkit-box-shadow:none;
+	-mox-box-shadow:none;
+}
+
+.popover-inner {
+	background-color:#2980B9;
+	border:none;
+}
+
+.popover.top .arrow {
+	border-top-color:#2980B9;
+}
+
+.popover.top .arrow:after {
+	border-top-color:#2980B9;
+}
+
 /* Header Container */
 
 div#header-container > h1 {
@@ -85,7 +164,6 @@ div.left-sidebar a {
 div.feed-item {
 	font-size:1.2em;
 	padding:10px 14px;
-	display:inline-block;
 }
 
 div.selected {
@@ -148,3 +226,8 @@ div.bordered {
 	border-left:2px solid #777;
 	border-right:2px solid #777;
 }
+
+.inline {
+	display: inline;
+}
+

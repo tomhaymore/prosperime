@@ -14,22 +14,30 @@ def _formatted_date(date):
     two_days = timedelta(days=2)
 
     if (now - date) < one_day:
-        if date.hour > 12:
-            return "Today at " + str(date.hour - 12) + ":" + str(date.minute) + ' p.m.'
-        else:
-            return "Today at " + str(date.hour) + ':' + str(date.minute) + ' a.m.'
-
+         return_date = "Today at "
     elif (now - date) < two_days:
-        if date.hour > 12:
-            return "Yesterday at " + str(date.hour - 12) + ":" + str(date.minute) + " p.m."
-        else:
-            return "Yesterday at " + str(date.hour) + ":" + str(date.minute) + " a.m."
-
+        return_date = "Yesterday at "
     else:
         return date
 
+    if date.minute < 10:
+        minute = "0" + str(date.minute)
+    else:
+        minute = str(date.minute)
 
+    if date.hour > 12:
+        hour = str(date.hour - 12)
+        prefix = " p.m."
+    elif date.hour == 0:
+        hour = "12"
+        prefix = " a.m."
+    else:
+        hour = str(date.hour)
+        prefix = " a.m."
 
+    print date.hour
+    return return_date + hour + ":" + minute + prefix
+  
 
 def _months_from_now_json(start_date):
     ## expects a start-date as a string of form MM/YY

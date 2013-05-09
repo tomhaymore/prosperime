@@ -1,0 +1,27 @@
+{
+	"name":"Jony Ive",
+	"headline":"Vice President of Industrial Design at Apple",
+	"profile_pic":"/static/img/jony_ive.jpeg",
+	"path": [
+		{
+		"title":"B.A. in Industrial Design",
+		"type":"education",
+		"entity_name":"Newcastle Polytechnic University",
+		"meta":"highlight"
+		}, {
+		"entity_name":"Tangerine Design Consultancy, London",
+		"title":"Co-Founder",
+		"type":"position"
+		}, {
+		"entity_name":"Apple",
+		"title":"Consultant Designer",
+		"type":"position"
+		}, {
+		"entity_name":"Apple",
+		"type":"position",
+		"title":"Senior Vice President of Industrial Design",
+		"description":"Jony has led Apple's iconic design team, reporting directly to Steve Jobs and now Tim Cook.",
+		"meta":"highlight"
+		}
+	]
+}

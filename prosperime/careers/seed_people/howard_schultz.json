@@ -1,0 +1,36 @@
+{
+	"name":"Howard Schultz",
+	"headline":"Chairman and CEO of Starbucks",
+	"profile_pic":"/static/img/howard_schultz.jpeg",
+	"path": [
+		{
+		"title":"B.A. in Communications",
+		"type":"education",
+		"entity_name":"Northern Michigan University",
+		"description":"Attended on athletic scholarship"
+		}, {
+		"title":"Salesman",
+		"type":"position",
+		"entity_name":"Xerox Corporation",
+		"meta":"highlight"
+		}, {
+		"title":"General Manager",
+		"entity_name":"Hammarplast",
+		"type":"position",
+		"meta":"pivot"
+		}, {
+		"title":"Director of Marketing",
+		"entity_name":"Starbucks",
+		"type":"position"
+		}, {
+		"title":"Founder",
+		"entity_name":"Il Giornale",
+		"type":"position"
+		}, {
+		"title": "CEO",
+		"entity_name": "Starbucks",
+		"meta":"highlight",
+		"type":"position"
+		}
+	]
+}
