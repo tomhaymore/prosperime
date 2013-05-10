@@ -13,7 +13,7 @@
 {% cache 10 content user.id career.id %}
 
 <div id="content-container" class="main-container">
-	<p class="main-header">Career: <span class="splash-slug">{{career.name}}</span></p>
+	<p class="feature-page-header">{{career.name}}</p>
 	{% if career.description %}
 		<p class="main-sub-header">{{career.description}}</p>
 	{% endif %}
@@ -22,7 +22,7 @@
 		<div class="career-profile-nav-container">
 			<!-- <span class="main-sub-header pull-left">View stats for: </span> -->
 			<a class="career-profile-nav pull-left selected" data-view="network">Your Network</a> 
-			<a class="career-profile-nav pull-left unselected" data-view="all">Prosperime Community</a>
+			<a class="career-profile-nav pull-left unselected" data-view="all">Prospr.me Community</a>
 			<div class="clear"></div>
 			
 		</div>
@@ -31,12 +31,12 @@
 			<div id="career-profile-graph-label">&nbsp;</div>
 			{% if ed_overview %}
 				<ul class="ed_overview_network_graph_list">
-				{% for k,v in ed_overview.network.items|slice:":10" %}
+				{% for k,v in ed_overview.network.items|slice:":5" %}
 					<li class="ed_overview_network_item" data-id="{{k}}" data-count="{{v.count}}" data-name="{{v.name}}">{{v.name}}</li>
 				{% endfor %}
 				</ul>
 				<ul class="ed_overview_all_graph_list">
-				{% for k,v in ed_overview.all.items|slice:":10" %}
+				{% for k,v in ed_overview.all.items|slice:":5" %}
 					<li class="ed_overview_all_item" data-id="{{k}}" data-count="{{v.count}}" data-name="{{v.name}}">{{v.name}}</li>
 				{% endfor %}
 				</ul>
@@ -150,9 +150,9 @@
 				{% for k,v in paths.all.items|slice:":10" %}
 					<li class="career-profile-paths-item">
 						{% if v.pic %}
-							<img class="career-profile-preview" src="{{ MEDIA_URL }}{{v.pic}}" />
+							<!-- <img class="career-profile-preview" src="{{ MEDIA_URL }}{{v.pic}}" /> -->
 						{% else %}
-							<img class="career-profile-preview" src="{{ MEDIA_URL }}/pictures/anon.jpg" />
+							<!-- <img class="career-profile-preview" src="{{ MEDIA_URL }}/pictures/anon.jpg" /> -->
 						{% endif %}
 						<p class="career-profile-preview-name"><a href="/profile/{{k}}">{{v.full_name}}</a></p>
 					</li>
@@ -161,7 +161,7 @@
 			</div>
 			<div class="clear"></div>
 		</div>
-		<div class="career-profile-positions-container">
+	<!-- 	<div class="career-profile-positions-container">
 			<p class="main-sub-header">Positions</p><a name="positions"></a>
 			<div class="career-profile-positions" data-view="network">
 				<p>Coming soon!</p>
@@ -178,7 +178,7 @@
 				{% endif %}
 			</div>
 			<div class="clear"></div>
-		</div>
+		</div> -->
 		<div class="career-profile-orgs-container">
 			<p class="main-sub-header">Organizations</p><a name="organizations"></a>
 			<div class="career-profile-orgs" data-view="network">
