@@ -1,7 +1,7 @@
 {
 	"name":"Nate Silver",
-	"headline":"Professor at M.I.T., Founder of the Whitehead Institute Center for Genomic Research",
-	"profile_pic":"/static/img/nate_silver.jpeg",
+	"headline":"Founder and blogger at FiveThirtyEight, statistician and political analyst",
+	"profile_pic":"/static/img/nate_silver.jpg",
 	"path": [
 		{
 		"title":"B.A. Economics",

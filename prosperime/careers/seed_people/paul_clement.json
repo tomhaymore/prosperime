@@ -1,7 +1,7 @@
 {
 	"name":"Paul Clement",
 	"headline":"Former U.S. Solicitor General and current Professor at Georgetown University Law",
-	"profile_pic":"/static/img/paul_clement.jpeg",
+	"profile_pic":"/static/img/paul_clement.jpg",
 	"path": [
 		{
 		"title":"B.S.F.S.",
@@ -34,10 +34,6 @@
 		"entity_name":"King & Spalding",
 		"type":"position",
 		"title":"Partner"
-		}, {
-		"title":"Adjunct Professor",
-		"entity_name":"Georgetown University Law Center",
-		"type":"position"
 		}, {
 		"title":"Principal Deputy Solicitor General",
 		"entity_name":"U.S. Department of Justice",
