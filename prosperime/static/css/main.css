@@ -393,6 +393,7 @@ p.promo-message {
 
 div#promo-message-container {
 	padding-top:10px;
+	margin-bottom:50px;
 	/*background-color: whitesmoke;
 	height:225px;
 	width:1000px;
@@ -401,9 +402,9 @@ div#promo-message-container {
 }
 
 div#promo-message-inner {
-	width:1000px;
-	margin-right: auto;
-	margin-left: auto;
+	width:100%;
+	margin-right:0 auto;
+	margin-left:0 auto;
 }
 
 ul {

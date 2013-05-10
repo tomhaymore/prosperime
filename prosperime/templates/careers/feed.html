@@ -69,7 +69,7 @@
 			<div class="span7 column">
 
 				<!-- Carousel -->
-				<div id="popover-container"></div>
+				<!-- <div id="popover-container"></div> -->
 				<div class="row" id="carousel-container">
 					<div class="span12">
 						<div id="carousel" class="carousel slide">
@@ -165,12 +165,14 @@
 		$('#carousel').carousel({interval:false})
 
 		// Create universal popover
-		$('#popover-container').popover({
-			'trigger':'manual',
-			'placement':'top',
-			'animation':'ease',
-			'content':"Content would go here"
-		})
+		$('.popover-container').each(function() {
+			$(this).popover({
+				'trigger':'manual',
+				'placement':'top',
+				'animation':'ease',
+				'content':"Content would go here"
+			});
+		});
 
 
 
@@ -248,7 +250,6 @@
 
 	});
 
-	// var paper = null;
 
 
 
@@ -306,51 +307,29 @@
 				var displayed = false;
 				if (path[j]['meta'] == 'pivot' || path[j]['meta'] == 'highlight') {
 
+					var target = $(dot.node)
+					console.log($('#popover-'+j).attr("x"))
+
+					if (target.attr('y') < pos_y)
+						$('#popover-'+j).show().css("left",(current_x) + "px").css("top",(current_y) + "px").attr("data-original-title", target.attr('pop-title')).attr("data-content", target.attr('pop-content')).popover("show")
+
+					else
+						$('#popover-'+j).show().css("left",(current_x + dot_radius) + "px").css("top",(current_y) + "px").attr("data-original-title", target.attr('pop-title')).attr("data-content", target.attr('pop-content')).popover("show")
+			
+				} else {
 					$(dot.node).on('mouseenter', function(ev) {
 						var target = $(ev.currentTarget)
 						var offset = target.offset()
 
 
 						if (target.attr('y') < pos_y) {
-							$('#popover-container').show().css("left",(offset.left + dot_radius) + "px").css("top",(offset.top) + "px").attr("data-original-title", target.attr('pop-title')).attr("data-content", target.attr('pop-content')).popover("show").attr("placement", "bottom")
+							$('#popover-'+j).show().css("left",(offset.left + dot_radius) + "px").css("top",(offset.top) + "px").attr("data-original-title", target.attr('pop-title')).attr("data-content", target.attr('pop-content')).popover("show").attr("placement", "bottom")
 
 						}
 						else
-							$('#popover-container').show().css("left",(offset.left + dot_radius) + "px").css("top",(offset.top) + "px").attr("data-original-title", target.attr('pop-title')).attr("data-content", target.attr('pop-content')).popover("show")
+							$('#popover-'+j).show().css("left",(offset.left + dot_radius) + "px").css("top",(offset.top) + "px").attr("data-original-title", target.attr('pop-title')).attr("data-content", target.attr('pop-content')).popover("show")
 					}).on('mouseleave', function(ev) {
-						$('#popover-container').hide().popover("hide")
-					})
-
-
-					// if (index == 0) {
-					// 	var title_y = (current_y >= pos_y) ? current_y + text_offset1 : current_y - text_offset2
-					// 	var ent_y = (current_y > pos_y) ? current_y + text_offset2 : current_y - text_offset1
-					// } else {
-					// 	var title_y = (current_y >= pos_y) ? current_y + text_offset1 : current_y - 40
-					// 	var ent_y = (current_y >= pos_y) ? current_y + text_offset2 : current_y - 50
-					// }
-
-
-					// var title = paper.text(current_x, title_y, path[j]['title']).attr({'text-anchor':'left', 'font-size':12,'font-family':'Helvetica Neue'})
-					// var ent = paper.text(current_x, ent_y, path[j]['entity_name']).attr({'text-anchor':'left', 'font-size':12, 'font-family':'Helvetica Neue'})
-
-					// console.log(title.attr("y") + ' ' + ent.attr("y"))
-
-					// displayed=true
-				} else {
-						$(dot.node).on('mouseenter', function(ev) {
-						var target = $(ev.currentTarget)
-						var offset = target.offset()
-
-
-						if (target.attr('y') < pos_y) {
-							$('#popover-container').show().css("left",(offset.left + dot_radius) + "px").css("top",(offset.top) + "px").attr("data-original-title", target.attr('pop-title')).attr("data-content", target.attr('pop-content')).popover("show").attr("placement", "bottom")
-
-						}
-						else
-							$('#popover-container').show().css("left",(offset.left + dot_radius) + "px").css("top",(offset.top) + "px").attr("data-original-title", target.attr('pop-title')).attr("data-content", target.attr('pop-content')).popover("show")
-					}).on('mouseleave', function(ev) {
-						$('#popover-container').hide().popover("hide")
+						$('#popover-'+j).hide().popover("hide")
 					})
 				}
 
@@ -449,11 +428,20 @@
 		// $("#thumbnail-container").empty()
 	};
 
+	var num_popovers_created = 0;
 	var create_carousel = function() {
 		var seeds = {{seeds|safe}}
-		var keys = Object.keys(seeds)
 		
 		for (var i = 0; i < seeds.length; i++) {
+
+			// Append unique popovers to container if needed
+			if (seeds[i]['path'].length > num_popovers_created) {
+				var difference = seeds[i]['path'].length - num_popovers_created
+
+				for (var j = 0; j < difference; j++) {
+					$('#carousel-container').append("<div class='popover-container' id='popover-" + (++num_popovers_created) + "'></div>")
+				}
+			}
 
 			// First (active) pane
 			if (i == 0) {

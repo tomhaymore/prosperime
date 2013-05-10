@@ -73,6 +73,10 @@ div#popover-container {
 	position:absolute;
 }
 
+div.popover-container {
+	position:relative;
+}
+
 /* Customer Popover Styling */
 .popover-title {
 	background-color:#2980B9;

@@ -2,6 +2,7 @@
 
 {% block head %}
 
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/welcome.css" />
 {% endblock %}
 
 <!-- Messages -->
@@ -14,13 +15,10 @@
 
 	<div class="span10 offset1">
 		<p class="splash-message-header">Don't just work, prosper!</p>
-		<p class="splash-message-subheader">Prosperime helps you discover actual career paths from real people in your network.</p>
+		<p class="splash-message-subheader">ProsperMe helps you discover actual career paths from real people in your network.</p>
 		<p class="text-center splash-submessage no-hover">
 			<a id="get-started-button" class="flat-button green-button center" href="/account/register">Get started</a>
 		</p>
-		<!-- <p class="text-center splash-submessage">
-			<a class="left-spacer center" href="/account/login">Already registered?</a>
-		</p>	 -->
 	</div>
 
 	<div class="clear"></div>
@@ -31,34 +29,73 @@
 {% block promo %}
 <div id="promo-message-container">
 	<div id="promo-message-inner">
-			<div class="third-container pull-left">
-				<div class="v5-header"><a href="/build/">Build</a></div>
-				<div class="v5-text">Build your career step-by-step and see what possibilities each new job opens up</div>
-				<div class="flat-button v5-button pull-left"><a href="/build/">Start Building</a></div>
-				<div class="clear"></div>
+
+		<!-- Explore Career Paths -->
+		<div class="row">
+			<div class="span6 promo-header-container column-left">
+				<div class="promo-header">
+					Explore Career Paths
+				</div>
+				<div class="promo-text">
+					See the career paths of industry leaders, celebrities, and others. Learn from ther decisions, step-by-step, and build your own plans using their foundation.
+				</div>
+				<div class="flat-button blue-button button-large promo-button" onclick="register()">Start Exploring</div>
+
 			</div>
 
-			<!-- Plan -->
-			<div class="third-container pull-left">
-				<div class="v5-header"><a href="/profile/{{user.id}}/">Plan</a></div>
-				<div class="v5-text">Pick your ideal job and see how others have achieved it and how you can reach the same goal</div>
-				<div class="flat-button v5-button pull-left"><a href="/plan/">Start Planning</a></div>
-				<div class="clear"></div>
+			<div class="span6 promo-image-containe column-right">
+				IMAGE
 			</div>
-		
 
-			<!-- Next -->
-			<div class="third-container pull-left">
-				<div class="v5-header"><a href="/next/#?i1={{industry}}/">Next</a></div>
-				<div class="v5-text">See the tried and true options for switching from your current industry to another</div>
-				<div class="flat-button v5-button pull-left"><a href="/next/#?i1={{industry}}">What's Next</a></div>
-				<div class="clear"></div>
+		</div>
+
+		<!-- Build Career Paths -->
+		<div class="row">
+
+			<div class="span6 promo-image-container column-left">
+
+				IMAGE
 			</div>
-			<div class="clear"></div>
+
+			<div class="span6 promo-header-container column-right">
+				<div class="promo-header">
+					Build Your Own Career
+				</div>
+				<div class="promo-text">
+					Build your future career path one position at a time. With each new position, ProsperMe will show you what opportunitites come next until you reach your dream job.
+				</div>
+				<div class="flat-button blue-button button-large promo-button" onclick="register()">Start Building</div>
+			</div>
+		</div>
+
+		<!-- Plan Next Steps -->
+		<div class="row">
+
+			<div class="span6 promo-header-container column-left">
+				<div class="promo-header">
+					Plan Your Next Steps
+				</div>
+				<div class="promo-text">
+					Planning a career change to something new? See the options for switching to a new industry.
+				</div>
+				<div class="flat-button blue-button button-large  promo-button" onclick="register()">See What's Next</div>
+			</div>
+			<div class="span6 promo-image-container column-right">
+				IMAGE
+			</div>
+
+			
+		</div>	
 	</div>
 
 
 </div>
+<script type="text/javascript">
+	var register=function() {
+		window.location="/account/register"
+	};
+</script>
+
 {% endblock %}
 
 {% block templates %}
