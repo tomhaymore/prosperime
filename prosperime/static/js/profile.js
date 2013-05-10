@@ -1,3 +1,84 @@
+var colors = {
+	0:"rgb(8,81,156)",
+	1:"rgb(49,130,189)",
+	2:"rgb(107,174,214)",
+	3:"rgb(189,215,231)",
+	4:"rgb(239,243,255)"
+}
+
+Raphael.fn.donutChart = function (cx, cy, r, rin, values, labels, ids, stroke) {
+    var paper = this,
+        rad = Math.PI / 180,
+        chart = this.set();
+    function sector(cx, cy, r, startAngle, endAngle, params) {
+        //console.log(params.fill);
+        var x1 = cx + r * Math.cos(-startAngle * rad),
+            x2 = cx + r * Math.cos(-endAngle * rad),
+            y1 = cy + r * Math.sin(-startAngle * rad),
+            y2 = cy + r * Math.sin(-endAngle * rad),
+            xx1 = cx + rin * Math.cos(-startAngle * rad),
+            xx2 = cx + rin * Math.cos(-endAngle * rad),
+            yy1 = cy + rin * Math.sin(-startAngle * rad),
+            yy2 = cy + rin * Math.sin(-endAngle * rad);
+        
+        return paper.path(["M", xx1, yy1,
+                           "L", x1, y1, 
+                           "A", r, r, 0, +(endAngle - startAngle > 180), 0, x2, y2, 
+                           "L", xx2, yy2, 
+                           "A", rin, rin, 0, +(endAngle - startAngle > 180), 1, xx1, yy1, "z"]
+                         ).attr(params);
+        
+    }
+    var angle = 0,
+        total = 0,
+        start = 0,
+        process = function (j) {
+            var value = values[j],
+                angleplus = 360 * value / total,
+                popangle = angle + (angleplus / 2),
+                // color = Raphael.hsb(start, .75, 1),
+                color = Raphael.getRGB(colors[j]),
+                ms = 500,
+                delta = 30,
+                bcolor = Raphael.hsb(start, 1, 1),
+                p = sector(cx, cy, r, angle, angle + angleplus, {fill: color, stroke: stroke, "stroke-width": 3});
+                // txt = paper.text(cx + (r + delta + 55) * Math.cos(-popangle * rad), cy + (r + delta + 25) * Math.sin(-popangle * rad), labels[j]).attr({fill: "#181818", stroke: "none", opacity: 0, "font-size": 20});
+            p.mouseover(function () {
+                p.stop().animate({transform: "s1.1 1.1 " + cx + " " + cy}, ms, "elastic");
+                $("#profile-career-list-"+ids[j]).addClass("strong");
+                $("#profile-career-name").text(labels[j])
+                // txt.stop().animate({opacity: 1}, ms, "elastic");
+            }).mouseout(function () {
+                p.stop().animate({transform: ""}, ms, "elastic");
+                $("#profile-career-list-"+ids[j]).removeClass("strong");
+                // txt.stop().animate({opacity: 0}, ms);
+            });
+            angle += angleplus;
+            chart.push(p);
+            // chart.push(txt);
+            start += .1;
+        };
+    for (var i = 0, ii = values.length; i < ii; i++) {
+        total += values[i];
+    }
+    for (i = 0; i < ii; i++) {
+        process(i);
+    }
+    return chart;
+};
+$(function() {
+	var values = [],
+		ids = [],
+        labels = [];
+    $("li.profile-career-chart-item").each(function () {
+        values.push($(this).data("score"));
+        labels.push($(this).data("name"));
+        ids.push($(this).data("id"));
+    });
+    $("div#career-chart-data").hide();
+    Raphael("profile-careers-chart", 200, 200).donutChart(100, 100, 75, 25, values, labels, ids);	
+})
+  
 
 $(function(){
 
