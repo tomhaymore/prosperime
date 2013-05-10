@@ -88,9 +88,13 @@
 
 				<!-- Search Box -->
 				<div class="build-positions-search pull-right">
-					<div class="input-append inline">
-						<input id="build-positions-search-box" type="text" placeholder="Search for a position">
-						<span id="add-build-position-button" class="add-on"> Add </span>
+					<div class="control-group">
+						<div class="controls">
+							<div class="input-append inline">
+								<input id="build-positions-search-box" type="text" placeholder="Search for a position">
+								<span id="add-build-position-button" class="add-on"> Add </span>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -155,12 +159,15 @@
 		var position_selected_title = null
 		var position_selected_entity_name = null
 		var position_selected_ideal_id = null
+		var position_selected_text = null
 
 		// Autocomplete for current position
 		$('#build-positions-search-box').autocomplete({
 	    	serviceUrl: '/careers/positionAutocomplete/',
 	    	minChars: 2,
 	    	onSelect: function(suggestion) {
+
+	    		position_selected_text = $('#build-positions-search-box').val()
 				position_selected_pos_id = suggestion.pos_id
 				position_selected_title = suggestion.title
 				position_selected_entity_name = suggestion.entity_name
@@ -170,16 +177,30 @@
 
 		// Add click handler to search box
 	    $('#add-build-position-button').click(function(ev) {
+
+	    	var text = $('#build-positions-search-box').val()
+
+	    	if (text != position_selected_text || text.length == 0) {
+	    		$('.control-group').each(function() {
+	    			$(this).toggleClass("error").append("<label class='control-label' id='error-label' style='visibility:hidden' for='build-positions-search-box'>Sorry, please select a position from the search box.</label>")
+	    			$('#error-label').css('visibility','visible').hide().fadeIn(500)
+	    		})
+	    		return false;
+	    	}
+
+	    	// Remove previous warning labels if applicable, animate box
+	    	$('.control-label').each(function() { $(this).remove(); });
+	    	$('.control-group').each(function() { $(this).removeClass("error") });
+	    	$('#build-positions-search-box').val("").fadeOut(175).fadeIn(175).fadeOut(175).fadeIn(175)
+
 	    	// If there's something there
-	    	if ($('#build-positions-search-box').val().length > 0) {
-	    		add_first_position(position_selected_pos_id, position_selected_ideal_id, position_selected_title, position_selected_entity_name)
+    		add_first_position(position_selected_pos_id, position_selected_ideal_id, position_selected_title, position_selected_entity_name)
 
-	    		// Add click handler to row
-	    		$('#build-positions-table td:last').click(current_position_clicked)
+    		// Add click handler to row
+    		$('#build-positions-table td:last').click(current_position_clicked)
 
-	    		// Add to "current" list
-	    		current_pos.push({'entity_name':position_selected_entity_name, 'ideal_id':position_selected_ideal_id, 'pos_id':position_selected_pos_id, 'title':position_selected_title})
-	    	};
+    		// Add to "current" list
+    		current_pos.push({'entity_name':position_selected_entity_name, 'ideal_id':position_selected_ideal_id, 'pos_id':position_selected_pos_id, 'title':position_selected_title})
 	    });
 
 
@@ -769,6 +790,7 @@
 		} else {
 			// unselect starting point
 			normalize_rows()
+			deactivate_shuffle_button()
 		}
 	};
 
