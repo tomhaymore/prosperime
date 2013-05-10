@@ -1,0 +1,30 @@
+
+
+div.promo-header {
+	font-size: 2.5em;
+	line-height: 1.8em;
+	margin-top:15px;
+	font-weight: 500;
+	font-family: "Lato", Helvetica;
+	color: rgb(41,98,152);
+}
+
+div.promo-text {
+	font-size:1.2em;
+	line-height:25px;
+
+}
+
+div.column-left {
+	padding-left:75px;
+	padding-right:50px;
+}
+div.column-right {
+	padding-right:75px;
+	padding-left:50px;
+}
+
+div.promo-button {
+	padding:12px 16px;
+	margin-top:25px;
+}
