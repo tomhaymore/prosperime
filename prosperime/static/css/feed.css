@@ -96,6 +96,25 @@ div#popover-container {
 	position:absolute;
 }
 
+div.popover-container {
+	position:relative;
+}
+
+div#description-container-wrapper {
+	min-height:50px;
+}
+
+div#description-container {
+	display:none;
+	width:100%;
+	padding:6px 8px;
+	border-radius:4px;
+	text-align:center;
+	margin:0 auto;
+	background-color:#2980B9;
+	color:#fffffe;
+}
+
 /* Customer Popover Styling */
 .popover-title {
 	background-color:#2980B9;
@@ -191,6 +210,18 @@ div.left-sidebar a {
 
 
 /* Feed */
+
+.spotlight-header {
+	font-family: "Helvetica Neue";
+	font-size: 1.3em;
+	font-weight: 400;
+	color: rgb(48,91,152);
+	border-bottom: 1px solid black;
+	display: inline-block;
+	width: 85%;
+	padding-bottom: 7px;
+	/*text-align: center;*/
+}
 
 div.feed-main {
 	/*width:650px;*/

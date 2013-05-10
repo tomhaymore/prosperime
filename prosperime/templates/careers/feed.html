@@ -73,9 +73,10 @@ $(function() {
 				<div id="popover-container"></div>
 				<div class="" id="carousel-container">
 					<div class="">
-						<p class="feature-page-subheader pull-left">Spotlight</p>
+						<p class="spotlight-header pull-left">Spotlight</p>
 						<a id="close-spotlight" href="" class="inline-link pull-right">Close</a>
 						<div class="clear"></div>
+
 						<div id="carousel" class="carousel slide">
 							<ol id="seed-carousel-indicators" class="carousel-indicators">
 								<!-- JS Here -->
@@ -91,6 +92,9 @@ $(function() {
 							<a class="carousel-control left" href="#carousel" data-slide="prev">&lsaquo;</a>
 					 		<a class="carousel-control right" href="#carousel" data-slide="next">&rsaquo;</a>
 						</div>
+					</div>
+					<div id="description-container-wrapper">
+						<div id="description-container"></div>
 					</div>
 				</div>
 
@@ -176,94 +180,18 @@ $(function() {
 			'placement':'top',
 			'animation':'ease',
 			'content':"Content would go here"
-		})
-
-
-
-
-
-		// Iterate through seed people
-		for (var i = 0; i < paths.length; i++) {
-
-			// var paper = new Raphael("seed-" + paths[i]['id'], paper_w, paper_h)
-			// current_x = start_x
-			// current_y = pos_y
-			// x_offset = (paper_w / (paths[i]['path'].length + 1))
-
-			// Iterate through positions in each path
-			// for (var j = 0; j < paths[i]['path'].length; j++) {
-
-			// 	// Set variables for dot
-			// 	if (paths[i]['path'][j]['type'] == "education") {
-			// 		color = ed_color
-			// 		current_y = ed_y
-			// 	} else {
-			// 		color = pos_color
-			// 		if (paths[i]['path'][j]['meta'] == 'pivot')
-			// 			current_y = (current_y == pos_y) ? current_y + 40 : pos_y
-			// 		else
-			// 			current_y = pos_y
-			// 	}
-
-
-			// 	// Draw dot
-			// 	var dot = paper.circle(current_x,current_y,dot_radius).attr({'fill':color,'stroke-width':0})
-			// 	dot.node.id="dot-" + dot.id // for popover
-			// 	dot.node.setAttribute('pop-title', paths[i]['path'][j]['title'] + " at " + paths[i]['path'][j]['entity_name'])
-
-			// 	// Write text on pivots, first and last pos
-			// 	var displayed = false;
-			// 	if (paths[i]['path'][j]['meta'] == 'pivot' || paths[i]['path'][j]['meta'] == 'highlight' || j == 0) {
-			// 		var title_y = (current_y > pos_y) ? current_y + text_offset1 : current_y - text_offset2
-			// 		var ent_y = (current_y > pos_y) ? current_y + text_offset2 : current_y - text_offset1
-
-			// 		var title = paper.text(current_x, title_y, paths[i]['path'][j]['title']).attr({'text-anchor':'left', 'font-size':12,'font-family':'Helvetica Neue'})
-			// 		var ent = paper.text(current_x, ent_y, paths[i]['path'][j]['entity_name']).attr({'text-anchor':'left', 'font-size':12, 'font-family':'Helvetica Neue'})
-			// 		displayed=true
-			// 	}
-
-			// 	// Add hover (if applicable)
-			// 	if ('description' in paths[i]['path'][j] || !displayed) {
-			// 		console.log('in here')
-			// 		$(dot.node).on('mouseenter', function(ev) {
-			// 			var target = $(ev.currentTarget)
-			// 			var offset = target.offset()
-			// 			$('#popover-container').show().css("left",(offset.left + dot_radius) + "px").css("top",(offset.top) + "px").attr("data-original-title", target.attr('pop-title')).attr("data-content", target.attr('pop-content')).popover("show")
-			// 		})
-
-			// 		// .on('mouseleave', function(ev) {
-			// 		// 	$('#popover-container').hide().popover("hide")
-			// 		// });
-
-				
-			// 	}
-				
-
-				// // Draw connecting line
-				// if (j > 0) {
-				// 	var line = paper.path("M"+prev_x+","+prev_y+"L"+current_x+","+current_y).attr({'stroke':'#c0c0c0', 'stroke-linecap':'round', 'stroke-opacity':0.8})
-				// }
-				
-
-				// Set variables for next go round
-				// prev_y = current_y; prev_x = current_x; 
-				// current_x += x_offset
-			// };	
-		};	
-
-
+		});
 	});
 
-	// var paper = null;
 
 
 
 	// Constants
 	var paths = {{seeds|safe}}
-	var paper_w = 550; var paper_h = 200;
+	var paper_w = 550; var paper_h = 160;
 	var dot_radius = 12
 	var start_x = 20
-	var ed_y = 60
+	var ed_y = 140
 	var pos_y = 100
 	var current_y = pos_y
 	var ed_color = '#E74C3C'
@@ -285,8 +213,6 @@ $(function() {
 			var prev_dot = null;
 
 
-
-
 			// Iterate thru path
 			for (var j = 0; j < path.length; j++) {
 
@@ -296,10 +222,10 @@ $(function() {
 					current_y = ed_y
 				} else {
 					color = pos_color
-					if (path[j]['meta'] == 'pivot')
-						current_y = (current_y == pos_y) ? current_y + 40 : pos_y
-					else
-						current_y = pos_y
+					if (current_y == ed_y) current_y = pos_y
+
+					else if (path[j]['meta'] == 'pivot')
+						current_y = (current_y == pos_y) ? current_y - 40 : pos_y	
 				}
 
 
@@ -308,71 +234,59 @@ $(function() {
 				dot.node.id="dot-" + dot.id // for popover
 				dot.node.setAttribute('pop-title', path[j]['title'] + " at " + path[j]['entity_name'])
 				dot.node.setAttribute('y', current_y)
+				if ("description" in path[j]) 
+					dot.node.setAttribute('description', path[j]['description'])
+				else dot.node.setAttribute('description',null)
 
-				// Write text on pivots, first and last pos
-				var displayed = false;
-				if (path[j]['meta'] == 'pivot' || path[j]['meta'] == 'highlight') {
+				// // Write text on pivots, first and last pos
+				// if (path[j]['meta'] == 'pivot' || path[j]['meta'] == 'highlight') {
 
-					$(dot.node).on('mouseenter', function(ev) {
-						var target = $(ev.currentTarget)
-						var offset = target.offset()
+				// 	// $('#seed-carousel-inner').append("<div id='popover-"+index+"-"+j+"'></div>")
 
-
-						if (target.attr('y') < pos_y) {
-							$('#popover-container').show().css("left",(offset.left + dot_radius) + "px").css("top",(offset.top) + "px").attr("data-original-title", target.attr('pop-title')).attr("data-content", target.attr('pop-content')).popover("show").attr("placement", "bottom")
-
-						}
-						else
-							$('#popover-container').show().css("left",(offset.left + dot_radius) + "px").css("top",(offset.top) + "px").attr("data-original-title", target.attr('pop-title')).attr("data-content", target.attr('pop-content')).popover("show")
-					}).on('mouseleave', function(ev) {
-						$('#popover-container').hide().popover("hide")
-					})
+				// 	// $('#popover-'+index+'-'+j).popover({
+				// 	// 	'trigger':'manual',
+				// 	// 	'placement':'top',
+				// 	// 	'animation':'ease',
+				// 	// 	'content':'content'
+				// 	// }).css("left", current_x + "px").attr("data-original-title", $(dot.node).attr("pop-title")).popover("show")
 
 
-					// if (index == 0) {
-					// 	var title_y = (current_y >= pos_y) ? current_y + text_offset1 : current_y - text_offset2
-					// 	var ent_y = (current_y > pos_y) ? current_y + text_offset2 : current_y - text_offset1
-					// } else {
-					// 	var title_y = (current_y >= pos_y) ? current_y + text_offset1 : current_y - 40
-					// 	var ent_y = (current_y >= pos_y) ? current_y + text_offset2 : current_y - 50
-					// }
-
-
-					// var title = paper.text(current_x, title_y, path[j]['title']).attr({'text-anchor':'left', 'font-size':12,'font-family':'Helvetica Neue'})
-					// var ent = paper.text(current_x, ent_y, path[j]['entity_name']).attr({'text-anchor':'left', 'font-size':12, 'font-family':'Helvetica Neue'})
-
-					// console.log(title.attr("y") + ' ' + ent.attr("y"))
-
-					// displayed=true
-				} else {
-						$(dot.node).on('mouseenter', function(ev) {
-						var target = $(ev.currentTarget)
-						var offset = target.offset()
-
-
-						if (target.attr('y') < pos_y) {
-							$('#popover-container').show().css("left",(offset.left + dot_radius) + "px").css("top",(offset.top) + "px").attr("data-original-title", target.attr('pop-title')).attr("data-content", target.attr('pop-content')).popover("show").attr("placement", "bottom")
-
-						}
-						else
-							$('#popover-container').show().css("left",(offset.left + dot_radius) + "px").css("top",(offset.top) + "px").attr("data-original-title", target.attr('pop-title')).attr("data-content", target.attr('pop-content')).popover("show")
-					}).on('mouseleave', function(ev) {
-						$('#popover-container').hide().popover("hide")
-					})
-				}
-
-				// Add hover (if applicable)
-				if ('description' in path[j] || !displayed) {
 					
 
+			
+				// } else {
+
+				// On generic elements, just use the universal popover
+				$(dot.node).on('mouseenter', function(ev) {
+					var target = $(ev.currentTarget)
+					var offset = target.offset()
+
+
+					if (target.attr('y') < pos_y)
+						$('#popover-container').show().css("left",(offset.left + dot_radius) + "px").css("top",(offset.top) + "px").attr("data-original-title", target.attr('pop-title')).attr("data-content", target.attr('pop-content')).popover("show").attr("placement", "bottom")
+
 				
-				}
+					else
+						$('#popover-container').show().css("left",(offset.left + dot_radius) + "px").css("top",(offset.top) + "px").attr("data-original-title", target.attr('pop-title')).attr("data-content", target.attr('pop-content')).popover("show")
+
+					if (target.attr("description") != "null")
+						$('#description-container').css("display", "inline-block").append(target.attr("description"))
+
+
+				}).on('mouseleave', function(ev) {
+					$('#popover-container').css("display", "none").popover("hide")
+					$('#description-container').hide().empty()
+				})
+				// }
+
+				
 
 				// Draw connecting line
-				// TODO: draw line first!
 				if (j > 0) {
 					var line = paper.path("M"+prev_x+","+prev_y+"L"+current_x+","+current_y).attr({'stroke':'#c0c0c0', 'stroke-linecap':'round', 'stroke-opacity':0.8})
 				}
+
+				// Thomas witchcraft
 				dot.toFront();
 				prev_y = current_y; prev_x = current_x; 
 				current_x += x_offset
@@ -440,7 +354,7 @@ $(function() {
 
 				// If this is first career path, create paper
 				if (!paper) 
-					paper = new Raphael("thumbnail-svg-container", 225, 400)
+					paper = new Raphael("thumbnail-svg-container", 300, 400)
 
 				data["paper"] = paper
 				data["path"] = stub["path"]
@@ -462,9 +376,28 @@ $(function() {
 
 	var create_carousel = function() {
 		var seeds = {{seeds|safe}}
-		var keys = Object.keys(seeds)
 		
+		// Iterate through each seed person
 		for (var i = 0; i < seeds.length; i++) {
+
+			// // Append unique popovers to container per highlight/pivot/person
+			// for (var j = 0; j < seeds[i]['path'].length; j++) {
+			// 	if ('meta' in seeds[i]['path'][j]) {
+			// 		console.log(seeds[i]['path'][j])
+			// 		$()
+
+			// 	}
+			// }
+
+
+
+			// if (seeds[i]['path'].length > num_popovers_created) {
+			// 	var difference = seeds[i]['path'].length - num_popovers_created
+
+			// 	for (var j = 0; j < difference; j++) {
+			// 		$('#carousel-container').append("<div class='popover-container' id='popover-" + (++num_popovers_created) + "'></div>")
+			// 	}
+			// }
 
 			// First (active) pane
 			if (i == 0) {
