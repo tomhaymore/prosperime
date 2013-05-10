@@ -689,12 +689,19 @@ class CareerPathBase(CareerBase):
 		positions = Position.objects.filter(person=user)
 		# init array
 		careers = {}
+		# init vars
+		all_dur = 0
 		# loop through positions
 		for p in positions:
 			if p.ideal_position:
-				dur = p.duration_in_years() if p.duration_in_years() is not None else 1
-				level = p.ideal_position.level
-				score = self.CAREER_SCORE[level] * dur
+				p.dur = p.duration_in_years() if p.duration_in_years() is not None else 1
+				p.level = p.ideal_position.level
+				all_dur += p.dur
+				
+		# now that we have whole duration, loop through again
+		for p in positions:
+			if p.ideal_position:
+				score = self.CAREER_SCORE[p.level] * (p.dur / all_dur)
 				# loop through each career attached to position
 				for c in p.ideal_position.careers.all():
 					# check to see if career is already in dict
