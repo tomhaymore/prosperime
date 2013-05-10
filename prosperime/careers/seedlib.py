@@ -81,12 +81,12 @@ class SeedBase():
 	def get_seeds(self,user,**opts):
 
 		## For Dev to test all industries
-		ind_names = [str(i.name) for i in Industry.objects.all()]
+		# ind_names = [str(i.name) for i in Industry.objects.all()]
 		
 		# # Grab your related inds and saved inds
-		# ind_names = [str(i.name) for i in user.profile._industries()]
-		# saved_industries = [str(saved_ind.industry.name) for saved_ind in SavedIndustry.objects.filter(owner=user)]
-		# ind_names.extend(saved_industries)
+		ind_names = [str(i.name) for i in user.profile._industries()]
+		saved_industries = [str(saved_ind.industry.name) for saved_ind in SavedIndustry.objects.filter(owner=user)]
+		ind_names.extend(saved_industries)
 		print ind_names
 
 		# Iterate through and return JSON people

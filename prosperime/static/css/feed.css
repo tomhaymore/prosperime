@@ -100,6 +100,21 @@ div.popover-container {
 	position:relative;
 }
 
+div#description-container-wrapper {
+	min-height:50px;
+}
+
+div#description-container {
+	display:none;
+	width:100%;
+	padding:6px 8px;
+	border-radius:4px;
+	text-align:center;
+	margin:0 auto;
+	background-color:#2980B9;
+	color:#fffffe;
+}
+
 /* Customer Popover Styling */
 .popover-title {
 	background-color:#2980B9;
