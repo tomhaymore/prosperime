@@ -65,7 +65,8 @@ class SeedBase():
 		"Writing & Editing":["nate_silver"],
 	}
 
-	prefix = "careers/seed_people/"
+	# prefix = "careers/seed_people/"
+	prefix = "/app/prosperime/careers/seed_people/"
 	suffix = ".json"
 
 	def test(self):
