@@ -831,7 +831,9 @@ class CareerBuild(CareerPathBase):
 						positions[ideal_id] = {
 							'count':0,
 							'positions':None,
-							'orgs':None
+							'orgs':None,
+							'ideal_id':ideal_id,
+							'ideal_title':ideal_title
 						}
 						positions[ideal_id]['count'] += 1
 						positions[ideal_id]['positions'] = [{'pos_id':pos_id,'ideal_id':ideal_id,'title':title,'ideal_title':ideal_title,'entity_name':entity_name,'level':level}]
@@ -846,8 +848,10 @@ class CareerBuild(CareerPathBase):
 				else:
 					is_ed = False
 		
+		positions_list = [{'ideal_title':v['ideal_title'],'ideal_id':v['ideal_id'],'count':v['count'],'positions':v['positions'],'orgs':v['orgs']} for k,v in positions.iteritems()]
+
 		# sort result by count
-		sorted_positions = sorted(positions.items(), key=self.keyfunc)
+		sorted_positions = sorted(positions_list, key=itemgetter('count'), reverse=True)
 
 		return sorted_positions
 
