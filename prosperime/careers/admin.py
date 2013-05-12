@@ -2,7 +2,7 @@
 from django.contrib import admin
 
 # from Prosperime
-from careers.models import Career, IdealPosition
+from careers.models import Career, IdealPosition, SavedCareer
 
 class CareerAdmin(admin.ModelAdmin):
 	search_fields = ['long_name','short_name']
