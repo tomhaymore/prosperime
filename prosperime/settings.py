@@ -168,7 +168,7 @@ INSTALLED_APPS = (
     'social',
     # 'debug_toolbar'
     # 'south',
-    'jsonify',
+    # 'jsonify',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
