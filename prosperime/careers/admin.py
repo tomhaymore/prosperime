@@ -10,6 +10,10 @@ class CareerAdmin(admin.ModelAdmin):
 class IdealPositionAdmin(admin.ModelAdmin):
 	pass
 
+class SavedCareerAdmin(admin.ModelAdmin):
+	pass
+
 admin.site.register(Career,CareerAdmin)
 admin.site.register(IdealPosition,IdealPositionAdmin)
+admin.site.register(SavedCareer,SavedCareerAdmin)
 
