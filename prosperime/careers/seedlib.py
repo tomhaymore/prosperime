@@ -69,7 +69,7 @@ class SeedBase():
 	suffix = ".json"
 
 	def __init__(self):
-		stage = os.environ['PROSPR_ENV']
+		stage = os.environ.get('PROSPR_ENV',None)
 		if stage is None:
 			prefix = "careers/seed_people/"
 		elif stage == 'production' or stage == 'staging':

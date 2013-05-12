@@ -90,6 +90,35 @@ def build(request):
 		'viewer_is_owner':"true",
 	}
 
+	return render_to_response("careers/build_v2.html", data, context_instance=RequestContext(request))
+
+@login_required
+def build_v2(request):
+
+	path_title = "Untitled" ## this should default if no title
+
+	# latest_position = request.user.profile.latest_position()
+	educations = request.user.profile.educations()
+
+	current_positions = []
+	all_positions = Position.objects.filter(person=request.user).values("id", "ideal_position__id", "title", "entity__name")
+	for p in all_positions:
+		current_positions.append({"pos_id": p["id"], "ideal_id": p["ideal_position__id"], "title":p["title"], "entity_name":p["entity__name"]})
+	# current_positions.append({'pos_id':latest_position.id,'ideal_id':latest_position.ideal_position_id,'title':str(latest_position.title),'entity_name':str(latest_position.entity.name)})
+
+	# for e in educations:
+	# 	current_positions.append({'pos_id':e.id,'ideal_id':e.ideal_position_id,'title':e.title,'entity_name':e.entity.name})
+	
+
+	data = {
+		'title':path_title,
+		'current_positions':current_positions,
+		'current_positions_json':json.dumps(current_positions),
+		'path_id':-1,
+		'path_steps':None,
+		'viewer_is_owner':"true",
+	}
+
 	return render_to_response("careers/build.html", data, context_instance=RequestContext(request))
 
 @login_required
@@ -163,7 +192,12 @@ def feed(request):
 	seed_data = []
 	print filenames
 	for f in filenames:
-		json_person = open(f)
+		try:
+			json_person = open(f)
+		except IOError, e:
+			print str(e)
+		except e:
+			print e
 		data = json.load(json_person)
 		seed_data.append(data)
 		json_person.close()
@@ -1436,6 +1470,29 @@ def get_next_build_step(request):
 		start_pos_id = request.GET.getlist('pos_id')[0]
 
 		positions = career_path.get_next_build_step(start_ideal_id,start_pos_id)
+
+		print "Num Options Returned: " + str(len(positions))
+
+		return HttpResponse(json.dumps(positions))
+
+# AJAX for getting build steps
+def get_next_build_step_ideal(request):
+	# check if GET parameters were sent
+	if request.GET.getlist('id'):
+		# initialize class
+		build = careerlib.CareerBuild()
+
+		# initiate next and finished flag
+		next = []
+		finished = []
+		# initiate array for next positions
+		pos = []
+		# reduce GET to variable
+		
+		start_ideal_id = request.GET.getlist('id')[0]
+		start_pos_id = request.GET.getlist('pos_id')[0]
+
+		positions = career_path.get_next_build_step_ideal(start_ideal_id,start_pos_id)
 
 		print "Num Options Returned: " + str(len(positions))
 
