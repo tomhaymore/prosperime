@@ -71,9 +71,9 @@ class SeedBase():
 	def __init__(self):
 		stage = os.environ.get('PROSPR_ENV',None)
 		if stage is None:
-			prefix = "careers/seed_people/"
+			self.prefix = "careers/seed_people/"
 		elif stage == 'production' or stage == 'staging':
-			prefix = "/app/prosperime/careers/seed_people/"
+			self.prefix = "/app/prosperime/careers/seed_people/"
 
 	def test(self):
 
