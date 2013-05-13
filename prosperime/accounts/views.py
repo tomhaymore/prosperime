@@ -4,6 +4,7 @@ import cgi
 from datetime import datetime, timedelta
 import urlparse
 import math
+import json
 
 # import datetime
 
@@ -489,6 +490,7 @@ def profile(request, user_id):
 
 
 	response = {
+		'user':user,
 		'profile':profile,
 		'viewer_saved_paths':simplejson.dumps(viewer_saved_paths),
 		'saved_path_ids':saved_path_ids,

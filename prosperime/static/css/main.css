@@ -4,6 +4,10 @@
 	margin-left:28px;
 }
 
+.strong {
+	font-weight:bold;
+}
+
 /* Bootstrap Tabs */
 .nav-tabs>.active>a {
 	background-color:rgb(41,98,152);
@@ -999,10 +1003,16 @@ button.general-add-button:active {
 .flat-input {
 	width: 350px !important; 
 	border-radius: 0px !important; 
-	margin-top: 5px;
+	/*margin-top: 5px;*/
 	padding: 0px 6px 4px 6px; 
 	margin-bottom:0px !important; 
 	height: 26px !important; 
+	font-size:16px !important;
+}
+
+input.tt-hint {
+	height:26px;
+	font-size:16px;
 }
 
 .flat-input-med {
@@ -1303,13 +1313,14 @@ button.general-add-button:active {
 
 .feature-page-subheader {
 	font-family: "Helvetica Neue";
-	font-size: 1.5em;
+	font-size: 1.3em;
 	font-weight: 400;
 	color: rgb(48,91,152);
-	border-bottom: 1px solid black;
+	/*border-bottom: 1px solid black;*/
 	display: inline-block;
 	width: 85%;
-	padding-bottom: 7px;
+	/*padding-bottom: 7px;*/
+	text-align: center;
 }
 
 

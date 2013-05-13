@@ -211,6 +211,18 @@ div.left-sidebar a {
 
 /* Feed */
 
+.spotlight-header {
+	font-family: "Helvetica Neue";
+	font-size: 1.3em;
+	font-weight: 400;
+	color: rgb(48,91,152);
+	border-bottom: 1px solid black;
+	display: inline-block;
+	width: 85%;
+	padding-bottom: 7px;
+	/*text-align: center;*/
+}
+
 div.feed-main {
 	/*width:650px;*/
 }
@@ -218,6 +230,11 @@ div.feed-main {
 div.feed-item {
 	font-size:1.1em;
 	padding:10px 14px;
+}
+
+div.feed-menu-item:hover {
+	background-color: rgb(41,98,152);
+	color:#f0f0f0;
 }
 
 div.selected {
@@ -235,6 +252,14 @@ div#more {
 	text-align:center;
 	font-size:1.2em;
 	margin-top:100px;
+}
+
+p.feed-menu-header {
+	font-size: 1.2em;
+	margin-bottom: 0;
+	color: rgb(48,91,152);
+	font-family: "Helvetica Neue", Helvetica;
+	text-decoration: underline;
 }
 
 /* Thumbnail View (Right Sidebar) */

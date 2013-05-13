@@ -89,9 +89,16 @@ span.splash-slug {
 	color:rgb(41,98,152);
 }
 
+p.profile-list {
+	font-family:Helvetica;
+	
+}
+
 div.profile-details-container {
 	margin-left:10px;
-	width:750px;
+	margin-right:25px;
+	width:450px;
+	height:200px;
 }
 
 #profile-careers-container {

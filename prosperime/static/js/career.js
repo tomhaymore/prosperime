@@ -14,8 +14,8 @@ $(document).ready(function() {
             $("div[data-view='network']").show();
             $("div[data-view='all']").hide();
             // switch stats
-            $("span.carer-profile-stats-block[data-view='network']").addClass('stats-highlighted');
-            $("span.carer-profile-stats-block[data-view='all']").removeClass('stats-highlighted');
+            $("span.career-profile-stats-block[data-view='network']").addClass('stats-highlighted');
+            $("span.career-profile-stats-block[data-view='all']").removeClass('stats-highlighted');
             $("span.stats-holder[data-view='network']").show();
             $("span.stats-holder[data-view='all']").hide();
         } else {
@@ -30,8 +30,8 @@ $(document).ready(function() {
             $("div[data-view='all']").show();
             $("div[data-view='network']").hide();
             // switch stats
-            $("span.carer-profile-stats-block[data-view='all']").addClass('stats-highlighted');
-            $("span.carer-profile-stats-block[data-view='network']").removeClass('stats-highlighted');
+            $("span.career-profile-stats-block[data-view='all']").addClass('stats-highlighted');
+            $("span.career-profile-stats-block[data-view='network']").removeClass('stats-highlighted');
             $("span.stats-holder[data-view='all']").show();
             $("span.stats-holder[data-view='network']").hide();
         }
@@ -39,6 +39,15 @@ $(document).ready(function() {
 });
 
 // chart functions
+
+var colors = {
+    0:"rgb(8,81,156)",
+    1:"rgb(49,130,189)",
+    2:"rgb(107,174,214)",
+    3:"rgb(189,215,231)",
+    4:"rgb(239,243,255)"
+}
+
 Raphael.fn.pieChart = function (cx, cy, r, values, labels, stroke) {
     var paper = this,
         rad = Math.PI / 180,
@@ -57,12 +66,13 @@ Raphael.fn.pieChart = function (cx, cy, r, values, labels, stroke) {
             var value = values[j],
                 angleplus = 360 * value / total,
                 popangle = angle + (angleplus / 2),
-                color = Raphael.hsb(start, .75, 1),
+                // color = Raphael.hsb(start, .75, 1),
+                color = Raphael.getRGB(colors[j]),
                 ms = 500,
                 text_ms = 30,
                 delta = 30,
                 bcolor = Raphael.hsb(start, 1, 1),
-                p = sector(cx, cy, r, angle, angle + angleplus, {fill: "90-" + bcolor + "-" + color, stroke: stroke, "stroke-width": 3});
+                p = sector(cx, cy, r, angle, angle + angleplus, {fill:color, stroke: stroke, "stroke-width": 3});
                 //txt = paper.text(100,10,labels[j]).attr({stroke:"none",opacity:0,"font-size":12});
             p.mouseover(function () {
                 p.stop().animate({transform: "s1.1 1.1 " + cx + " " + cy}, ms, "elastic");

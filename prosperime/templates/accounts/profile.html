@@ -10,7 +10,8 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/viz.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/drag_and_drop.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+<!-- <script type="text/javascript" src="{{ STATIC_URL }}js/raphael.js"></script> -->
+<script type="text/javascript" src="http://github.com/DmitryBaranovskiy/raphael/raw/master/raphael-min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.autocomplete.min.js"></script>
 
 <script type="text/javascript">
@@ -78,9 +79,13 @@ $.ajaxSetup({
 	<div class="profile-header-container">
 
 
-		<div class="profile-header">Profile: 
-			<span class="splash-slug">{{profile.first_name}} {{profile.last_name}}</span>
-		</div>
+		<!-- <p class="feature-page-header">Profile</p> -->
+		<p class="feature-page-header">{{profile.full_name}}
+			{% if request.user.id == user.id %}
+				<a class="flat-button green-button">Edit</a>
+			{% endif %}
+		</p>
+		
 
 		<div class="profile-image-container pull-left">
 			<img class="profile-image" src="{{profile.default_profile_pic}}" />
@@ -91,15 +96,45 @@ $.ajaxSetup({
 			{% else %}
 				<p class="profile-subheader">{{profile.latest_position.safe_title}}</p>
 			{% endif %}
-			<span class="profile-careers">
+			{% if profile.educations %}
+			<ul>
+				{% for e in profile.educations %}
+				<li>{{e.entity.name}}, {{e.degree}}</li>
+				{% endfor %}
+				
+			</ul>
+			{% endif %}
+		</div>
+		<div class="profile-careers-container pull-left">
+			<div class="pull-left">
+				<p class="feature-page-subheader" style="display:inline-block;width:200px;">Career Breakdown</p>
 				{% if top_careers %}
-				<ul class="profile-careers-list flat">
+					<ul>
 					{% for c in top_careers %}
-						<li class="profile-career"><a class="profile-button" href="/career/{{c.id}}">{{c.short_name}}</a></li>
+						<p id="profile-career-list-{{c.1.id}}" class="profile-list">{{c.1.name}}</p>
 					{% endfor %}
-				</ul>
+					</ul>
 				{% endif %}
-			</span>
+			</div>
+			<div class="pull-left">
+				
+			<div id="profile-careers-chart" width="150" height="150"></div>
+				<div class="profile-careers" id="career-chart-data">
+					{% if top_careers %}
+					<ul class="profile-career-chart-list">
+					{% for c in top_careers %}
+						<li class="profile-career-chart-item" data-id="{{c.0}}" data-score="{{c.1.score}}" data-name="{{c.1.name}}">{{c.1.name}}</li>
+					{% endfor %}
+					</ul>
+					<!-- <ul class="profile-careers-list flat">
+						{% for c in top_careers %}
+							<li class="profile-career"><a class="profile-button" href="/career/{{c.id}}">{{c.short_name}}</a></li>
+						{% endfor %}
+					</ul> -->
+					{% endif %}
+				</div>
+			</div>
+			<div class="clear"></div>
 		</div>
 		<div class="clear"></div>
 
@@ -298,7 +333,10 @@ $.ajaxSetup({
 
 </div>
 
+<script type="text/javascript">
 
+
+</script>
 
 <!-- These fxns won't be needed immediately, so async them -->
 <script async type="text/javascript">

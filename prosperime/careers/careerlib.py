@@ -689,12 +689,19 @@ class CareerPathBase(CareerBase):
 		positions = Position.objects.filter(person=user)
 		# init array
 		careers = {}
+		# init vars
+		all_dur = 0
 		# loop through positions
 		for p in positions:
 			if p.ideal_position:
-				dur = p.duration_in_years() if p.duration_in_years() is not None else 1
-				level = p.ideal_position.level
-				score = self.CAREER_SCORE[level] * dur
+				p.dur = p.duration_in_years() if p.duration_in_years() is not None else 1
+				p.level = p.ideal_position.level
+				all_dur += p.dur
+				
+		# now that we have whole duration, loop through again
+		for p in positions:
+			if p.ideal_position:
+				score = self.CAREER_SCORE[p.level] * (p.dur / all_dur)
 				# loop through each career attached to position
 				for c in p.ideal_position.careers.all():
 					# check to see if career is already in dict
@@ -824,7 +831,9 @@ class CareerBuild(CareerPathBase):
 						positions[ideal_id] = {
 							'count':0,
 							'positions':None,
-							'orgs':None
+							'orgs':None,
+							'ideal_id':ideal_id,
+							'ideal_title':ideal_title
 						}
 						positions[ideal_id]['count'] += 1
 						positions[ideal_id]['positions'] = [{'pos_id':pos_id,'ideal_id':ideal_id,'title':title,'ideal_title':ideal_title,'entity_name':entity_name,'level':level}]
@@ -839,8 +848,10 @@ class CareerBuild(CareerPathBase):
 				else:
 					is_ed = False
 		
+		positions_list = [{'ideal_title':v['ideal_title'],'ideal_id':v['ideal_id'],'count':v['count'],'positions':v['positions'],'orgs':v['orgs']} for k,v in positions.iteritems()]
+
 		# sort result by count
-		sorted_positions = sorted(positions.items(), key=self.keyfunc)
+		sorted_positions = sorted(positions_list, key=itemgetter('count'), reverse=True)
 
 		return sorted_positions
 

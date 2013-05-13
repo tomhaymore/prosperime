@@ -24,12 +24,13 @@ class FeedBase():
 
 		timeline = opts['timeline'] if 'timeline' in opts else 24
 		stop = datetime.now() - timedelta(hours = timeline)
-		print stop
+		# print stop
 
 		# get user connections and educations
 		connections = [u.id for u in user.profile.connections.all()]
+		connections.extend(user.id)
 		educations = [u.id for u in User.objects.filter(positions__entity_id__in=user.profile.educations(),positions__type="education")]
-		print educations
+		
 		# retrieve data
 		paths = SavedPath.objects.filter(Q(owner__in=connections) | Q(owner__in=educations)).filter(date_modified__gte=stop)
 		careers = SavedCareer.objects.filter(Q(owner__in=connections) | Q(owner__in=educations)).filter(updated__gte=stop)

@@ -49,13 +49,20 @@ $(function() {
 
 
 				<div>
-					<div class="feed-item selected">Updates</div>
+					<div class="feed-item feed-menu-item selected">Updates</div>
 					<a href="/profile/{{user_id}}/#goal-positions">
-						<div class="feed-item">Saved Positions</div>
+						<div class="feed-item feed-menu-item">Saved Positions</div>
 					</a>
 					<a href="/profile/{{user_id}}#saved-paths">
-						<div class="feed-item">Saved Paths</div>
+						<div class="feed-item feed-menu-item">Saved Paths</div>
 					</a>
+					<!-- <p class="feed-menu-header">Actions</p> -->
+					<a href="/build">
+						<div class="feed-item feed-menu-item">Build</div>
+					</a>
+					<!-- <a href="/plan">
+						<div class="feed-item feed-menu-item">Plan</div>
+					</a> -->
 				</div>
 			</div>
 
@@ -66,7 +73,7 @@ $(function() {
 				<div id="popover-container"></div>
 				<div class="" id="carousel-container">
 					<div class="">
-						<p class="feature-page-subheader pull-left">Spotlight</p>
+						<p class="spotlight-header pull-left">Spotlight</p>
 						<a id="close-spotlight" href="" class="inline-link pull-right">Close</a>
 						<div class="clear"></div>
 
