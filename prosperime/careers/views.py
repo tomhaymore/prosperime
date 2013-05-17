@@ -90,7 +90,7 @@ def build(request):
 		'viewer_is_owner':"true",
 	}
 
-	return render_to_response("careers/build_v2.html", data, context_instance=RequestContext(request))
+	return render_to_response("careers/build.html", data, context_instance=RequestContext(request))
 
 @login_required
 def build_v2(request):
@@ -119,7 +119,7 @@ def build_v2(request):
 		'viewer_is_owner':"true",
 	}
 
-	return render_to_response("careers/build.html", data, context_instance=RequestContext(request))
+	return render_to_response("careers/build_v2.html", data, context_instance=RequestContext(request))
 
 @login_required
 def viewPath(request,path_id):
@@ -1490,9 +1490,11 @@ def get_next_build_step_ideal(request):
 		# reduce GET to variable
 		
 		start_ideal_id = request.GET.getlist('id')[0]
+	
 		start_pos_id = request.GET.getlist('pos_id')[0]
 
-		positions = career_path.get_next_build_step_ideal(start_ideal_id,start_pos_id)
+
+		positions = build.get_next_build_step_ideal(start_ideal_id,start_pos_id)
 
 		print "Num Options Returned: " + str(len(positions))
 
