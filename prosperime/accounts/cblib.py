@@ -6,7 +6,7 @@ import json
 import sys
 from urlparse import urlparse
 from datetime import datetime
-from _retry import retry
+from utilities.helpers import retry
 from optparse import make_option
 
 # Django imports
