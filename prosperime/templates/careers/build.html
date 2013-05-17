@@ -839,7 +839,7 @@
 		jQuery.ajaxSetup({async:false})
 
 		$.get("/careers/getNextBuildStep/", {'id':ideal_id,'pos_id':pos_id}, function(response) {
-
+			console.log(response)
 			var length = (response.length > 5) ? 5 : response.length;
 			y_offset = Math.ceil(y_range/(length - 1)) // assuming 5 options...
 			ret_val = response
