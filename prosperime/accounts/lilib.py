@@ -930,7 +930,7 @@ class LIConnections(LIBase):
 		if total_count > 500:
 			# need to paginate
 			pages = ceil((total_count - 500)/ 500)
-			raise Exception(pages)
+			# raise Exception(pages)
 			for i in range(1,int(pages)+1):
 				# construct url with pagination
 				start_num = i*500+1

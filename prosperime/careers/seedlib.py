@@ -1,4 +1,4 @@
-
+import os
 import random
 
 from entities.models import Industry, Entity
@@ -68,6 +68,13 @@ class SeedBase():
 	# prefix = "careers/seed_people/"
 	prefix = "/app/prosperime/careers/seed_people/"
 	suffix = ".json"
+
+	def __init__(self):
+		stage = os.environ.get('PROSPR_ENV',None)
+		if stage is None:
+			self.prefix = "careers/seed_people/"
+		elif stage == 'production' or stage == 'staging':
+			self.prefix = "/app/prosperime/careers/seed_people/"
 
 	def test(self):
 

@@ -33,7 +33,7 @@ class FeedBase():
 		paths = SavedPath.objects.filter(Q(owner__in=connections) | Q(owner__in=educations)).filter(date_modified__gte=stop)
 		careers = SavedCareer.objects.filter(Q(owner__in=connections) | Q(owner__in=educations)).filter(updated__gte=stop)
 		positions = GoalPosition.objects.filter(Q(owner__in=connections) | Q(owner__in=educations)).filter(updated__gte=stop)
-		users = User.objects.filter(Q(id__in=connections) | Q(id__in=educations)).filter(date_joined__gte=stop)
+		users = User.objects.filter(Q(id__in=connections) | Q(id__in=educations)).filter(date_joined__gte=stop, profile__status="active")
 		comments = Comment.objects.filter(Q(owner__in=connections) | Q(owner__in=educations)).filter(updated__gte=stop)
 
 		# concatenate into one list
