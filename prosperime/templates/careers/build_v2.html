@@ -1,0 +1,181 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<!-- CSS -->
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/build.css" />
+
+
+<!-- JS -->
+	<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>
+	<script async type="text/javascript" src="{{ STATIC_URL }}js/timeline-viz.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.autocomplete.min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/helpers.js"></script>
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div id="content-container" class="main-container">
+
+	<!-- Header --> 
+	<div class="build-header">
+		Build: 
+		{% if title == "Untitled" %}
+			<span class="build-header-name italicize">{{title}}</span>
+		{% else %}
+			<span class="build-header-name">{{title}}</span>
+		{% endif %}
+
+	<!-- Delete Button --> 
+		<div id="delete-button-container" class="pull-right flat-button">
+			{% if path_id > -1 %}
+				<div id="delete-button" onclick="delete_path()">
+					Delete
+				</div>
+			{% endif %}
+		</div>
+
+
+	</div>
+
+	<!-- Sub Header -->
+	<div class="call-out-text">
+		<p><!-- Choose a position: --> <select name="position-select" id="position-select">
+			<option>Choose a position:</option>
+			{% for pos in current_positions %}
+				<option class="position-select-option" data-pos_id="{{pos.pos_id}}" data-title="{{pos.title}}" data-entity_name="{{pos.entity_name}}" data-ideal_id="{{pos.ideal_id}}" value="{{pos.ideal_id}}">
+					{{pos.title}} at {{pos.entity_name}}
+				</option>
+			{% endfor %}
+			<option disabled="disabled">--------------------</option>
+			<option name="position-selection-new" id="position-selection-new">Add a new position...</option>
+		</select>
+		<!-- or add a new one: <input id="build-positions-search-box" type="text" placeholder="Search for a position">
+								<span id="add-build-position-button" class="add-on"> Add </span>  -->
+		<!-- Build a career path using one of your <a href="#current-positions">current positions</a> or a completely new starting point. Click on one of your <a href="#current-positions">current positions</a> below to get started, or use the search box to add any position you like.
+
+		<br/><br/>
+
+		Within a path, click on the most recent node to go back. -->
+	</div>
+
+	<!-- MAIN PATH CONTAINER -->
+	<div id="path-container">
+		<!-- SVG here -->
+	</div>
+
+
+	<!-- Bottom Container -->
+	<div class="row">
+		<div id="build-positions-container" class="span12">
+			
+			<!-- If your path, show current positions -->
+			<div class="pull-left span6 main-column inline" style="margin-left:0px;">
+
+				<!-- Save Button -->
+				<div id="build-save-button" class="flat-button pull-right button-large save-button" onclick="save()">
+					Save
+				</div>
+
+				<div class="build-sub-header pull-left">
+					Current Positions<a name="current-positions"></a>
+				</div>
+
+				<!-- Warning Button -->
+				<div id="are-you-sure-prompt" style="visibility:hidden;"></div>
+		
+				<!-- Current Positions -->
+				<table id="build-positions-table" class="table">
+				{% for pos in current_positions %}
+					<tr><td class="build-start-position" data-pos_id="{{pos.pos_id}}" data-title="{{pos.title}}" data-entity_name="{{pos.entity_name}}" data-ideal_id="{{pos.ideal_id}}">
+						{{pos.title}} at {{pos.entity_name}}
+					</td></tr>
+				{% endfor %}
+				</table>
+
+				<!-- Search Box -->
+				<div class="build-positions-search pull-right">
+					<div class="control-group">
+						<div class="controls">
+							<div class="input-append inline">
+								<input id="build-positions-search-box" type="text" placeholder="Search for a position">
+								<span id="add-build-position-button" class="add-on"> Add </span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		
+
+
+			<!-- Comments -->
+			<div id="comments-container" class="pull-right inline span6" style="margin-left:0px; visibility:hidden;">
+				<div class="build-sub-header" id="comments-container-header">Comments</div>
+				{% if comments|length == 0 %}
+					{% if viewer_own_profile == "false" %}
+						Be the first one to leave a comment!
+					{% else %}
+						No comments yet
+					{% endif %}
+				{% else %}
+					{% for c in comments %}
+						<div class="comment-inline">
+							<img width="25" height="25" class="profile-image" src="{{c.profile_pic}}"/>
+							<span class="comment-name"><a href="/profile/{{c.user_id}}/">{{c.user_name}}</a></span>
+							<span class="comment-body">{{c.body}}</span>
+							<span class="comment-date">{{c.date_created}}</span>
+						</div>
+					{% endfor %}
+				{% endif %}
+
+				</div>
+		</div>
+	</div>	
+	
+</div>
+{% endblock %}
+
+{% block templates %}
+
+<script type="text/javascript">
+	var path_id = {{path_id}};
+	var csrf_token = "{{csrf_token}}";
+	var current_positions_json = {{current_positions_json|safe}};
+	{% if path_steps %}
+		var path_steps = {{path_steps}}
+	{% else %}
+		var path_steps = null
+	{% endif %}
+</script>
+
+<script type="text/javascript" src="{{ STATIC_URL }}js/build.js"></script>
+
+
+<script type="text/template" id="inline-comment-template">
+
+	<div class="comment-inline">
+		<img width="25" height="25" class="profile-image" src="<%=profile_pic%>"/>
+		<span class="comment-name"><%=user_name%></span>
+		<span class="comment-body"><%=body%></span>
+		<span class="comment-date"><%=date_created%></span>
+	</div>
+
+</script>
+
+
+
+
+
+
+{% endblock %}
+
+
+
+
+
+
