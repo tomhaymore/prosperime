@@ -22,7 +22,7 @@ class FeedBase():
 		"""
 		# set defaults
 
-		timeline = opts['timeline'] if 'timeline' in opts else 24
+		timeline = opts['timeline'] if 'timeline' in opts else 1024
 		stop = datetime.now() - timedelta(hours = timeline)
 		# print stop
 
