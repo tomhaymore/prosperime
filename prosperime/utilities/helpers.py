@@ -1,11 +1,22 @@
 import time
 import urllib2
+import json
+
 # import simplejson
 from django.utils import simplejson
 import math
 import datetime
 from datetime import timedelta
 
+def _get_json(url):
+        """ returns JSON file in Python-readable format from URL"""
+        sys.stdout.write("fetching " + url + "\n")
+        try:
+            return json.load(urllib2.urlopen(url))
+        except urllib.URLError, e:
+            print str(e)
+        except:
+            return None
 
 def _formatted_date(date):
 
