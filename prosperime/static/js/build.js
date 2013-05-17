@@ -33,7 +33,9 @@ $(function() {
 		shuffle_text_id = -1,
 		chosen_data,
 		chosen_path, // container set for all selected options
-		no_display_ids; 
+		no_display_ids,
+		index_length,
+		no_options_display; 
 
 
 	// init positioning variables
@@ -91,13 +93,15 @@ $(function() {
 
 	var current_position_clicked = function(el) {
 		
+		option_index = 0;
+		index_length = null;
+		clear_path();
 		// assign target for easier reference
 		var opt = el;
 
 		// check to see if need to remove no options
-		if (no_display_ids != null && no_display_ids.length > 0) {
-			paper.getById(no_display_ids.rect).remove();
-			paper.getById(no_display_ids.text).remove();
+		if (no_options_display != null) {
+			no_options_display.remove();
 		}
 
 		// If already selected, do nothing
@@ -256,6 +260,8 @@ $(function() {
 			// add to umbrella set
 			chosen_path.push(group);
 
+			lines = paper.set();
+
 			if (i > 0) {
 				line_params = {
 					'x_start':x_start + ((i-1) * dot_distance) + dot_radius,
@@ -265,6 +271,9 @@ $(function() {
 					'attr':chosen_line_attributes
 				};
 				var line = add_line(line_params);
+				// add line to set
+				lines.push(line);
+				// add line data to array
 				line_data.push(line.id);
 				line.toBack();
 			}
@@ -439,17 +448,20 @@ $(function() {
 
 		// get length of data
 		var length = data.length - option_index > 5 ? 5 + option_index : data.length - option_index;
-		alert(option_index);
+		if (!index_length) {
+			index_length = length;
+		}
+
 		// // get starting point for rendering options
 		// if (index == null) {
 		// 	option_index = 0;
 		// }
 
 		// loop through data
-		for (var i = option_index; i < length; i++) {
+		for (var i = option_index; i < index_length; i++) {
 			// set positioning variables
 			x = dot_distance * chosen_data.length + x_start;
-			
+			console.log(option_index,index_length);
 			
 			// check to see if there is only one option; if so, set to midline
 			if (length == 1) {
@@ -524,6 +536,7 @@ $(function() {
 		// if no options returned... then do nothing!
 		if (!options || options.length == 0) {
 			console.log("No options returned.");
+			console.log(options);
 			display_no_options();
 			deactivate_shuffle_button();
 			return false;
@@ -541,7 +554,7 @@ $(function() {
 	};
 
 	var display_no_options = function() {
-		
+		no_options_display = paper.set();
 		rect_attr = {
 			"stroke-width":1,
 			"stroke":"rgb(48,91,152)"
@@ -575,10 +588,7 @@ $(function() {
 
 		var rect = add_rect(rect_params);
 		var text = add_text(text_params);
-		no_display_ids = {
-			'rect': rect.id,
-			'text': text.id
-		}
+		no_options_display.push(rect,text);
 
 	}
 
@@ -597,22 +607,32 @@ $(function() {
 	};
 
 	var deactivate_shuffle_button = function() {
-
-		shuffle_button.remove();
-		shuffle_text.remove();
+		if (shuffle_button != null) {
+			shuffle_button.remove();
+			shuffle_text.remove();	
+		}
+		
 		
 	};
 
 	var shuffle_options = function() {
-		if (options_data_raw.length - 5 > 5) {
+		
+		if (options_data_raw.length - option_index > 5) {
 			option_index += 5;
+			index_length = option_index + options_data_raw.length - option_index;
+			console.log('index length',index_length);
 		} else {
-			option_index += options_data_raw.length - 5;
+			option_index += options_data_raw.length - option_index;
+			index_length = options_data_raw.length;
+
 		}
 		convert_and_render_data();
 	}
 
 	var option_clicked = function(el) {
+		// reset counters
+		option_index = 0;
+		index_length = 0;
 
 		var id = el.id;
 		var ideal_id = el.data('ideal_id');
@@ -693,6 +713,7 @@ $(function() {
 			var length = (response.length > 5) ? 5 : response.length;
 			// y_offset = Math.ceil(y_range/(length - 1)) // assuming 5 options...
 			ret_val = response
+			console.log(ret_val);
 		}, "json");
 
 		jQuery.ajaxSetup({async:true})

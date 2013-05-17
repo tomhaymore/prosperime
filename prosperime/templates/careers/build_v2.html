@@ -48,9 +48,11 @@
 		<p><!-- Choose a position: --> <select name="position-select" id="position-select">
 			<option>Choose a position:</option>
 			{% for pos in current_positions %}
+				{% if pos.ideal_id %}
 				<option class="position-select-option" data-pos_id="{{pos.pos_id}}" data-title="{{pos.title}}" data-entity_name="{{pos.entity_name}}" data-ideal_id="{{pos.ideal_id}}" value="{{pos.ideal_id}}">
 					{{pos.title}} at {{pos.entity_name}}
 				</option>
+				{% endif %}
 			{% endfor %}
 			<option disabled="disabled">--------------------</option>
 			<option name="position-selection-new" id="position-selection-new">Add a new position...</option>
