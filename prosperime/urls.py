@@ -25,8 +25,11 @@ urlpatterns = patterns('',
     # Careers Views
     url(r'^path/(\d+)/$', 'careers.views.viewPath'),
     url(r'^feed/$', 'careers.views.feed'),
+    url(r'^buildv2/$','careers.views.build_v2'),
     url(r'^build/$', 'careers.views.build'),
+    
     url(r'^build/(\d+)/$', 'careers.views.modify_saved_path'),
+
     url(r'^plan/$', 'careers.views.plan'),
     url(r'^plan/(\d+)/$', 'careers.views.plan'),
 
@@ -67,6 +70,7 @@ urlpatterns = patterns('',
     url(r'^careers/getSavedCareers/$', 'careers.views.getSavedCareers'),
     url(r'^careers/getGoalPositions/$', 'careers.views.getGoalPositions'),
     url(r'^careers/getNextBuildStep/$', 'careers.views.get_next_build_step'),
+    url(r'^careers/getNextBuildStepIdeal/$', 'careers.views.get_next_build_step_ideal'),
     url(r'^careers/saveBuildPath/$', 'careers.views.save_build_path'),
     url(r'^careers/deleteSavedPath/$', 'careers.views.delete_path'),
     url(r'^careers/getIdealPosPath/$', 'careers.views.get_ideal_pos_paths'),
