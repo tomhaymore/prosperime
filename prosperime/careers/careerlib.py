@@ -792,6 +792,8 @@ class CareerBuild(CareerPathBase):
 		positions = {}
 		# init is_ed flag
 		is_ed = False
+		# init overall count 
+		overall_count = 0
 		# loop through each user
 		for k,v in paths.iteritems():
 			# loop through position for each user 
@@ -806,6 +808,8 @@ class CareerBuild(CareerPathBase):
 				entity_name = p['entity_name']
 				title = p['title']
 				# filter out various ineligible positions
+				if ideal_id is None:
+					continue
 				if p['level'] is not None and is_ed is True and int(p['level']) == int(ideal_pos.level):
 					print "same level ed @ build"
 					continue
@@ -816,6 +820,8 @@ class CareerBuild(CareerPathBase):
 					print "education with no degree @ build"
 					continue
 				if p['id'] in next and p['id'] not in finished and int(p['pos_id']) != int(start_pos_id):
+					# increment overall count
+					overall_count += 1
 					# next step in the path, add to array
 					if ideal_id in positions:
 						# increment counter
@@ -826,18 +832,29 @@ class CareerBuild(CareerPathBase):
 						if entity_id in positions[ideal_id]['orgs']:
 							positions[ideal_id]['orgs'][entity_id]['count'] += 1
 						else:
-							positions[ideal_id]['orgs'].append({entity_id:{'name':entity_name,'id':entity_id,'count':1}})
+							# positions[ideal_id]['orgs'].append({entity_id:{'name':entity_name,'id':entity_id,'count':1}})
+							positions[ideal_id]['orgs'][entity_id] = {
+								'name':entity_name,
+								'id':entity_id,
+								'count':1
+								}
 					else:
 						positions[ideal_id] = {
 							'count':0,
 							'positions':None,
-							'orgs':None,
+							'orgs':{},
 							'ideal_id':ideal_id,
 							'ideal_title':ideal_title
 						}
 						positions[ideal_id]['count'] += 1
 						positions[ideal_id]['positions'] = [{'pos_id':pos_id,'ideal_id':ideal_id,'title':title,'ideal_title':ideal_title,'entity_name':entity_name,'level':level}]
-						positions[ideal_id]['orgs'] = [{entity_id:{'name':entity_name,'id':entity_id,'count':1}}]
+						# positions[ideal_id]['orgs'] = [{entity_id:{'name':entity_name,'id':entity_id,'count':1}}]
+						
+						positions[ideal_id]['orgs'][entity_id] = {
+							'name':entity_name,
+							'id':entity_id,
+							'count':1
+							}
 					# add to processed positions array
 					finished.append(u_id)
 				if ideal_id == int(start_ideal_id):
@@ -847,8 +864,12 @@ class CareerBuild(CareerPathBase):
 					is_ed = True
 				else:
 					is_ed = False
+
+		# collapse orgs list
+		for k,v in positions.iteritems():
+			v['orgs'] = [{'name':v1['name'],'id':v1['id'],'count':v1['count']} for k1, v1 in v['orgs'].iteritems()]
 		
-		positions_list = [{'ideal_title':v['ideal_title'],'ideal_id':v['ideal_id'],'count':v['count'],'positions':v['positions'],'orgs':v['orgs']} for k,v in positions.iteritems()]
+		positions_list = [{'ideal_title':v['ideal_title'],'ideal_id':v['ideal_id'],'prop_raw':float(v['count'])/overall_count,'prop':"{0:.0f}%".format((float(v['count'])/overall_count)*100),'count':v['count'],'positions':v['positions'],'orgs':v['orgs']} for k,v in positions.iteritems()]
 
 		# sort result by count
 		sorted_positions = sorted(positions_list, key=itemgetter('count'), reverse=True)
