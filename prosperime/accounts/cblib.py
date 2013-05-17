@@ -647,8 +647,12 @@ class CBPeople(CBBase):
 
 	def parse_people(self):
 		cb_url = self.get_cb_url('list','person')
+		env = os.environ.get("PROSPR_ENV")
 		try:
-			f = open('cb_people_list.json','rU')
+			if env == "production":
+				f = open("/app/prosperime/cb_people_list.json","rU")
+			else:
+				f = open('cb_people_list.json','rU')
 			people_list = json.loads(f.read())
 		except:
 			people_list = self.get_json(cb_url)

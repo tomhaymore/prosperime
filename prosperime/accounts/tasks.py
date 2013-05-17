@@ -1,5 +1,6 @@
 from celery import task
 from lilib import LIConnections, LIProfile
+import accounts.cblib as cblib
 ## somewhat useful for celery debugging
 # from celery.contrib import rdb
 
@@ -39,6 +40,11 @@ def process_li_profile(user_id,acct_id,**kwargs):
 	# li_parser = LIProfile(career_mapper)
 	li_parser = LIProfile()
 	li_parser.process_profile(user_id,acct_id)
+
+@task()
+def process_cb_people():
+	cb = cblib.CBPeople()
+	cb.parse_people()
 
 # tasks.register(ProcessLIProfile)
 # tasks.register(ProcessLIConnections)
