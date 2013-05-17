@@ -27,6 +27,7 @@ urlpatterns = patterns('',
     url(r'^feed/$', 'careers.views.feed'),
     url(r'^buildv2/$','careers.views.build_v2'),
     url(r'^build/$', 'careers.views.build'),
+    url(r'^schools/$', 'careers.views.schools'),
     
     url(r'^build/(\d+)/$', 'careers.views.modify_saved_path'),
 

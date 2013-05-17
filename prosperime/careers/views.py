@@ -63,6 +63,9 @@ def home(request):
 
 	return render_to_response('home_v5.html',data,context_instance=RequestContext(request))
 
+def schools(request):
+	return render_to_response("schools.html", context_instance=RequestContext(request))
+
 @login_required
 def build(request):
 
