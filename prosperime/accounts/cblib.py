@@ -567,9 +567,13 @@ class CBPeople(CBBase):
 		# print data
 		# return None
 		if data:
-			p = User()
 			username = data['first_name'] + data['last_name'] + "_crunchbase"
-			p.username = username[:30]
+			try:
+				p = User.objects.get(username=username)
+			except:
+				p = User()
+				p.username = username[:30]
+			
 			p.is_active = False
 			p.first_name = data['first_name'][:30]
 			p.last_name = data['last_name'][:30]
