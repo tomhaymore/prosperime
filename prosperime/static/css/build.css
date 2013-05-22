@@ -147,10 +147,136 @@ span.comment-date {
 	color:#333;
 }
 
+/***********/
+/* Build 3 */
+/***********/
+
+/* Main */
+div#build-main-container {
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+
+	padding-left:45px;
+	padding-right:45px;
+	margin-right:45px;
+	margin-left:45px;
+}
+
+div#current-positions-container {
+	width:70%;
+	display:inline-block;
+	vertical-align: top:;
+}
+
+div#path-container-svg {
+	overflow:hidden;
+	width:100%;
+	display:inline-block;
+}
+
+div#info-box-container {
+	width:28%;
+	display:inline-block;
+	vertical-align: top;
+}
+
+div.main-message {
+	position:absolute;
+	font-size:1.4em;
+	top:450px;
+	left:315px;
+}
+
+/* Current Pos */
+div.position-box {
+	text-align:center;
+	margin-right:25px;
+	margin-bottom:15px;
+	border-radius:2px;
+	color:#fffffe;
+	font-size:0.9em;
+	width:165px;
+	line-height:18px;
+	height:60px;
+	display:inline-block;
+	vertical-align:top;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+
+}
+
+div.current-position {
+	border:2px solid rgb(41, 128, 185);
+	background-color:rgba(41,128,185,0.7);
+}
+
+div.new-position {
+	border:2px solid rgb(149, 165, 166);
+	background-color:rgba(149,165,166,0.7);
+}
+
+/* Info Box */
+div.info-box-sub-header {
+	font-size:1.2em;
+}
+
+#info-box-header { 
+	text-align: center;
+ }
+
+div.info-box-stat {
+	padding-left:8px;
+	font-size:0.9em;
+}
+
+div.info-box-person {
+	margin-top:4px;
+}
+
+div.info-box-people-pic {
+	width:60px;
+	height:60px;
+	display:inline-block;
+	vertical-align: top;
+}
+
+div.info-box-people-text {
+	font-size:0.9em;
+	display:inline-block;
+	vertical-align: top;
+	padding-left:4px;
+}
+
+div#info-box-entities {
+	text-align:center;
+}
+
+div.info-box-entity {
+
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	border:2px solid rgb(41, 128, 185);
+	width:250px;
+	margin:0 auto;
+	margin-top:8px;
+	padding-top:4px;
+	padding-bottom:4px;
+}
+
+div.info-box-entity-description {
+	border-top:2px solid rgb(41,128,185);
+}
 
 
 
 /* Modifiers */
+
+.low-padding { padding:2px;}
+.medium-padding { padding:8px; }
+.high-padding { padding:20px; }
 
 .smaller { font-size:1em !important; }
 

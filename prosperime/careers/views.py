@@ -93,7 +93,7 @@ def build(request):
 		'viewer_is_owner':"true",
 	}
 
-	return render_to_response("careers/build.html", data, context_instance=RequestContext(request))
+	return render_to_response("careers/build3.html", data, context_instance=RequestContext(request))
 
 @login_required
 def build_v2(request):
@@ -1472,7 +1472,33 @@ def get_next_build_step(request):
 		start_ideal_id = request.GET.getlist('id')[0]
 		start_pos_id = request.GET.getlist('pos_id')[0]
 
-		positions = career_path.get_next_build_step(start_ideal_id,start_pos_id)
+		#positions = career_path.get_next_build_step(start_ideal_id,start_pos_id)
+
+		p = Profile.objects.get(id=880)
+		people = []
+		latest = p.latest_position()
+		people.append({'id':880, 'name':p.full_name(), 'title':latest.title, 'entity_name':latest.entity.name, 'profile_pic':p.default_profile_pic()})
+		p = Profile.objects.get(id=841)
+		latest = p.latest_position()
+		people.append({'id':841, 'name':p.full_name(), 'title':latest.title, 'entity_name':latest.entity.name, 'profile_pic':p.default_profile_pic()})
+		p = Profile.objects.get(id=908)
+		latest = p.latest_position()
+		people.append({'id':908, 'name':p.full_name(), 'title':latest.title, 'entity_name':latest.entity.name, 'profile_pic':p.default_profile_pic()})
+
+
+		e = Entity.objects.get(id=757)
+		entities = []
+		entities.append({'name':e.name, 'description':e.description})
+		entities.append({'name':e.name, 'description':e.description})
+		entities.append({'name':e.name, 'description':e.description})
+		entities.append({'name':e.name, 'description':e.description})
+
+
+		positions = []
+		positions.append({'ideal_id':7, 'title':'Web Developer', 'duration':'12 months', 'probability':17, 'people':people, 'entities':entities})
+		positions.append({'ideal_id':7, 'title':'iOS Developer', 'duration':'12 months', 'probability':11, 'people':people, 'entities':entities})
+		positions.append({'ideal_id':7, 'title':'Systems Architect', 'duration':'12 months', 'probability':10, 'people':people, 'entities':entities})
+		positions.append({'ideal_id':7, 'title':'Hardware Developer', 'duration':'12 months', 'probability':4, 'people':people, 'entities':entities})
 
 		print "Num Options Returned: " + str(len(positions))
 
