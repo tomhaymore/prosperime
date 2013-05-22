@@ -187,8 +187,8 @@ class ParseBG(ParseBase):
 		self.ENTITIES_LIST = [{'name':self._standardize_names(e.name),'id':e.id} for e in Entity.objects.all()]
 
 	def _init_position_list(self):
-		pos_list = [p.title.lower() for p in Position.objects.exclude(title=None)]
-		ideal_pos_list = [p.title.lower() for p in IdealPosition.objects.exclude(title=None)]
+		pos_list = [self._standardize_names(p.title) for p in Position.objects.exclude(title=None)]
+		ideal_pos_list = [self._standardize_names(p.title) for p in IdealPosition.objects.exclude(title=None)]
 		full_list = pos_list + ideal_pos_list
 		self.POSITIONS_LIST = list(set(full_list))
 
@@ -429,6 +429,13 @@ class ParseBG(ParseBase):
 		self.parse_positions(soup,person)
 		return "Success",None
 
+	def _log_missed_positions(self):
+		import datetime
+		filename = "parselib_missed_positions_" + str(datetime.datetime.now()).replace(" ","_")
+		f = open(filename,'w')
+		f.write(json.dumps(self.MISSSED_POSITIONS))
+		f.close()
+
 	def parse_people(self):
 		full = "000000"
 		for a in self.abc:
@@ -445,5 +452,5 @@ class ParseBG(ParseBase):
 					stop = True
 				# increment i
 				i += 1
-		print self.MISSSED_POSITIONS
-		print self.HIT_POSITIONS
+		# print all missed positions
+		self._log_missed_positions()
