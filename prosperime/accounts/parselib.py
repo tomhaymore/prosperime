@@ -4,16 +4,22 @@ import urllib2
 import json
 import re
 import sys
-
+from operator import itemgetter
 # from Django
 
 # from prospr
 from utilities.helpers import _get_json 
-from careers.models import Career, Position
+from careers.models import Career, Position, IdealPosition
 from entities.models import Entity
 
 
 class ParseBase():
+
+	# set max size of ngram
+	NGRAM_MAX = 10
+
+	# set min size of ngram
+	NGRAM_MIN = 1
 
 	def get_json(self,url):
 		print "fetching..." + str(url)
@@ -36,16 +42,77 @@ class ParseBase():
 		# print soup
 		return soup
 
+	def _standardize_names(self,data):
+		"""
+		standardizes entity / position names like tokens
+		"""
+		import string
+		if data:
+			# init punctuation map
+			remove_punctuation_map = dict((ord(char), None) for char in string.punctuation)
+			
+			# reduce all strings to lower case and strip any leading / trailing whitespace
+			data = data.lower()
+			data = data.striop()
+			
+			# remove punctuation
+			data = data.translate(remove_punctuation_map)
+
+			return data
+		return None
+
+	def _tokenize(self,data):
+		"""
+		tokenizes position title based on spaces
+		"""
+		import string
+		if data:
+			# init punctuation map
+			remove_punctuation_map = dict((ord(char), None) for char in string.punctuation)
+			
+			# tokenize
+			tokens = data.split(" ")
+
+			# reduce all strings to lower case and strip any leading / trailing whitespace
+			tokens = [t.lower() for t in tokens]
+			tokens = [t.strip() for t in tokens]
+			
+			# remove punctuation
+			tokens = [w.translate(remove_punctuation_map) for w in tokens]
+
+			return tokens
+		return None
+
+	def _extract_ngrams(self,tokens):
+		"""
+		assembles tokens into appropriate number of ngrams and returns as a list
+		"""
+		if tokens:
+			ngrams = []
+			n_tokens = len(tokens)
+			for i in range(n_tokens):
+				for j in range(i+1,min(n_tokens,self.NGRAM_MAX)+1):
+					ngram = " ".join(tokens[i:j])
+					ngrams.append(ngram)
+
+			return ngrams
+		return None
+
 class ParseBG(ParseBase):
 
 	ENTITIES_LIST = []
 
 	POSITIONS_LIST = []
 
+	MISSSED_POSITIONS = []
+
+	HIT_POSITIONS = []
+
 	DEGREES = [
 		'BA',
 		'BS',
 		'AB',
+		'MA',
 		'LLM',
 		'JD',
 		'MBA',
@@ -91,30 +158,41 @@ class ParseBG(ParseBase):
 		'Doctor of Philosophy',
 		'MPS',
 		'MSEE',
-		'MPA'
+		'MPA',
+		'Fulbright Scholarship',
+		'graduate work',
+		'attended',
+		'studied'
 	]
 
-	DEGREES_REGEX = [{'string':d,'regex':re.compile(d)} for d in DEGREES]
+	DEGREES_REGEX = [{'string':d,'regex':re.compile(d.lower())} for d in DEGREES]
 
 	BASE_URL = "http://bioguide.congress.gov/scripts/biodisplay.pl?index="
 
-	DOB_BOUNDARY = 1930
+	DOB_BOUNDARY = 1920
 
 	soup = bs4.BeautifulSoup
 
 	abc = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+	SENATE = Entity.objects.get(name="U.S. Senate")
+
+	HOUSE = Entity.objects.get(name="U.S. House of Representatives")
 
 	def __init__(self):
 		self._init_entity_list()
 		self._init_position_list()
 
 	def _init_entity_list(self):
-		self.ENTITIES_LIST = [{'name':e.name,'id':e.id} for e in Entity.objects.all()]
+		self.ENTITIES_LIST = [{'name':self._standardize_names(e.name),'id':e.id} for e in Entity.objects.all()]
 
 	def _init_position_list(self):
-		self.POSITIONS_LIST = [p.title for p in Position.objects.exclude(title=None)]
+		pos_list = [p.title.lower() for p in Position.objects.exclude(title=None)]
+		ideal_pos_list = [p.title.lower() for p in IdealPosition.objects.exclude(title=None)]
+		full_list = pos_list + ideal_pos_list
+		self.POSITIONS_LIST = list(set(full_list))
 
-	def full_url(self,stub):
+	def _full_url(self,stub):
 		return self.BASE_URL+stub
 
 	def end_of_letter(self,soup):
@@ -133,21 +211,34 @@ class ParseBG(ParseBase):
 		"""
 		text = soup.find_all('table')[1].table.td.find_all('font')[1].get_text()
 		m = re.search('[0-9]+(?:\.[0-9]*)?',text)
-		dob = int(m.group(0))
-		if dob < self.DOB_BOUNDARY:
-			print "@ parselib -- too old, skipping"
-			return True
+		if m:
+			dob = int(m.group(0))
+			if dob < self.DOB_BOUNDARY:
+				print "@ parselib -- too old, skipping"
+				return True
 		return False
 
 	def add_ed(self,pos,person):
 		# init array for saving to model
 		params = {
 			'type':'education',
-			'person':person
+			'person':person,
+			'entity':None,
+			'degree':'Unknown',
+			'start_date':None,
+			'end_date':None
 		}
+		degree = None
 		for reg in self.DEGREES_REGEX:
 			if re.search(reg['regex'],pos):
+				# print "@ parselib -- matching reg " + reg['string']
 				degree = reg['string']
+		if degree:
+			params['degree'] = degree
+			# print "@ parselib -- matching reg " + params['degree']
+		else:
+			# print "@ parselib -- no matching degrees"
+			pass
 		date = re.findall("[0-9]+(?:\.[0-9]*)?",pos)
 		# try to get start and end dates
 		if len(date) == 1:
@@ -155,16 +246,33 @@ class ParseBG(ParseBase):
 		elif len(date) == 2:
 			params['start_date'] = date[0]
 			params['end_date'] = date[1]
-		for e in self.ENTITIES_LIST:
-			if e['name'] in pos.lower():
-				params['entity'] = Entity.objects.get(pk=e['id'])
+		# get ngrams from text
+		ngrams = self._extract_ngrams(self._tokenize(pos))
+		# print ngrams
+		matched_ents = [{'name':len(e['name']),'id':e['id']} for e in self.ENTITIES_LIST if e['name'] in ngrams]
+		if matched_ents:
+			sorted_matched_ents = sorted(matched_ents,key=itemgetter('name'),reverse=True)
+			params['entity'] = Entity.objects.get(pk=sorted_matched_ents[0]['id'])
+		# for e in self.ENTITIES_LIST:
+			
+		# 	if e['name'] in ngrams:
+		# 		params['entity'] = Entity.objects.get(pk=e['id'])
 		if params['entity'] is not None:
-			print "@ parselib -- added education " + str(params['entity'].name)
+			# print 'match'
+			# print "@ parselib -- degree " + params['degree']
+			if params['degree'] == "Unknown":
+				print pos
+			print "@ parselib -- entity id: " + str(params['entity'].id)
+			print "@ parselib -- added education: " + params['degree'] + " from " + str(params['entity'])  + ", " + str(params['start_date']) + " - " + str(params['end_date'])
 			# position = Position(params)
 			# position.save()
-
+		else:
+			# print 'no match'
+			pass
 
 	def is_ed_degree(self,pos):
+		if 'graduated' in pos or 'attended' in pos or 'graduate' in pos:
+			return True
 		if any(reg['regex'].search(pos) for reg in self.DEGREES_REGEX):
 			return True
 
@@ -175,7 +283,9 @@ class ParseBG(ParseBase):
 			'type':'education',
 			'person':person,
 			'title':'Unknown',
-			'entity':None
+			'entity':None,
+			'start_date':None,
+			'end_date':None
 		}
 		date = re.findall("[0-9]+(?:\.[0-9]*)?",pos)
 		# try to get start and end dates
@@ -184,29 +294,68 @@ class ParseBG(ParseBase):
 		elif len(date) == 2:
 			params['start_date'] = date[0]
 			params['end_date'] = date[1]
-
-		for p in self.POSITIONS_LIST:
-			if p in pos.lower():
-				params['title'] = p
-		for e in self.ENTITIES_LIST:
-			if e['name'] in pos.lower():
-				params['entity'] = Entity.objects.get(pk=e['id'])
+		# get ngrams from text
+		ngrams = self._extract_ngrams(self._tokenize(pos))
+		# check for military careers
+		if "served in" in ngrams and "navy" in ngrams:
+			params['title'] = "Military"
+		if "enlisted in" in ngrams:
+			params['title'] = "Military"
+		# check for position name
+		matched_pos = [p for p in self.POSITIONS_LIST if p in ngrams]
+		# if anything matched, sort by length of string
+		if matched_pos:
+			sorted_matched_pos = sorted(matched_pos,key=len,reverse=True)
+			params['title'] = sorted_matched_pos[0]
+		matched_ents = [{'name':len(e['name']),'id':e['id']} for e in self.ENTITIES_LIST if e['name'] in ngrams]
+		if matched_ents:
+			sorted_matched_ents = sorted(matched_ents,key=itemgetter('name'),reverse=True)
+			params['entity'] = Entity.objects.get(pk=sorted_matched_ents[0]['id'])
+		# for p in self.POSITIONS_LIST:
+		# 	if p in ngrams:
+		# 		params['title'] = p
+		# for e in self.ENTITIES_LIST:
+		# 	if e['name'] in ngrams:
+		# 		params['entity'] = Entity.objects.get(pk=e['id'])
 		if params['entity'] is not None:
-			print "@ parselib -- added position at " + str(params['entity'].name)
+			
+			if params['title'] == 'Unknown':
+				self.MISSSED_POSITIONS.append(pos)
+			else:
+				self.HIT_POSITIONS.append(params['title'])
+			print "@ parselib -- entity id: " + str(params['entity'].id)
+			print "@ parselib -- added position: " + params['title'] + " at " + str(params['entity']) + ", " + str(params['start_date']) + " - " + str(params['end_date'])
 			# position = Position(params)
 			# position.save()
+
+	def is_irrel(self,data):
+		"""
+		tests for irrelevant data, e.g., "Born in ..." "Died on ..."
+		"""
+		triggers = [
+			"born",
+			"died",
+			"interment"
+		]
+		found_triggers = [t for triggers if t in data]
+		if found_triggers:
+			return True
+		return False
 
 	def parse_positions(self,soup,person):
 		# get text of biography
 		text = soup.find_all('table')[1].p.get_text()
 		# clean up text and split into array
-		positions = text.replace('\r','').replace('\n','').split(';')
+		positions = text.replace('\r','').replace('\n','').split('; ')
 		for p in positions:
 			p = p.strip()
 		# loop through positions
 		for p in positions:
-			if 'graduated' in p or self.is_ed_degree(p.replace('.','')):
-				self.add_ed(p,person)
+			# test for irrelevant entry
+			if self.is_irrel(p):
+				continue
+			if self.is_ed_degree(p.replace('.','')):
+				self.add_ed(p.replace('.',''),person)
 			else:
 				self.add_pos(p,person)
 
@@ -215,7 +364,7 @@ class ParseBG(ParseBase):
 		params = {}
 		names = soup.find_all('table')[1].table.a.get_text().split(',')
 		first_name = names[1].title()
-		last_name = names[0].strip()
+		last_name = names[0].strip().title()
 		username = first_name + last_name + "_bioguide"
 		# add person
 		person = ''
@@ -227,11 +376,48 @@ class ParseBG(ParseBase):
 		# person.profile.status = "bioguide"
 		# person.profile.save()
 		print "@ parselib -- added " + first_name + " " + last_name
+		# check for Senate or House
+		params = {}
+		text = soup.find_all('table')[1].find_all('td')[1].get_text()
+		m = re.search('(?<=:\s)(\d+)-(\d+)',text)
+		if m:
+			# it's a senate position
+			params['entity'] = self.SENATE
+			params['title'] = "U.S. Senator"
+			params['start_date'] = int(m.group(1))
+			try:
+				params['end_date'] = int(m.group(2))
+			except:
+				params['end_date'] = None
+		else:
+			# it's a house position
+			params['entity'] = self.HOUSE
+			params['title'] = "U.S. Representative"
+			try:
+				m1 = re.search('(?<=\().+(\d+)',text)
+				m2 = re.findall('([\d]{4})',m.group(0))
+			except:
+				m1 = None
+				m2 = None
+			if m2:
+				if len(m2) == 1:
+					params['start_date'] = int(m2[0])
+					params['end_date'] = None
+				elif len(m2) == 2:
+					params['start_date'] = int(m2[0])
+					params['end_date'] = int(m2[1])
+				else:
+					params['start_date'] = None
+					params['end_date'] = None
+		# add position
+		# position = Position(params)
+		# position.save()
+		print "@ parselib -- added position at " + params['entity'].name
 		return person
 
 	def parse_person(self,index):
 		# fetch page
-		soup = self.get_soup(self.full_url(index))
+		soup = self.get_soup(self._full_url(index))
 		# check to see if end of letter
 		if self.end_of_letter(soup):
 			return None, "end"
@@ -259,3 +445,5 @@ class ParseBG(ParseBase):
 					stop = True
 				# increment i
 				i += 1
+		print self.MISSSED_POSITIONS
+		print self.HIT_POSITIONS
