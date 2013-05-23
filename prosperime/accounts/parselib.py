@@ -5,7 +5,9 @@ import json
 import re
 import sys
 from operator import itemgetter
+
 # from Django
+from django.db.models import Q
 
 # from prospr
 from utilities.helpers import _get_json 
@@ -53,12 +55,12 @@ class ParseBase():
 			
 			# reduce all strings to lower case and strip any leading / trailing whitespace
 			data = data.lower()
-			data = data.striop()
+			data = data.strip()
 			
 			# remove punctuation
 			data = data.translate(remove_punctuation_map)
-
 			return data
+
 		return None
 
 	def _tokenize(self,data):
@@ -99,6 +101,10 @@ class ParseBase():
 		return None
 
 class ParseBG(ParseBase):
+
+	ALL_POS_COUNT = 0
+
+	MATCHED_POS_COUNT = 0
 
 	ENTITIES_LIST = []
 
@@ -179,7 +185,13 @@ class ParseBG(ParseBase):
 		'studied'
 	]
 
-	DEGREES_REGEX = [{'string':d,'regex':re.compile(d.lower())} for d in DEGREES]
+	DEGREES.sort(key=len)
+
+	DEGREES = [d.lower() for d in DEGREES]
+
+	# DEGREES_REGEX = [{'string':d,'regex':re.compile(d.lower())} for d in DEGREES]
+
+	DEGREES.sort(key=len,reverse=True)
 
 	BASE_URL = "http://bioguide.congress.gov/scripts/biodisplay.pl?index="
 
@@ -201,7 +213,7 @@ class ParseBG(ParseBase):
 		self.ENTITIES_LIST = [{'name':self._standardize_names(e.name),'id':e.id} for e in Entity.objects.all()]
 
 	def _init_position_list(self):
-		pos_list = [self._standardize_names(p.title) for p in Position.objects.exclude(title=None)]
+		pos_list = [self._standardize_names(p.title) for p in Position.objects.exclude(Q(title=None) | Q(title=""))]
 		ideal_pos_list = [self._standardize_names(p.title) for p in IdealPosition.objects.exclude(title=None)]
 		full_list = pos_list + ideal_pos_list
 		self.POSITIONS_LIST = list(set(full_list))
@@ -242,11 +254,16 @@ class ParseBG(ParseBase):
 			'start_date':None,
 			'end_date':None
 		}
+		# get ngrams from text
+		ngrams = self._extract_ngrams(self._tokenize(pos))
 		degree = None
-		for reg in self.DEGREES_REGEX:
-			if re.search(reg['regex'],pos):
-				# print "@ parselib -- matching reg " + reg['string']
-				degree = reg['string']
+		matched_degrees = [d for d in self.DEGREES if d in ngrams]
+		if matched_degrees:
+			degree = matched_degrees[0]
+		# for reg in self.DEGREES_REGEX:
+		# 	if re.search(reg['regex'],pos):
+		# 		# print "@ parselib -- matching reg " + reg['string']
+		# 		degree = reg['string']
 		if degree:
 			params['degree'] = degree
 			# print "@ parselib -- matching reg " + params['degree']
@@ -260,8 +277,7 @@ class ParseBG(ParseBase):
 		elif len(date) == 2:
 			params['start_date'] = date[0]
 			params['end_date'] = date[1]
-		# get ngrams from text
-		ngrams = self._extract_ngrams(self._tokenize(pos))
+		
 		# print ngrams
 		matched_ents = [{'name':len(e['name']),'id':e['id']} for e in self.ENTITIES_LIST if e['name'] in ngrams]
 		if matched_ents:
@@ -274,6 +290,7 @@ class ParseBG(ParseBase):
 		if params['entity'] is not None:
 			# print 'match'
 			# print "@ parselib -- degree " + params['degree']
+			self.MATCHED_POS_COUNT += 1
 			if params['degree'] == "Unknown":
 				print pos
 			print "@ parselib -- entity id: " + str(params['entity'].id)
@@ -287,8 +304,13 @@ class ParseBG(ParseBase):
 	def is_ed_degree(self,pos):
 		if 'graduated' in pos or 'attended' in pos or 'graduate' in pos:
 			return True
-		if any(reg['regex'].search(pos) for reg in self.DEGREES_REGEX):
+		# get ngrams from text
+		ngrams = self._extract_ngrams(self._tokenize(pos))
+		matched_degrees = [d for d in self.DEGREES if d in ngrams]
+		if matched_degrees:
 			return True
+		# if any(reg['regex'].search(pos) for reg in self.DEGREES_REGEX):
+		# 	return True
 
 	def add_pos(self,pos,person):
 		# init array for saving to model
@@ -332,7 +354,7 @@ class ParseBG(ParseBase):
 		# 	if e['name'] in ngrams:
 		# 		params['entity'] = Entity.objects.get(pk=e['id'])
 		if params['entity'] is not None:
-			
+			self.MATCHED_POS_COUNT += 1
 			if params['title'] == 'Unknown':
 				self.MISSSED_POSITIONS.append(pos)
 			else:
@@ -351,7 +373,7 @@ class ParseBG(ParseBase):
 			"died",
 			"interment"
 		]
-		found_triggers = [t for triggers if t in data]
+		found_triggers = [t for t in triggers if t in data]
 		if found_triggers:
 			return True
 		return False
@@ -368,6 +390,8 @@ class ParseBG(ParseBase):
 			# test for irrelevant entry
 			if self.is_irrel(p):
 				continue
+			# increment counter
+			self.ALL_POS_COUNT += 1
 			if self.is_ed_degree(p.replace('.','')):
 				self.add_ed(p.replace('.',''),person)
 			else:
