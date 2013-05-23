@@ -70,19 +70,30 @@ def schools(request):
 def build(request):
 
 	path_title = "Untitled" ## this should default if no title
-
-	# latest_position = request.user.profile.latest_position()
-	educations = request.user.profile.educations()
-
+	
+	# V3 EDIT - only latest pos and ed
 	current_positions = []
-	all_positions = Position.objects.filter(person=request.user).values("id", "ideal_position__id", "title", "entity__name")
-	for p in all_positions:
-		current_positions.append({"pos_id": p["id"], "ideal_id": p["ideal_position__id"], "title":p["title"], "entity_name":p["entity__name"]})
-	# current_positions.append({'pos_id':latest_position.id,'ideal_id':latest_position.ideal_position_id,'title':str(latest_position.title),'entity_name':str(latest_position.entity.name)})
+	latest_position = request.user.profile.latest_position_with_ideal()
+	educations = request.user.profile.educations()
+	
+	if latest_position is not None:
+		current_positions.append({"pos_id":latest_position.id, "ideal_id": latest_position.ideal_position.id, 'title':latest_position.title, 'entity_name':latest_position.entity.name})
+	if len(educations) > 0:
+		for ed in educations:
+			current_positions.append({"pos_id":ed.id, "ideal_id": ed.ideal_position.id, 'title':ed.title, 'entity_name':ed.entity.name})
+	
+
+	# all_positions = Position.objects.filter(person=request.user).values("id", "ideal_position__id", "title", "entity__name")
+	# for p in all_positions:
+	# 	current_positions.append({"pos_id": p["id"], "ideal_id": p["ideal_position__id"], "title":p["title"], "entity_name":p["entity__name"]})
 
 	# for e in educations:
 	# 	current_positions.append({'pos_id':e.id,'ideal_id':e.ideal_position_id,'title':e.title,'entity_name':e.entity.name})
 	
+	eligible_alternates = Position.objects.filter().exclude(type="education").exclude(ideal_position=None).order_by("title").select_related("entity", "ideal_position")
+	alternate_starting_points = []
+	for e in eligible_alternates:
+		alternate_starting_points.append({"pos_id":e.id, "ideal_id":e.ideal_position.id, "title":e.title, 'entity_name':e.entity.name})
 
 	data = {
 		'title':path_title,
@@ -91,6 +102,7 @@ def build(request):
 		'path_id':-1,
 		'path_steps':None,
 		'viewer_is_owner':"true",
+		'alternate_starting_points':alternate_starting_points,
 	}
 
 	return render_to_response("careers/build3.html", data, context_instance=RequestContext(request))
@@ -1472,8 +1484,13 @@ def get_next_build_step(request):
 		start_ideal_id = request.GET.getlist('id')[0]
 		start_pos_id = request.GET.getlist('pos_id')[0]
 
-		#positions = career_path.get_next_build_step(start_ideal_id,start_pos_id)
+		print 'ideal_id: ' + str(start_ideal_id)
+		print 'pos_id: ' + str(start_pos_id)
 
+		ideal_pos = career_path.get_next_build_step_ideal(start_ideal_id,start_pos_id)
+		print ideal_pos
+		
+		## GET FAKE TOP PEOPLE
 		p = Profile.objects.get(id=880)
 		people = []
 		latest = p.latest_position()
@@ -1485,24 +1502,37 @@ def get_next_build_step(request):
 		latest = p.latest_position()
 		people.append({'id':908, 'name':p.full_name(), 'title':latest.title, 'entity_name':latest.entity.name, 'profile_pic':p.default_profile_pic()})
 
+		## GET FAKE ENTITIES
+		# e = Entity.objects.get(id=757)
+		# entities = []
+		# entities.append({'name':e.name, 'description':e.description})
+		# entities.append({'name':e.name, 'description':e.description})
+		# entities.append({'name':e.name, 'description':e.description})
+		# entities.append({'name':e.name, 'description':e.description})
 
-		e = Entity.objects.get(id=757)
-		entities = []
-		entities.append({'name':e.name, 'description':e.description})
-		entities.append({'name':e.name, 'description':e.description})
-		entities.append({'name':e.name, 'description':e.description})
-		entities.append({'name':e.name, 'description':e.description})
 
 
-		positions = []
-		positions.append({'ideal_id':7, 'title':'Web Developer', 'duration':'12 months', 'probability':17, 'people':people, 'entities':entities})
-		positions.append({'ideal_id':7, 'title':'iOS Developer', 'duration':'12 months', 'probability':11, 'people':people, 'entities':entities})
-		positions.append({'ideal_id':7, 'title':'Systems Architect', 'duration':'12 months', 'probability':10, 'people':people, 'entities':entities})
-		positions.append({'ideal_id':7, 'title':'Hardware Developer', 'duration':'12 months', 'probability':4, 'people':people, 'entities':entities})
+		for ideal in ideal_pos:
+			ideal["people"] = people
+			ideal["duration"] = "12 months"
+			entities = []
+			for e in ideal["orgs"]:
+				ent = Entity.objects.get(id=e["id"])
+				entities.append({'name':e['name'], 'description':ent.description})
+			ideal["entities"] = entities
+			ideal["title"] = ideal["ideal_title"]
 
-		print "Num Options Returned: " + str(len(positions))
 
-		return HttpResponse(json.dumps(positions))
+
+		# positions = []
+		# positions.append({'ideal_id':7, 'title':'Web Developer', 'duration':'12 months', 'probability':17, 'people':people, 'entities':entities})
+		# positions.append({'ideal_id':7, 'title':'iOS Developer', 'duration':'12 months', 'probability':11, 'people':people, 'entities':entities})
+		# positions.append({'ideal_id':7, 'title':'Systems Architect', 'duration':'12 months', 'probability':10, 'people':people, 'entities':entities})
+		# positions.append({'ideal_id':7, 'title':'Hardware Developer', 'duration':'12 months', 'probability':4, 'people':people, 'entities':entities})
+
+		print "Num Options Returned: " + str(len(ideal_pos))
+
+		return HttpResponse(json.dumps(ideal_pos))
 
 # AJAX for getting build steps
 def get_next_build_step_ideal(request):

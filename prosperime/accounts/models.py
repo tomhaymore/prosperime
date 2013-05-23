@@ -123,6 +123,13 @@ class Profile(models.Model):
         else:
             return None
 
+    def latest_position_with_ideal(self):
+        positions = self.user.positions.all().order_by('-start_date').exclude(type="education").exclude(ideal_position=None)
+        if positions.exists():
+            return positions[0]
+        else:
+            return None
+
     def educations(self):
         return self.user.positions.all().filter(type="education").order_by('start_date')
 

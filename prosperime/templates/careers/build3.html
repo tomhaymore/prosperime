@@ -13,6 +13,7 @@
 	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.autocomplete.min.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/helpers.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/build3.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
 
 
 {% endblock %}
@@ -32,7 +33,7 @@
 			<span class="build-header-name">{{title}}</span>
 		{% endif %}
 
-	<!-- Delete Button --> 
+		<!-- Delete Button --> 
 		<div id="delete-button-container" class="pull-right flat-button">
 			{% if path_id > -1 %}
 				<div id="delete-button" onclick="delete_path()">
@@ -41,12 +42,13 @@
 			{% endif %}
 		</div>
 
+		<div class="pull-right save-button disabled" disabled>Save</div>
 
 	</div>
 
 	<!-- Sub Header -->
 	<div class="call-out-text">
-		Choose a starting point and begin exploring the array of options available to you as you build out your ideal career path.		
+		Choose a starting point and begin exploring the array of options available to you as you build out your ideal career path.	
 	</div>
 
 	<div class="row">
@@ -63,8 +65,13 @@
 						
 		
 			{% endfor %}
-			<div class="position-box new-position high-padding">New Position</div>
-			<!-- fencepost -->
+			<div id="new-position-box" class="position-box new-position high-padding" onclick="searchStartingPositions()">New Position</div>
+			
+			<select data-placeholder="Select a position..." id="build-new-position-select">
+				{% for pos in alternate_starting_points %}
+					<option data-ideal_id="{{pos.ideal_id}}" data-pos_id="{{pos.pos_id}}" data-title="{{pos.title}}" data-entity_name="{{pos.entity_name}}">{{pos.title}} at {{pos.entity_name}}</option>
+				{% endfor %}
+			</select>	
 
 
 			<div id="path-container-wrapper">
@@ -123,6 +130,10 @@
 		</div>	
 	</div>
 
+	<div class="feedback-container">
+		<div class="feedback-prompt">Something broken? Something you'd like to see? <a href="mailto:clayton@prospr.me?subject=Build Feedback">Let us know</a>.</div>
+	</div>
+
 
 </div>
 {% endblock %}
@@ -164,6 +175,8 @@
 		});
 
 		$('.build-header-name').click(title_change_handler)
+
+		// $('#build-new-position-select').chosen()
 	});
 
 

@@ -873,7 +873,6 @@ class CareerBuild(CareerPathBase):
 
 		# sort result by count
 		sorted_positions = sorted(positions_list, key=itemgetter('count'), reverse=True)
-
 		return sorted_positions
 
 	
