@@ -197,6 +197,12 @@ div#end-message {
 	left:100px;
 }
 
+div.warning-message {
+	color:#E74C3C;
+	font-size:1em;
+
+}
+
 /* Current Pos */
 div.position-box {
 	cursor:pointer;

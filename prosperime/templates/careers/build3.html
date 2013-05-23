@@ -25,6 +25,7 @@
 <div id="build-main-container" class="main-container">
 
 	<!-- Header --> 
+	<div class="pull-right warning-message"></div>
 	<div class="build-header">
 		Build: 
 		{% if title == "Untitled" %}
@@ -34,17 +35,18 @@
 		{% endif %}
 
 		<!-- Delete Button --> 
-		<div id="delete-button-container" class="pull-right flat-button">
+		<!-- <div id="delete-button-container" class="pull-right flat-button">
 			{% if path_id > -1 %}
 				<div id="delete-button" onclick="delete_path()">
 					Delete
 				</div>
 			{% endif %}
-		</div>
+		</div> -->
 
-		<div class="pull-right save-button disabled" disabled>Save</div>
+		<div class="pull-right save-button disabled" disabled style="display:none">Save</div>
 
 	</div>
+
 
 	<!-- Sub Header -->
 	<div class="call-out-text">
@@ -65,7 +67,7 @@
 						
 		
 			{% endfor %}
-			<div id="new-position-box" class="position-box new-position high-padding" onclick="searchStartingPositions()">New Position</div>
+			<div id="new-position-box" class="position-box new-position high-padding">New Position</div>
 			
 			<select data-placeholder="Select a position..." id="build-new-position-select">
 				{% for pos in alternate_starting_points %}
@@ -144,6 +146,7 @@
 <script type="text/javascript">
 
 	var current_positions_javascript = {{current_positions_json|safe}}
+	var path = {{path_steps|safe}}
 
 	// Title change handlers....
 	var enterPressed = function(ev) {
@@ -174,6 +177,7 @@
 			);
 		});
 
+		$("#new-position-box").click(searchStartingPositions)
 		$('.build-header-name').click(title_change_handler)
 
 		// $('#build-new-position-select').chosen()

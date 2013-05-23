@@ -11,14 +11,13 @@
 
 <!-- Fonts -->
 <!-- <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Source+Sans+Pro|Varela+Round"> -->
-<link href='http://fonts.googleapis.com/css?family=Lato|Arimo' rel='stylesheet' type='text/css'>
+	
 <!-- Past Favorites: Lato, Arvo, -->
 <!-- JS -->
 	<script type="text/javascript" src="{{ STATIC_URL }}js/json2.js"></script>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
 	<!-- Should add JQuery if Google CDN Fails --> 
-	
 	<script type="text/javascript">
 		if (typeof jQuery == 'undefined') {
 			document.write(unescape("%3Cscript src='{{ STATIC_URL }}js/jquery.js' type='text/javascript'%3E%3C/script%3E"));
@@ -28,8 +27,8 @@
 	<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
 
-	<!-- Alternates (= no wifi) -->
-	<!-- <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js"></script> -->
+<!-- Alternates (= no wifi) -->
+<!-- <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js"></script> -->
 
 
 {% block head %} {% endblock %}
@@ -79,9 +78,6 @@
 								</li>
 		                		<li>
 									<a href="/contact/">Contact</a>
-								</li>
-								<li>
-									<a href="/schools/">For Schools</a>
 								</li>
 	                		{% endif %}
 							
