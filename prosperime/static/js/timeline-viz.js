@@ -364,6 +364,9 @@ var monospaced_timeline = function(constants, positions, el) {
         "stroke":timeline_color,
     })
 
+    // So that it renders in correct order (HACK)
+    positions.reverse()
+
 	// Main Loop - Add dot for each position
     for (var j = 0; j < positions.length; j++) {
 
