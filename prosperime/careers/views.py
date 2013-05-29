@@ -66,6 +66,36 @@ def home(request):
 def schools(request):
 	return render_to_response("schools.html", context_instance=RequestContext(request))
 
+def progress(request):
+
+	options = [
+		{'title':'VP of Engineering', 'ideal_id':7 },
+		{'title':'VP of Sales', 'ideal_id':10 },
+		{'title':'MBA Candidate', 'ideal_id':11 },
+		{'title':'Partner (Management Consulting)', 'ideal_id':27}
+	]
+
+	data = {
+		"authenticated":request.user.is_authenticated(),
+		"options":options
+	}
+	return render_to_response("careers/on_track.html", data, context_instance=RequestContext(request))
+
+def get_progress(request):
+	response = {}
+
+	if not request.is_ajax:
+		response["result"] = "failure"
+		response["errors"] = "incorrect request type"
+		return HttpResponse(json.dumps(response))
+
+	ideal_id = request.GET.get("ideal_id")
+
+	response["result"] = "success"
+
+	return HttpResponse(json.dumps(response))
+
+
 @login_required
 def build(request):
 

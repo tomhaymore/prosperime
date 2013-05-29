@@ -12,7 +12,13 @@ var range = max_radius - min_radius
 var break_string = function(max_chars, string) {
 
 	var last_space = string.substring(0,max_chars).lastIndexOf(" ")
-	return string.substring(0, last_space) + "\n" + string.substring(last_space)
+	if (string.substring(last_space).length > max_chars) {
+		string = string.substring(0, last_space) + "\n" + string.substring(last_space)
+		var second_space = string.substring(last_space+1,last_space+1+max_chars).lastIndexOf(" ")
+		return string.substring(0,last_space+second_space+1) + "\n" + string.substring(last_space+second_space+1)
+	
+	} else
+		return string.substring(0, last_space) + "\n" + string.substring(last_space)
 };
 
 var get_max_radius = function() {
