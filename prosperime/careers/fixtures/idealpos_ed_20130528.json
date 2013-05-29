@@ -1,0 +1,549 @@
+[
+	{
+		"title":"B.S.",
+		"description":"",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of science","bs","bsc"]
+				}
+			]
+	},
+	{
+		"title":"B.S.Anthro",
+		"description":"Bachelor of Science in Anthropology",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of science in anthropology","bsanthro","bs anthropology"]
+				}
+			]
+	},
+	{
+		"title":"B.S.ChemE",
+		"description":"Bachelor of Science in Chemical Engineering",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of science in chemical engineering","bscheme","bs chemical engineering"]
+				}
+			]
+	},
+	{
+		"title":"B.S.E.E.",
+		"description":"Bachelor of Science in Electrical Engineering",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of science in electrical engineering","bsee","bs electrical engineering"]
+				}
+			]
+	}
+	,
+	{
+		"title":"B.S. Industrial Engineering",
+		"description":"Bachelor of Science in Industrial Engineering",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of science in industrial engineering","bs industrial engineering"]
+				}
+			]
+	},
+	{
+		"title":"M.S.I.E.",
+		"description":"Master of Science in Industrial Engineering",
+		"level":2,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["msie","ms industrial engineering"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Management Science",
+		"description":"Bachelor of Science in Management Science",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of science in management science","bs management science"]
+				}
+			]
+	},
+	{
+		"title":"B.Tech.",
+		"description":"Bachelor of Technology",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of technology","btech"]
+				}
+			]
+	},
+	{
+		"title":"B.A.",
+		"description":"",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of arts"]
+				}
+			]
+	},
+	{
+		"title":"B.A.S.",
+		"description":"",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bas","bachelor of arts and sciences"]
+				}
+			]
+	},
+	{
+		"title":"B.F.A.",
+		"description":"",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bfa","bachelor of fine arts"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Philosophy, Politics and Economics",
+		"description":"",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["philosophy politics and economics","ppe"]
+				}
+			]
+	},
+	{
+		"title":"B.S. in Mechanical Engineering",
+		"description":"",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of science in mechanical engineering","bs in mechanical engineering"]
+				}
+			]
+	},
+	{
+		"title":"B.S. in Symoblic Systems",
+		"description":"",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of science in symoblic systems","bs symbolic systems"]
+				}
+			]
+	},
+	{
+		"title":"B.B.A.",
+		"description":"",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of business administration","bba"]
+				}
+			]
+	},
+	{
+		"title":"M.A.",
+		"description":"",
+		"level":2,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["master of arts","masters"]
+				}
+			]
+	},
+	{
+		"title":"M.Phil.",
+		"description":"Master of Philosophy",
+		"level":2,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["master of philosophy","mphil"]
+				}
+			]
+	},
+	{
+		"title":"M.S.",
+		"description":"Master of Science",
+		"level":2,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["master of science","ma"]
+				}
+			]
+	},
+	{
+		"title":"M.S. Audio Engineering",
+		"description":"Master of Science in Audio Engineering",
+		"level":2,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["master of science in audio engineering","ms audio engineering"]
+				}
+			]
+	},
+	{
+		"title":"M.S. Operations Research",
+		"description":"Master of Science in Operations Research",
+		"level":2,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["master of science in operations research","ms operations research"]
+				}
+			]
+	},
+	{
+		"title":"M.Eng.",
+		"description":"Master of Engineering",
+		"level":2,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["meng","masters of engineering"]
+				}
+			]
+	},
+	{
+		"title":"B.Eng.",
+		"description":"Bachelor of Engineering",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["beng","bachelor of engineering","bachelor of science engineering","bse"]
+				}
+			]
+	},
+	{
+		"title":"M.B.A.",
+		"description":"",
+		"level":2,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["mba","masters of business administration"]
+				}
+			]
+	},
+	{
+		"title":"Executive M.B.A.",
+		"description":"",
+		"level":2,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["executive mba","executive masters of business administration"]
+				}
+			]
+	},
+	{
+		"title":"M.I.M.",
+		"description":"",
+		"level":2,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["mim","master in management","master of science in management"]
+				}
+			]
+	},
+	{
+		"title":"B.S.B.A.",
+		"description":"Bachelor of Science in Business Administration",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bsba","bachelor of science in business administration"]
+				}
+			]
+	},
+	{
+		"title":"A.A.S.",
+		"description":"Associate of Arts and Sciences",
+		"level":0,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["aas","associate in arts and sciences","associate of arts and sciences"]
+				}
+			]
+	},
+	{
+		"title":"A.A.",
+		"description":"Associate of Arts",
+		"level":0,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["aa","associate in arts","associate of arts"]
+				}
+			]
+	},
+	{
+		"title":"A.S.",
+		"description":"Associate of Science",
+		"level":0,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["as","associate in science","associate of science"]
+				}
+			]
+	},
+	{
+		"title":"Ph.D.",
+		"description":"",
+		"level":3,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["phd","doctor of philosophy"]
+				}
+			]
+	},
+	{
+		"title":"GED",
+		"description":"",
+		"level":0,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ged","general education development"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Sociology",
+		"description":"",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba sociology","bachelor of arts in sociology"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Political Science",
+		"description":"",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba political science","bachelor of arts in political science"]
+				}
+			]
+	},
+	{
+		"title":"B.A. International Relations",
+		"description":"",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba international relations","bachelor of arts in international relations"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Economics",
+		"description":"Bachelor of Arts in Economics",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba economics","bachelor of arts in economics"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Economics",
+		"description":"",
+		"level":1,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs economics","bs in economics","bachelor of science in economics"]
+				}
+			]
+	},
+	{
+		"title":"JD",
+		"description":"",
+		"level":3,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["juris doctor","jd","doctor of law"]
+				}
+			]
+	},
+	{
+		"title":"M.Ed.",
+		"description":"Master of Education",
+		"level":2,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["edm","med","master of education"]
+				}
+			]
+	},
+	{
+		"title":"M.D.",
+		"description":"Doctor of Medicine",
+		"level":2,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["md","doctor of medicine"]
+				}
+			]
+	},
+	{
+		"title":"L.L.M.",
+		"description":"Master of Laws",
+		"level":2,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["llm","master of laws"]
+				}
+			]
+	},
+	{
+		"title":"M.Acc.",
+		"description":"Master of Accountancy",
+		"level":2,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["macc","mac","macy","mpacy","mpa","mpac","mpacc","msa","master of science in accounting"]
+				}
+			]
+	},
+	{
+		"title":"Certificate in Forensic Science",
+		"description":"Certificate in forensic science",
+		"level":0,
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["certificate in forensic science"]
+				}
+			]
+	}
+]
