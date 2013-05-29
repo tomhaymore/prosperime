@@ -102,6 +102,8 @@ class ParseBase():
 
 class ParseBG(ParseBase):
 
+	# global variables
+
 	ALL_POS_COUNT = 0
 
 	MATCHED_POS_COUNT = 0
@@ -109,6 +111,8 @@ class ParseBG(ParseBase):
 	ENTITIES_LIST = []
 
 	POSITIONS_LIST = []
+
+	POSITION_DICT = {}
 
 	MISSSED_POSITIONS = []
 
@@ -132,7 +136,7 @@ class ParseBG(ParseBase):
 		'Bachelor of Law',
 		'doctoral degree',
 		'JD',
-		'Juris Doctor'
+		'Juris Doctor',
 		'MBA',
 		'MCP',
 		'MD',
@@ -201,25 +205,56 @@ class ParseBG(ParseBase):
 
 	abc = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-	SENATE = Entity.objects.get(name="U.S. Senate")
+	SENATE = None
 
-	HOUSE = Entity.objects.get(name="U.S. House of Representatives")
+	HOUSE = None
+
+	# variables for each person
+
+	ORIG_POS = {}
+
+	PERSON = None
+
+	NGRAMS = None
+
+	TYPE = None
 
 	def __init__(self):
+		# initialize lists
 		self._init_entity_list()
 		self._init_position_list()
+		# initialize Senate and House objects
+		self.SENATE = Entity.objects.get(name="U.S. Senate")
+		self.HOUSE = Entity.objects.get(name="U.S. House of Representatives")
 
 	def _init_entity_list(self):
 		self.ENTITIES_LIST = [{'name':self._standardize_names(e.name),'id':e.id} for e in Entity.objects.all()]
 
 	def _init_position_list(self):
-		pos_list = [self._standardize_names(p.title) for p in Position.objects.exclude(Q(title=None) | Q(title=""))]
+		all_positions = set([p.title for p in Position.objects.exclude(Q(title=None) | Q(title=""))])
+		pos_list = [self._standardize_names(p) for p in all_positions]
+		pos_dict = {}
+		for p in all_positions:
+			pos_dict[self._standardize_names(p)] = p
+		# pos_list = [{'string':p.title,'match':self._standardize_names(p.title)} for p in Position.objects.exclude(Q(title=None) | Q(title=""))]
+		all_ideals = [p.title for p in IdealPosition.objects.exclude(title=None)]
 		ideal_pos_list = [self._standardize_names(p.title) for p in IdealPosition.objects.exclude(title=None)]
+		for p in ideal_pos_list:
+			norm_title = self._standardize_names(p)
+			if norm_title not in pos_dict:
+				pos_dict[norm_title] = p
 		full_list = pos_list + ideal_pos_list
 		self.POSITIONS_LIST = list(set(full_list))
+		self.POSITION_DICT = pos_dict
 
 	def _full_url(self,stub):
 		return self.BASE_URL+stub
+
+	def _reset_orig_values(self):
+		self.ORIG_PERSON = None
+		self.PERSON = None
+		self.NGRAMS = None
+		self.TYPE = None
 
 	def end_of_letter(self,soup):
 		"""
@@ -255,11 +290,12 @@ class ParseBG(ParseBase):
 			'end_date':None
 		}
 		# get ngrams from text
-		ngrams = self._extract_ngrams(self._tokenize(pos))
+		# ngrams = self._extract_ngrams(self._tokenize(pos))
+		ngrams = self.NGRAMS
 		degree = None
 		matched_degrees = [d for d in self.DEGREES if d in ngrams]
 		if matched_degrees:
-			degree = matched_degrees[0]
+			degree = matched_degrees[0].upper()
 		# for reg in self.DEGREES_REGEX:
 		# 	if re.search(reg['regex'],pos):
 		# 		# print "@ parselib -- matching reg " + reg['string']
@@ -301,11 +337,12 @@ class ParseBG(ParseBase):
 			# print 'no match'
 			pass
 
-	def is_ed_degree(self,pos):
+	def _is_ed_degree(self,pos):
 		if 'graduated' in pos or 'attended' in pos or 'graduate' in pos:
 			return True
 		# get ngrams from text
-		ngrams = self._extract_ngrams(self._tokenize(pos))
+		self.NGRAMS = self._extract_ngrams(self._tokenize(pos))
+		ngrams = self.NGRAMS
 		matched_degrees = [d for d in self.DEGREES if d in ngrams]
 		if matched_degrees:
 			return True
@@ -316,7 +353,7 @@ class ParseBG(ParseBase):
 		# init array for saving to model
 		
 		params = {
-			'type':'education',
+			'type':'professional',
 			'person':person,
 			'title':'Unknown',
 			'entity':None,
@@ -331,7 +368,8 @@ class ParseBG(ParseBase):
 			params['start_date'] = date[0]
 			params['end_date'] = date[1]
 		# get ngrams from text
-		ngrams = self._extract_ngrams(self._tokenize(pos))
+		# ngrams = self._extract_ngrams(self._tokenize(pos))
+		ngrams = self.NGRAMS
 		# check for military careers
 		if "served in" in ngrams and "navy" in ngrams:
 			params['title'] = "Military"
@@ -342,7 +380,7 @@ class ParseBG(ParseBase):
 		# if anything matched, sort by length of string
 		if matched_pos:
 			sorted_matched_pos = sorted(matched_pos,key=len,reverse=True)
-			params['title'] = sorted_matched_pos[0]
+			params['title'] = self.POSITION_DICT[sorted_matched_pos[0]]
 		matched_ents = [{'name':len(e['name']),'id':e['id']} for e in self.ENTITIES_LIST if e['name'] in ngrams]
 		if matched_ents:
 			sorted_matched_ents = sorted(matched_ents,key=itemgetter('name'),reverse=True)
@@ -354,6 +392,9 @@ class ParseBG(ParseBase):
 		# 	if e['name'] in ngrams:
 		# 		params['entity'] = Entity.objects.get(pk=e['id'])
 		if params['entity'] is not None:
+			# ensure different from original position
+			if self._is_orig_pos(params):
+				return None
 			self.MATCHED_POS_COUNT += 1
 			if params['title'] == 'Unknown':
 				self.MISSSED_POSITIONS.append(pos)
@@ -364,7 +405,15 @@ class ParseBG(ParseBase):
 			# position = Position(params)
 			# position.save()
 
-	def is_irrel(self,data):
+	def _is_orig_pos(self,params):
+		if params['entity'] == self.ORIG_POS['entity']:
+			if params['start_date'] == self.ORIG_POS['start_date'] and params['end_date'] == self.ORIG_POS['end_date']:
+				return True
+		else:
+			return False
+
+
+	def _is_irrel(self,data):
 		"""
 		tests for irrelevant data, e.g., "Born in ..." "Died on ..."
 		"""
@@ -388,11 +437,11 @@ class ParseBG(ParseBase):
 		# loop through positions
 		for p in positions:
 			# test for irrelevant entry
-			if self.is_irrel(p):
+			if self._is_irrel(p):
 				continue
 			# increment counter
 			self.ALL_POS_COUNT += 1
-			if self.is_ed_degree(p.replace('.','')):
+			if self._is_ed_degree(p.replace('.','')):
 				self.add_ed(p.replace('.',''),person)
 			else:
 				self.add_pos(p,person)
@@ -420,17 +469,27 @@ class ParseBG(ParseBase):
 		m = re.search('(?<=:\s)(\d+)-(\d+)',text)
 		if m:
 			# it's a senate position
-			params['entity'] = self.SENATE
-			params['title'] = "U.S. Senator"
-			params['start_date'] = int(m.group(1))
+			self.TYPE = 'sen'
+			params = {
+				'entity': self.SENATE,
+				'title': "U.S. Senator",
+				'start_date': int(m.group(1)),
+				'end_date': None
+			}
 			try:
 				params['end_date'] = int(m.group(2))
 			except:
 				params['end_date'] = None
 		else:
 			# it's a house position
-			params['entity'] = self.HOUSE
-			params['title'] = "U.S. Representative"
+			self.TYPE = 'house'
+			params = {
+				'entity': self.HOUSE,
+				'title': "U.S. Representative",
+				'start_date': None,
+				'end_date': None
+			}
+			
 			try:
 				m1 = re.search('(?<=\().+(\d+)',text)
 				m2 = re.findall('([\d]{4})',m.group(0))
@@ -447,13 +506,22 @@ class ParseBG(ParseBase):
 				else:
 					params['start_date'] = None
 					params['end_date'] = None
+		# set original position
+		self.ORIG_POS = {
+			'entity': params['entity'],
+			'start_date': params['start_date'],
+			'end_date': params['end_date']
+		}
 		# add position
 		# position = Position(params)
 		# position.save()
 		print "@ parselib -- added position at " + params['entity'].name
+		self.PERSON = person
 		return person
 
 	def parse_person(self,index):
+		# reset all values
+		self._reset_orig_values()
 		# fetch page
 		soup = self.get_soup(self._full_url(index))
 		# check to see if end of letter
@@ -469,7 +537,7 @@ class ParseBG(ParseBase):
 
 	def _log_missed_positions(self):
 		import datetime
-		filename = "parselib_missed_positions_" + str(datetime.datetime.now()).replace(" ","_")
+		filename = "parselib_missed_positions_" + str(datetime.datetime.now()).replace(" ","_") + ".json"
 		f = open(filename,'w')
 		f.write(json.dumps(self.MISSSED_POSITIONS))
 		f.close()
