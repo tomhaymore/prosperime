@@ -10,7 +10,6 @@ from math import ceil
 from optparse import make_option
 import urlparse
 from bs4 import BeautifulSoup
-# from _retry import retry
 from utilities.helpers import retry
 import dateutil
 from sys import stdout
@@ -26,9 +25,6 @@ import careers.careerlib as careerlib
 from django.core.files import File
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
-
-# initiate CareerMapBase class
-# career_mapper = CareerMapBase()
 
 class LIBase():
 
