@@ -78,9 +78,10 @@ def build(request):
 	
 	if latest_position is not None:
 		current_positions.append({"pos_id":latest_position.id, "ideal_id": latest_position.ideal_position.id, 'title':latest_position.title, 'entity_name':latest_position.entity.name})
-	if len(educations) > 0:
+	if educations is not None:
 		for ed in educations:
-			current_positions.append({"pos_id":ed.id, "ideal_id": ed.ideal_position.id, 'title':ed.title, 'entity_name':ed.entity.name})
+			if ed.ideal_position is not None:
+				current_positions.append({"pos_id":ed.id, "ideal_id": ed.ideal_position.id, 'title':ed.title, 'entity_name':ed.entity.name})
 	
 
 	# all_positions = Position.objects.filter(person=request.user).values("id", "ideal_position__id", "title", "entity__name")
