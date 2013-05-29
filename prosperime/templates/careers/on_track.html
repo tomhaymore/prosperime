@@ -1,0 +1,427 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<!-- CSS -->
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/on_track.css" />
+	<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Lato">
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
+
+<!-- JS -->
+	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div id="content-container" class="main-container">
+
+	<!-- Main Header -->
+	<div id="on-track-header" class="h1 center">Am I on track?</div>
+
+	<!-- Search Box Wrapper --> 
+	<div id="search-box-wrapper" class="center">
+		<div class="input-prepend">
+  			<span id="enlarge" class="add-on">I want to be: </span>
+  			<select id="goal-position-box">
+  				<option value="" disabled selected>&nbsp;&nbsp;&nbsp;&nbsp;Select your goal position...</option>
+				{% for o in options %}
+					<option value="{{o.ideal_id}}">{{o.title}}</option>
+				{% endfor %}
+				<option value="build">I'm not sure!</option>
+  			</select>
+		</div>
+
+		<div class="call-out-text">Don't see what you're looking for? <a href="/">Let us know.</a></div>
+  			
+		<div id="show-results-button" class="prompt-button flat-button not-shown">	See Your Results
+		</div>
+
+	</div>
+
+
+	<!-- Get Info Wrapper -->
+	<div id="get-info-wrapper" class="not-shown">
+		<div class="call-out-text center offset2 span8">
+			Before we can analyze whether you're on track, we need to know more about you! Keep in mind that the more information you give us, the more thorough analysis we can do, and the more personalized the results will be. <br/> You can either...
+		</div>
+
+		<div id="button-wrapper" class="center">
+
+			<div id="tell-us-more-button" class="flat-button large-button prompt-button" onclick="renderTellUsMoreForm()">
+				Tell us about yourself!
+			</div>
+
+			<span class="call-out-text"> or </span>
+
+			<div id="linkedin-button" class="flat-button large-button prompt-button">
+				Login with LinkedIn
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Preview Wrapper -->
+	<div id="preview-wrapper" class="center">
+		<div class="preview-section">
+			<div class="section-header">We can show you: </div>
+			<ul>
+				<li>The dominant career paths that lead to your goals</li>
+				<li>Related professionals in your desired career</li>
+				<li>Important statistics, like how long it takes to get there</li>
+			</ul>
+		</div>
+
+		<div class="preview-section">
+			<div id="img-placeholder">SCREENSHOT</div>
+		</div>
+	</div>
+
+	<!-- Form Wrapper -->
+	<div id="form-wrapper" class="center not-shown">
+		<div class="section-header">Tell us more about yourself by clicking on the categories below...</div>
+
+		<div class="tell-us-more-header" data-section_type="education">
+			<i class="icon-chevron-sign-right"></i>
+			<span>Education</span>
+		</div>
+
+		<div class="tell-us-more-header" data-section_type="experience">
+			<i class="icon-chevron-sign-right"></i>
+			<span>Experience</span>
+		</div>
+
+		<div class="tell-us-more-header" data-section_type="skills">
+			<i class="icon-chevron-sign-right"></i>
+			<span>Skills</span>
+		</div>
+
+		<div class="progress-bar"></div>
+
+	</div>
+
+	<!-- Results Wrapper--> 
+	<div id="results-wrapper" class="center not-shown">	
+		<div class="progress-bar"> </div>
+	</div>
+
+</div>
+{% endblock %}
+
+{% block templates %}
+
+<!-- V3 Script -->
+<script type="text/javascript">
+
+
+	// = #2980B9 (belize hole)
+	var color_map = [
+		"rgba(41,128,185,0.4)",
+		"rgba(41,128,185,0.5)",
+		"rgba(41,128,185,0.6)",
+		"rgba(41,128,185,0.7)",
+		"rgba(41,128,185,0.8)",
+		"rgba(41,128,185,0.9)",
+		"rgba(41,128,185,1)",
+	]
+
+	// Fake data for now
+		var timeline = [
+			{'title':'College Soccer Player at UNC Chapel-Hill', 'duration':'1 week'}, 
+
+			{'title':'B.A. English at Stanford University', 'duration':'4 years'},
+			{'title':'Product Management Intern at Kaazing Corp.','duration':'3 months'}, {
+				'title':'Web Development Intern at Reverb Technologies','duration':'6 months'
+			},
+			{'title':'VP of Product at ProsperMe', 'duration':'4 months'}
+		]
+
+	// DST for storing any data the user inputs
+	var path = []
+
+
+	/* Main */	
+	$(function() {
+
+		// Change handler on the main select box
+		$("#goal-position-box").change(function() {
+
+			// Hide Preview
+			// TODO: add analytics to this, because it's the first step
+			if (!$("#preview-wrapper").hasClass("not-shown")) {
+				$("#preview-wrapper").fadeOut(250, function() {
+					$(this).toggleClass("not-shown")
+
+					// Repeat code for animation's sake
+					if ("{{authenticated}}" == "False") {
+						renderGetMoreInfo()
+						return false;
+					} else renderSelectButton() 
+				});
+			} else {
+
+				if ("{{authenticated}}" == "False") {
+					if ($("#get-info-wrapper").hasClass("not-shown")) {
+						renderGetMoreInfo()
+						return false;
+					}
+				} else renderSelectButton()
+			}
+		});
+
+
+		$(".tell-us-more-header").each(function() {
+			$(this).click(function(ev) {
+				formSectionClicked(ev, this)
+			})
+		})
+	});
+
+	// Responds to selecting a goal position
+	var positionSelected = function(ideal_id) {
+
+		// Animate clicked
+		$("#show-results-button").fadeOut(100).fadeIn(100)
+
+		// Check if ideal_id = "build"
+		if (ideal_id == "build") {
+			$("#search-box-wrapper").append("<div class=' offset2 span8 call-out-text'>Unsure of what your options are? <br/><br/> We're here to help. <br/> ProsperMe specializes in analyzing your existing academic and professional career in order to help you explore options are relevant and personalized for you. <br/><br/> <a href='/account/register/'>Sound good?</a> It is, and it's free. <br/><br/><div id='register-button' class='flat-button prompt-button'>Explore Your Future</div></div>")
+			return false;
+		}
+
+		// Else, AJAX for results
+		$.get("/careers/getProgress", {"ideal_id":ideal_id}, function(response) 
+		{
+			if (response["result"] == "success") {
+				renderResults(response)
+			} else {
+				console.log("Failure: " + response["errors"])
+			}
+		}, "json")
+
+	};
+
+	// Renders results of AJAX to server
+	var renderResults = function(results) {
+		console.log("show those results")
+		$("#show-results-button").fadeOut(500, function() { $(this).addClass("not-shown") });
+
+	};
+
+	// Renders the basic blurb/info and screenshot
+	var renderGetMoreInfo = function() {
+		$("#get-info-wrapper").removeClass("not-shown").hide().fadeIn(500)
+	};
+
+	// Renders a single path/progress bar
+	var renderProgressBar = function(data) {
+		console.log(data)
+		var width = Math.floor(100/data.length)
+		for (var j = 0; j < data.length; j++) {
+
+			$(".progress-bar").append("<div class='progress-item' style='background-color:" + color_map[j] + ";width:"+width+"%'>"+data[j]["title"]+"</div>")
+		}
+		$("#results-wrapper").toggleClass("not-shown")
+	};
+
+	// Changes the input prepend text to "Select" and activates it
+	var renderSelectButton = function() {
+
+		var ideal_id = $("#goal-position-box option:selected").val()
+		if ($(".input-prepend .add-on").html() != "Select")
+			$(".input-prepend .add-on").animate({"background-color":"#fffffe"}, 250)
+
+			$("#show-results-button").removeClass("not-shown").click(function() { positionSelected(ideal_id) }).hide().fadeIn(250)
+	};
+
+	// Essentially a constant, makes the check mark and x icons
+	var control_button_html = "<i class='icon-remove icon-large red inline-icon'></i> <i class='icon-ok icon-large green inline-icon' onclick='addPositionToProgressBar(this.parentNode)'></i>"
+
+
+	// If user elects to enter data manually, show form headers
+	var renderTellUsMoreForm = function() {
+		$("#get-info-wrapper").fadeOut(500, function() {
+			$(this).addClass("not-shown")
+			$("#form-wrapper").removeClass("not-shown").hide().fadeIn(250)
+		});
+	};
+
+	// Renders input for new experience
+	var renderExperienceInput = function(el) {
+		$(el).after("<div class='input-container'><input type='text' placeholder='Title' class='input-medium'/> at <input type='text' placeholder='Company' class='input-medium'/> From: " + month_select() + year_select() + " to " + month_select() + year_select() + control_button_html + "</div>")
+	};
+
+	// Renders input for new education
+	var renderEducationInput = function(el) {
+		$(el).after("<div class='input-container'><input type='text' placeholder='Degree' class='input-small'/> in <input type='text' placeholder='Field' class='input-medium'/> at <input type='text' placeholder='School' class='input-medium'/> &nbsp;Graduated In: " + year_select() + control_button_html +  "</div>")
+	};
+
+	// Renders input for new skills
+	var renderSkillsInput = function(el) {
+		$(el).after("<div class='input-container'><input type='text' placeholder='Skills' class='input-xlarge'/></div>")
+	};
+
+	// Opens and closes pieces of the form when respective headers clicked
+	var formSectionClicked = function(ev, el) {
+		var $icon = $(el).children().first()
+
+		// If opened, close
+		if ($icon.hasClass("section-opened")) {
+
+			// Only close if click on icon or header
+			if (ev.target.tagName == "I" || ev.target.tagName == "SPAN") {
+				$icon.removeClass("icon-chevron-sign-down").addClass("icon-chevron-sign-right").fadeIn(250).removeClass("section-opened")
+				$(el).children().last().fadeOut(250, function() { this.remove() });
+			}
+
+		// If closed, open and show inputs
+		} else {
+			$icon.fadeOut(250, function() {
+				$(this).removeClass("icon-chevron-sign-right").addClass("icon-chevron-sign-down").fadeIn(250).addClass("section-opened") 
+
+				var type = $(this).parent().data("section_type")
+				if (type=="education") {
+					renderEducationInput($(this).next())
+				} else if (type=="experience") {
+					renderExperienceInput($(this).next())
+				} else if (type=="skills") {
+					renderSkillsInput($(this).next())
+				}
+			});
+		}
+	};
+
+	// Adds recently added position to progress bar
+	var addPositionToProgressBar = function(el) {
+
+		// Don't dismiss the bar... yet
+		event.stopPropagation()
+
+		// Calculate num items and width
+		var num_items = path.length
+		var width = Math.floor(100/(num_items+1))
+
+		var type = $(el).parent().data("section_type")
+
+		/* Thomas... 
+			this will get called whenever a checkmark is pressed
+			the 'type' variable above will either be 'education', 'experience', or 'skills' 
+
+			Right now I grab the input data in a stupid way, and this will bug if the user has > 1 form open (I'll fix this before it goes live)
+
+				I grab the inputs by looking under the header:
+					$(".tell-us-more-header input")
+					and then iterate through them manually, welcome to add data tags or classes if it makes it easier
+		*/
+
+		if (type == "education") {
+			var inputs = $(".tell-us-more-header input")
+			var degree = inputs[0].value
+			var field = inputs[1].value
+			var school = inputs[2].value
+			var grad_year = $(".tell-us-more-header select :selected").val()
+			console.log(grad_year)
+			var display_text = degree + ", " + field + " at " + school
+			path.push({
+				"type":"education",
+				"degree":degree,
+				"field":field,
+				"school":school,
+				"grad_year":grad_year,
+				"display_text":display_text
+			})
+
+			// then clear the fields
+			$(".tell-us-more-header input").each(function() {
+				$(this).val("")
+			})
+		} else if (type == "experience") {
+			var inputs = $('.tell-us-more-header input')
+			var title = inputs[0].value
+			var entity = inputs[1].value
+			var selects = $('.tell-us-more-header select')
+			var start_mo = selects[0].options[selects[0].selectedIndex].value
+			var start_yr = selects[1].options[selects[1].selectedIndex].value
+			var end_mo = selects[2].options[selects[2].selectedIndex].value
+			var end_yr = selects[3].options[selects[3].selectedIndex].value
+
+			console.log(title+" "+entity+" "+start_mo+"/"+start_yr+" "+end_mo+"/"+end_yr)
+			var display_text = title + " at " + entity
+			path.push({
+				"type":"position",
+				"title":title,
+				"entity":entity,
+				"start_mo":start_mo,
+				"start_yr":start_yr,
+				"end_mo":end_mo,
+				"end_yr":end_yr,
+				"display_text":display_text,
+			})
+			
+			$(".tell-us-more-header input").each(function() {
+				$(this).val("")
+			})
+
+
+		} else if (type == "skills") {
+			console.log("skills entered... what to do with?")
+		}
+
+		// Render the progress bar with new data
+		//	Note, must re-render the entire thing to adjust widths
+		$("#form-wrapper .progress-bar").empty()
+		for (var j = 0; j < num_items+1; j++) {
+			$("#form-wrapper .progress-bar").append("<div class='progress-item' style='background-color:" + color_map[j] + ";width:"+width+"%'>"+path[j]['display_text']+"</div>")
+		}
+	}
+
+
+
+
+	/***********/
+	/* HELPERS */
+	/***********/
+
+	// Creates select input form for months
+	var month_select = function() {
+		var html = "<select class='input-mini'>"
+		for (var i = 1; i <= 12; i++)
+			html += "<option value='" + i + "'>" + i + "</option>"
+		return html + "</select>"
+	};
+
+	// Creates select input form for years back to 1970
+	var year_select = function() {
+		var html = "<select class='input-small'>"
+		for (var i = 2020; i >= 1980; i--) {
+			if (i == 2013)
+				html += "<option value='" + i + "' selected>" + i + "</option>"
+			else html += "<option value='" + i + "'>" + i + "</option>"
+		}
+		return html + "</select>"
+	};
+
+/*
+	TODO: 
+		: "Let us know" needs to send us an email somehow or store info
+		: Form validation (Thomas)
+
+
+
+
+
+
+*/
+
+</script>
+
+{% endblock %}
+
+
+
+
+
+

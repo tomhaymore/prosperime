@@ -25,10 +25,12 @@ urlpatterns = patterns('',
     # Careers Views
     url(r'^path/(\d+)/$', 'careers.views.viewPath'),
     url(r'^feed/$', 'careers.views.feed'),
-    url(r'^buildv2/$','careers.views.build_v2'),
     url(r'^build/$', 'careers.views.build'),
     url(r'^schools/$', 'careers.views.schools'),
+
+    url(r'^progress/$', 'careers.views.progress'), # Am I on Track?
     
+    url(r'^buildv2/$','careers.views.build_v2'),
     url(r'^build/(\d+)/$', 'careers.views.modify_saved_path'),
 
     url(r'^plan/$', 'careers.views.plan'),
@@ -77,6 +79,7 @@ urlpatterns = patterns('',
     url(r'^careers/getIdealPosPath/$', 'careers.views.get_ideal_pos_paths'),
     url(r'^careers/getIdealMatches/$', 'careers.views.get_ideal_match_users'),
     url(r'^api/list_careers/$', 'careers.views.list_careers'),
+    url(r'^careers/getProgress/$', 'careers.views.get_progress'),
 
     ## Accounts - AJAX calls
     url(r'^accounts/updateProfile/$', 'accounts.views.updateProfile'),

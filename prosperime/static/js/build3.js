@@ -192,9 +192,11 @@
 		paper.getById(option_data["box_id"]).unhover().hover(function() {
 			showInfo(options[option_data["index"]], option_data["index"])
 			this.animate({"width":ob_w+12, "x":x-6, "height":ob_h+6, "y":y-3}, '100', '<>')
-		}, function() {
-			this.animate({"width":ob_w, "x":x, "height":ob_h, "y":y}, '100', '<>')
+		}, function(e) {
+			if (e.toElement.tagName != "tspan" && e.relatedTarget.tagName != "tspan")
+				this.animate({"width":ob_w, "x":x, "height":ob_h, "y":y}, '100', '<>')
 		});
+
 	};
 
 	/* Handler for scroll arrow click */
@@ -243,7 +245,7 @@
 		if ('entity_id' in most_recent)
 			paper.getById(most_recent["entity_id"]).animate({"opacity":0}, "500", "<>", function() { this.remove() }) 	
 
-		// Remove back buttons
+		// Remove back button
 		removeBackButton()
 
 		// Remove shufflers
@@ -288,6 +290,7 @@
 	/* Display "no more options" message */
 	var displayEndMessage = function() {
 		$('#current-positions-container').append("<div id='end-message' class='main-message'>Sorry, we actually aren't sure what comes after that, but we're <br/>hard at work figuring it out. Go back to keep exploring this path.</div>")
+		$('#end-message').fadeOut(200).fadeIn(400)
 	};
 
 	/* Display welcome message */
@@ -417,7 +420,11 @@
 
 		// Add arrow
 		var arrow_x = current_x + (ob_w/2)
-		var arrow = paper.path("M"+arrow_x+","+(y_offset-70)+"L"+(arrow_x-15)+","+(y_offset-50) +"L"+(arrow_x+15)+","+(y_offset-50)+"z").attr(shuffle_attr).click(scrollOptions)
+		var arrow = paper.path("M"+arrow_x+","+(y_offset-70)+"L"+(arrow_x-15)+","+(y_offset-50) +"L"+(arrow_x+15)+","+(y_offset-50)+"z").attr(shuffle_attr).click(scrollOptions).hover(function() {
+			this.glow()
+		}, function() {
+			
+		})
 		shuffle_data.push(arrow.id)
 	}
 
@@ -425,13 +432,12 @@
 	var drawOptionBox = function(position, x, y, index) {
 
 		// Draw box, set handlers
-		var option_box = paper.rect(x,y,ob_w,ob_h,ob_r).attr({
-			'stroke':color_map[1], 'fill':color_map[1], 'fill-opacity':0, 'opacity':0, 'stroke-width':2,
-		}).hover(function() {
+		var option_box = paper.rect(x,y,ob_w,ob_h,ob_r).attr(opt_attr).hover(function() {
 			showInfo(position, index)
 			this.animate({"width":ob_w+12, "x":x-6, "height":ob_h+6, "y":y-3}, '100', '<>')
-		}, function() {
-			this.animate({"width":ob_w, "x":x, "height":ob_h, "y":y}, '100', '<>')
+		}, function(e) {
+			if (e.toElement.tagName != "tspan" && e.relatedTarget.tagName != "tspan")
+				this.animate({"width":ob_w, "x":x, "height":ob_h, "y":y}, '100', '<>')
 		}).click(function() {
 			optionClicked(index) // = index in the "options" array
 		})
@@ -448,13 +454,6 @@
 		title.data("box_id",option_box.id)
 		title.click(function() { optionClicked(index) });
 
-		// // Box needs to animate on hover here, too
-		// title.hover(function() {
-		// 	paper.getById(this.data("box_id")).animate({"width":ob_w+12, "x":x-6, "height":ob_h+6, "y":y-3}, '250', '<>')
-		// }, function() {
-		// 	paper.getById(this.data("box_id")).animate({"width":ob_w, "x":x, "height":ob_h, "y":y}, '150', '<>')
-		// })
-
 		// Create probability badge and text
 		var badge = paper.circle(x+ob_w,y,badge_r).attr(opt_badge_attr)
 		var badge_text = paper.text(x+ob_w,y,position['prop']).attr(text_single_attr)
@@ -470,8 +469,9 @@
 		var box = paper.rect(x,y_start,pb_w,pb_h,pb_r).attr(path_box_attr).hover(function() {
 			this.attr("fill-opacity",1)
 			if (!isStarting && index >= 0) showInfo(position, index)
-		}, function() {
-			this.attr("fill-opacity",0.7)
+		}, function(e) {
+			if (e.toElement.tagName != "tspan" && e.relatedTarget.tagName != "tspan")
+				this.attr("fill-opacity",0.7)
 		});
 
 		// Format text to fit 
@@ -672,7 +672,7 @@
 	/* Constants */
 	var paper;
 	var midline = 175;
-	var pb_w = 160; var pb_h = 65; var pb_r = 2; var pb_offset = 75;
+	var pb_w = 150; var pb_h = 65; var pb_r = 2; var pb_offset = 75;
 	var ob_w = 150; var ob_h = 50; var ob_r = 2;
 	var x_start = 50;
 	var y_start = midline - (pb_h/2)
@@ -703,6 +703,7 @@
 	var text_options_attr={'stroke':'#68696b', 'font-size':13, 'cursor':'pointer', 'font-family':'"Arimo", "Helvetica Neue", "Helvetica"'}
 	var opt_badge_attr = {'stroke':'rgb(41,128,185)', 'fill':'rgb(41,128,185)'}
 	var path_box_attr = {'stroke':'#2980B9', 'fill':'#2980B9', 'fill-opacity':'0.7', 'stroke-width':2 }
+	var opt_attr = {'stroke':"#2980B9", 'fill':"#2980B9", 'fill-opacity':0, 'opacity':0, 'stroke-width':1}
 	var duration_attr = {'stroke':'#68696b', 'opacity':0} // to animate in
 	var back_button_attr = {'stroke':'#E74C3C', 'fill':'#E74C3C', 'cursor':'pointer'}
 	var back_button_x_attr = {'stroke':'#fffffe', 'cursor':'pointer', 'font-size':14}
@@ -733,11 +734,10 @@
 
 
 	/* TODO
+	: experiment with making boxes smaller
 	: rendering just 2 results --> "Account Executire @ EventBrite"
-	: make newposition box clickable
 	: need to automatically scroll right... gradually... 
 	: email dead end idealpos
-	: triply long text
 	: need to show level
 	: three line current-position when added from new position
 	: disable all saving
