@@ -3,12 +3,13 @@
 		"title":"B.S.",
 		"description":"",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
 				{
 					"type":"education",
-					"title":["bachelor of science","bs","bsc"]
+					"title":["bachelor of science","bs","bsc","sb","scb"]
 				}
 			]
 	},
@@ -16,6 +17,7 @@
 		"title":"B.S.Anthro",
 		"description":"Bachelor of Science in Anthropology",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -29,6 +31,7 @@
 		"title":"B.S.ChemE",
 		"description":"Bachelor of Science in Chemical Engineering",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -42,6 +45,7 @@
 		"title":"B.S.E.E.",
 		"description":"Bachelor of Science in Electrical Engineering",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -50,12 +54,26 @@
 					"title":["bachelor of science in electrical engineering","bsee","bs electrical engineering"]
 				}
 			]
-	}
-	,
+	},
+	{
+		"title":"M.S.E.E.",
+		"description":"Master of Science in Electrical Engineering",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["master of science in electrical engineering","msee","ms electrical engineering"]
+				}
+			]
+	},
 	{
 		"title":"B.S. Industrial Engineering",
 		"description":"Bachelor of Science in Industrial Engineering",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -66,9 +84,66 @@
 			]
 	},
 	{
+		"title":"B.A.Sc.",
+		"description":"Bachelor of Applied Science",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of applied science","basc","aasb"]
+				}
+			]
+	},
+	{
+		"title":"B.A.A.S.",
+		"description":"Bachelor of Applied Arts and Science",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of applied arts and science","baas","aasb"]
+				}
+			]
+	},
+	{
+		"title":"B.Arch.",
+		"description":"Bachelor of Architecture",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of architecture","barch"]
+				}
+			]
+	},
+	{
+		"title":"M.Arch.",
+		"description":"Master of Architecture",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["master of architecture","march"]
+				}
+			]
+	},
+	{
 		"title":"M.S.I.E.",
 		"description":"Master of Science in Industrial Engineering",
 		"level":2,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -82,6 +157,7 @@
 		"title":"B.S. Management Science",
 		"description":"Bachelor of Science in Management Science",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -95,6 +171,7 @@
 		"title":"B.Tech.",
 		"description":"Bachelor of Technology",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -108,12 +185,13 @@
 		"title":"B.A.",
 		"description":"",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
 				{
 					"type":"education",
-					"title":["bachelor of arts"]
+					"title":["bachelor of arts","ba","ab"]
 				}
 			]
 	},
@@ -121,6 +199,7 @@
 		"title":"B.A.S.",
 		"description":"",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -134,6 +213,7 @@
 		"title":"B.F.A.",
 		"description":"",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -147,6 +227,7 @@
 		"title":"B.A. Philosophy, Politics and Economics",
 		"description":"",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -160,6 +241,7 @@
 		"title":"B.S. in Mechanical Engineering",
 		"description":"",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -173,6 +255,7 @@
 		"title":"B.S. in Symoblic Systems",
 		"description":"",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -186,6 +269,7 @@
 		"title":"B.B.A.",
 		"description":"",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -199,6 +283,7 @@
 		"title":"M.A.",
 		"description":"",
 		"level":2,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -212,6 +297,7 @@
 		"title":"M.Phil.",
 		"description":"Master of Philosophy",
 		"level":2,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -225,6 +311,7 @@
 		"title":"M.S.",
 		"description":"Master of Science",
 		"level":2,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -238,6 +325,7 @@
 		"title":"M.S. Audio Engineering",
 		"description":"Master of Science in Audio Engineering",
 		"level":2,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -251,6 +339,7 @@
 		"title":"M.S. Operations Research",
 		"description":"Master of Science in Operations Research",
 		"level":2,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -264,6 +353,7 @@
 		"title":"M.Eng.",
 		"description":"Master of Engineering",
 		"level":2,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -277,12 +367,13 @@
 		"title":"B.Eng.",
 		"description":"Bachelor of Engineering",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
 				{
 					"type":"education",
-					"title":["beng","bachelor of engineering","bachelor of science engineering","bse"]
+					"title":["beng","bachelor of engineering","bachelor of science engineering","bse","be","bse","besc","bseng"]
 				}
 			]
 	},
@@ -290,6 +381,7 @@
 		"title":"M.B.A.",
 		"description":"",
 		"level":2,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -303,6 +395,7 @@
 		"title":"Executive M.B.A.",
 		"description":"",
 		"level":2,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -313,9 +406,24 @@
 			]
 	},
 	{
+		"title":"D.B.A.",
+		"description":"Doctor of Business Administration",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["dba","doctor of business administration"]
+				}
+			]
+	},
+	{
 		"title":"M.I.M.",
 		"description":"",
 		"level":2,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -329,6 +437,7 @@
 		"title":"B.S.B.A.",
 		"description":"Bachelor of Science in Business Administration",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -342,6 +451,7 @@
 		"title":"A.A.S.",
 		"description":"Associate of Arts and Sciences",
 		"level":0,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -355,6 +465,7 @@
 		"title":"A.A.",
 		"description":"Associate of Arts",
 		"level":0,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -368,6 +479,7 @@
 		"title":"A.S.",
 		"description":"Associate of Science",
 		"level":0,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -381,12 +493,13 @@
 		"title":"Ph.D.",
 		"description":"",
 		"level":3,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
 				{
 					"type":"education",
-					"title":["phd","doctor of philosophy"]
+					"title":["phd","doctor of philosophy","doctoral degree"]
 				}
 			]
 	},
@@ -394,6 +507,7 @@
 		"title":"GED",
 		"description":"",
 		"level":0,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -407,6 +521,7 @@
 		"title":"B.A. Sociology",
 		"description":"",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -420,6 +535,7 @@
 		"title":"B.A. Political Science",
 		"description":"",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -433,6 +549,7 @@
 		"title":"B.A. International Relations",
 		"description":"",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -446,6 +563,7 @@
 		"title":"B.A. Economics",
 		"description":"Bachelor of Arts in Economics",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -459,6 +577,7 @@
 		"title":"B.S. Economics",
 		"description":"",
 		"level":1,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -472,12 +591,27 @@
 		"title":"JD",
 		"description":"",
 		"level":3,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
 				{
 					"type":"education",
-					"title":["juris doctor","jd","doctor of law"]
+					"title":["juris doctor","jd","doctor of law","juris doctorate"]
+				}
+			]
+	},
+	{
+		"title":"M.C.P.",
+		"description":"Master of City Planning",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["mcp","master of city planning"]
 				}
 			]
 	},
@@ -485,12 +619,27 @@
 		"title":"M.Ed.",
 		"description":"Master of Education",
 		"level":2,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
 				{
 					"type":"education",
-					"title":["edm","med","master of education"]
+					"title":["edm","med","master of education","msed"]
+				}
+			]
+	},
+	{
+		"title":"D.Ed.",
+		"description":"Doctor of Education",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["edd","ded","doctor of education"]
 				}
 			]
 	},
@@ -498,6 +647,7 @@
 		"title":"M.D.",
 		"description":"Doctor of Medicine",
 		"level":2,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -508,9 +658,38 @@
 			]
 	},
 	{
+		"title":"M.Div.",
+		"description":"Master of Divinity",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["mdiv","master of divinity","divm"]
+				}
+			]
+	},
+	{
+		"title":"L.L.B.",
+		"description":"Bachelor of Laws",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["llb","bachelor of laws"]
+				}
+			]
+	},
+	{
 		"title":"L.L.M.",
 		"description":"Master of Laws",
 		"level":2,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
@@ -521,15 +700,100 @@
 			]
 	},
 	{
-		"title":"M.Acc.",
-		"description":"Master of Accountancy",
+		"title":"M.J.S.",
+		"description":"Master of Judicial Studies",
 		"level":2,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
 				{
 					"type":"education",
-					"title":["macc","mac","macy","mpacy","mpa","mpac","mpacc","msa","master of science in accounting"]
+					"title":["mjs","master of judicial studies","master of juridical studies"]
+				}
+			]
+	},
+	{
+		"title":"M.P.H.",
+		"description":"Master of Public Health",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["mph","master of public health"]
+				}
+			]
+	},
+	{
+		"title":"M.Litt.",
+		"description":"Master of Literature",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["mlitt","master of literature"]
+				}
+			]
+	},
+	{
+		"title":"M.P.P.",
+		"description":"Master of Public Policy",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["mpp","master of public policy"]
+				}
+			]
+	},
+	{
+		"title":"L.L.D.",
+		"description":"Doctor of Laws",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["lld","doctor of laws"]
+				}
+			]
+	},
+	{
+		"title":"B.Acc.",
+		"description":"Bachelor of Accountancy",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bacc","bac","bacy","bpacy","bpa","bpac","bpacc","bsa","bachelor of science in accounting","bachelor of accounting","bachelor of science in accounting"]
+				}
+			]
+	},
+	{
+		"title":"M.Acc.",
+		"description":"Master of Accountancy",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["macc","mac","macy","mpacy","mpac","mpacc","msa","master of science in accounting"]
 				}
 			]
 	},
@@ -537,12 +801,139 @@
 		"title":"Certificate in Forensic Science",
 		"description":"Certificate in forensic science",
 		"level":0,
+		"cat":"ed",
 		"careers":[595],
 		"matches":
 			[
 				{
 					"type":"education",
 					"title":["certificate in forensic science"]
+				}
+			]
+	},
+	{
+		"title":"Ph.D. Geology",
+		"description":"Doctor of Geology",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["phd geology","dgeo","doctor of geology"]
+				}
+			]
+	},
+	{
+		"title":"D.D.S.",
+		"description":"Doctor of Dental Science",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["dds","doctor of dental science","doctor of dentistry"]
+				}
+			]
+	},
+	{
+		"title":"B.N.",
+		"description":"Bachelor of Nursing",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bn","bachelor of nursing","bnsc","bachelor of nursing science","bsn","bachelor of science in nursing"]
+				}
+			]
+	},
+	{
+		"title":"B.V.Sc.",
+		"description":"Bachelor of Veterinary Science",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bvsc","bachelor of veterinary science","bvms"]
+				}
+			]
+	},
+	{
+		"title":"D.V.M.",
+		"description":"Doctor of Veterinary Medicine",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["dvm","doctor of veterinary medicine"]
+				}
+			]
+	},
+	{
+		"title":"Pharm.D.",
+		"description":"Doctor of Pharmacy",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["pharmd","dpharm","doctor of pharmacy"]
+				}
+			]
+	},
+	{
+		"title":"M.P.S.",
+		"description":"Master of Professional Studies",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["master of professional studies","mps"]
+				}
+			]
+	},
+	{
+		"title":"M.P.A.",
+		"description":"Master of Public Administration",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["master of public administration","mpa"]
+				}
+			]
+	},
+	{
+		"title":"Fulbright Scholarship",
+		"description":"Fulbright Scholarship",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["fulbright"]
 				}
 			]
 	}
