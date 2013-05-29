@@ -964,11 +964,21 @@ class CareerMapBase():
 		for row in reader:
 			self.STOP_LIST.append(row[0])
 
-	def tokenize_position(self,title):
+	def tokenize_position(self,pos):
 		"""
 		tokenizes position title based on spaces
 		"""
 		import string
+		title = ''
+		# check to see if education
+		if pos.type == "education":
+			# concatenate title and degree / field of study
+			if pos.degree:
+				title = " ".join([title,pos.degree])
+			if pos.field:
+				title = " ".join([title,pos.field])
+		else:
+			title = pos.title
 		if title:
 			remove_punctuation_map = dict((ord(char), None) for char in string.punctuation)
 			# print remove_punctuation_map
@@ -1068,7 +1078,7 @@ class CareerMapBase():
 		matches positions to ideals using matching data in ideal positions
 		"""
 		# break position title into ngrams
-		title_ngrams = self.extract_ngrams(self.tokenize_position(pos.title))
+		title_ngrams = self.extract_ngrams(self.tokenize_position(pos))
 		# fetch industries for position
 		industries = [i.id for i in pos.entity.domains.all()]
 		# initialize careers array
@@ -1093,8 +1103,10 @@ class CareerMapBase():
 		else:
 			if ideals_objects:
 				print "@ match_position_to_ideals() -- final match: " + pos.title + " (" + str(ideals_objects[0]) + ") " + str(ideals)
+				return True
 			else:
 				print pos.title + ": no match"
+				return False
 
 	def test_position(self,title):
 
@@ -1143,7 +1155,14 @@ class CareerMapBase():
 											continue
 									if is_match == True:
 										ideals.append(k)	
-										print "Initial match: " + t + ": " + m['title']		
+										print "Initial match: " + t + ": " + m['title']	
+							elif m['type'] == 'education':
+								# check to see if degree and / or field of study is in the string
+								for tt in m['title']:
+									if tt in t:
+										is_match = True
+								if is_match == True:
+									ideals.append(k)	
 						# check to see if text matches
 						else:
 							# print "@ _get_matching_ideals() -- not a wild match"
@@ -1441,13 +1460,13 @@ class CareerImportBase():
 						m['industries'] = industry_ids
 			if existing:
 				old_matches = json.loads(ipos.matches)
-				print "Old matches: " + str(old_matches)
-				print "New matches: " + str(i['matches'])
+				# print "Old matches: " + str(old_matches)
+				# print "New matches: " + str(i['matches'])
 				if old_matches:
 					new_matches = old_matches + i['matches']
 				else:
 					new_matches = i['matches']
-				print "Full matches: " + str(new_matches)
+				# print "Full matches: " + str(new_matches)
 				ipos.matches = json.dumps(new_matches)
 				# ipos.save()
 				# go to next iteration
