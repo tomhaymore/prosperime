@@ -5,7 +5,7 @@
 <!-- CSS -->
 	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/on_track.css" />
 	<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Lato">
-<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
 
 <!-- JS -->
 	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
@@ -108,6 +108,7 @@
 		<div class="progress-bar"> </div>
 	</div>
 
+{% csrf_token %}
 </div>
 {% endblock %}
 
@@ -145,7 +146,17 @@
 
 	/* Main */	
 	$(function() {
-
+		// setup CSRF token
+		$.ajaxSetup({
+	        beforeSend: function(xhr, settings) {
+	            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+	                // Only send the token to relative URLs i.e. locally.
+	                xhr.setRequestHeader("X-CSRFToken",
+	                                     $("input[name='csrfmiddlewaretoken']").val());
+	            }
+	        }
+	    });
+	    jQuery.ajaxSetup({async:true})
 		// Change handler on the main select box
 		$("#goal-position-box").change(function() {
 
@@ -251,7 +262,8 @@
 
 	// Renders input for new experience
 	var renderExperienceInput = function(el) {
-		$(el).after("<div class='input-container'><input type='text' placeholder='Title' class='input-medium'/> at <input type='text' placeholder='Company' class='input-medium'/> From: " + month_select() + year_select() + " to " + month_select() + year_select() + control_button_html + "</div>")
+		// $(el).after("<div class='input-container'><input type='text' placeholder='Title' class='input-medium'/> at <input type='text' placeholder='Company' class='input-medium'/> From: " + month_select() + year_select() + " to " + month_select() + year_select() + control_button_html + "</div>");
+		$(el).after("<div class='input-container'><input type='text' placeholder='Title' class='input-medium'/> at <input type='text' placeholder='Company' class='input-medium'/> From: <input type='text' placeholder='mm/yyy' class='input-medium' /> To: <input type='text' placeholder='mm/yyyy' class='input-medium' />" + control_button_html + "</div>")
 	};
 
 	// Renders input for new education
@@ -306,61 +318,113 @@
 
 		var type = $(el).parent().data("section_type")
 
-		/* Thomas... 
-			this will get called whenever a checkmark is pressed
-			the 'type' variable above will either be 'education', 'experience', or 'skills' 
-
-			Right now I grab the input data in a stupid way, and this will bug if the user has > 1 form open (I'll fix this before it goes live)
-
-				I grab the inputs by looking under the header:
-					$(".tell-us-more-header input")
-					and then iterate through them manually, welcome to add data tags or classes if it makes it easier
-		*/
-
 		if (type == "education") {
 			var inputs = $(".tell-us-more-header input")
 			var degree = inputs[0].value
 			var field = inputs[1].value
 			var school = inputs[2].value
 			var grad_year = $(".tell-us-more-header select :selected").val()
-			console.log(grad_year)
+			// console.log(grad_year)
 			var display_text = degree + ", " + field + " at " + school
-			path.push({
+			// path.push({
+			// 	"type":"education",
+			// 	"degree":degree,
+			// 	"field":field,
+			// 	"school":school,
+			// 	"grad_year":grad_year,
+			// 	"display_text":display_text
+			// })
+
+			post_data = {
 				"type":"education",
 				"degree":degree,
 				"field":field,
-				"school":school,
-				"grad_year":grad_year,
-				"display_text":display_text
-			})
+				"entity":school,
+				"end_date":grad_year
+			}
+
+			// post to api
+			$.post('/careers/addProgressDetails/',post_data,function(data) {
+				console.log(data);
+				if (data["result"] == "success") {
+					console.log('success');
+					// CLAYTON -- should render in here...?
+					path.push({
+						"type":"education",
+						"degree":data.data.degree,
+						"field":data.data.field,
+						"school":data.data.entity,
+						"grad_year":data.data.end_date,
+						"display_text":data.data.degree + ", " + data.data.field + " at " + data.data.entity
+					});
+					console.log(path);
+				} else {
+					// display error
+					console.log('failure');
+					console.log(data.errors);
+				}
+			},'json');
 
 			// then clear the fields
 			$(".tell-us-more-header input").each(function() {
 				$(this).val("")
 			})
+			
 		} else if (type == "experience") {
 			var inputs = $('.tell-us-more-header input')
 			var title = inputs[0].value
 			var entity = inputs[1].value
 			var selects = $('.tell-us-more-header select')
-			var start_mo = selects[0].options[selects[0].selectedIndex].value
-			var start_yr = selects[1].options[selects[1].selectedIndex].value
-			var end_mo = selects[2].options[selects[2].selectedIndex].value
-			var end_yr = selects[3].options[selects[3].selectedIndex].value
+			var start_date = inputs[2].value
+			var end_date = inputs[3].value
+			// var start_mo = selects[0].options[selects[0].selectedIndex].value
+			// var start_yr = selects[1].options[selects[1].selectedIndex].value
+			// var end_mo = selects[2].options[selects[2].selectedIndex].value
+			// var end_yr = selects[3].options[selects[3].selectedIndex].value
 
-			console.log(title+" "+entity+" "+start_mo+"/"+start_yr+" "+end_mo+"/"+end_yr)
+			// console.log(title+" "+entity+" "+start_mo+"/"+start_yr+" "+end_mo+"/"+end_yr)
 			var display_text = title + " at " + entity
-			path.push({
+			// path.push({
+			// 	"type":"position",
+			// 	"title":title,
+			// 	"entity":entity,
+			// 	"start_mo":start_mo,
+			// 	"start_yr":start_yr,
+			// 	"end_mo":end_mo,
+			// 	"end_yr":end_yr,
+			// 	"display_text":display_text,
+			// })
+			
+			post_data = {
 				"type":"position",
 				"title":title,
 				"entity":entity,
-				"start_mo":start_mo,
-				"start_yr":start_yr,
-				"end_mo":end_mo,
-				"end_yr":end_yr,
-				"display_text":display_text,
-			})
-			
+				"start_date":start_date,
+				"end_date":end_date
+			}
+
+			// post to api
+			$.post('/careers/addProgressDetails/',post_data,function(data) {
+				console.log(data);
+				if (data["result"] == "success") {
+					console.log('success');
+					// CLAYTON -- should render in here...?
+					path.push({
+						"type":"position",
+						"title":data.data.title,
+						"entity":data.data.entity,
+						"start_date":data.data.start_date,
+						"end_date":data.data.end_date,
+						"display_text":data.data.title + " at " + data.data.entity
+					});
+					console.log(path);
+				} else {
+					// display error
+					console.log('failure');
+					console.log(data.errors);
+				}
+			},'json');
+
 			$(".tell-us-more-header input").each(function() {
 				$(this).val("")
 			})
@@ -372,6 +436,7 @@
 
 		// Render the progress bar with new data
 		//	Note, must re-render the entire thing to adjust widths
+		// console.log(path);
 		$("#form-wrapper .progress-bar").empty()
 		for (var j = 0; j < num_items+1; j++) {
 			$("#form-wrapper .progress-bar").append("<div class='progress-item' style='background-color:" + color_map[j] + ";width:"+width+"%'>"+path[j]['display_text']+"</div>")
