@@ -1562,6 +1562,7 @@ def get_next_build_step(request):
 				entities.append({'name':e['name'], 'description':ent.description})
 			ideal["entities"] = entities
 			ideal["title"] = ideal["ideal_title"]
+			ideal["level"] = ideal["positions"][0]["level"]
 
 
 
