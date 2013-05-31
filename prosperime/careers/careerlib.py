@@ -55,6 +55,14 @@ def match_careers_to_position(pos):
 	careers = career_mapper.match_careers_to_position(pos)
 	return careers
 
+def match_degree(deg):
+	"""
+	takes user input and matches to valid degree
+	"""
+	mapper = EdMapper()
+	return mapper.match_degree(deg)
+
+
 class CareerBase():
 
 	def get_users_in_career_full(self,career):
@@ -964,11 +972,21 @@ class CareerMapBase():
 		for row in reader:
 			self.STOP_LIST.append(row[0])
 
-	def tokenize_position(self,title):
+	def tokenize_position(self,pos):
 		"""
 		tokenizes position title based on spaces
 		"""
 		import string
+		title = ''
+		# check to see if education
+		if pos.type == "education":
+			# concatenate title and degree / field of study
+			if pos.degree:
+				title = " ".join([title,pos.degree])
+			if pos.field:
+				title = " ".join([title,pos.field])
+		else:
+			title = pos.title
 		if title:
 			remove_punctuation_map = dict((ord(char), None) for char in string.punctuation)
 			# print remove_punctuation_map
@@ -1063,12 +1081,36 @@ class CareerMapBase():
 
 		self.positions_to_ideals_map = ideal_positions_map
 
+	def return_ideal_from_position(self,pos):
+		"""
+		returns matching idealposition from position title
+		"""
+		# break position title into ngrams
+		title_ngrams = self.extract_ngrams(self.tokenize_position(pos))
+		# fetch industries for position
+		industries = []
+		# initialize careers array
+		ideals = []
+		ideals_objects = []
+
+		# loop through ngrams to match
+		if title_ngrams is not None:
+			ideals = self._get_matching_ideals(title_ngrams,industries)
+			
+		if ideals:
+			# fetch all matched ideal positions, sorted by length of title
+			ideals_objects = IdealPosition.objects.filter(pk__in=ideals).extra(order_by=[len("-title")])
+
+			return ideals_objects[0]
+		return None
+
+
 	def match_position_to_ideals(self,pos,test=False):
 		"""
 		matches positions to ideals using matching data in ideal positions
 		"""
 		# break position title into ngrams
-		title_ngrams = self.extract_ngrams(self.tokenize_position(pos.title))
+		title_ngrams = self.extract_ngrams(self.tokenize_position(pos))
 		# fetch industries for position
 		industries = [i.id for i in pos.entity.domains.all()]
 		# initialize careers array
@@ -1093,8 +1135,10 @@ class CareerMapBase():
 		else:
 			if ideals_objects:
 				print "@ match_position_to_ideals() -- final match: " + pos.title + " (" + str(ideals_objects[0]) + ") " + str(ideals)
+				return True
 			else:
 				print pos.title + ": no match"
+				return False
 
 	def test_position(self,title):
 
@@ -1143,7 +1187,14 @@ class CareerMapBase():
 											continue
 									if is_match == True:
 										ideals.append(k)	
-										print "Initial match: " + t + ": " + m['title']		
+										print "Initial match: " + t + ": " + m['title']	
+							elif m['type'] == 'education':
+								# check to see if degree and / or field of study is in the string
+								for tt in m['title']:
+									if tt in t:
+										is_match = True
+								if is_match == True:
+									ideals.append(k)	
 						# check to see if text matches
 						else:
 							# print "@ _get_matching_ideals() -- not a wild match"
@@ -1208,6 +1259,58 @@ class CareerMapBase():
 		for p in positions:
 			if p.title:
 				print p.title
+
+class EdMapper(CareerMapBase):
+	"""
+	specialized class for mapping educaitonal positions, degrees, etc.
+	"""
+
+	positions_to_ideals_map = None
+
+	def __init__(self):
+		# get all ed ideal positions
+		self._init_positions_to_ideals_map()
+
+	def _init_positions_to_ideals_map(self):
+		"""
+		fill in ideal position map dictionary
+		"""
+		# fetch matching information for ideal positions and matching career ids
+		# ideals = IdealPosition.objects.filter(cat="ed").values('id','matches').exclude(matches=None).extra(order_by=[len("-title")])
+		ideals = IdealPosition.objects.filter(cat="ed").values('id','matches').exclude(matches=None)
+
+		# init career map dictionary
+		ideal_positions_map = {}
+
+		for i in ideals:
+			
+			matches = json.loads(i['matches'])
+			
+			ideal_positions_map[i['id']] = matches
+
+		self.positions_to_ideals_map = ideal_positions_map
+
+	def match_degree(self,deg):
+		# initialize match variables
+		is_match = False
+		ideals = []
+		# cycle through ideal ed positions to find match
+		for k,v in self.positions_to_ideals_map.items():
+			# go through each match for each ideal pos
+			for m in v:
+				# cycle through list of possible degree names
+				for d in m['title']:
+					if d in deg:
+						is_match = True
+						ideals.append(k)
+		if is_match:
+			# fetch and return best match
+			ip = IdealPosition.objects.get(pk=ideals[0])
+			return ip
+		else:
+			return None
+
+
 
 class CareerImportBase():
 
@@ -1441,21 +1544,24 @@ class CareerImportBase():
 						m['industries'] = industry_ids
 			if existing:
 				old_matches = json.loads(ipos.matches)
-				print "Old matches: " + str(old_matches)
-				print "New matches: " + str(i['matches'])
+				# print "Old matches: " + str(old_matches)
+				# print "New matches: " + str(i['matches'])
 				if old_matches:
 					new_matches = old_matches + i['matches']
 				else:
 					new_matches = i['matches']
-				print "Full matches: " + str(new_matches)
+				# print "Full matches: " + str(new_matches)
 				ipos.matches = json.dumps(new_matches)
 				# ipos.save()
 				# go to next iteration
 				# continue
+
 			else:
 				ipos.matches = json.dumps(i['matches'])
 			if 'level' in i:
 				ipos.level = i['level']
+			if 'cat' in i:
+				ipos.cat = i['cat']
 			else:
 				ipos.level = 1
 			ipos.save()

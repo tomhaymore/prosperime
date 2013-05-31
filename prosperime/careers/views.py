@@ -95,6 +95,90 @@ def get_progress(request):
 
 	return HttpResponse(json.dumps(response))
 
+def add_progress_detail(request):
+	# initialize response
+	response = {}
+	# return error if not ajax or post
+	if not request.is_ajax or not request.POST:
+		response['re sult'] = 'failure'
+		response['errors'] = 'invalid request type'
+		return HttpResponse(json.dumps(response))
+	if request.POST:
+		from careers.forms import AddProgressDetailsForm
+		# bind form
+		form = AddProgressDetailsForm(request.POST)
+		# validate form
+		if form.is_valid():
+			# init carerlib
+			mapper = careerlib.EdMapper()
+
+			# check for type of detail being added
+			if form.cleaned_data['type'] == "education":
+				# set up initial data
+				response['data'] = {
+					'grad_year':form.cleaned_data['end_date'].year	
+				}
+				# see if we can map degree
+				idealdegree = mapper.match_degree(form.cleaned_data['degree'] + form.cleaned_data['field'])
+				if idealdegree:
+					# there is a match, add ideal id to path generation
+					response['result'] = 'success'
+					response['data']['degree'] = idealdegree.title
+					response['data']['field'] = None
+					response['data']['ideal_id'] = idealdegree.id
+					
+				else:
+					# no match, still return data but don't update 
+					response['result'] = 'success'
+					response['errors'] = 'missing ideal id'
+					response['data']['degree'] = form.cleaned_data['degree']
+					response['data']['field'] = form.cleaned_data['field']
+				# see if we can match entity
+				entity = Entity.objects.filter(name__icontains=form.cleaned_data['entity'],subtype="ed-institution").annotate(pop=Count("positions__id")).order_by("-pop")
+				if entity.exists():
+					# there is a match
+					response['data']['entity'] = entity[0].name
+					response['data']['entity_id'] = entity[0].id
+				else:
+					# no match, return same text string as entered
+					response['data']['entity'] = form.cleaned_data['entity']
+				# return JSON response
+				return HttpResponse(json.dumps(response))
+			elif form.cleaned_data['type'] == "position":
+				# set up initial data
+				response['data'] = {
+					'start_date':form.cleaned_data['start_date'].year,
+					'end_date':form.cleaned_data['end_date'].year
+				}
+				# see if we can map position
+				pos = Object()
+				pos.title = form.cleaned_data['title']
+				pos.type = "position"
+				# pos.entity = None
+				idealpos = mapper.return_ideal_from_position(pos)
+				if idealpos:
+					response['result'] = "success"
+					response['data']['title'] = idealpos.title
+					response['data']['ideal_id'] = idealpos.id
+				else:
+					response['result'] = 'success'
+					response['errors'] = 'missing ideal id'
+					response['data']['title'] = form.cleaned_data['title']
+				# see if we can find entity
+				entity = Entity.objects.filter(name__icontains=form.cleaned_data['entity']).annotate(pop=Count("positions__id")).order_by("-pop")
+				if entity.exists():
+					# there is a match
+					response['data']['entity'] = entity[0].name
+					response['data']['entity_id'] = entity[0].id
+				else:
+					# no match, return same text string as entered
+					response['data']['entity'] = form.cleaned_data['entity']
+				return HttpResponse(json.dumps(response))
+		else:
+			# return error
+			response['result'] = "failure"
+			response['errors'] = form.errors
+			return HttpResponse(json.dumps(response))
 
 @login_required
 def build(request):
@@ -108,9 +192,10 @@ def build(request):
 	
 	if latest_position is not None:
 		current_positions.append({"pos_id":latest_position.id, "ideal_id": latest_position.ideal_position.id, 'title':latest_position.title, 'entity_name':latest_position.entity.name})
-	if len(educations) > 0:
+	if educations is not None:
 		for ed in educations:
-			current_positions.append({"pos_id":ed.id, "ideal_id": ed.ideal_position.id, 'title':ed.title, 'entity_name':ed.entity.name})
+			if ed.ideal_position is not None:
+				current_positions.append({"pos_id":ed.id, "ideal_id": ed.ideal_position.id, 'title':ed.title, 'entity_name':ed.entity.name})
 	
 
 	# all_positions = Position.objects.filter(person=request.user).values("id", "ideal_position__id", "title", "entity__name")
@@ -1602,8 +1687,22 @@ def get_next_build_step_ideal(request):
 		return HttpResponse(json.dumps(positions))
 	
 # AJAX for returning a JSON of ideal position paths
+
+def get_ideal_paths(request):
+	# verify GET has right parameters
+	if request.GET.getlist('ideal_id'):
+
+		ideal_pos_id = request.GET.getlist('ideal_id')[0]
+
+		from careers.positionlib import IdealPositionBase
+		ideal_pos_lib = IdealPositionBase()
+
+		paths = get_ideal_paths(ideal_pos_id)
+
+		return HttpResponse(json.dumps(paths))
+
 def get_ideal_pos_paths(request):
-	# verify GET has righ parameters
+	# verify GET has right parameters
 	if request.GET.getlist('ideal_id'):
 
 		# reduce GET param to regular variable
@@ -2540,3 +2639,6 @@ def manual_save(user_id, path_id, pos_id):
 	saved_position.save()	
 
 	return 'Success'
+
+class Object(object):
+	pass
