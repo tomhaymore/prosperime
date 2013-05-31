@@ -174,6 +174,21 @@ class PositionBase():
 
 class IdealPositionBase(PositionBase):
 
+	def get_ideal_paths(self,ideal_pos_id,initial=None,limit=5):
+		# init paths
+		paths = {}
+		# fetch ideal position object
+		ideal_pos = IdealPosition.objects.get(pk=ideal_pos_id)
+
+		users = User.objects.filter(positions__ideal_position=ideal_pos).order_by("positions__start_date").distinct()
+
+		# breakout all positions, in oder
+		for u in users:
+		
+			paths[u.id] = [{'pos_title':p.title,'pos_id':p.id,'ideal_title': p.ideal_position.title if p.ideal_position else None,'ideal_id':p.ideal_position_id if p.ideal_position else None,'entity':p.entity.name,'entity_id':p.entity.id} for p in u.positions.all() if p is not None]
+
+		return paths		
+
 	def get_paths_to_ideal_position(self,ideal_pos_id,initial=None,limit=5):
 		# fetch ideal position object
 		ideal_pos = IdealPosition.objects.get(pk=ideal_pos_id)

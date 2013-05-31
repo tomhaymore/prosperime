@@ -31,6 +31,9 @@ import utilities.helpers as helpers
 ################## CORE VIEWS ########################
 ######################################################
 
+
+
+
 def home(request):
 	if not request.user.is_authenticated():
 		return HttpResponseRedirect('/welcome/')
@@ -1686,8 +1689,8 @@ def get_next_build_step_ideal(request):
 		return HttpResponse(json.dumps(positions))
 	
 # AJAX for returning a JSON of ideal position paths
-
 def get_ideal_paths(request):
+	
 	# verify GET has right parameters
 	if request.GET.getlist('ideal_id'):
 
@@ -1696,11 +1699,12 @@ def get_ideal_paths(request):
 		from careers.positionlib import IdealPositionBase
 		ideal_pos_lib = IdealPositionBase()
 
-		paths = get_ideal_paths(ideal_pos_id)
+		paths = ideal_pos_lib.get_ideal_paths(ideal_pos_id)
 
 		return HttpResponse(json.dumps(paths))
 
 def get_ideal_pos_paths(request):
+	print request
 	# verify GET has right parameters
 	if request.GET.getlist('ideal_id'):
 
