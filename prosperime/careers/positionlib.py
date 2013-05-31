@@ -8,6 +8,10 @@ import os
 from django.contrib.auth.models import User
 from careers.models import Career, Position, IdealPosition
 
+def get_avg_duration_to_position(user,position):
+	positionlib = PositionBase()
+	return positionlib.get_avg_duration_to_position(user,position)
+
 class NestedDict(dict):
 	"""                                                                       
 	Nested dictionary of arbitrary depth with autovivification.
@@ -173,6 +177,14 @@ class PositionBase():
 			return None
 
 class IdealPositionBase(PositionBase):
+
+	def get_ideal_people(self,ideal_pos):
+		import operator
+		"""
+		returns top people for ideal id, based on time in position
+		"""
+		users = User.objects.filter(positions__ideal_position=ideal_pos).order_by("-positions__start_date")
+		return users
 
 	def get_ideal_paths(self,ideal_pos_id,initial=None,limit=5):
 		# init paths

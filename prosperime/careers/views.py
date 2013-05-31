@@ -1617,19 +1617,19 @@ def get_next_build_step(request):
 		print 'pos_id: ' + str(start_pos_id)
 
 		ideal_pos = career_path.get_next_build_step_ideal(start_ideal_id,start_pos_id)
-		print ideal_pos
+		# print ideal_pos
 		
 		## GET FAKE TOP PEOPLE
-		p = Profile.objects.get(id=880)
-		people = []
-		latest = p.latest_position()
-		people.append({'id':880, 'name':p.full_name(), 'title':latest.title, 'entity_name':latest.entity.name, 'profile_pic':p.default_profile_pic()})
-		p = Profile.objects.get(id=841)
-		latest = p.latest_position()
-		people.append({'id':841, 'name':p.full_name(), 'title':latest.title, 'entity_name':latest.entity.name, 'profile_pic':p.default_profile_pic()})
-		p = Profile.objects.get(id=908)
-		latest = p.latest_position()
-		people.append({'id':908, 'name':p.full_name(), 'title':latest.title, 'entity_name':latest.entity.name, 'profile_pic':p.default_profile_pic()})
+		# p = Profile.objects.get(id=880)
+		# people = []
+		# latest = p.latest_position()
+		# people.append({'id':880, 'name':p.full_name(), 'title':latest.title, 'entity_name':latest.entity.name, 'profile_pic':p.default_profile_pic()})
+		# p = Profile.objects.get(id=841)
+		# latest = p.latest_position()
+		# people.append({'id':841, 'name':p.full_name(), 'title':latest.title, 'entity_name':latest.entity.name, 'profile_pic':p.default_profile_pic()})
+		# p = Profile.objects.get(id=908)
+		# latest = p.latest_position()
+		# people.append({'id':908, 'name':p.full_name(), 'title':latest.title, 'entity_name':latest.entity.name, 'profile_pic':p.default_profile_pic()})
 
 		## GET FAKE ENTITIES
 		# e = Entity.objects.get(id=757)
@@ -1641,15 +1641,15 @@ def get_next_build_step(request):
 
 
 
-		for ideal in ideal_pos:
-			ideal["people"] = people
-			ideal["duration"] = "12 months"
-			entities = []
-			for e in ideal["orgs"]:
-				ent = Entity.objects.get(id=e["id"])
-				entities.append({'name':e['name'], 'description':ent.description})
-			ideal["entities"] = entities
-			ideal["title"] = ideal["ideal_title"]
+		# for ideal in ideal_pos:
+		# 	ideal["people"] = people
+		# 	ideal["duration"] = "12 months"
+		# 	entities = []
+		# 	for e in ideal["orgs"]:
+		# 		ent = Entity.objects.get(id=e["id"])
+		# 		entities.append({'name':e['name'], 'description':ent.description})
+		# 	ideal["entities"] = entities
+		# 	ideal["title"] = ideal["ideal_title"]
 
 
 
