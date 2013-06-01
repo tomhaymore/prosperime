@@ -164,6 +164,14 @@ class Profile(models.Model):
         self.prefs = json.dumps(prefs)
         self.save()
 
+    def current_position(self):
+        positions = self.user.positions.all().order_by('-start_date').exclude(type="education")
+        if positions.exists():
+            return positions[0].title + " at " + positions[0].entity.name
+        else:
+            return None
+
+
     def bio_simple(self):
         return [{'title':p.title,'id':p.id} for p in self.user.positions.all()]
 

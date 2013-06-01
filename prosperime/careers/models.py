@@ -62,6 +62,8 @@ class Position(models.Model):
 		else:
 			return None
 
+	duration_in_months = property(duration_in_months)
+
 	def duration_in_years(self):
 		if self.duration_in_months():
 			return round(float(self.duration_in_months()) / 12,2)

@@ -9,14 +9,16 @@ import re
 import os
 import types
 
-
 # from Django
 from django.contrib.auth.models import User
-from entities.models import Industry, Entity
-from careers.models import Career, Position, IdealPosition
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.core import management
 from django.db.models import Count, Q
+
+# from ProsperMe
+from entities.models import Industry, Entity
+from careers.models import Career, Position, IdealPosition
+from careers.positionlib import IdealPositionBase
 
 def safe_int(data):
 	if data is not None:
@@ -789,9 +791,13 @@ class CareerBuild(CareerPathBase):
 		return paths
 
 	def get_next_build_step_ideal(self,start_ideal_id,start_pos_id):
+		positionlib = IdealPositionBase()
 		from operator import itemgetter
 		# get ideal position object
 		ideal_pos = IdealPosition.objects.get(pk=start_ideal_id)
+		# get pos object
+		reg_pos = Position.objects.get(pk=start_pos_id)
+		init_user = reg_pos.person
 		# get paths
 		paths = self.get_position_paths_from_ideal(start_ideal_id)
 		# init arrays
@@ -863,6 +869,11 @@ class CareerBuild(CareerPathBase):
 							'id':entity_id,
 							'count':1
 							}
+						# add duration
+						positions[ideal_id]['duration'] = positionlib.get_avg_duration_to_position(init_user,ideal_pos)
+						# add similar people
+						positions[ideal_id]['people'] = [{'name':p.profile.full_name(),'position':p.profile.current_position(),'pic':p.profile.default_profile_pic(),'id':p.id} for p in positionlib.get_ideal_people(ideal_pos)[:3]]
+						
 					# add to processed positions array
 					finished.append(u_id)
 				if ideal_id == int(start_ideal_id):
@@ -876,8 +887,9 @@ class CareerBuild(CareerPathBase):
 		# collapse orgs list
 		for k,v in positions.iteritems():
 			v['orgs'] = [{'name':v1['name'],'id':v1['id'],'count':v1['count']} for k1, v1 in v['orgs'].iteritems()]
-		
-		positions_list = [{'ideal_title':v['ideal_title'],'ideal_id':v['ideal_id'],'prop_raw':float(v['count'])/overall_count,'prop':"{0:.0f}%".format((float(v['count'])/overall_count)*100),'count':v['count'],'positions':v['positions'],'orgs':v['orgs']} for k,v in positions.iteritems()]
+			v['orgs'] = sorted(v['orgs'],key=itemgetter('count'),reverse=True)
+
+		positions_list = [{'ideal_title':v['ideal_title'],'ideal_id':v['ideal_id'],'prop_raw':float(v['count'])/overall_count,'prop':"{0:.0f}%".format((float(v['count'])/overall_count)*100),'count':v['count'],'positions':v['positions'],'orgs':v['orgs'],'people':v['people'],'duration':v['duration']} for k,v in positions.iteritems()]
 
 		# sort result by count
 		sorted_positions = sorted(positions_list, key=itemgetter('count'), reverse=True)

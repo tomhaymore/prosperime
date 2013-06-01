@@ -31,6 +31,9 @@ import utilities.helpers as helpers
 ################## CORE VIEWS ########################
 ######################################################
 
+
+
+
 def home(request):
 	if not request.user.is_authenticated():
 		return HttpResponseRedirect('/welcome/')
@@ -1615,27 +1618,19 @@ def get_next_build_step(request):
 		print 'pos_id: ' + str(start_pos_id)
 
 		ideal_pos = career_path.get_next_build_step_ideal(start_ideal_id,start_pos_id)
-		print ideal_pos
+		# print ideal_pos
 		
 		## GET FAKE TOP PEOPLE
-		p = Profile.objects.get(id=880)
-		people = []
-		latest = p.latest_position()
-		people.append({'id':880, 'name':p.full_name(), 'title':latest.title, 'entity_name':latest.entity.name, 'profile_pic':p.default_profile_pic()})
-		p = Profile.objects.get(id=841)
-		latest = p.latest_position()
-		people.append({'id':841, 'name':p.full_name(), 'title':latest.title, 'entity_name':latest.entity.name, 'profile_pic':p.default_profile_pic()})
-		p = Profile.objects.get(id=908)
-		latest = p.latest_position()
-		people.append({'id':908, 'name':p.full_name(), 'title':latest.title, 'entity_name':latest.entity.name, 'profile_pic':p.default_profile_pic()})
-
-		## GET FAKE ENTITIES
-		# e = Entity.objects.get(id=757)
-		# entities = []
-		# entities.append({'name':e.name, 'description':e.description})
-		# entities.append({'name':e.name, 'description':e.description})
-		# entities.append({'name':e.name, 'description':e.description})
-		# entities.append({'name':e.name, 'description':e.description})
+		# p = Profile.objects.get(id=880)
+		# people = []
+		# latest = p.latest_position()
+		# people.append({'id':880, 'name':p.full_name(), 'title':latest.title, 'entity_name':latest.entity.name, 'profile_pic':p.default_profile_pic()})
+		# p = Profile.objects.get(id=841)
+		# latest = p.latest_position()
+		# people.append({'id':841, 'name':p.full_name(), 'title':latest.title, 'entity_name':latest.entity.name, 'profile_pic':p.default_profile_pic()})
+		# p = Profile.objects.get(id=908)
+		# latest = p.latest_position()
+		# people.append({'id':908, 'name':p.full_name(), 'title':latest.title, 'entity_name':latest.entity.name, 'profile_pic':p.default_profile_pic()})
 
 
 
@@ -1649,14 +1644,6 @@ def get_next_build_step(request):
 			ideal["entities"] = entities
 			ideal["title"] = ideal["ideal_title"]
 			ideal["level"] = ideal["positions"][0]["level"]
-
-
-
-		# positions = []
-		# positions.append({'ideal_id':7, 'title':'Web Developer', 'duration':'12 months', 'probability':17, 'people':people, 'entities':entities})
-		# positions.append({'ideal_id':7, 'title':'iOS Developer', 'duration':'12 months', 'probability':11, 'people':people, 'entities':entities})
-		# positions.append({'ideal_id':7, 'title':'Systems Architect', 'duration':'12 months', 'probability':10, 'people':people, 'entities':entities})
-		# positions.append({'ideal_id':7, 'title':'Hardware Developer', 'duration':'12 months', 'probability':4, 'people':people, 'entities':entities})
 
 		print "Num Options Returned: " + str(len(ideal_pos))
 
@@ -1688,8 +1675,8 @@ def get_next_build_step_ideal(request):
 		return HttpResponse(json.dumps(positions))
 	
 # AJAX for returning a JSON of ideal position paths
-
 def get_ideal_paths(request):
+	
 	# verify GET has right parameters
 	if request.GET.getlist('ideal_id'):
 
@@ -1698,11 +1685,12 @@ def get_ideal_paths(request):
 		from careers.positionlib import IdealPositionBase
 		ideal_pos_lib = IdealPositionBase()
 
-		paths = get_ideal_paths(ideal_pos_id)
+		paths = ideal_pos_lib.get_ideal_paths(ideal_pos_id)
 
 		return HttpResponse(json.dumps(paths))
 
 def get_ideal_pos_paths(request):
+	print request
 	# verify GET has right parameters
 	if request.GET.getlist('ideal_id'):
 
