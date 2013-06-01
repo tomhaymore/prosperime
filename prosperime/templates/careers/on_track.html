@@ -81,7 +81,7 @@
 	</div>
 
 	<!-- Form Wrapper -->
-	<div id="form-wrapper" class="center not-shown">
+	<div id="form-wrapper" class="center not-shown"> 
 		<div class="section-header">Tell us more about yourself by clicking on the categories below...</div>
 
 		<div class="tell-us-more-header" data-section_type="education">
@@ -99,7 +99,7 @@
 			<span>Skills</span>
 		</div>
 
-		<div class="progress-bar"></div>
+		<div id="inline-form-container"></div>
 
 	</div>
 
@@ -157,8 +157,12 @@
 	        }
 	    });
 	    jQuery.ajaxSetup({async:true})
+
 		// Change handler on the main select box
 		$("#goal-position-box").change(function() {
+
+			// Remove previous end goal from progress bar
+			$(".end-item").remove()
 
 			// Hide Preview
 			// TODO: add analytics to this, because it's the first step
@@ -170,7 +174,14 @@
 					if ("{{authenticated}}" == "False") {
 						renderGetMoreInfo()
 						return false;
-					} else renderSelectButton() 
+					} else {
+						if ($("#goal-position-box :selected").val() == "build") {
+							console.log('here')
+							$("#search-box-wrapper").append("<div class=' offset2 span8 call-out-text'>Unsure of what your options are? <br/><br/> That's the question we specialize in answering. <br/> ProsperMe specializes in analyzing your existing academic and professional career in order to help you explore options are relevant and personalized for you. <br/><br/> <a href='/account/register/'>Sound good?</a> It is, and it's free. <br/><br/><div id='register-button' class='flat-button prompt-button'>Explore Your Future</div></div>")
+								return false;
+
+						} else renderSelectButton() 
+					}
 				});
 			} else {
 
@@ -179,7 +190,15 @@
 						renderGetMoreInfo()
 						return false;
 					}
-				} else renderSelectButton()
+				} else {
+					if ($("#goal-position-box :selected").val() == "build") {
+						console.log('here')
+
+						$("#search-box-wrapper").append("<div class=' offset2 span8 call-out-text'>Unsure of what your options are? <br/><br/> That's the question we specialize in answering. <br/> ProsperMe specializes in analyzing your existing academic and professional career in order to help you explore options are relevant and personalized for you. <br/><br/> <a href='/account/register/'>Sound good?</a> It is, and it's free. <br/><br/><div id='register-button' class='flat-button prompt-button'>Explore Your Future</div></div>")
+							return false;
+
+					} else renderSelectButton() 
+				}
 			}
 		});
 
@@ -196,10 +215,10 @@
 
 		// Animate clicked
 		$("#show-results-button").fadeOut(100).fadeIn(100)
-
+		console.log(ideal_id)
 		// Check if ideal_id = "build"
 		if (ideal_id == "build") {
-			$("#search-box-wrapper").append("<div class=' offset2 span8 call-out-text'>Unsure of what your options are? <br/><br/> We're here to help. <br/> ProsperMe specializes in analyzing your existing academic and professional career in order to help you explore options are relevant and personalized for you. <br/><br/> <a href='/account/register/'>Sound good?</a> It is, and it's free. <br/><br/><div id='register-button' class='flat-button prompt-button'>Explore Your Future</div></div>")
+			$("#search-box-wrapper").append("<div class=' offset2 span8 call-out-text'>Unsure of what your options are? <br/><br/> That's the question we specialize in answering. <br/> ProsperMe specializes in analyzing your existing academic and professional career in order to help you explore options are relevant and personalized for you. <br/><br/> <a href='/account/register/'>Sound good?</a> It is, and it's free. <br/><br/><div id='register-button' class='flat-button prompt-button'>Explore Your Future</div></div>")
 			return false;
 		}
 
@@ -258,49 +277,63 @@
 			$(this).addClass("not-shown")
 			$("#form-wrapper").removeClass("not-shown").hide().fadeIn(250)
 		});
+
+		$("#results-wrapper").removeClass("not-shown").hide().fadeIn(250)
+		$(".progress-bar").append("<div class='end-item'>"+$("#goal-position-box :selected").html()+"</div>")
 	};
 
 	// Renders input for new experience
 	var renderExperienceInput = function(el) {
-		// $(el).after("<div class='input-container'><input type='text' placeholder='Title' class='input-medium'/> at <input type='text' placeholder='Company' class='input-medium'/> From: " + month_select() + year_select() + " to " + month_select() + year_select() + control_button_html + "</div>");
-		$(el).after("<div class='input-container'><input type='text' placeholder='Title' class='input-medium'/> at <input type='text' placeholder='Company' class='input-medium'/> From: <input type='text' placeholder='mm/yyy' class='input-medium' /> To: <input type='text' placeholder='mm/yyyy' class='input-medium' />" + control_button_html + "</div>")
+		$(el).empty().append("<div class='input-container'><input type='text' placeholder='Title' class='input-medium'/> at <input type='text' placeholder='Company' class='input-medium'/> From: <input type='text' placeholder='mm/yyy' class='input-medium' /> To: <input type='text' placeholder='mm/yyyy' class='input-medium' />" + control_button_html + "</div>").animate({"opacity":1}, "250")
 	};
 
 	// Renders input for new education
 	var renderEducationInput = function(el) {
-		$(el).after("<div class='input-container'><input type='text' placeholder='Degree' class='input-small'/> in <input type='text' placeholder='Field' class='input-medium'/> at <input type='text' placeholder='School' class='input-medium'/> &nbsp;Graduated In: " + year_select() + control_button_html +  "</div>")
+		$(el).empty().append("<div class='input-container'><input type='text' placeholder='Degree' class='input-small'/> in <input type='text' placeholder='Field' class='input-medium'/> at <input type='text' placeholder='School' class='input-medium'/> &nbsp;Graduated In: " + year_select() + control_button_html +  "</div>").animate({"opacity":1}, "250")
 	};
 
 	// Renders input for new skills
 	var renderSkillsInput = function(el) {
-		$(el).after("<div class='input-container'><input type='text' placeholder='Skills' class='input-xlarge'/></div>")
+		$(el).empty().append("<div class='input-container'><input type='text' placeholder='Skills' class='input-xlarge'/></div>").animate({"opacity":1}, "250")
 	};
 
 	// Opens and closes pieces of the form when respective headers clicked
 	var formSectionClicked = function(ev, el) {
 		var $icon = $(el).children().first()
 
-		// If opened, close
+		// check if other sections are open
+		$(".section-opened").each(function() {
+			// must compare DOM node, not JQuery el
+			if (this != el.children[0]) {
+				// this means a different section currently open
+				$(this).removeClass("icon-chevron-sign-down").addClass("icon-chevron-sign-right").fadeIn(250).removeClass("section-opened")
+			}
+		});
+
+		// If this section is open, close it
 		if ($icon.hasClass("section-opened")) {
 
 			// Only close if click on icon or header
 			if (ev.target.tagName == "I" || ev.target.tagName == "SPAN") {
 				$icon.removeClass("icon-chevron-sign-down").addClass("icon-chevron-sign-right").fadeIn(250).removeClass("section-opened")
-				$(el).children().last().fadeOut(250, function() { this.remove() });
+
+				$("#inline-form-container").animate({'opacity':0}, '250', function() { $(this).empty() })
+
 			}
 
-		// If closed, open and show inputs
+		// If this section is closed, open and show form
 		} else {
 			$icon.fadeOut(250, function() {
 				$(this).removeClass("icon-chevron-sign-right").addClass("icon-chevron-sign-down").fadeIn(250).addClass("section-opened") 
 
 				var type = $(this).parent().data("section_type")
+				var $container = $("#inline-form-container")
 				if (type=="education") {
-					renderEducationInput($(this).next())
+					renderEducationInput($container) // $(this).next()
 				} else if (type=="experience") {
-					renderExperienceInput($(this).next())
+					renderExperienceInput($container)
 				} else if (type=="skills") {
-					renderSkillsInput($(this).next())
+					renderSkillsInput($container)
 				}
 			});
 		}
@@ -316,24 +349,17 @@
 		var num_items = path.length
 		var width = Math.floor(100/(num_items+1))
 
-		var type = $(el).parent().data("section_type")
+		// Get type
+		var type = $(".section-opened").parent().data("section_type")
+		var inputs = $("#inline-form-container input")
 
+		// Education
 		if (type == "education") {
-			var inputs = $(".tell-us-more-header input")
 			var degree = inputs[0].value
 			var field = inputs[1].value
 			var school = inputs[2].value
-			var grad_year = $(".tell-us-more-header select :selected").val()
-			// console.log(grad_year)
+			var grad_year = $("#inline-form-container :selected").val()
 			var display_text = degree + ", " + field + " at " + school
-			// path.push({
-			// 	"type":"education",
-			// 	"degree":degree,
-			// 	"field":field,
-			// 	"school":school,
-			// 	"grad_year":grad_year,
-			// 	"display_text":display_text
-			// })
 
 			post_data = {
 				"type":"education",
@@ -343,38 +369,34 @@
 				"end_date":grad_year
 			}
 
-			// post to api
-			$.post('/careers/addProgressDetails/',post_data,function(data) {
-				console.log(data);
-				if (data["result"] == "success") {
-					console.log('success');
-					// CLAYTON -- should render in here...?
-					path.push({
-						"type":"education",
-						"degree":data.data.degree,
-						"field":data.data.field,
-						"school":data.data.entity,
-						"grad_year":data.data.end_date,
-						"display_text":data.data.degree + ", " + data.data.field + " at " + data.data.entity
-					});
-					console.log(path);
-				} else {
-					// display error
-					console.log('failure');
-					console.log(data.errors);
-				}
-			},'json');
+			// // post to api
+			// $.post('/careers/addProgressDetails/',post_data,function(data) {
+			// 	console.log(data);
+			// 	if (data["result"] == "success") {
+			// 		console.log('success');
+			// 		// CLAYTON -- should render in here...?
+			// 		path.push({
+			// 			"type":"education",
+			// 			"degree":data.data.degree,
+			// 			"field":data.data.field,
+			// 			"school":data.data.entity,
+			// 			"grad_year":data.data.end_date,
+			// 			"display_text":data.data.degree + ", " + data.data.field + " at " + data.data.entity
+			// 		});
+			// 		console.log(path);
+			// 	} else {
+			// 		// display error
+			// 		console.log('failure');
+			// 		console.log(data.errors);
+			// 	}
+			// },'json');
 
-			// then clear the fields
-			$(".tell-us-more-header input").each(function() {
-				$(this).val("")
-			})
+
 			
 		} else if (type == "experience") {
-			var inputs = $('.tell-us-more-header input')
 			var title = inputs[0].value
 			var entity = inputs[1].value
-			var selects = $('.tell-us-more-header select')
+			var selects = $('#inline-form-container select')
 			var start_date = inputs[2].value
 			var end_date = inputs[3].value
 			// var start_mo = selects[0].options[selects[0].selectedIndex].value
@@ -382,19 +404,8 @@
 			// var end_mo = selects[2].options[selects[2].selectedIndex].value
 			// var end_yr = selects[3].options[selects[3].selectedIndex].value
 
-			// console.log(title+" "+entity+" "+start_mo+"/"+start_yr+" "+end_mo+"/"+end_yr)
 			var display_text = title + " at " + entity
-			// path.push({
-			// 	"type":"position",
-			// 	"title":title,
-			// 	"entity":entity,
-			// 	"start_mo":start_mo,
-			// 	"start_yr":start_yr,
-			// 	"end_mo":end_mo,
-			// 	"end_yr":end_yr,
-			// 	"display_text":display_text,
-			// })
-			
+
 			post_data = {
 				"type":"position",
 				"title":title,
@@ -403,36 +414,39 @@
 				"end_date":end_date
 			}
 
-			// post to api
-			$.post('/careers/addProgressDetails/',post_data,function(data) {
-				console.log(data);
-				if (data["result"] == "success") {
-					console.log('success');
-					// CLAYTON -- should render in here...?
-					path.push({
-						"type":"position",
-						"title":data.data.title,
-						"entity":data.data.entity,
-						"start_date":data.data.start_date,
-						"end_date":data.data.end_date,
-						"display_text":data.data.title + " at " + data.data.entity
-					});
-					console.log(path);
-				} else {
-					// display error
-					console.log('failure');
-					console.log(data.errors);
-				}
-			},'json');
+			// // post to api
+			// $.post('/careers/addProgressDetails/',post_data,function(data) {
+			// 	console.log(data);
+			// 	if (data["result"] == "success") {
+			// 		console.log('success');
+			// 		// CLAYTON -- should render in here...?
+			// 		path.push({
+			// 			"type":"position",
+			// 			"title":data.data.title,
+			// 			"entity":data.data.entity,
+			// 			"start_date":data.data.start_date,
+			// 			"end_date":data.data.end_date,
+			// 			"display_text":data.data.title + " at " + data.data.entity
+			// 		});
+			// 		console.log(path);
+			// 	} else {
+			// 		// display error
+			// 		console.log('failure');
+			// 		console.log(data.errors);
+			// 	}
+			// },'json');
 
-			$(".tell-us-more-header input").each(function() {
-				$(this).val("")
-			})
+
 
 
 		} else if (type == "skills") {
 			console.log("skills entered... what to do with?")
 		}
+
+		// Clear Form Fields
+		$("#inline-form-container input").each(function() {
+			$(this).val("")
+		})
 
 		// Render the progress bar with new data
 		//	Note, must re-render the entire thing to adjust widths

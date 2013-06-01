@@ -105,6 +105,7 @@ def add_progress_detail(request):
 		return HttpResponse(json.dumps(response))
 	if request.POST:
 		from careers.forms import AddProgressDetailsForm
+		print 'hola'
 		# bind form
 		form = AddProgressDetailsForm(request.POST)
 		# validate form
