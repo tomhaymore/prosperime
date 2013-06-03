@@ -72,15 +72,17 @@ def schools(request):
 def progress(request):
 
 	# ghetto way of finding positions that we can give info on
-	applicable_positions = Position.objects.filter(ideal_position__level=4)
-	ideal_positions = []
-	for a in applicable_positions:
-		if a.ideal_position not in ideal_positions:
-			ideal_positions.append(a.ideal_position)
+	# applicable_positions = Position.objects.filter(ideal_position__level=4)
+	applicable_positions = IdealPosition.objects.filter(level__gte=4).annotate(pop=Count('position__id')).order_by("-pop")
+	# ideal_positions = []
+	# for a in applicable_positions:
+	# 	if a.ideal_position not in ideal_positions:
+	# 		ideal_positions.append(a.ideal_position)
 
-	options = []
-	for i in ideal_positions:
-		options.append({'title':i.title, 'ideal_id':i.id})
+	options = [{'title':i.title,'ideal_id':i.id} for i in applicable_positions]
+	# options = []
+	# for i in ideal_positions:
+	# 	options.append({'title':i.title, 'ideal_id':i.id})
 
 	# If we know user, get existing pos
 	if request.user.is_authenticated():
