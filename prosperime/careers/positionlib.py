@@ -197,8 +197,8 @@ class IdealPositionBase(PositionBase):
 		# breakout all positions, in oder
 		for u in users:
 		
-			paths[u.id] = [{'pos_title':p.title,'pos_id':p.id,'ideal_title': p.ideal_position.title if p.ideal_position else None,'ideal_id':p.ideal_position_id if p.ideal_position else None,'entity':p.entity.name,'entity_id':p.entity.id} for p in u.positions.all() if p is not None]
-
+			paths[u.id] = [{'pos_title':p.title,'pos_id':p.id,'ideal_title': p.ideal_position.title if p.ideal_position else None,'ideal_id':p.ideal_position_id if p.ideal_position else None,'entity':p.entity.name,'entity_id':p.entity.id,'start_date':p.start_date,'end_date':p.end_date} for p in u.positions.all() if p is not None]
+			paths[u.id] = sorted(paths[u.id],key=itemgetter('start_date'))
 		return paths		
 
 	def get_paths_to_ideal_position(self,ideal_pos_id,initial=None,limit=5):
