@@ -1616,7 +1616,14 @@ def get_next_build_step(request):
 		print 'ideal_id: ' + str(start_ideal_id)
 		print 'pos_id: ' + str(start_pos_id)
 
-		ideal_pos = career_path.get_next_build_step_ideal(start_ideal_id,start_pos_id)
+		# try to retreive positions from cache
+		positions = cache.get("get_next_build_step_ideal_"+str(start_ideal_id)+"_"+str(start_pos_id))
+		if positions is None:
+			# initialize class
+			build = careerlib.CareerBuild()
+			positions = build.get_next_build_step_ideal(start_ideal_id,start_pos_id)
+
+		# ideal_pos = career_path.get_next_build_step_ideal(start_ideal_id,start_pos_id)
 		# print ideal_pos
 		
 		## GET FAKE TOP PEOPLE
@@ -1659,9 +1666,9 @@ def get_next_build_step(request):
 		# positions.append({'ideal_id':7, 'title':'Systems Architect', 'duration':'12 months', 'probability':10, 'people':people, 'entities':entities})
 		# positions.append({'ideal_id':7, 'title':'Hardware Developer', 'duration':'12 months', 'probability':4, 'people':people, 'entities':entities})
 
-		print "Num Options Returned: " + str(len(ideal_pos))
+		print "Num Options Returned: " + str(len(positions))
 
-		return HttpResponse(json.dumps(ideal_pos))
+		return HttpResponse(json.dumps(positions))
 
 # AJAX for getting build steps
 def get_next_build_step_ideal(request):
@@ -1681,8 +1688,12 @@ def get_next_build_step_ideal(request):
 	
 		start_pos_id = request.GET.getlist('pos_id')[0]
 
-
-		positions = build.get_next_build_step_ideal(start_ideal_id,start_pos_id)
+		# try to retreive positions from cache
+		positions = cache.get("get_next_build_step_ideal_"+str(start_ideal_id)+"_"+str(start_pos_id))
+		if positions is None:
+			# initialize class
+			build = careerlib.CareerBuild()
+			positions = build.get_next_build_step_ideal(start_ideal_id,start_pos_id)
 
 		print "Num Options Returned: " + str(len(positions))
 
@@ -1696,10 +1707,17 @@ def get_ideal_paths(request):
 
 		ideal_pos_id = request.GET.getlist('ideal_id')[0]
 
-		from careers.positionlib import IdealPositionBase
-		ideal_pos_lib = IdealPositionBase()
+		# from careers.positionlib import IdealPositionBase
+		# ideal_pos_lib = IdealPositionBase()
 
-		paths = ideal_pos_lib.get_ideal_paths(ideal_pos_id)
+		# check cache for path information
+		paths = cache.get('get_ideal_paths'+'_'+str(ideal_pos_id))
+		if paths is None:
+			# cache expired, retrieve anew
+			from careers.positionlib import IdealPositionBase
+			ideal_pos_lib = IdealPositionBase()
+
+			paths = ideal_pos_lib.get_ideal_paths(ideal_pos_id)
 
 		return HttpResponse(json.dumps(paths))
 
