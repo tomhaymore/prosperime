@@ -187,14 +187,14 @@ class IdealPositionBase(PositionBase):
 		users = User.objects.filter(positions__ideal_position=ideal_pos).order_by("-positions__start_date")
 		return users
 
-	def get_ideal_paths(self,ideal_pos_id,initial=None,limit=5):
+	def get_ideal_paths(self,ideal_pos_id,initial=None,limit=20):
 		import operator
 		# init paths
 		paths = {}
 		# fetch ideal position object
 		ideal_pos = IdealPosition.objects.get(pk=ideal_pos_id)
 
-		users = User.objects.filter(positions__ideal_position=ideal_pos).order_by("positions__start_date").distinct()
+		users = User.objects.filter(positions__ideal_position=ideal_pos).order_by("positions__start_date").distinct()[:limit]
 
 		# breakout all positions, in oder
 		for u in users:
