@@ -71,17 +71,30 @@ def schools(request):
 
 def progress(request):
 
-	options = [
-		{'title':'VP of Engineering', 'ideal_id':7 },
-		{'title':'VP of Sales', 'ideal_id':10 },
-		{'title':'MBA Candidate', 'ideal_id':11 },
-		{'title':'Partner (Management Consulting)', 'ideal_id':27}
-	]
+	# ghetto way of finding positions that we can give info on
+	applicable_positions = Position.objects.filter(ideal_position__level=4)
+	ideal_positions = []
+	for a in applicable_positions:
+		if a.ideal_position not in ideal_positions:
+			ideal_positions.append(a.ideal_position)
+
+	options = []
+	for i in ideal_positions:
+		options.append({'title':i.title, 'ideal_id':i.id})
+
+	# If we know user, get existing pos
+	if request.user.is_authenticated():
+		formatted_positions = [{'title':p.title, 'id':p.id, 'entity_name':p.entity.name, 'ideal_id':p.ideal_position.id} for p in Position.objects.filter(person=request.user).exclude(ideal_position=None).select_related("entity")]
+	# Else, no existing pos
+	else:
+		formatted_positions = []
 
 	data = {
 		"authenticated":request.user.is_authenticated(),
-		"options":options
+		"options":options,
+		"positions":json.dumps(formatted_positions)
 	}
+
 	return render_to_response("careers/on_track.html", data, context_instance=RequestContext(request))
 
 def get_progress(request):
@@ -108,6 +121,7 @@ def add_progress_detail(request):
 		return HttpResponse(json.dumps(response))
 	if request.POST:
 		from careers.forms import AddProgressDetailsForm
+		print 'hola'
 		# bind form
 		form = AddProgressDetailsForm(request.POST)
 		# validate form
@@ -1638,33 +1652,18 @@ def get_next_build_step(request):
 		# latest = p.latest_position()
 		# people.append({'id':908, 'name':p.full_name(), 'title':latest.title, 'entity_name':latest.entity.name, 'profile_pic':p.default_profile_pic()})
 
-		## GET FAKE ENTITIES
-		# e = Entity.objects.get(id=757)
-		# entities = []
-		# entities.append({'name':e.name, 'description':e.description})
-		# entities.append({'name':e.name, 'description':e.description})
-		# entities.append({'name':e.name, 'description':e.description})
-		# entities.append({'name':e.name, 'description':e.description})
 
 
-
-		# for ideal in ideal_pos:
-		# 	ideal["people"] = people
-		# 	ideal["duration"] = "12 months"
-		# 	entities = []
-		# 	for e in ideal["orgs"]:
-		# 		ent = Entity.objects.get(id=e["id"])
-		# 		entities.append({'name':e['name'], 'description':ent.description})
-		# 	ideal["entities"] = entities
-		# 	ideal["title"] = ideal["ideal_title"]
-
-
-
-		# positions = []
-		# positions.append({'ideal_id':7, 'title':'Web Developer', 'duration':'12 months', 'probability':17, 'people':people, 'entities':entities})
-		# positions.append({'ideal_id':7, 'title':'iOS Developer', 'duration':'12 months', 'probability':11, 'people':people, 'entities':entities})
-		# positions.append({'ideal_id':7, 'title':'Systems Architect', 'duration':'12 months', 'probability':10, 'people':people, 'entities':entities})
-		# positions.append({'ideal_id':7, 'title':'Hardware Developer', 'duration':'12 months', 'probability':4, 'people':people, 'entities':entities})
+		for ideal in ideal_pos:
+			ideal["people"] = people
+			ideal["duration"] = "12 months"
+			entities = []
+			for e in ideal["orgs"]:
+				ent = Entity.objects.get(id=e["id"])
+				entities.append({'name':e['name'], 'description':ent.description})
+			ideal["entities"] = entities
+			ideal["title"] = ideal["ideal_title"]
+			ideal["level"] = ideal["positions"][0]["level"]
 
 		print "Num Options Returned: " + str(len(positions))
 

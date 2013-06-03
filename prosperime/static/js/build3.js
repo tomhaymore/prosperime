@@ -63,7 +63,7 @@
 	var getOptions = function(ideal_id) {
 		jQuery.ajaxSetup({async:false});
 		var return_value = null
-		$.get("/careers/getNextBuildStep/", {'id':ideal_id,'pos_id':start_pos_id}, function(response) {
+		$.get("/careers/getNextBuildStepIdeal/", {'id':ideal_id,'pos_id':start_pos_id}, function(response) {
 			options = response
 		}, "json");
 
@@ -139,7 +139,8 @@
 
 		// Get ideal_id
 		var ideal_id = options[index]['ideal_id']
-
+		console.log("Level: " + options[index]['level'])
+ 
 		// Fade out other options
 		removeOptions(selected_index)
 
@@ -420,11 +421,7 @@
 
 		// Add arrow
 		var arrow_x = current_x + (ob_w/2)
-		var arrow = paper.path("M"+arrow_x+","+(y_offset-70)+"L"+(arrow_x-15)+","+(y_offset-50) +"L"+(arrow_x+15)+","+(y_offset-50)+"z").attr(shuffle_attr).click(scrollOptions).hover(function() {
-			this.glow()
-		}, function() {
-			
-		})
+		var arrow = paper.path("M"+arrow_x+","+(y_offset-70)+"L"+(arrow_x-15)+","+(y_offset-50) +"L"+(arrow_x+15)+","+(y_offset-50)+"z").attr(shuffle_attr).click(scrollOptions)
 		shuffle_data.push(arrow.id)
 	}
 
@@ -564,7 +561,6 @@
 
 	/* Renders options */
 	var renderOptions = function(options, y_offset) {
-
 		// Set length based on max displayed (4) */
 		var length = (options.length > max_options) ? max_options : options.length;
 
@@ -582,7 +578,6 @@
 
 	/* Main Methods */
 	var addStartingPosition = function(el) {
-
 
 		normalizeCurrentPos()
 		removeAllMessages()
@@ -608,9 +603,18 @@
 		// Set start pos id
 		start_pos_id = starting_position["pos_id"]
 
-		console.log("calling getAndRenderOptions from @addStartingPosition")
 		getAndRenderOptions(starting_position['ideal_id'])
 		enableSave()
+
+		addCurrentPositionsToCache(starting_position["ideal_id"])
+	};
+
+	var addCurrentPositionsToCache = function(clicked_ideal_id) {
+
+		for (var j = 0; j < current_positions_javascript.length; j++) {
+			if (current_positions_javascript[j]["ideal_id"] != clicked_ideal_id)
+				local_cache[current_positions_javascript[j]["ideal_id"]] = getOptions(current_positions_javascript[j]["ideal_id"])
+		}
 	};
 
 	var searchStartingPositions = function() {
@@ -627,8 +631,22 @@
 	/* Just a way to decompose (and debug) two bigger methods */
 	var getAndRenderOptions = function(ideal_id) {
 		
-		// Get options from server
-		options = getOptions(ideal_id)	
+		// First, check cache
+		if (ideal_id in local_cache) {
+			options = local_cache[ideal_id]
+			console.log('hit cache')
+		} else {
+			// Get options from server
+			// var start = new Date().getTime()
+			options = getOptions(ideal_id)
+
+			// Set cache	
+			local_cache[ideal_id] = options
+			// var end = new Date().getTime()
+			// console.log(end-start)
+
+		}
+
 		// console.log(options)
 
 		// If none returned, display message
@@ -641,6 +659,7 @@
 		var offset_denominator = (options.length > 4) ? 6 : options.length + 2
 		var y_offset = (options.length == 1) ? 175 : Math.ceil(425/(offset_denominator))
 		renderOptions(options,y_offset)
+
 	};
 
 	/* Renders existing path */
@@ -695,10 +714,12 @@
 	var shuffle_data = []
 	var back_button_data = []
 
+	var local_cache = {}
+
 
 	/* SVG Styling */
-	var text_double_attr={'fill':'#fffffe','opacity':'1','font-size':13, 'font-family':"'Arimo', 'Helvetica Neue', 'Helvetica'"}
-	var text_single_attr={'fill':'#fffffe','opacity':'1','font-size':13, 'font-family':"'Arimo', 'Helvetica Neue', 'Helvetica'", 'font-weight':'lighter'}
+	var text_double_attr={'fill':'#fffffe','opacity':'1','font-size':12, 'font-family':"'Arimo', 'Helvetica Neue', 'Helvetica'", 'stroke-width':0}
+	var text_single_attr={'fill':'#fffffe','opacity':'1','font-size':12, 'font-family':"'Arimo', 'Helvetica Neue', 'Helvetica'", 'stroke-width':0}
 	var line_attr={'stroke':'#68696b', 'stroke-width':2, 'opacity':0}
 	var text_options_attr={'stroke':'#68696b', 'font-size':13, 'cursor':'pointer', 'font-family':'"Arimo", "Helvetica Neue", "Helvetica"'}
 	var opt_badge_attr = {'stroke':'rgb(41,128,185)', 'fill':'rgb(41,128,185)'}
