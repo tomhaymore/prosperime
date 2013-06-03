@@ -63,7 +63,7 @@
 	var getOptions = function(ideal_id) {
 		jQuery.ajaxSetup({async:false});
 		var return_value = null
-		$.get("/careers/getNextBuildStep/", {'id':ideal_id,'pos_id':start_pos_id}, function(response) {
+		$.get("/careers/getNextBuildStepIdeal/", {'id':ideal_id,'pos_id':start_pos_id}, function(response) {
 			options = response
 		}, "json");
 

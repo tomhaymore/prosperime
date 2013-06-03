@@ -22,8 +22,8 @@ body {
 
 /* Main Containers */
 div#search-box-wrapper {
-	margin-top:50px;
-}
+/*	margin-top:30px;
+*/}
 
 div#button-wrapper {
 	margin-top:15px;
@@ -39,12 +39,20 @@ div#form-wrapper {
 	text-align:left;
 }
 
+div#call-to-build-wrapper {
+	text-align:center;
+}
+
+div#progress-wrapper {
+	margin-top:25px;
+}
+
 
 
 /* ID's */
 
 #on-track-header {
-	margin-top:35px;
+	margin-top:25px;
 	margin-bottom:0px;
 	color:#68696b; 
 	font-family:Lato, Helvetica;
@@ -59,13 +67,68 @@ div#form-wrapper {
 
 /* Progress Bar */
 div.progress-bar {
-	margin-top:50px;
+	margin-top:0px;
 	display:inline-block;
 	color:#ECF0F1;
-	width:80%;
-	height:100px;
-		border:2px dashed #333;
+	width:0%; /* Allows animation to 80% (full-width) */
+	height:80px;
+	vertical-align: top;
+	overflow:hidden;
+}
 
+div.path-bar {
+	margin-top:0px;
+	display:inline-block;
+	color:#ECF0F1;
+	width:0%; /* Allows animation to 80% (full-width) */
+	height:100px;
+	vertical-align: top;
+	overflow:hidden;
+	margin-bottom:15px;
+}
+
+div.path-item {
+
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	display:inline-block;
+	height:100%;
+	vertical-align: middle;
+	padding:10px;
+	width:100%;
+	line-height:80px;
+	text-align:center;
+	font-size:1.2em;
+	border-radius:4px;
+	border:1px solid #ECF0F1;
+}
+
+div.end-goal-wrapper {
+	display:inline-block;
+	width:10%;
+	min-width:100px;
+	height:80px;
+	color:#ECF0F1;
+	margin-top:0px;
+	vertical-align: top;
+}
+
+/* what to do with this? */
+div.progress-info-bar {
+	margin-top:0px;
+	margin-bottom:0px;
+	width:100%;
+	height:20px;
+}
+
+div#progress-bar-svg-container {
+	width:5%;
+	min-width:60px;
+	height:80px;
+	margin-top:0px;
+	vertical-align: top;
+	display:none;
 }
 
 div.progress-item {
@@ -78,7 +141,7 @@ div.progress-item {
 	vertical-align: middle;
 	padding:10px;
 	width:100%;
-	line-height:28px;
+	line-height:60px;
 	text-align:center;
 	font-size:1.2em;
 	border-radius:4px;
@@ -98,7 +161,6 @@ div.end-item {
 	font-size:1.2em;
 	border-radius:4px;
 	border:1px solid #E74C3C;
-	float:right;
 	width:150px;
 	background-color: #E74C3C;
 
@@ -128,7 +190,7 @@ div.end-item {
 .section-header {
 	font-size:1.6em;
 	line-height:36px;
-	margin-bottom:16px;
+	margin-bottom:8px;
 }
 
 #img-placeholder {
@@ -235,6 +297,26 @@ div.input-container {
 	line-height:40px;
 	color:#ECF0F1;
 	border-radius:4px;
+	cursor:pointer;
+}
+
+.turquoise-button {
+	background-color:#27AE60;
+}
+.turquoise {
+	background-color:#27AE60;
+}
+
+.dark-blue {
+	background-color:#34495E;
+}
+
+.right-button {
+	margin-left:25px;
+}
+
+.left-button {
+	margin-right:25px;
 }
 
 #linkedin-button {
@@ -254,6 +336,20 @@ div.input-container {
 
 #show-results-button {
 	background-color:#27AE60;
+}
+
+#tell-us-more-results-button {
+	margin-top:25px;
+	visibility: hidden;
+}
+
+#search-again-button {
+	position:relative;
+	left:800px;
+	bottom:45px;
+}
+.button-left {
+
 }
 
 

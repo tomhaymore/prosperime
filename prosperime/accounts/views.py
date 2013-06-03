@@ -74,7 +74,7 @@ def use(request):
 def register(request):
 
 	if request.user.is_authenticated():
-		return HttpResponseRedirect('/f')
+		return HttpResponseRedirect('/feed/')
 
 	if request.method == "POST":
 		form = RegisterForm(request.POST)

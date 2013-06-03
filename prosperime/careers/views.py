@@ -71,17 +71,30 @@ def schools(request):
 
 def progress(request):
 
-	options = [
-		{'title':'VP of Engineering', 'ideal_id':7 },
-		{'title':'VP of Sales', 'ideal_id':10 },
-		{'title':'MBA Candidate', 'ideal_id':11 },
-		{'title':'Partner (Management Consulting)', 'ideal_id':27}
-	]
+	# ghetto way of finding positions that we can give info on
+	applicable_positions = Position.objects.filter(ideal_position__level=4)
+	ideal_positions = []
+	for a in applicable_positions:
+		if a.ideal_position not in ideal_positions:
+			ideal_positions.append(a.ideal_position)
+
+	options = []
+	for i in ideal_positions:
+		options.append({'title':i.title, 'ideal_id':i.id})
+
+	# If we know user, get existing pos
+	if request.user.is_authenticated():
+		formatted_positions = [{'title':p.title, 'id':p.id, 'entity_name':p.entity.name, 'ideal_id':p.ideal_position.id} for p in Position.objects.filter(person=request.user).exclude(ideal_position=None).select_related("entity")]
+	# Else, no existing pos
+	else:
+		formatted_positions = []
 
 	data = {
 		"authenticated":request.user.is_authenticated(),
-		"options":options
+		"options":options,
+		"positions":json.dumps(formatted_positions)
 	}
+
 	return render_to_response("careers/on_track.html", data, context_instance=RequestContext(request))
 
 def get_progress(request):
