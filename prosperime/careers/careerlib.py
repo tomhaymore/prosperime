@@ -985,14 +985,14 @@ class CareerMapBase():
 		for row in reader:
 			self.STOP_LIST.append(row[0])
 
-	def tokenize_position(self,pos):
+	def tokenize_position(self,pos,**opts):
 		"""
 		tokenizes position title based on spaces
 		"""
 		import string
 		title = ''
 		# check to see if education
-		if pos.type == "education":
+		if hasattr(pos,'type') and pos.type == 'education':
 			# concatenate title and degree / field of study
 			if pos.degree:
 				title = " ".join([title,pos.degree])
@@ -1054,7 +1054,7 @@ class CareerMapBase():
 
 	def match_careers_to_position(self,pos):
 		# break position title into ngrams
-		title_ngrams = self.extract_ngrams(self.tokenize_position(pos.title))
+		title_ngrams = self.extract_ngrams(self.tokenize_position(pos))
 		
 		# initialize careers array
 		careers = []

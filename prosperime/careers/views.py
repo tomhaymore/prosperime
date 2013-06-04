@@ -72,15 +72,17 @@ def schools(request):
 def progress(request):
 
 	# ghetto way of finding positions that we can give info on
-	applicable_positions = Position.objects.filter(ideal_position__level=4)
-	ideal_positions = []
-	for a in applicable_positions:
-		if a.ideal_position not in ideal_positions:
-			ideal_positions.append(a.ideal_position)
+	# applicable_positions = Position.objects.filter(ideal_position__level=4)
+	applicable_positions = IdealPosition.objects.filter(level__gte=4).annotate(pop=Count('position__id')).order_by("-pop")
+	# ideal_positions = []
+	# for a in applicable_positions:
+	# 	if a.ideal_position not in ideal_positions:
+	# 		ideal_positions.append(a.ideal_position)
 
-	options = []
-	for i in ideal_positions:
-		options.append({'title':i.title, 'ideal_id':i.id})
+	options = [{'title':i.title,'ideal_id':i.id} for i in applicable_positions]
+	# options = []
+	# for i in ideal_positions:
+	# 	options.append({'title':i.title, 'ideal_id':i.id})
 
 	# If we know user, get existing pos
 	if request.user.is_authenticated():
@@ -1630,7 +1632,14 @@ def get_next_build_step(request):
 		print 'ideal_id: ' + str(start_ideal_id)
 		print 'pos_id: ' + str(start_pos_id)
 
-		ideal_pos = career_path.get_next_build_step_ideal(start_ideal_id,start_pos_id)
+		# try to retreive positions from cache
+		positions = cache.get("get_next_build_step_ideal_"+str(start_ideal_id)+"_"+str(start_pos_id))
+		if positions is None:
+			# initialize class
+			build = careerlib.CareerBuild()
+			positions = build.get_next_build_step_ideal(start_ideal_id,start_pos_id)
+
+		# ideal_pos = career_path.get_next_build_step_ideal(start_ideal_id,start_pos_id)
 		# print ideal_pos
 		
 		## GET FAKE TOP PEOPLE
@@ -1658,9 +1667,9 @@ def get_next_build_step(request):
 			ideal["title"] = ideal["ideal_title"]
 			ideal["level"] = ideal["positions"][0]["level"]
 
-		print "Num Options Returned: " + str(len(ideal_pos))
+		print "Num Options Returned: " + str(len(positions))
 
-		return HttpResponse(json.dumps(ideal_pos))
+		return HttpResponse(json.dumps(positions))
 
 # AJAX for getting build steps
 def get_next_build_step_ideal(request):
@@ -1680,8 +1689,12 @@ def get_next_build_step_ideal(request):
 	
 		start_pos_id = request.GET.getlist('pos_id')[0]
 
-
-		positions = build.get_next_build_step_ideal(start_ideal_id,start_pos_id)
+		# try to retreive positions from cache
+		positions = cache.get("get_next_build_step_ideal_"+str(start_ideal_id)+"_"+str(start_pos_id))
+		if positions is None:
+			# initialize class
+			build = careerlib.CareerBuild()
+			positions = build.get_next_build_step_ideal(start_ideal_id,start_pos_id)
 
 		print "Num Options Returned: " + str(len(positions))
 
@@ -1695,10 +1708,17 @@ def get_ideal_paths(request):
 
 		ideal_pos_id = request.GET.getlist('ideal_id')[0]
 
-		from careers.positionlib import IdealPositionBase
-		ideal_pos_lib = IdealPositionBase()
+		# from careers.positionlib import IdealPositionBase
+		# ideal_pos_lib = IdealPositionBase()
 
-		paths = ideal_pos_lib.get_ideal_paths(ideal_pos_id)
+		# check cache for path information
+		paths = cache.get('get_ideal_paths'+'_'+str(ideal_pos_id))
+		if paths is None:
+			# cache expired, retrieve anew
+			from careers.positionlib import IdealPositionBase
+			ideal_pos_lib = IdealPositionBase()
+
+			paths = ideal_pos_lib.get_ideal_paths(ideal_pos_id)
 
 		return HttpResponse(json.dumps(paths))
 

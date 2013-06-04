@@ -1,10 +1,9 @@
+prospr
+*.pyc
 *.log
 *.pot
-*.pyc
-local_settings.py
-django14_env/*
 prosperime/settings_dev.py
-env_act
-prosperime/media/logos/*
-prosperime/media/pictures/*
+prosperime/media/logos
+prosperime/media/pictures
 !prosperime/media/pictures/anon.jpg
+prosprenv

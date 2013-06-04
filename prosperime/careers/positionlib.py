@@ -7,6 +7,8 @@ import os
 # from Django
 from django.contrib.auth.models import User
 from careers.models import Career, Position, IdealPosition
+from entities.models import Entity, Office
+from django.db.models import Count, Q
 
 def get_avg_duration_to_position(user,position):
 	positionlib = PositionBase()
@@ -175,28 +177,48 @@ class PositionBase():
 			return None
 
 class IdealPositionBase(PositionBase):
+	
 
 	def get_ideal_people(self,ideal_pos):
-		import operator
 		"""
 		returns top people for ideal id, based on time in position
 		"""
+		import operator
 		users = User.objects.filter(positions__ideal_position=ideal_pos).order_by("-positions__start_date")
 		return users
 
-	def get_ideal_paths(self,ideal_pos_id,initial=None,limit=5):
+	def get_entities_from_ideal(self,ideal_pos,limit=5):
+		"""
+		returns all entities that share ideal position
+		"""
+
+		# entities = Entity.objects.filter(positions__ideal_position=ideal_pos).annotate(pop=Count("positions__id")).order_by("-pop")[:limit]
+		entities = Entity.objects.filter(positions__ideal_position=ideal_pos).prefetch_related('offices')[:limit]
+
+		# print entities
+		
+		entities_list = [{'name':e.name,'id':e.id,'descr':e.description,'no_employees':e.no_employees,'locations':[o.city for o in e.offices.all()]} for e in entities]
+		# entities_list = [{'name':e.name,'id':e.id,'descr':e.description,'no_employees':e.no_employees} for e in entities]
+
+		# print entities_list
+
+		return entities_list
+
+	def get_ideal_paths(self,ideal_pos_id,initial=None,limit=20):
+		import operator
 		# init paths
 		paths = {}
 		# fetch ideal position object
 		ideal_pos = IdealPosition.objects.get(pk=ideal_pos_id)
 
-		users = User.objects.filter(positions__ideal_position=ideal_pos).order_by("positions__start_date").distinct()
+		users = User.objects.filter(positions__ideal_position=ideal_pos).order_by("profile__status").distinct()[:limit]
 
 		# breakout all positions, in oder
 		for u in users:
-		
-			paths[u.id] = [{'pos_title':p.title,'pos_id':p.id,'ideal_title': p.ideal_position.title if p.ideal_position else None,'ideal_id':p.ideal_position_id if p.ideal_position else None,'entity':p.entity.name,'entity_id':p.entity.id} for p in u.positions.all() if p is not None]
-
+			print u.id
+			paths[u.id] = [{'pos_title':p.title,'pos_id':p.id,'ideal_title': p.ideal_position.title if p.ideal_position else None,'ideal_id':p.ideal_position_id if p.ideal_position else None,'entities':self.get_entities_from_ideal(p.ideal_position),'entity':p.entity.name,'entity_id':p.entity.id,'start_date': p.start_date.year if p.start_date else None ,'end_date':p.end_date.year if p.end_date else None} for p in u.positions.all() if p is not None]
+			# paths[u.id] = [{'pos_title':p.title,'pos_id':p.id,'ideal_title': p.ideal_position.title if p.ideal_position else None,'ideal_id':p.ideal_position_id if p.ideal_position else None,'entity':p.entity.name,'entity_id':p.entity.id,'start_date': p.start_date.year if p.start_date else None ,'end_date':p.end_date.year if p.end_date else None} for p in u.positions.all() if p is not None]
+			paths[u.id] = sorted(paths[u.id],key=operator.itemgetter('start_date'))
 		return paths		
 
 	def get_paths_to_ideal_position(self,ideal_pos_id,initial=None,limit=5):
