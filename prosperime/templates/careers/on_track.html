@@ -21,7 +21,7 @@
 
 	<!-- Main Header -->
 	<div id="on-track-header" class="h1 center">
-		Am I on track?
+		How do I get there?
 	</div>
 	
 	<div style="visibility:hidden;" id="search-again-button" class="flat-button turquoise-button prompt-button smaller-button float-right" onclick="backToSearch()">Search again</div>
@@ -39,7 +39,7 @@
   			</select>
 		</div>
 
-		<div class="call-out-text">Don't see what you're looking for? <a href="/">Let us know.</a></div>
+		<div class="call-out-text">Don't see what you're looking for? <a href="">Let us know.</a></div>
   			
 		<div id="show-results-button" class="prompt-button flat-button not-shown" onclick="positionSelected()">	See Your Results
 		</div>
@@ -103,7 +103,7 @@
 		</div>
 
 		<div class="preview-section">
-			<div id="img-placeholder"><img src="/static/img/progress_1.png"/></div>
+			<div id="img-placeholder"><img src="/static/img/progress_3.png"/></div>
 		</div>
 	</div>
 
@@ -132,6 +132,7 @@
 
 	<!-- Results Wrapper--> 
 	<div id="results-wrapper" class="center not-shown">
+		<div id="v2-bar-entity-wrapper"></div>
 		<div class="call-out-text">Here are the top paths to becoming <span id="goal-position-call-out"></span>.</div>	
 		<div id="shuffle-button" class="flat-button prompt-button turquoise-button smaller-button" onclick="renderNextPath()">Show another path</div>
 	</div>
@@ -154,7 +155,11 @@
 
 		<div class='flat-button prompt-button turquoise-button left-button' onclick='resultsToTellUsMore()'>Tell us more about yourself</div>
 
+		{% if authenticated %}
+		<a href="/build/">
+		{% else %}
 		<a href='/account/register/'>
+			{% endif %}
 			<div class='flat-button prompt-button turquoise-button right-button'>Take the next step</div>
 		</a>
 	</div>
@@ -280,12 +285,16 @@
 
 					// Make path and resize it
 					renderV2Path($container, $d_container, path)
+
+					$("#progress-wrapper").removeClass("not-shown")
+					$("#call-to-action-wrapper").removeClass("not-shown").hide().fadeIn(500)
+
+					// Segment this call to give more time...
+					//	 TODO: fix this problem
 					$(".v2-item", $container).each( function() {
 						resizeText(this)
 					});
 
-					$("#progress-wrapper").removeClass("not-shown")
-					$("#call-to-action-wrapper").removeClass("not-shown").hide().fadeIn(500)
 				}
 			}	
 		}, "json")
@@ -305,6 +314,14 @@
 		// Set instance variable for easy access
 		response_data = []
 		var first_shown = false
+		var length = Object.keys(paths).length
+
+		// Show/hide shuffle button
+		if (length > 1) $("#shuffle-button").show()
+		else $("#shuffle-button").hide()
+
+		$("#results-wrapper .call-out-text").show()
+
 		for (var key in paths) {
 
 			// Get path
@@ -327,8 +344,7 @@
 				first_shown = true
 			} 
 		};
-		if (response_data.length > 1) $("#shuffle-button").css("visibility", "visible")
-		else $("#shuffle-button").css("visibility","hidden")
+		
 	};
 
 
@@ -482,6 +498,9 @@
 			$("#form-wrapper").removeClass("not-shown").hide().fadeIn(250)
 		});
 		$("#results-wrapper").removeClass("not-shown").hide().fadeIn(250)
+		$("#results-wrapper .call-out-text").hide()
+		$("#results-wrapper #shuffle-button").hide()
+
 	};
 
 	// Renders input for new experience
@@ -722,6 +741,9 @@
 
 	var addV2Item = function(pos, $container, width, index) {
 
+		// Uniqify entities
+		pos["entities"] = _.uniq(pos["entities"], false, function(entity) { return entity["id"] });
+
 		$($container).append("<div class='v2-item' data-position_index='"+index+"' data-entity_index='0' style='width:"+(width-2)+"%'>"+pos["pos_title"]+" "+pos["entities"][0]["name"]+"</div>")
 	};
 
@@ -762,12 +784,19 @@
 
 				// Add hover
 				$(box_to_stack).hover(function() {
+					// get indices
 					var position_index = $(this).data("position_index")
 					var entity_index = $(this).data("entity_index") + 1
 					entity_index = (entity_index >= response_data[path_index][position_index]["entities"].length) ? 0 : entity_index
 
-
+					// get new entity
 					var new_ent = response_data[path_index][position_index]["entities"][entity_index]
+
+					// show entity
+					// $("#v2-bar-entity-wrapper").show().append()
+
+					// set index for next time
+					$(this).data("entity_index", entity_index)
 
 					// now. spray and show ents
 				}, function() {
@@ -795,10 +824,6 @@
 		// $($container).fadeOut(250, function() { $(this). empty() });
 		$($container).empty()
 		$($d_container).empty()
-
-		console.log($container)
-		console.log($d_container)
-		console.log(path)
 
 		// render new path w/ new index
 		renderV2Path($container, $d_container, path)
@@ -924,12 +949,8 @@
 
 /*
 	TODO: 
-		: resizing
-		: rendering your path
-		: adding positions manually
 		: colors?
 		: hover over
-		: show another path when 1 path?
 
 		: "Let us know" needs to send us an email somehow or store info
 		: Change link color, header color
