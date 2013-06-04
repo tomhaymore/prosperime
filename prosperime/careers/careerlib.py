@@ -884,6 +884,7 @@ class CareerBuild(CareerPathBase):
 				else:
 					is_ed = False
 
+
 		# collapse orgs list
 		for k,v in positions.iteritems():
 			v['orgs'] = [{'name':v1['name'],'id':v1['id'],'count':v1['count']} for k1, v1 in v['orgs'].iteritems()]

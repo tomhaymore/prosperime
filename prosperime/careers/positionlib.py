@@ -114,32 +114,30 @@ class PositionBase():
 		avg_duration = {}
 		# get all users
 		users = User.objects.values('id').filter(positions__ideal_position=position)
-		
 		# get list of all connections
-		connections = [u['user_id'] for u in user.profile.connections.values('user_id')]
-		
+		# connections = [u['user_id'] for u in user.profile.connections.values('user_id')]
 		# init array of durations
 		network_durations = []
 		all_durations = []
-		
+
 		# loop through all users, get duration
 		for u in users:
 			# check to see if user is in network
-			if u['id'] in connections:
-				duration = self._duration_to_position(u['id'],position)
-				if duration is not None:
-					network_durations.append(duration)
+			# if u['id'] in connections:
+			# 	duration = self._duration_to_position(u['id'],position)
+			# 	if duration is not None:
+			# 		network_durations.append(duration)
 			# compile all stats
 			duration = self._duration_to_position(u['id'],position)
 			if duration is not None:
 				all_durations.append(duration)
 
-		# compile network durations
-		if len(network_durations) > 0:
-			avg = sum(network_durations,timedelta()) / len(network_durations)
-			avg_duration['network'] = abs(round(avg.days / 365.25,2))
-		else:
-			avg_duration['network'] = None
+		# # compile network durations
+		# if len(network_durations) > 0:
+		# 	avg = sum(network_durations,timedelta()) / len(network_durations)
+		# 	avg_duration['network'] = abs(round(avg.days / 365.25,2))
+		# else:
+		# 	avg_duration['network'] = None
 
 		# compile all durations
 		if len(all_durations) > 0:
@@ -154,7 +152,7 @@ class PositionBase():
 		
 		# get all positions from user
 		positions = Position.objects.values('start_date','end_date','ideal_position_id').filter(person_id=user_id).order_by('-start_date')
-		
+		print "#positions checked: " + str(len(positions))
 		# setup placeholder end date
 		end_date = None
 		
