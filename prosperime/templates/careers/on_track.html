@@ -136,32 +136,35 @@
 
 
 	
-	<!-- Form Wrapper -->
-	<div id="form-wrapper" class="center not-shown"> 
-		<div class="section-header">Tell us more about yourself by clicking on the categories below...</div>
-
-		<div class="tell-us-more-header" data-section_type="education">
-			<i class="icon-chevron-sign-right"></i>
-			<span class="cursor">Education</span>
-		</div>
-
-		<div class="tell-us-more-header" data-section_type="experience">
-			<i class="icon-chevron-sign-right"></i>
-			<span class="cursor">Experience</span>
-		</div>
-
-		<div class="tell-us-more-header" data-section_type="skills">
-			<i class="icon-chevron-sign-right"></i>
-			<span class="cursor">Skills</span>
-		</div>
-
-		<div id="inline-form-container"></div>
-
-	</div>
+	
 
 	<!-- Progress Wrapper (Your path) -->
 	<div id="progress-wrapper" class="center not-shown">
 		<div class="section-header">Your Path</div>
+		
+		<!-- Form Wrapper -->
+		<div id="form-wrapper" class="center not-shown"> 
+			<div class="section-header">Tell us more about yourself by clicking on the categories below...</div>
+
+			<div class="tell-us-more-header" data-section_type="education">
+				<i class="icon-chevron-sign-right"></i>
+				<span class="cursor">Education</span>
+			</div>
+
+			<div class="tell-us-more-header" data-section_type="experience">
+				<i class="icon-chevron-sign-right"></i>
+				<span class="cursor">Experience</span>
+			</div>
+
+			<div class="tell-us-more-header" data-section_type="skills">
+				<i class="icon-chevron-sign-right"></i>
+				<span class="cursor">Skills</span>
+			</div>
+
+			<div id="inline-form-container"></div>
+
+		</div>
+		
 		<div class="path-bar"></div>
 
 
@@ -383,7 +386,7 @@
 
 	var resultsToTellUsMore = function() {
 		// Hide results... need to pipe positions to path
-		$("#results-wrapper").fadeOut(250, function() { $(this).addClass("not-shown") });
+		// $("#results-wrapper").fadeOut(250, function() { $(this).addClass("not-shown") });
 
 		// Hide call to action buttons
 		$("#call-to-action-wrapper").fadeOut(250, function() { $(this).addClass("not-shown") });	
