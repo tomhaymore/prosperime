@@ -193,12 +193,13 @@ class IdealPositionBase(PositionBase):
 		"""
 
 		# entities = Entity.objects.filter(positions__ideal_position=ideal_pos).annotate(pop=Count("positions__id")).order_by("-pop")[:limit]
-		entities = Entity.objects.filter(positions__ideal_position=ideal_pos).prefetch_related('offices')[:limit]
+		# entities = Entity.objects.filter(positions__ideal_position=ideal_pos).prefetch_related('offices').distinct()[:limit]
+		entities = Entity.objects.filter(positions__ideal_position=ideal_pos)[:limit]
 
 		# print entities
 		
-		entities_list = [{'name':e.name,'id':e.id,'descr':e.description,'no_employees':e.no_employees,'locations':[o.city for o in e.offices.all()]} for e in entities]
-		# entities_list = [{'name':e.name,'id':e.id,'descr':e.description,'no_employees':e.no_employees} for e in entities]
+		# entities_list = [{'name':e.name,'id':e.id,'descr':e.description,'no_employees':e.no_employees,'locations':[o.city for o in e.offices.all()]} for e in entities]
+		entities_list = [{'name':e.name,'id':e.id,'descr':e.description,'no_employees':e.no_employees} for e in entities]
 
 		# print entities_list
 
@@ -216,7 +217,18 @@ class IdealPositionBase(PositionBase):
 		# breakout all positions, in oder
 		for u in users:
 			print u.id
-			paths[u.id] = [{'pos_title':p.title,'pos_id':p.id,'ideal_title': p.ideal_position.title if p.ideal_position else None,'ideal_id':p.ideal_position_id if p.ideal_position else None,'entities':self.get_entities_from_ideal(p.ideal_position),'entity':p.entity.name,'entity_id':p.entity.id,'start_date': p.start_date.year if p.start_date else None ,'end_date':p.end_date.year if p.end_date else None} for p in u.positions.all() if p is not None]
+			paths[u.id] = [{
+				'pos_title':p.title,
+				'pos_id':p.id,
+				'ideal_title': p.ideal_position.title if p.ideal_position else None,
+				'ideal_id':p.ideal_position_id if p.ideal_position else None,
+				'entities':self.get_entities_from_ideal(p.ideal_position),
+				'entity':p.entity.name,
+				'entity_id':p.entity.id,
+				'start_date': p.start_date.year if p.start_date else None ,
+				'end_date':p.end_date.year if p.end_date else None,
+				'duration':(p.end_date - p.start_date).days/365.25 if p.start_date and p.end_date else None
+				} for p in u.positions.all() if p is not None]
 			# paths[u.id] = [{'pos_title':p.title,'pos_id':p.id,'ideal_title': p.ideal_position.title if p.ideal_position else None,'ideal_id':p.ideal_position_id if p.ideal_position else None,'entity':p.entity.name,'entity_id':p.entity.id,'start_date': p.start_date.year if p.start_date else None ,'end_date':p.end_date.year if p.end_date else None} for p in u.positions.all() if p is not None]
 			paths[u.id] = sorted(paths[u.id],key=operator.itemgetter('start_date'))
 		return paths		

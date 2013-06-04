@@ -69,11 +69,32 @@ def home(request):
 def schools(request):
 	return render_to_response("schools.html", context_instance=RequestContext(request))
 
+def test_ideal_paths(request):
+
+	# verify GET has right parameters
+	if request.GET.getlist('ideal_id'):
+
+		ideal_pos_id = request.GET.getlist('ideal_id')[0]
+
+		# from careers.positionlib import IdealPositionBase
+		# ideal_pos_lib = IdealPositionBase()
+
+		# check cache for path information
+		paths = cache.get('get_ideal_paths'+'_'+str(ideal_pos_id))
+		if paths is None:
+			# cache expired, retrieve anew
+			from careers.positionlib import IdealPositionBase
+			ideal_pos_lib = IdealPositionBase()
+
+			paths = ideal_pos_lib.get_ideal_paths(ideal_pos_id)
+
+		return render_to_response('careers/test_ideal_paths.html',{'paths':paths},context_instance=RequestContext(request))
+
 def progress(request):
 
 	# ghetto way of finding positions that we can give info on
 	# applicable_positions = Position.objects.filter(ideal_position__level=4)
-	applicable_positions = IdealPosition.objects.filter(level__gte=4).annotate(pop=Count('position__id')).order_by("-pop")
+	applicable_positions = IdealPosition.objects.filter(level=4).annotate(pop=Count('position__id')).order_by("-pop")
 	# ideal_positions = []
 	# for a in applicable_positions:
 	# 	if a.ideal_position not in ideal_positions:
