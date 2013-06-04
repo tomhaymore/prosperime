@@ -47,6 +47,9 @@ div#progress-wrapper {
 	margin-top:25px;
 }
 
+div#v2-bar-entity-wrapper {
+	position:absolute;
+}
 
 
 /* ID's */
@@ -361,7 +364,7 @@ div.input-container {
 
 /*********/
 .v2-bar {
-	margin-top:15px;
+	margin-top:25px;
 	display:inline-block;
 	color:#68696b;
 	width:90%; /* Allows animation to 80% (full-width) */
