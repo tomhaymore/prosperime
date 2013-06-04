@@ -1583,3 +1583,7 @@ a.inline-link:hover {
 	margin-top: 5px;
 	margin-bottom: 5px;
 }
+
+.cursor {
+	cursor:pointer;
+}

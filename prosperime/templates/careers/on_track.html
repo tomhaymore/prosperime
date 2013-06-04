@@ -21,10 +21,10 @@
 
 	<!-- Main Header -->
 	<div id="on-track-header" class="h1 center">
-		Am I on track?
+		How do I get to...?
 	</div>
 	
-	<div style="visibility:hidden;" id="search-again-button" class="flat-button turquoise-button prompt-button smaller-button float-right" onclick="backToSearch()">Search again</div>
+	
 
 	<!-- Search Box Wrapper --> 
 	<div id="search-box-wrapper" class="center">
@@ -39,7 +39,7 @@
   			</select>
 		</div>
 
-		<div class="call-out-text">Don't see what you're looking for? <a href="/">Let us know.</a></div>
+		<div class="call-out-text">Don't see what you're looking for? <a href="mailto:feedback@prospr.me">Let us know.</a></div>
   			
 		<div id="show-results-button" class="prompt-button flat-button not-shown" onclick="positionSelected()">	See Your Results
 		</div>
@@ -82,7 +82,7 @@
 
 			<span class="call-out-text"> or </span>
 
-			<a href="/account/authorize">
+			<a href="/account/authorize/?next=/progress">
 			<div id="linkedin-button" class="flat-button large-button prompt-button right-button dark-blue">
 				Login with LinkedIn
 			</div>
@@ -93,47 +93,70 @@
 
 	<!-- Preview Wrapper -->
 	<div id="preview-wrapper" class="center">
-		<div class="preview-section">
+		<div class="preview-section-full">
+			<div class="section-header">What is this?</div>
+			<p>This is a new tool from Prospr.me that helps you plan your future. Using our one-of-a-kind database of hundreds of thousands of actual career histories, we can show you possible paths to reach your goals.</p>
+		</div>
+		<!-- <div class="preview-section">
 			<div class="section-header">We can show you: </div>
 			<ul>
 				<li>The dominant career paths that lead to your goals</li>
 				<li>Related professionals in your desired career</li>
 				<li>Important statistics, like how long it takes to get there</li>
 			</ul>
-		</div>
+		</div> -->
 
-		<div class="preview-section">
+		<!-- <div class="preview-section">
+			<div class="section-header">What can we show you?</div>
+			<ul>
+				<li>The dominant career paths that lead to your goals</li>
+				<li>Related professionals in your desired career</li>
+				<li>Important statistics, like how long it takes to get there</li>
+			</ul>
+		</div> -->
+
+		<div class="preview-section-full">
 			<div id="img-placeholder"><img src="/static/img/progress_1.png"/></div>
 		</div>
 	</div>
 
+	
+
+	<!-- Results Wrapper--> 
+	<div id="results-wrapper" class="center not-shown">
+		<div class="call-out-text">Here are the top paths to becoming <span id="goal-position-call-out"></span>.</div>	
+	</div>
+	<div id="results-wrapper-buttons">
+		<div class="pull-right">
+			<div id="shuffle-button" style="visibility:hidden;" class="flat-button prompt-button turquoise-button smaller-button" onclick="renderNextPath()">Show another path</div>
+			<div style="visibility:hidden;" id="search-again-button" class="flat-button turquoise-button prompt-button smaller-button float-right" onclick="backToSearch()">Search again</div>
+		</div>
+		<div class="clear"></div>
+	</div>
+
+
+	
 	<!-- Form Wrapper -->
 	<div id="form-wrapper" class="center not-shown"> 
 		<div class="section-header">Tell us more about yourself by clicking on the categories below...</div>
 
 		<div class="tell-us-more-header" data-section_type="education">
 			<i class="icon-chevron-sign-right"></i>
-			<span>Education</span>
+			<span class="cursor">Education</span>
 		</div>
 
 		<div class="tell-us-more-header" data-section_type="experience">
 			<i class="icon-chevron-sign-right"></i>
-			<span>Experience</span>
+			<span class="cursor">Experience</span>
 		</div>
 
 		<div class="tell-us-more-header" data-section_type="skills">
 			<i class="icon-chevron-sign-right"></i>
-			<span>Skills</span>
+			<span class="cursor">Skills</span>
 		</div>
 
 		<div id="inline-form-container"></div>
 
-	</div>
-
-	<!-- Results Wrapper--> 
-	<div id="results-wrapper" class="center not-shown">
-		<div class="call-out-text">Here are the top paths to becoming <span id="goal-position-call-out"></span>.</div>	
-		<div id="shuffle-button" class="flat-button prompt-button turquoise-button smaller-button" onclick="renderNextPath()">Show another path</div>
 	</div>
 
 	<!-- Progress Wrapper (Your path) -->
@@ -295,6 +318,7 @@
 
 		// Show back button
 		$("#search-again-button").css("visibility", "visible")
+		$("#shuffle-button").css("visibility", "visible")
 	}
 
 	/* INSTANCE VARIABLE */
@@ -342,7 +366,7 @@
 			if ("display_text" in path[j])
 				$container.append("<div class='path-item' style='width:"+width+";background-color:"+color_map[j]+";'>"+path[j]["display_text"]+"</div>")
 
-			if ("pos_title" in path[j])
+			if ("pos_title" in path[j] && path[j]["pos_title"] != null)
 				$container.append("<div class='path-item' style='width:"+width+";background-color:"+color_map[j]+";'>"+path[j]["pos_title"]+"</div>")
 			else
 				$container.append("<div class='path-item' style='width:"+width+";background-color:"+color_map[j]+";'>"+path[j]["title"]+"</div>")
