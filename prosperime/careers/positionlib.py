@@ -199,9 +199,11 @@ class IdealPositionBase(PositionBase):
 		# print entities
 		
 		# entities_list = [{'name':e.name,'id':e.id,'descr':e.description,'no_employees':e.no_employees,'locations':[o.city for o in e.offices.all()]} for e in entities]
-		entities_list = [{'name':e.name,'id':e.id,'descr':e.description,'no_employees':e.no_employees} for e in entities]
 		focal_entity = entity
-		entities_list.append({'name':focal_entity.name,'id':focal_entity.id,'descr':focal_entity.description,'no_employees':focal_entity.no_employees})
+		entity_zero = [{'name':focal_entity.name,'id':focal_entity.id,'descr':focal_entity.description,'no_employees':focal_entity.no_employees}]
+		entities_list = [{'name':e.name,'id':e.id,'descr':e.description,'no_employees':e.no_employees} for e in entities]
+		entities_list.extend(entity_zero)
+		# entities_list.append({'name':focal_entity.name,'id':focal_entity.id,'descr':focal_entity.description,'no_employees':focal_entity.no_employees})
 
 		# print entities_list
 
