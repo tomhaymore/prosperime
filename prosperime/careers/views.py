@@ -1720,6 +1720,8 @@ def get_ideal_paths(request):
 
 			paths = ideal_pos_lib.get_ideal_paths(ideal_pos_id)
 
+		
+
 		return HttpResponse(json.dumps(paths))
 
 def get_ideal_pos_paths(request):

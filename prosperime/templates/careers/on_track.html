@@ -24,7 +24,7 @@
 		Am I on track?
 	</div>
 	
-	<div style="visibility:hidden;" id="search-again-button" class="flat-button green-button float-right" onclick="backToSearch()">Search again</div>
+	<div style="visibility:hidden;" id="search-again-button" class="flat-button turquoise-button prompt-button smaller-button float-right" onclick="backToSearch()">Search again</div>
 
 	<!-- Search Box Wrapper --> 
 	<div id="search-box-wrapper" class="center">
@@ -103,7 +103,7 @@
 		</div>
 
 		<div class="preview-section">
-			<div id="img-placeholder">SCREENSHOT</div>
+			<div id="img-placeholder"><img src="/static/img/progress_1.png"/></div>
 		</div>
 	</div>
 
@@ -131,13 +131,14 @@
 	</div>
 
 	<!-- Results Wrapper--> 
-	<div id="results-wrapper" class="center not-shown">	
-
+	<div id="results-wrapper" class="center not-shown">
+		<div class="call-out-text">Here are the top paths to becoming <span id="goal-position-call-out"></span>.</div>	
+		<div id="shuffle-button" class="flat-button prompt-button turquoise-button smaller-button" onclick="renderNextPath()">Show another path</div>
 	</div>
 
 	<!-- Progress Wrapper (Your path) -->
 	<div id="progress-wrapper" class="center not-shown">
-		<div class="section-header center">You</div>
+		<div class="section-header">Your Path</div>
 		<div class="path-bar"></div>
 
 
@@ -157,6 +158,7 @@
 			<div class='flat-button prompt-button turquoise-button right-button'>Take the next step</div>
 		</a>
 	</div>
+
 
 {% csrf_token %}
 </div>
@@ -186,11 +188,10 @@
 		"rgba(41,128,185,1)",
 	]
 
-	// DST for storing any data the user inputs
-	// var path = []
 
 	/* Main */	
 	$(function() {
+
 		// setup CSRF token
 		$.ajaxSetup({
 	        beforeSend: function(xhr, settings) {
@@ -261,14 +262,28 @@
 		var ideal_id = parseInt($("#goal-position-box :selected").val())
 		$.get("/careers/getIdealPaths", {"ideal_id":ideal_id}, function(response) {
 			renderResults(response)
-
-			// Show existing positions
+			// Show users's existing positions
 			if ($("#progress-wrapper").hasClass("not-shown") && path.length > 0) {
-				if ($("#progress-wrapper .path-item").length > 0) {
+				// If already rendered, show them
+				if ($("#progress-wrapper .v2-bar").length > 0) {
 					$("#progress-wrapper").removeClass("not-shown").hide().fadeIn(250)
 					$("#call-to-action-wrapper").removeClass("not-shown").hide().fadeIn(500)
 				} else {
-					renderPath($("#progress-wrapper .path-bar"), path)
+					// Else, make them
+
+					// Create containers
+					$("#progress-wrapper").append("<div class='v2-bar'></div>").append("<div class='v2-duration-bar'></div>")
+
+					// Append them
+					$container = $("#progress-wrapper .v2-bar :last")
+					$d_container = $("#progress-wrapper .v2-duration-bar :last")
+
+					// Make path and resize it
+					renderV2Path($container, $d_container, path)
+					$(".v2-item", $container).each( function() {
+						resizeText(this)
+					});
+
 					$("#progress-wrapper").removeClass("not-shown")
 					$("#call-to-action-wrapper").removeClass("not-shown").hide().fadeIn(500)
 				}
@@ -282,20 +297,38 @@
 		$("#search-again-button").css("visibility", "visible")
 	}
 
+	/* INSTANCE VARIABLE */
+	var response_data = []
+
 	// Handles rendering all ideal paths returned from server
 	var renderResults = function(paths) {
+		// Set instance variable for easy access
+		response_data = []
+		var first_shown = false
 		for (var key in paths) {
 
 			// Get path
 			var $path = paths[key]
+			response_data.push($path)
 
-			// Add new bar, set vars
-			$("#results-wrapper").append("<div class='path-bar'></div>").removeClass("not-shown").hide().fadeIn(250)
-			var $bar = $("#results-wrapper .path-bar :last")
+			// V2, only show first path
+			if (!first_shown) {
+				$("#results-wrapper").append("<div class='v2-bar' data-path_index='0'></div>").append("<div class='v2-duration-bar'></div>").removeClass("not-shown").hide().fadeIn(250)
 
-			// Render bar
-			renderPath($bar, $path)
+				$("#goal-position-call-out").html($("#goal-position-box :selected").html())
+
+				var $bar = $("#results-wrapper .v2-bar :last")
+				var $d_bar = $("#results-wrapper .v2-duration-bar :last")
+
+				renderV2Path($bar, $d_bar, $path)
+				$(".v2-item", $bar).each(function() {
+					resizeText(this)
+				})
+				first_shown = true
+			} 
 		};
+		if (response_data.length > 1) $("#shuffle-button").css("visibility", "visible")
+		else $("#shuffle-button").css("visibility","hidden")
 	};
 
 
@@ -403,7 +436,10 @@
 		$("#form-wrapper").fadeOut(250, function() { $(this).addClass("not-shown") });
 
 		// Erase previous path bars
-		$("#results-wrapper .path-bar").each(function() {
+		$("#results-wrapper .v2-bar").each(function() {
+			$(this).remove()
+		})
+		$("#results-wrapper .v2-duration-bar").each(function() {
 			$(this).remove()
 		})
 
@@ -613,14 +649,16 @@
 		})
 	}
 
+
 	// Render the progress bar with newly entered data
 		// Currently, re-rendering entire bar to adjust widths
 	var rerenderProgressBar = function(path) {
-
 		if (path.length == 1) { // first position
 			// add progress bar
-			$("#progress-wrapper .path-bar").css("display", "inline-block").animate({"width":"80%"}, "500")
-			$("#progress-wrapper").removeClass("not-shown")
+			// $("#progress-wrapper .path-bar").css("display", "inline-block").animate({"width":"80%"}, "500")
+
+			// Create progress bar
+			$("#progress-wrapper").removeClass("not-shown").append("<div class='v2-bar'></div>").append("<div class='v2-duration-bar'></div>")
 
 			// // add goal position
 			// $(".end-goal-wrapper").append("<div class='end-item'>"+$("#goal-position-box :selected").html()+"</div>").hide().delay(500).fadeIn(250)
@@ -632,12 +670,17 @@
 			$("#tell-us-more-results-button").css("visibility", "visible").hide().fadeIn(250)
 
 		} else // empty existing
-			$("#progress-wrapper .path-bar").empty()
+			$("#progress-wrapper .v2-bar").empty()
 
 		// Get new width
 		var width = Math.floor(100/(path.length))
+		var $container = $("#progress-wrapper .v2-bar")
+		var $d_container = $("#progress-wrapper .v2-duration-bar")
 
-		renderPath($("#progress-wrapper .path-bar"), path)
+		renderV2Path($container, $d_container, path)
+		$(".v2-item", $container).each(function() {
+			resizeText(this)
+		});
 
 		// // Loop through, add items
 		// for (var j = 0; j < path.length; j++) {
@@ -648,6 +691,123 @@
 		// }
 	}
 
+	/**************/
+	/* Viz V2 API */
+	/**************/
+
+	var renderV2Path = function($container, $d_container, path) {
+		// Set relative width
+		var width = Math.floor(100/path.length)
+		console.log(path)
+		var is_user = ("pos_title" in path[0]) ? false : true;
+		// Iterate through and create boxes
+		for (var j = 0; j < path.length; j++) {
+
+			if (is_user) addV2UserItem(path[j], $container, width, j)
+			else addV2Item(path[j],$container, width, j)
+
+			addV2Duration(path[j],$d_container, width)
+
+			// If not the last element, create link to next
+			if (j < path.length - 1) {// then add link box
+				$($container).append("<div class='v2-bar-link'></div>") 
+				$($d_container).append("<div class='v2-duration-bar-link'></div>")
+			};
+		};
+		// Have to do this after b/c widths have to be set
+		if (!is_user) addStacking(path, $container, width)
+		$($container).hide().fadeIn(250)
+	};
+
+
+	var addV2Item = function(pos, $container, width, index) {
+
+		$($container).append("<div class='v2-item' data-position_index='"+index+"' data-entity_index='0' style='width:"+(width-2)+"%'>"+pos["pos_title"]+" "+pos["entities"][0]["name"]+"</div>")
+	};
+
+	var addV2UserItem = function(pos, $container, width, index) {
+		if ("display_text" in pos)
+			$($container).append("<div class='v2-item' data-position_index='"+index+"' data-entity_index='0' style='width:"+(width-2)+"%'>"+pos["display_text"]+"</div>")
+		else
+			$($container).append("<div class='v2-item' data-position_index='"+index+"' data-entity_index='0' style='width:"+(width-2)+"%'>"+pos["title"]+" "+pos["entity_name"]+"</div>")
+	};
+
+
+	var addV2Duration = function(pos, $container, width) {
+		// show nothing for now
+		pos["duration"] = " "
+
+		$($container).append("<div class='v2-duration-item' style='width:"+(width-2)+"%'>"+pos["duration"]+"</div>")
+	};
+
+	// Iterates through data, looks for multiple entities, adds stacked
+	//	viz & hover handler if so
+	var addStacking = function(data, $container, width) {
+		for (var j = 0; j < data.length; j++) {
+			if (data[j]["entities"].length > 1) {
+				var box_to_stack = $(".v2-item :eq("+j+")", $container)
+
+				// Create stacked element, set width
+				$($container).append("<div class='v2-item stacked-item' style='width:"+(width-2)+"%'></div>")
+
+				// Find width, left, top offsets
+				var offset = $(box_to_stack).offset()
+				var d_width = $(box_to_stack).css("width")
+
+				// Place box
+				$(".stacked-item :last", $container).css("left", offset.left-8).css("top",offset.top-6).css("height", "80px").css("width", d_width).css("z-index","5")
+
+				// Path index
+				var path_index = $($container).data("path_index")
+
+				// Add hover
+				$(box_to_stack).hover(function() {
+					var position_index = $(this).data("position_index")
+					var entity_index = $(this).data("entity_index") + 1
+					entity_index = (entity_index >= response_data[path_index][position_index]["entities"].length) ? 0 : entity_index
+
+
+					var new_ent = response_data[path_index][position_index]["entities"][entity_index]
+
+					// now. spray and show ents
+				}, function() {
+					var foo = "bar"
+				});
+			};
+		};
+	};
+
+	/* handler for "shuffling" paths */
+	var renderNextPath = function() {
+		// get index of last
+		var next_index = parseInt($("#results-wrapper .v2-bar").data("path_index")) + 1
+
+		// reset index
+		next_index = (next_index >= response_data.length) ? 0 : next_index;
+		$("#results-wrapper .v2-bar").data("path_index", next_index)
+
+		// get path & container
+		var path = response_data[next_index]
+		var $container = $("#results-wrapper .v2-bar")
+		var $d_container = $("#results-wrapper .v2-duration-bar")
+
+		// empty of previous belongings
+		// $($container).fadeOut(250, function() { $(this). empty() });
+		$($container).empty()
+		$($d_container).empty()
+
+		console.log($container)
+		console.log($d_container)
+		console.log(path)
+
+		// render new path w/ new index
+		renderV2Path($container, $d_container, path)
+		$(".v2-item", $container).each(function() {
+			resizeText(this)
+		})
+	}
+
+
 
 
 	/***********/
@@ -656,7 +816,6 @@
 	var resizeText = function(el) {
 
 		var diff = el.scrollHeight - el.offsetHeight
-		// console.log(el.style.width)
 		if (diff > (el.offsetHeight * 2)) {
 			// console.log("tier 2")
 			// console.log(el)
@@ -664,23 +823,23 @@
 			$(el).css("font-size", (current_font_size-4) + "px")
 
 			var line_height = parseInt($(el).css("line-height"))
-			$(el).css("line-height", (18) + "px")
+			$(el).css("line-height", (14) + "px")
 		} else if (diff > el.offsetHeight) {
 			// font-size -= 2
 			var current_font_size = parseInt($(el).css("font-size"))
-			$(el).css("font-size", (current_font_size-4) + "px")
+			$(el).css("font-size", (current_font_size-2) + "px")
 			// console.log("tier 1")
 			// line height -= medium
 			var line_height = parseInt($(el).css("line-height"))
-			$(el).css("line-height", (22) + "px")
+			$(el).css("line-height", (18) + "px")
 
 		} else if (diff > 0) {
 			// font-size -= 2
 			// console.log("tier 0")
 			var line_height = parseInt($(el).css("line-height"))
-			$(el).css("line-height", (25) + "px")
-			var current_font_size = parseInt($(el).css("font-size"))
-			$(el).css("font-size", (current_font_size-2) + "px")
+			$(el).css("line-height", (24) + "px")
+			// var current_font_size = parseInt($(el).css("font-size"))
+			// $(el).css("font-size", (current_font_size-2) + "px")
 		} else if (el.scrollWidth > el.offsetWidth) {
 			var current_font_size = parseInt($(el).css("font-size"))
 			$(el).css("font-size", (current_font_size-2) + "px")
@@ -765,6 +924,13 @@
 
 /*
 	TODO: 
+		: resizing
+		: rendering your path
+		: adding positions manually
+		: colors?
+		: hover over
+		: show another path when 1 path?
+
 		: "Let us know" needs to send us an email somehow or store info
 		: Change link color, header color
 		: Get Screenshort
