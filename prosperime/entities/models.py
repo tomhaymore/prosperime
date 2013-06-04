@@ -101,7 +101,7 @@ class Industry(models.Model):
 		return self.name
 
 class Office(models.Model):
-	entity = models.ForeignKey(Entity)
+	entity = models.ForeignKey(Entity,related_name="offices")
 	description = models.CharField(max_length=450,blank=True,null=True)
 	is_hq = models.NullBooleanField(null=True)
 	addr_1 = models.CharField(max_length=150,blank=True,null=True)
