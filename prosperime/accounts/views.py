@@ -122,7 +122,9 @@ def linkedin_authorize(request):
 		
 	liparser = LIProfile()
 	redirect_url, request_token = liparser.authorize()
-
+	# check for a redirect parameter
+	if request.GET.get('next'):
+		request.session['next'] = request.GET.get('next')
 	request.session['request_token'] = request_token
 
 	return HttpResponseRedirect(redirect_url)
@@ -279,7 +281,10 @@ def finish_login(request):
 			}
 
 			#return HttpResponseRedirect('/account/success')
-			return HttpResponseRedirect('/personalize/careers/')
+			if 'next' not in request.session:
+				return HttpResponseRedirect('/personalize/careers/')
+			else:
+				return HttpResponseRedirect(request.session['next'])
 	else:
 		form = FinishAuthForm()
 
@@ -351,7 +356,10 @@ def finish_link(request):
 
 	messages.success(request, 'Your LinkedIn account has been successfully linked. Please refresh the page to see changes.')
 
-	return HttpResponseRedirect('/personalize/careers/')
+	if 'next' not in request.session:
+		return HttpResponseRedirect('/personalize/careers/')
+	else:
+		return HttpResponseRedirect(request.session['next'])
 
 def success(request):
 	return render_to_response('accounts/success.html',context_instance=RequestContext(request))

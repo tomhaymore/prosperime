@@ -22,11 +22,15 @@ body {
 
 /* Main Containers */
 div#search-box-wrapper {
-/*	margin-top:30px;
-*/}
+	margin-top:30px;
+}
 
 div#button-wrapper {
 	margin-top:15px;
+}
+
+div#results-wrapper-buttons {
+	min-width:300px;
 }
 
 div#preview-wrapper {
@@ -180,6 +184,16 @@ div.end-item {
 	max-width:50%;
 }
 
+.preview-section-full {
+	text-align:left;
+	font-size:1.2em;
+	line-height:26px;
+	display:inline-block;
+	vertical-align: top;
+	margin:0 auto;
+	max-width:75%;
+}
+
 .preview-section ul {
 	padding-left:15px;
 }
@@ -303,7 +317,7 @@ div.input-container {
 }
 
 .smaller-button {
-	width:15%;
+	width:150px;
 	height:30px;
 	line-height:30px;
 	font-size:1.1em;
@@ -353,9 +367,9 @@ div.input-container {
 }
 
 #search-again-button {
-	position:relative;
+	/*position:relative;
 	left:800px;
-	bottom:45px;
+	bottom:45px;*/
 }
 .button-left {
 
