@@ -189,7 +189,7 @@ class IdealPositionBase(PositionBase):
 		users = User.objects.filter(positions__ideal_position=ideal_pos).order_by("-positions__start_date")
 		return users
 
-	def get_entities_from_ideal(self,ideal_pos,limit=5):
+	def get_entities_from_ideal(self,ideal_pos,entity,limit=5):
 		"""
 		returns all entities that share ideal position
 		"""
@@ -202,7 +202,7 @@ class IdealPositionBase(PositionBase):
 		
 		# entities_list = [{'name':e.name,'id':e.id,'descr':e.description,'no_employees':e.no_employees,'locations':[o.city for o in e.offices.all()]} for e in entities]
 		entities_list = [{'name':e.name,'id':e.id,'descr':e.description,'no_employees':e.no_employees} for e in entities]
-		focal_entity = ideal_pos.position.entity
+		focal_entity = entity
 		entities_list.append({'name':focal_entity.name,'id':focal_entity.id,'descr':focal_entity.description,'no_employees':focal_entity.no_employees})
 
 		# print entities_list
@@ -226,7 +226,7 @@ class IdealPositionBase(PositionBase):
 				'pos_id':p.id,
 				'ideal_title': p.ideal_position.title if p.ideal_position else None,
 				'ideal_id':p.ideal_position_id if p.ideal_position else None,
-				'entities':self.get_entities_from_ideal(p.ideal_position),
+				'entities':self.get_entities_from_ideal(p.ideal_position,p.entity),
 				'entity':p.entity.name,
 				'entity_id':p.entity.id,
 				'start_date': p.start_date.year if p.start_date else None ,
