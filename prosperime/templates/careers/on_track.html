@@ -41,9 +41,12 @@
 
 		<div class="call-out-text">Don't see what you're looking for? <a href="mailto:feedback@prospr.me">Let us know.</a></div>
   			
-		<div id="show-results-button" class="prompt-button flat-button not-shown" onclick="positionSelected()">	See Your Results
+		<div id="show-results-button" class="prompt-button flat-button not-shown" onclick="getAndRenderResults()">	See Your Results
 		</div>
+	</div>
 
+	<div id="loading-wrapper" class="center not-shown">
+		<h1>Loading...</h1>
 	</div>
 
 	<!-- Call to Build Wrapper -->
@@ -115,8 +118,12 @@
 			</ul>
 		</div> -->
 
+<!-- <<<<<<< HEAD
+		<div class="preview-section">
+			<div id="img-placeholder"><img src="/static/img/progress_3.png"/></div>
+======= -->
 		<div class="preview-section-full">
-			<div id="img-placeholder"><img src="/static/img/progress_1.png"/></div>
+			<div id="img-placeholder"><img src="/static/img/progress_3.png"/></div>
 		</div>
 	</div>
 
@@ -124,18 +131,17 @@
 
 	<!-- Results Wrapper--> 
 	<div id="results-wrapper" class="center not-shown">
+		<div id="v2-bar-entity-wrapper"></div>
 		<div class="call-out-text">Here are the top paths to becoming <span id="goal-position-call-out"></span>.</div>	
 	</div>
-	<div id="results-wrapper-buttons">
+
+	<div id="results-wrapper-buttons" class="not-shown">
 		<div class="pull-right">
-			<div id="shuffle-button" style="visibility:hidden;" class="flat-button prompt-button turquoise-button smaller-button" onclick="renderNextPath()">Show another path</div>
-			<div style="visibility:hidden;" id="search-again-button" class="flat-button turquoise-button prompt-button smaller-button float-right" onclick="backToSearch()">Search again</div>
+			<div id="shuffle-button" class="flat-button prompt-button turquoise-button smaller-button" onclick="renderNextPath()">Show another path</div>
+			<div id="search-again-button" class="flat-button turquoise-button prompt-button smaller-button float-right" onclick="backToSearch()">Search again</div>
 		</div>
 		<div class="clear"></div>
 	</div>
-
-
-	
 	
 
 	<!-- Progress Wrapper (Your path) -->
@@ -180,7 +186,11 @@
 
 		<div class='flat-button prompt-button turquoise-button left-button' onclick='resultsToTellUsMore()'>Tell us more about yourself</div>
 
+		{% if authenticated %}
+		<a href="/build/">
+		{% else %}
 		<a href='/account/register/'>
+			{% endif %}
 			<div class='flat-button prompt-button turquoise-button right-button'>Take the next step</div>
 		</a>
 	</div>
@@ -284,9 +294,16 @@
 		console.log("Existing Path: ")
 		console.log(path)
 
+		// show loading
+		$("#loading-wrapper").removeClass("not-shown").hide().fadeIn(100)
+
 		// AJAX for ideal paths
 		var ideal_id = parseInt($("#goal-position-box :selected").val())
 		$.get("/careers/getIdealPaths", {"ideal_id":ideal_id}, function(response) {
+
+			// hide loading
+			$("#loading-wrapper").addClass("not-shown")
+
 			renderResults(response)
 			// Show users's existing positions
 			if ($("#progress-wrapper").hasClass("not-shown") && path.length > 0) {
@@ -306,22 +323,22 @@
 
 					// Make path and resize it
 					renderV2Path($container, $d_container, path)
+
+					$("#progress-wrapper").removeClass("not-shown")
+					$("#call-to-action-wrapper").removeClass("not-shown").hide().fadeIn(500)
+
+					// Segment this call to give more time...
+					//	 TODO: fix this problem
 					$(".v2-item", $container).each( function() {
 						resizeText(this)
 					});
 
-					$("#progress-wrapper").removeClass("not-shown")
-					$("#call-to-action-wrapper").removeClass("not-shown").hide().fadeIn(500)
 				}
 			}	
 		}, "json")
 
 		// Slide search wrapper out of the way
 		$("#search-box-wrapper").slideUp(300)
-
-		// Show back button
-		$("#search-again-button").css("visibility", "visible")
-		$("#shuffle-button").css("visibility", "visible")
 	}
 
 	/* INSTANCE VARIABLE */
@@ -332,6 +349,14 @@
 		// Set instance variable for easy access
 		response_data = []
 		var first_shown = false
+		var length = Object.keys(paths).length
+
+		// Show/hide shuffle button
+		if (length > 1) $("#shuffle-button").show()
+		else $("#shuffle-button").hide()
+
+		$("#results-wrapper .call-out-text").show()
+
 		for (var key in paths) {
 
 			// Get path
@@ -354,8 +379,7 @@
 				first_shown = true
 			} 
 		};
-		if (response_data.length > 1) $("#shuffle-button").css("visibility", "visible")
-		else $("#shuffle-button").css("visibility","hidden")
+		$("#results-wrapper-buttons").removeClass("not-shown").hide().fadeIn(250)
 	};
 
 
@@ -430,7 +454,7 @@
 
 	// Responds to selecting a goal position
 	var positionSelected = function() {
-
+		console.log("selected")
 		// Get selected ideal_id
 		var ideal_id = $("#goal-position-box :selected").val()
 
@@ -449,9 +473,6 @@
 
 		// Show search box
 		$("#search-box-wrapper").removeClass("not-shown").hide().slideDown(250)
-
-		// Hide Button
-		$("#search-again-button").css("visibility", "hidden")
 
 		// Hide Results
 		$("#results-wrapper").fadeOut(250, function() { $(this).addClass("not-shown") });
@@ -472,6 +493,11 @@
 
 		// Hide You bar
 		$("#progress-wrapper").addClass("not-shown")
+
+		// Hide Results buttons
+		$("#results-wrapper-buttons").fadeOut(250)
+
+		$("#v2-bar-entity-wrapper").css("left",-500)
 	};
 
 
@@ -509,6 +535,9 @@
 			$("#form-wrapper").removeClass("not-shown").hide().fadeIn(250)
 		});
 		$("#results-wrapper").removeClass("not-shown").hide().fadeIn(250)
+		$("#results-wrapper .call-out-text").hide()
+		$("#results-wrapper #shuffle-button").hide()
+
 	};
 
 	// Renders input for new experience
@@ -749,7 +778,10 @@
 
 	var addV2Item = function(pos, $container, width, index) {
 
-		$($container).append("<div class='v2-item' data-position_index='"+index+"' data-entity_index='0' style='width:"+(width-2)+"%'>"+pos["pos_title"]+" "+pos["entities"][0]["name"]+"</div>")
+		// Uniqify entities
+		pos["entities"] = _.uniq(pos["entities"], false, function(entity) { return entity["name"] });
+
+		$($container).append("<div class='v2-item' data-position_index='"+index+"' data-entity_index='0' style='width:"+(width-2)+"%'>"+pos["pos_title"]+" <span class='v2-item-entity'>"+pos["entities"][0]["name"]+"</span></div>")
 	};
 
 	var addV2UserItem = function(pos, $container, width, index) {
@@ -789,19 +821,58 @@
 
 				// Add hover
 				$(box_to_stack).hover(function() {
+					// get indices
 					var position_index = $(this).data("position_index")
-					var entity_index = $(this).data("entity_index") + 1
-					entity_index = (entity_index >= response_data[path_index][position_index]["entities"].length) ? 0 : entity_index
+					// var entity_index = $(this).data("entity_index") + 1
+					// entity_index = (entity_index >= response_data[path_index][position_index]["entities"].length) ? 0 : entity_index
 
+					// // get new entity
+					// var new_ent = response_data[path_index][position_index]["entities"][entity_index]
 
-					var new_ent = response_data[path_index][position_index]["entities"][entity_index]
+					// show entity
+					var entities = response_data[path_index][position_index]["entities"]
 
-					// now. spray and show ents
-				}, function() {
-					var foo = "bar"
+					showEntityList(entities, $(this).offset(), this)
+
+				}, function(e) {
+					$("#v2-bar-entity-wrapper").delay(4000).fadeOut(500, function() {
+						$(this).css("left",-500).fadeIn()
+					})
 				});
 			};
 		};
+	};
+
+	// moves absolutely positioned div to appropriate location and
+	//	renders ul of entities inside it
+	var showEntityList = function(entities, offset, item) {
+		var text = "<ul class='entity-list'><li><i class='icon-caret-right icon-large'></i><b>Related Companies:</b></li>"
+		for (var j = 0; j < entities.length; j++) {
+			text += "<li class='entity-list-item'>" + entities[j]["name"] + "</li>"
+		};
+		text += "</ul>"
+
+		// Place 
+		$("#v2-bar-entity-wrapper").html(text).css("top",offset.top+80).css("left",offset.left-10)
+
+		// Allow each to be clicked
+		$(".entity-list li :not(:first)").each(function() {
+			$(this).click(function() {
+				entityClicked($(this).html(), item)
+			});
+			$(this).hover(function() {
+				$(this).css("background-color", "rgba(41,128,185,0.7)")
+			}, function() {
+				$(this).css("background-color","rgba(256,256,255,0.7)")
+			});
+		});
+	};
+
+	// changes the entity of a particular v2 path item
+	var entityClicked = function(clicked, item) {
+		$(".v2-item-entity", item).fadeOut(150, function() {
+			$(this).html(clicked).fadeIn(150)
+		});
 	};
 
 	/* handler for "shuffling" paths */
@@ -822,10 +893,6 @@
 		// $($container).fadeOut(250, function() { $(this). empty() });
 		$($container).empty()
 		$($d_container).empty()
-
-		console.log($container)
-		console.log($d_container)
-		console.log(path)
 
 		// render new path w/ new index
 		renderV2Path($container, $d_container, path)
@@ -951,12 +1018,8 @@
 
 /*
 	TODO: 
-		: resizing
-		: rendering your path
-		: adding positions manually
 		: colors?
 		: hover over
-		: show another path when 1 path?
 
 		: "Let us know" needs to send us an email somehow or store info
 		: Change link color, header color
