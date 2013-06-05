@@ -199,10 +199,11 @@ class IdealPositionBase(PositionBase):
 		# print entities
 		
 		# entities_list = [{'name':e.name,'id':e.id,'descr':e.description,'no_employees':e.no_employees,'locations':[o.city for o in e.offices.all()]} for e in entities]
-		entities_list = [{'name':e.name,'id':e.id,'descr':e.description,'no_employees':e.no_employees} for e in entities]
-		focal_entity = entity
-		entities_list.append({'name':focal_entity.name,'id':focal_entity.id,'descr':focal_entity.description,'no_employees':focal_entity.no_employees})
-
+		entities_list = [{'name':entity.name,'id':entity.id,'descr':entity.description,'no_employees':entity.no_employees}]
+		new_entities_list = [{'name':e.name,'id':e.id,'descr':e.description,'no_employees':e.no_employees} for e in entities]
+		# focal_entity = entity
+		# entities_list.append({'name':focal_entity.name,'id':focal_entity.id,'descr':focal_entity.description,'no_employees':focal_entity.no_employees})
+		entities_list.extend(new_entities_list)
 		# print entities_list
 
 		return entities_list
@@ -214,7 +215,7 @@ class IdealPositionBase(PositionBase):
 		# fetch ideal position object
 		ideal_pos = IdealPosition.objects.get(pk=ideal_pos_id)
 
-		users = User.objects.filter(positions__ideal_position=ideal_pos).order_by("profile__status").distinct()[:limit]
+		users = User.objects.filter(positions__ideal_position=ideal_pos).annotate(nopos=Count('positions__id')).exclude(nopos__lte=1).distinct()[:limit]
 
 		# breakout all positions, in oder
 		for u in users:
