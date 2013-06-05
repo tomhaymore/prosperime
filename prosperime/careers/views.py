@@ -245,10 +245,12 @@ def build(request):
 	# for e in educations:
 	# 	current_positions.append({'pos_id':e.id,'ideal_id':e.ideal_position_id,'title':e.title,'entity_name':e.entity.name})
 	
-	eligible_alternates = Position.objects.filter().exclude(type="education").exclude(ideal_position=None).order_by("title").select_related("entity", "ideal_position")
-	alternate_starting_points = []
-	for e in eligible_alternates:
-		alternate_starting_points.append({"pos_id":e.id, "ideal_id":e.ideal_position.id, "title":e.title, 'entity_name':e.entity.name})
+	# eligible_alternates = Position.objects.filter().exclude(Q(type="education") | Q(ideal_position=None)).order_by("title").select_related("entity", "ideal_position")
+	# alternate_starting_points = []
+	# for e in eligible_alternates:
+	# 	alternate_starting_points.append({"pos_id":e.id, "ideal_id":e.ideal_position.id, "title":e.title, 'entity_name':e.entity.name})
+
+	alternate_starting_points = [{"pos_id":e.id, "ideal_id":e.ideal_position.id, "title":e.title, 'entity_name':e.entity.name} for e in Position.objects.filter().exclude(Q(type="education") | Q(ideal_position=None)).order_by("title").select_related("entity", "ideal_position")]
 
 	data = {
 		'title':path_title,
