@@ -183,7 +183,7 @@ class IdealPositionBase(PositionBase):
 		"""
 		returns top people for ideal id, based on time in position
 		"""
-		import operator
+		# import operator
 		users = User.objects.filter(positions__ideal_position=ideal_pos).order_by("-positions__start_date")
 		return users
 

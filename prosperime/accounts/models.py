@@ -167,7 +167,7 @@ class Profile(models.Model):
     def current_position(self):
         positions = self.user.positions.all().order_by('-start_date').exclude(type="education")
         if positions.exists():
-            return positions[0].title + " at " + positions[0].entity.name
+            return str(positions[0].title) + " at " + str(positions[0].entity.name)
         else:
             return None
 
