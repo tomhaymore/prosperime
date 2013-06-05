@@ -90,11 +90,13 @@ def test_ideal_paths(request):
 
 		return render_to_response('careers/test_ideal_paths.html',{'paths':paths},context_instance=RequestContext(request))
 
+
+
 def progress(request):
 
 	# ghetto way of finding positions that we can give info on
 	# applicable_positions = Position.objects.filter(ideal_position__level=4)
-	applicable_positions = IdealPosition.objects.filter(level=4).annotate(pop=Count('position__id')).order_by("-pop")
+	applicable_positions = IdealPosition.objects.annotate(pop=Count('position__id')).filter(level=4,pop__gte=3).order_by("-pop")[:10]
 	# ideal_positions = []
 	# for a in applicable_positions:
 	# 	if a.ideal_position not in ideal_positions:
@@ -1634,6 +1636,24 @@ def show_paths(request):
 		formatted_paths.append(current)	
 
 	return HttpResponse(simplejson.dumps(formatted_paths))
+
+def test_build_paths(request):
+
+	# verify GET has right parameters
+	if request.GET.getlist('ideal_id'):
+
+		start_ideal_id = request.GET.getlist('ideal_id')[0]
+		start_pos_id = request.GET.getlist('pos_id')[0]
+
+		# check cache for path information
+		paths = cache.get("get_next_build_step_ideal_"+str(start_ideal_id)+"_"+str(start_pos_id))
+		if paths is None:
+			# initialize class
+			build = careerlib.CareerBuild()
+			paths = build.get_next_build_step_ideal(start_ideal_id,start_pos_id)
+			cache.set('get_next_build_step_ideal_'+str(start_ideal_id)+'_'+str(start_pos_id),paths,10)
+
+		return render_to_response('careers/test_build_paths.html',{'paths':paths},context_instance=RequestContext(request))
 
 # AJAX for getting build steps
 def get_next_build_step(request):

@@ -1,0 +1,37 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<!-- CSS -->
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/on_track.css" />
+	<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Lato">
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
+
+<!-- JS -->
+	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div id="content-container" class="main-container">
+
+{% for p in paths %}
+	{{p}}
+{% endfor %}
+</div>
+{% endblock %}
+
+{% block templates %}
+
+
+{% endblock %}
+
+
+
+
+
+

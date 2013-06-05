@@ -873,8 +873,8 @@ class CareerBuild(CareerPathBase):
 						# positions[ideal_id]['duration'] = positionlib.get_avg_duration_to_position(init_user,ideal_pos)
 						positions[ideal_id]['duration'] = None
 						# add similar people
-						# positions[ideal_id]['people'] = [{'name':p.profile.full_name(),'position':p.profile.current_position(),'pic':p.profile.default_profile_pic(),'id':p.id} for p in positionlib.get_ideal_people(ideal_pos)[:3]]
-						positions[ideal_id]['people'] = None
+						positions[ideal_id]['people'] = [{'name':p.profile.full_name(),'position':p.profile.current_position(),'pic':p.profile.default_profile_pic(),'id':p.id} for p in positionlib.get_ideal_people(ideal_pos)[:3]]
+						# positions[ideal_id]['people'] = None
 					# add to processed positions array
 					finished.append(u_id)
 				if ideal_id == int(start_ideal_id):
