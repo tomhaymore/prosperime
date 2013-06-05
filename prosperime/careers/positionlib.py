@@ -183,7 +183,7 @@ class IdealPositionBase(PositionBase):
 		"""
 		returns top people for ideal id, based on time in position
 		"""
-		import operator
+		# import operator
 		users = User.objects.filter(positions__ideal_position=ideal_pos).order_by("-positions__start_date")
 		return users
 
@@ -204,7 +204,6 @@ class IdealPositionBase(PositionBase):
 		new_entities_list = [{'name':e.name,'id':e.id,'descr':e.description,'no_employees':e.no_employees} for e in entities]
 		entities_list.extend(new_entities_list)
 		# entities_list.append({'name':focal_entity.name,'id':focal_entity.id,'descr':focal_entity.description,'no_employees':focal_entity.no_employees})
-
 		# print entities_list
 
 		return entities_list
@@ -216,7 +215,11 @@ class IdealPositionBase(PositionBase):
 		# fetch ideal position object
 		ideal_pos = IdealPosition.objects.get(pk=ideal_pos_id)
 
-		users = User.objects.filter(positions__ideal_position=ideal_pos).prefetch_related('positions').annotate(nopos=Count('positions__id')).exclude(nopos__lte=1).distinct()[:limit]
+
+		# users = User.objects.filter(positions__ideal_position=ideal_pos).prefetch_related('positions').annotate(nopos=Count('positions__id')).exclude(nopos__lte=1).distinct()[:limit]
+
+		users = User.objects.filter(positions__ideal_position=ideal_pos).annotate(nopos=Count('positions__id')).exclude(nopos__lte=1).distinct()[:limit]
+
 
 		# breakout all positions, in oder
 		for u in users:
