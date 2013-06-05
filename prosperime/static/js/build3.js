@@ -443,8 +443,12 @@
 		option_box.animate({'opacity':1}, '300', '<>')
 
 		// Ensure title will fit
-		if (position["title"].length > 20) var pos_title = break_string(20, position["title"])
-		else var pos_title = position["title"]
+		if (position["ideal_title"] != null) {
+			if (position["ideal_title"].length > 20) var pos_title = break_string(20, position["ideal_title"])
+			else var pos_title = position["ideal_title"]
+		} else {
+			var pos_title = null
+		}
 		
 		// Title 
 		var title = paper.text(x+(ob_w/2),y+t_opt_offset, pos_title).attr(text_options_attr)
