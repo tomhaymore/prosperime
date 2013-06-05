@@ -273,7 +273,6 @@
 /*  Main Methods  */
 /******************/
 	var getAndRenderResults = function(origin) {
-		//console.log(origin)
 		if (origin == "tell-us-more") {
 			// hide form wrapper
 			$("#form-wrapper").fadeOut(250, function() { $(this).addClass("not-shown")})
@@ -285,8 +284,8 @@
 		$("#show-results-button").fadeOut(500, function() { $(this).addClass("not-shown") });
 
 		// Render existing path (if applicable)
-		console.log("Existing Path: ")
-		console.log(path)
+		// console.log("Existing Path: ")
+		// console.log(path)
 
 		// show loading
 		$("#loading-wrapper").removeClass("not-shown").hide().fadeIn(100)
@@ -305,6 +304,7 @@
 				if ($("#progress-wrapper .v2-bar").length > 0) {
 					$("#progress-wrapper").removeClass("not-shown").hide().fadeIn(250)
 					$("#call-to-action-wrapper").removeClass("not-shown").hide().fadeIn(500)
+
 				} else {
 					// Else, make them
 
@@ -318,6 +318,7 @@
 					// Make path and resize it
 					renderV2Path($container, $d_container, path)
 
+					// Show containers
 					$("#progress-wrapper").removeClass("not-shown")
 					$("#call-to-action-wrapper").removeClass("not-shown").hide().fadeIn(500)
 
@@ -326,10 +327,14 @@
 					$(".v2-item", $container).each( function() {
 						resizeText(this)
 					});
-
-				}
-			}	
+				};
+				// Add '+' box
+				addTellUsMoreEndPosition()
+			} 	
 		}, "json")
+
+		// Add '+' box
+		addTellUsMoreEndPosition()	
 
 		// Slide search wrapper out of the way
 		$("#search-box-wrapper").slideUp(300)
@@ -409,6 +414,12 @@
 		// Hide call to action buttons
 		$("#call-to-action-wrapper").fadeOut(250, function() { $(this).addClass("not-shown") });	
 
+		// Hide '+' button
+		removeTellUsMoreEndPosition()
+
+		// Hide entity dropdown
+		$("#v2-bar-entity-wrapper").css("left","-500px")
+
 		// Show form
 		$("#form-wrapper").removeClass("not-shown").hide().fadeIn(500)
 	};
@@ -479,7 +490,6 @@
 
 	// Responds to selecting a goal position
 	var positionSelected = function() {
-		console.log("selected")
 		// Get selected ideal_id
 		var ideal_id = $("#goal-position-box :selected").val()
 
@@ -522,11 +532,12 @@
 		// Hide Results buttons
 		$("#results-wrapper-buttons").fadeOut(250)
 
-		$("#v2-bar-entity-wrapper").css("left",-500)
+		// Hide entity div
+		$("#v2-bar-entity-wrapper").css("left","-500px")
+
+		// Show '+' box
+		addTellUsMoreEndPosition()
 	};
-
-
-
 
 
 	// Renders the basic blurb/info and screenshot
@@ -565,6 +576,9 @@
 
 		$("#progress-wrapper").removeClass("not-shown").hide().fadeIn(250)
 		if (path.length == 0) $("#progress-wrapper .section-header :last").css("visibility", "hidden")
+
+		// hide '+' box
+		removeTellUsMoreEndPosition()
 	};
 
 	// Renders input for new experience
@@ -633,7 +647,7 @@
 		$(el).children().last().fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(250)
 
 		// Don't dismiss the bar... yet
-		event.stopPropagation()
+		// event.stopPropagation()
 
 		// Calculate num items and width
 		var num_items = path.length
@@ -673,7 +687,7 @@
 						"grad_year":data.data.end_date,
 						"display_text":data.data.degree + ", " + data.data.field + " at " + data.data.entity
 						});
-					console.log(path);
+					//console.log(path);
 					rerenderProgressBar(path)
 				} else {
 					console.log('failure');
@@ -713,7 +727,7 @@
 						"end_date":data.data.end_date,
 						"display_text":data.data.title + " at " + data.data.entity
 					});
-					console.log(path);
+					// console.log(path);
 					rerenderProgressBar(path)
 				} else {
 					// display error
@@ -767,7 +781,7 @@
 	var renderV2Path = function($container, $d_container, path) {
 		// Set relative width
 		var width = (path.length == 1) ? 30 : Math.floor(100/path.length)
-		console.log(path)
+		// console.log(path)
 		var is_user = ("pos_title" in path[0]) ? false : true;
 		if (is_user && path.length > 1) width = Math.floor(100/(path.length + 1))
 		// Iterate through and create boxes
@@ -795,7 +809,11 @@
 		// Uniqify entities
 		pos["entities"] = _.uniq(pos["entities"], false, function(entity) { return entity["name"] });
 
-		$($container).append("<div class='v2-item' data-position_index='"+index+"' data-entity_index='0' style='width:"+(width-2)+"%'>"+pos["pos_title"]+" <span class='v2-item-entity'>"+pos["entities"][0]["name"]+"</span></div>")
+		// Need to check for null position titles from API
+		if (pos["pos_title"] != null)
+			$($container).append("<div class='v2-item' data-position_index='"+index+"' data-entity_index='0' style='width:"+(width-2)+"%'>"+pos["pos_title"]+" <span class='v2-item-entity'>"+pos["entities"][0]["name"]+"</span></div>")
+		else
+			$($container).append("<div class='v2-item' data-position_index='"+index+"' data-entity_index='0' style='width:"+(width-2)+"%'><span class='v2-item-entity'>"+pos["entities"][0]["name"]+"</span></div>")
 	};
 
 	var addV2UserItem = function(pos, $container, width, index) {
@@ -857,13 +875,18 @@
 		};
 	};
 
-	var addTellUsMoreEndPosition = function(width) {
-		$("#progress-wrapper .v2-bar :last").append("<div class='v2-bar-link'></div><div style='width:"+(width - 2)+"%;'class='v2-item-prompt'>+</div>")
-		$("#progress-wrapper .v2-item-prompt").click(resultsToTellUsMore)
+	var addTellUsMoreEndPosition = function() {
+		if ($("#progress-wrapper .v2-bar .v2-item-prompt").length == 0) {
+
+			var width = $("#progress-wrapper .v2-bar .v2-item :first").css("width")
+			$("#progress-wrapper .v2-bar :last").append("<div class='v2-bar-link'></div><div style='width:"+(width)+";'class='v2-item-prompt'>+</div>")
+			$("#progress-wrapper .v2-item-prompt").click(resultsToTellUsMore)
+		};
 	};
 
 	var removeTellUsMoreEndPosition = function() {
-		//
+		$("#progress-wrapper .v2-bar .v2-bar-link :last").fadeOut(250, function() { $(this).remove() });
+		$("#progress-wrapper .v2-bar .v2-item-prompt").fadeOut(250, function() { $(this).remove() });
 	};
 
 	// moves absolutely positioned div to appropriate location and
@@ -894,8 +917,10 @@
 	// changes the entity of a particular v2 path item
 	var entityClicked = function(clicked, item) {
 		$(".v2-item-entity", item).fadeOut(150, function() {
-			$(this).html(clicked).fadeIn(150)
-		});
+			$(this).html(clicked).fadeIn(150, function() {
+				resizeText(item)
+			});
+		});	
 	};
 
 	/***********/
@@ -1014,6 +1039,11 @@
      -- remove "Tell us more about yourself" button and instead append one square at the end of the path that is green and says "Add"
 
 
+-- make the new "add position box' work
+	-- render on first fetch, goback
+	-- hide on tell us more
+-- make new build work
+-- if time permits, allow entity hover --> description
 */
 
 </script>
