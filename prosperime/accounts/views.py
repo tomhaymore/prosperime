@@ -151,8 +151,13 @@ def linkedin_authenticate(request):
 	# print user
 	# print linkedin_user_info['id']
 	if user is not None:
+		
+
 		auth_login(request,user)
-		return HttpResponseRedirect('/')
+		if 'next' in request.session:
+			return HttpResponseRedirect(request.session['next'])
+		else:
+			return HttpResponseRedirect('/')
 	else:
 		# store information in a cookie
 		request.session['linkedin_user_info'] = linkedin_user_info
