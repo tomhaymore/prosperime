@@ -39,7 +39,7 @@
   			</select>
 		</div>
 
-		<div class="call-out-text">Don't see what you're looking for? <a href="mailto:feedback@prospr.me">Let us know.</a></div>
+		<div class="call-out-text">Don't see what you're looking for? <a href="mailto:feedback@prospr.me?subject=You're missing my dream job!">Let us know.</a></div>
   			
 		<div id="show-results-button" class="prompt-button flat-button not-shown" onclick="getAndRenderResults()">	See Your Results
 		</div>
@@ -146,7 +146,6 @@
 
 	<!-- Progress Wrapper (Your path) -->
 	<div id="progress-wrapper" class="center not-shown">
-		<div class="section-header">Your Path</div>
 		
 		<!-- Form Wrapper -->
 		<div id="form-wrapper" class="center not-shown"> 
@@ -170,21 +169,16 @@
 			<div id="inline-form-container"></div>
 
 		</div>
-		
-		<div class="path-bar"></div>
 
+		<div class="section-header">Your Path</div>
 
-		<div style="display:none;" class="progress-info-bar"></div>
-		<div style="display:none;" class="progress-bar"> </div>
-		<div style="display:none;" id="progress-bar-svg-container"></div>
-		<div style="display:none;" class="end-goal-wrapper"> </div>
 		<div style="display:none;" id="tell-us-more-results-button" class="green-button prompt-button" onclick="getAndRenderResults('tell-us-more')">See your results</div>
 	</div>
 
 	<div id="call-to-action-wrapper" class="center not-shown">
-		<div class='call-out-text'>Don't like what you see?</div>
+		<div class='call-out-text'>Want to see even more options?</div>
 
-		<div class='flat-button prompt-button turquoise-button left-button' onclick='resultsToTellUsMore()'>Tell us more about yourself</div>
+	<!-- 	<div class='flat-button prompt-button turquoise-button left-button' onclick='resultsToTellUsMore()'>Tell us more about yourself</div> -->
 
 		{% if authenticated %}
 		<a href="/build/">
@@ -263,11 +257,11 @@
 			})
 		})
 
-		// Draw squiggle ahead of time
-		var mini_paper = new Raphael("progress-bar-svg-container",30,100)
-		mini_paper.path("M15,10 L15,40 L30,47 L0,54 L15,61 L15,90").attr({
-			"stroke-width":2, "stroke":"#68696b"
-		})
+		// // Draw squiggle ahead of time
+		// var mini_paper = new Raphael("progress-bar-svg-container",30,100)
+		// mini_paper.path("M15,10 L15,40 L30,47 L0,54 L15,61 L15,90").attr({
+		// 	"stroke-width":2, "stroke":"#68696b"
+		// })
 
 	});
 
@@ -424,6 +418,37 @@
 /******************/
 /*    Handlers    */
 /******************/
+
+	/* handler for "shuffling" paths */
+	var renderNextPath = function() {
+		// make sure entity list is hidden
+		$("#v2-bar-entity-wrapper").css("left","-500px")
+
+		// get index of last
+		var next_index = parseInt($("#results-wrapper .v2-bar").data("path_index")) + 1
+
+		// reset index
+		next_index = (next_index >= response_data.length) ? 0 : next_index;
+		$("#results-wrapper .v2-bar").data("path_index", next_index)
+
+		// get path & container
+		var path = response_data[next_index]
+		var $container = $("#results-wrapper .v2-bar")
+		var $d_container = $("#results-wrapper .v2-duration-bar")
+
+		// empty of previous belongings
+		// $($container).fadeOut(250, function() { $(this). empty() });
+		$($container).empty()
+		$($d_container).empty()
+
+		// render new path w/ new index
+		renderV2Path($container, $d_container, path)
+		$(".v2-item", $container).each(function() {
+			resizeText(this)
+		})
+	};
+
+
 	// Responds to main select box change event
 	var selectItemChanged = function() {
 
@@ -538,6 +563,8 @@
 		$("#results-wrapper .call-out-text").hide()
 		$("#results-wrapper #shuffle-button").hide()
 
+		$("#progress-wrapper").removeClass("not-shown").hide().fadeIn(250)
+		if (path.length == 0) $("#progress-wrapper .section-header :last").css("visibility", "hidden")
 	};
 
 	// Renders input for new experience
@@ -710,26 +737,19 @@
 		// Currently, re-rendering entire bar to adjust widths
 	var rerenderProgressBar = function(path) {
 		if (path.length == 1) { // first position
-			// add progress bar
-			// $("#progress-wrapper .path-bar").css("display", "inline-block").animate({"width":"80%"}, "500")
 
 			// Create progress bar
-			$("#progress-wrapper").removeClass("not-shown").append("<div class='v2-bar'></div>").append("<div class='v2-duration-bar'></div>")
-
-			// // add goal position
-			// $(".end-goal-wrapper").append("<div class='end-item'>"+$("#goal-position-box :selected").html()+"</div>").hide().delay(500).fadeIn(250)
-
-			// // add divider (svg)
-			// $("#progress-bar-svg-container").css("display","inline-block").hide().fadeIn(250)
+			$("#progress-wrapper .section-header :last").after("<div class='v2-duration-bar'></div>").after("<div class='v2-bar'></div>").css("visibility", "visible").fadeIn(250)
 
 			// allow "show results" button to be clicked
 			$("#tell-us-more-results-button").css("visibility", "visible").hide().fadeIn(250)
 
 		} else // empty existing
 			$("#progress-wrapper .v2-bar").empty()
+	
 
 		// Get new width
-		var width = Math.floor(100/(path.length))
+
 		var $container = $("#progress-wrapper .v2-bar")
 		var $d_container = $("#progress-wrapper .v2-duration-bar")
 
@@ -738,13 +758,6 @@
 			resizeText(this)
 		});
 
-		// // Loop through, add items
-		// for (var j = 0; j < path.length; j++) {
-		// 	if ("display_text" in path[j])
-		// 		$("#progress-wrapper .path-bar").append("<div class='path-item' style='background-color:" + color_map[j] + ";width:"+width+"%'>"+path[j]['display_text']+"</div>")
-		// 	else 
-		// 		$("#progress-wrapper .path-bar").append("<div class='path-item' style='background-color:" + color_map[j] + ";width:"+width+"%'>"+path[j]['title']+"</div>")
-		// }
 	}
 
 	/**************/
@@ -753,9 +766,10 @@
 
 	var renderV2Path = function($container, $d_container, path) {
 		// Set relative width
-		var width = Math.floor(100/path.length)
+		var width = (path.length == 1) ? 30 : Math.floor(100/path.length)
 		console.log(path)
 		var is_user = ("pos_title" in path[0]) ? false : true;
+		if (is_user && path.length > 1) width = Math.floor(100/(path.length + 1))
 		// Iterate through and create boxes
 		for (var j = 0; j < path.length; j++) {
 
@@ -835,12 +849,21 @@
 					showEntityList(entities, $(this).offset(), this)
 
 				}, function(e) {
-					$("#v2-bar-entity-wrapper").delay(4000).fadeOut(500, function() {
-						$(this).css("left",-500).fadeIn()
-					})
+					// $("#v2-bar-entity-wrapper").delay(4000).fadeOut(500, function() {
+					// 	$(this).css("left",-500).fadeIn()
+					// })
 				});
 			};
 		};
+	};
+
+	var addTellUsMoreEndPosition = function(width) {
+		$("#progress-wrapper .v2-bar :last").append("<div class='v2-bar-link'></div><div style='width:"+(width - 2)+"%;'class='v2-item-prompt'>+</div>")
+		$("#progress-wrapper .v2-item-prompt").click(resultsToTellUsMore)
+	};
+
+	var removeTellUsMoreEndPosition = function() {
+		//
 	};
 
 	// moves absolutely positioned div to appropriate location and
@@ -875,35 +898,6 @@
 		});
 	};
 
-	/* handler for "shuffling" paths */
-	var renderNextPath = function() {
-		// get index of last
-		var next_index = parseInt($("#results-wrapper .v2-bar").data("path_index")) + 1
-
-		// reset index
-		next_index = (next_index >= response_data.length) ? 0 : next_index;
-		$("#results-wrapper .v2-bar").data("path_index", next_index)
-
-		// get path & container
-		var path = response_data[next_index]
-		var $container = $("#results-wrapper .v2-bar")
-		var $d_container = $("#results-wrapper .v2-duration-bar")
-
-		// empty of previous belongings
-		// $($container).fadeOut(250, function() { $(this). empty() });
-		$($container).empty()
-		$($d_container).empty()
-
-		// render new path w/ new index
-		renderV2Path($container, $d_container, path)
-		$(".v2-item", $container).each(function() {
-			resizeText(this)
-		})
-	}
-
-
-
-
 	/***********/
 	/* HELPERS */
 	/***********/
@@ -911,8 +905,7 @@
 
 		var diff = el.scrollHeight - el.offsetHeight
 		if (diff > (el.offsetHeight * 2)) {
-			// console.log("tier 2")
-			// console.log(el)
+
 			var current_font_size = parseInt($(el).css("font-size"))
 			$(el).css("font-size", (current_font_size-4) + "px")
 
@@ -922,8 +915,7 @@
 			// font-size -= 2
 			var current_font_size = parseInt($(el).css("font-size"))
 			$(el).css("font-size", (current_font_size-2) + "px")
-			// console.log("tier 1")
-			// line height -= medium
+
 			var line_height = parseInt($(el).css("line-height"))
 			$(el).css("line-height", (18) + "px")
 
@@ -932,8 +924,7 @@
 			// console.log("tier 0")
 			var line_height = parseInt($(el).css("line-height"))
 			$(el).css("line-height", (24) + "px")
-			// var current_font_size = parseInt($(el).css("font-size"))
-			// $(el).css("font-size", (current_font_size-2) + "px")
+
 		} else if (el.scrollWidth > el.offsetWidth) {
 			var current_font_size = parseInt($(el).css("font-size"))
 			$(el).css("font-size", (current_font_size-2) + "px")
@@ -948,27 +939,7 @@
 		// };
 	};
 
-	var test = function(el) {
-		if ((el.offsetHeight * 3) < el.scrollHeight) {
 
-			var line_height = parseInt($(el).css("line-height"))
-			$(el).css("line-height", (25) + "px")
-
-			var current_font_size = parseInt($(el).css("font-size"))
-			if (current_font_size >= 12) 
-				$(el).css("font-size", (current_font_size-2) + "px")
-
-		} else if (el.offsetHeight < el.scrollHeight) { 
-
-			var line_height = parseInt($(el).css("line-height"))
-			$(el).css("line-height", (30) + "px")
-
-			var current_font_size = parseInt($(el).css("font-size"))
-			if (current_font_size >= 12) 
-				$(el).css("font-size", (current_font_size-2) + "px")
-
-		};
-	};
 
 	var closeInlineForm = function(el) {
 
@@ -1019,11 +990,9 @@
 /*
 	TODO: 
 		: colors?
-		: hover over
 
 		: "Let us know" needs to send us an email somehow or store info
 		: Change link color, header color
-		: Get Screenshort
 		: Toy w/ Colors!
 		: check date entry HTML5 date input? (tell me more)
 		: if re-select a position midway through, clear all
@@ -1036,6 +1005,14 @@
 		: need to always render positions from same DST ("path")
 
 		: Idea -- iterate through and animate widths to new, then drop in other one somehow.... animate from 0?
+
+
+-- move "Your Path" farther down, maybe 35-50px
+-- remove "null" positions
+-- give buttons different colors -- one blue, one green
+-- change "Don't like what you see?" section:
+     -- remove "Tell us more about yourself" button and instead append one square at the end of the path that is green and says "Add"
+
 
 */
 
