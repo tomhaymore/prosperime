@@ -693,10 +693,10 @@ class CareerPathBase(CareerBase):
 		key, d = tup
 		return d['score']
 
-	def get_focal_careers(self,user,limit=5):
+	def get_focal_careers(self,users,limit=5):
 		from operator import itemgetter
 		# get all user positions
-		positions = Position.objects.filter(person=user)
+		positions = Position.objects.filter(person__in=users)
 		# init array
 		careers = {}
 		# init vars
@@ -772,6 +772,54 @@ class CareerPathBase(CareerBase):
 		careers = sorted(careers_dict.iteritems(),key=lambda (k,v):v['num_people'],reverse=True)
 
 		return careers
+
+	def get_careers_in_schools(self,schools,user=None):
+		# get all users related to school
+		school_ids = [s.id for s in schools]
+		users = User.objects.filter(positions__entity__id__in=school_ids)
+		# get focal careers
+		careers = self.get_focal_careers(users)
+		# restructure into easier list
+		all_careers = [{'id':c[0],'name':c[1]['name']} for c in careers]
+		return all_careers
+
+	def get_paths_from_schools(self,schools,user=None):
+		"""
+		returns a set of user paths that contain the school
+		"""
+		users = User.objects.filter(positions__entity__in=schools).distinct()
+		return users
+
+	def get_first_jobs_from_schools(self,schools,user=None):
+		""" 
+		returns a list of first jobs users held after leaving school
+		"""
+		# init global vars
+		paths = {}
+		next = False
+		final = False
+		users = User.objects.select_related("positions").filter(positions__entity__in=schools)
+		for u in users:
+			for p in u.positions.all():
+				if final:
+					continue
+				if next:
+					if not p.ideal_position:
+						continue
+					if p.ideal_position.id in paths:
+						paths[p.ideal_position.id]['count'] += 1
+					else:
+						paths[p.ideal_position.id] = {
+							'title':p.ideal_position.title,
+							'id':p.id,
+							'ideal_id':p.ideal_position.id,
+							'count':1
+						}
+				if p.entity in schools:
+					next = True
+		paths = sorted(paths.iteritems(),key=lambda x: x[1]['count'])
+		return paths
+
 
 class CareerBuild(CareerPathBase):
 
