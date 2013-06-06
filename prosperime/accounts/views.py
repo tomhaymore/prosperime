@@ -19,16 +19,18 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.utils import simplejson
-from accounts.forms import FinishAuthForm, AuthForm, RegisterForm
+
 from django.contrib import messages
 from lilib import LIProfile
-from accounts.tasks import process_li_profile, process_li_connections
+
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
 # Prosperime
 from accounts.models import Account, Profile, Picture, Connection
-from careers.models import SavedPath, CareerDecision, Position, SavedPosition, SavedCareer, GoalPosition
-from entities.models import Entity
-
+from careers.models import SavedPath, CareerDecision, Position, SavedPosition, SavedCareer, GoalPosition, IdealPosition
+from entities.models import Entity, Region
+from accounts.tasks import process_li_profile, process_li_connections
+from accounts.forms import FinishAuthForm, AuthForm, RegisterForm, AddEducationForm, AddExperienceForm, AddGeographyForm, AddGoalForm
 import utilities.helpers as helpers
 
 
@@ -107,7 +109,7 @@ def register(request):
 				auth_login(request,user)
 
 			# send to personalization
-			return HttpResponseRedirect('/personalize/careers/')
+			return HttpResponseRedirect('/personalize/')
 	else:
 		form = RegisterForm()
 
@@ -287,7 +289,7 @@ def finish_login(request):
 
 			#return HttpResponseRedirect('/account/success')
 			if 'next' not in request.session:
-				return HttpResponseRedirect('/personalize/careers/')
+				return HttpResponseRedirect('/personalize/')
 			else:
 				return HttpResponseRedirect(request.session['next'])
 	else:
@@ -349,20 +351,14 @@ def finish_link(request):
 
 	# save task ids to session
 	request.session['tasks'] = {
-		'profile': {
-			'status':profile_task.ready(),
-			'id':profile_task.id
-			},
-		'connections': {
-			'status':connections_task.ready(),
-			'id':connections_task.id
-			}
+		'profile': profile_task.id,
+		'connections': connections_task.id
 	}
 
-	messages.success(request, 'Your LinkedIn account has been successfully linked. Please refresh the page to see changes.')
+	messages.success(request, 'Your LinkedIn account has been successfully linked.')
 
 	if 'next' not in request.session:
-		return HttpResponseRedirect('/personalize/careers/')
+		return HttpResponseRedirect('/personalize/')
 	else:
 		return HttpResponseRedirect(request.session['next'])
 
@@ -638,6 +634,154 @@ def deleteItem(request):
 
 	return HttpResponse(simplejson.dumps(response))
 
+@login_required
+def personalize(request):
+	'''
+	asks users for more information about their goals and whatnot
+	'''
+	# check to see if tasks information is in session
+	tasks = False
+	profile_task_id = 99
+	connections_task_id = 'null'
+	if "tasks" in request.session:
+		tasks = True
+		profile_task_id = request.session['tasks']['profile']
+		connections_task_id = request.session['tasks']['connections']
+
+	data = {
+		'tasks':tasks,
+		'profile_task_id':profile_task_id,
+		'connections_task_id':connections_task_id,
+		'educations':Position.objects.filter(person=request.user,type="education").values("id","degree","field","entity__name","end_date"),
+		'positions':Position.objects.filter(person=request.user).exclude(type="education").values("id","title","entity__name","start_date","end_date"),
+		'geographies':Region.objects.filter(people=request.user).values("name","id"),
+		'goals':GoalPosition.objects.filter(owner=request.user).values("position__title","id")
+	}
+
+	return render_to_response('careers/personalize.html',data,context_instance=RequestContext(request))
+
+@login_required
+def add_to_profile(request):
+	# check for form submission
+	if request.POST:
+		print request.POST
+		import accounts.tasks as tasks
+		if request.POST['type'] == "education":
+			# bind form
+			form = AddEducationForm(request.POST)
+			# validate form
+			if form.is_valid():
+				try:
+					school = Entity.objects.get(name=form.cleaned_data['school'])
+				except MultipleObjectsReturned:
+					school = Entity.objects.filter(name=form.cleaned_data['school'])[0]
+				except ObjectDoesNotExist:
+					school = Entity(name=form.cleaned_data['school'])
+					school.save()
+
+				ed = Position(type="education",entity=school,end_date=form.cleaned_data['end_date'],degree=form.cleaned_data['degree'],field=form.cleaned_data['field'],person=request.user)
+				ed.save()
+				# kick off task to process for career matches
+				tasks.match_position(ed)
+				position_data = {
+					'degree':ed.degree,
+					'pos_id':ed.id,
+					'field':ed.field,
+					'entity':ed.entity.name
+				}
+				response = {
+					'result':'success',
+					'position':position_data
+				}
+			else:
+				response = {
+					'result':'failure',
+					'errors':form.errors
+				}
+			return HttpResponse(json.dumps(response))
+		if request.POST['type'] == "experience":
+			# bind form
+			form = AddExperienceForm(request.POST)
+			# validate form
+			if form.is_valid():
+				try:
+					entity = Entity.objects.get(name=form.cleaned_data['entity'])
+				except MultipleObjectsReturned:
+					entity = Entity.objects.filter(name=form.cleaned_data['entity'])[0]
+				except ObjectDoesNotExist:
+					entity = Entity(name=form.cleaned_data['entity'])
+					entity.save()
+
+				pos = Position(
+					type="professional",
+					entity=entity,
+					person=request.user,
+					start_date=form.cleaned_data['start_date'],
+					end_date=form.cleaned_data['end_date'],
+					title=form.cleaned_data['title']
+					)
+				pos.save()
+				# kick off task to process career matches
+				tasks.match_position(pos)
+				# return json response
+				position_data = {
+					'title':pos.title,
+					'pos_id':pos.id,
+					'entity':pos.entity.name
+				}
+				response = {
+					'result':'success',
+					'position':position_data
+				}
+				
+			else:
+				response = {
+					'result':'failure',
+					'errors':form.errors
+				}
+			return HttpResponse(json.dumps(response))
+		if request.POST['type'] == "geography":
+			# bind form
+			form = AddGeographyForm(request.POST)
+			# validate form
+			if form.is_valid():
+				try:
+					reg = Region.objects.get(name=form.cleaned_data['region'])
+				except MultipleObjectsReturned:
+					reg = Region.objects.filter(name=form.cleaned_data['region'])[0]
+				reg.people.add(request.user)
+				response = {
+					'result':'success',
+					'geo':reg.name
+				}
+			else:
+				response = {
+					'result':'failure',
+					'errors':form.errors
+				}
+			return HttpResponse(json.dumps(response))
+		if request.POST['type'] == "goal":
+			# bind form
+			form = AddGoalForm(request.POST)
+			# validate form
+			if form.is_valid():
+				try:
+					ideal = IdealPosition.objects.get(title=form.cleaned_data['goal'])
+				except MultipleObjectsReturned:
+					ideal = IdealPosition.objects.filter(title=form.cleaned_data['goal'])[0]
+				g = GoalPosition(position=ideal,owner=request.user)
+				g.save()
+				response = {
+					'result':'success',
+					'goal':g.position.title
+				}
+			else:
+				response = {
+					'result':'failure',
+					'errors':form.errors
+				}
+			return HttpResponse(json.dumps(response))
+
 
 # Called after a goal position, saved career is added to a profile, allowing
 #	backbone to refresh the template
@@ -646,32 +790,33 @@ def updateProfile(request):
 	response = {}
 	query = request.GET.getlist('query')
 
-	if not query:
-		response["result"] = 'failure'
+	if query:
+
+		if query[0] == "goalPositions":
+
+			goal_positions_queryset = GoalPosition.objects.filter(owner=request.user).select_related("position")
+			goal_positions = []
+			for pos in goal_positions_queryset:
+				goal_positions.append(_ideal_position_to_json(pos.position))
+
+			response["data"] = goal_positions
+
+		elif query[0] == "savedCareers":
+
+			goal_careers_queryset = SavedCareer.objects.filter(owner=request.user).select_related("career")
+			goal_careers = []
+			for career in goal_careers_queryset:
+				goal_careers.append(_saved_career_to_json(career.career))
+
+			response["data"] = goal_careers
+
+		else:
+			response["data"] = None
+
+		response["result"] = "success"
 		return HttpResponse(simplejson.dumps(response))
 
-	if query[0] == "goalPositions":
-
-		goal_positions_queryset = GoalPosition.objects.filter(owner=request.user).select_related("position")
-		goal_positions = []
-		for pos in goal_positions_queryset:
-			goal_positions.append(_ideal_position_to_json(pos.position))
-
-		response["data"] = goal_positions
-
-	elif query[0] == "savedCareers":
-
-		goal_careers_queryset = SavedCareer.objects.filter(owner=request.user).select_related("career")
-		goal_careers = []
-		for career in goal_careers_queryset:
-			goal_careers.append(_saved_career_to_json(career.career))
-
-		response["data"] = goal_careers
-
-	else:
-		response["data"] = None
-
-	response["result"] = "success"
+	response["result"] = 'failure'
 	return HttpResponse(simplejson.dumps(response))
 
 
