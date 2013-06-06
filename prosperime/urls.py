@@ -6,7 +6,6 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Examples:
     url(r'^$', 'careers.views.home', name='home'),
     url(r'^home/$', 'careers.views.home'),
     url(r'^welcome/$','entities.views.welcome'),
@@ -36,7 +35,7 @@ urlpatterns = patterns('',
     url(r'^plan/$', 'careers.views.plan'),
     url(r'^plan/(\d+)/$', 'careers.views.plan'),
 
-    # url(r'^personalize/$','careers.views.personalize_careers_jobs'),
+    url(r'^personalize/$','accounts.views.personalize'),
     url(r'^personalize/careers/$','careers.views.personalize_careers'),
     url(r'^personalize/jobs/$','careers.views.personalize_jobs'),
     url(r'^add_personalization/$','careers.views.add_personalization'),
@@ -58,6 +57,10 @@ urlpatterns = patterns('',
     url(r'^paths/','entities.views.paths'),
     url(r'^path/(\d+)/$','entities.views.path'),
     url(r'^careers/$','entities.views.careers'),
+
+    ## Entities - API
+
+    url(r'^entities/suggest/(\w+)/$','entities.views.suggest'),
 
     ## Careers - AJAX calls
     url(r'^careers/addDecision/$', 'careers.views.addDecision'),
@@ -84,9 +87,12 @@ urlpatterns = patterns('',
     url(r'^api/list_careers/$', 'careers.views.list_careers'),
     url(r'^careers/getProgress/$', 'careers.views.get_progress'),
     url(r'^careers/addProgressDetails/$', 'careers.views.add_progress_detail'),
+    url(r'^careers/getSchoolFragment/(?:/(?P<school_id>\d+))?/$', 'careers.views.get_school_fragment'),
+    url(r'^careers/getSchoolFragment/$', 'careers.views.get_school_fragment'),
 
     ## Accounts - AJAX calls
     url(r'^accounts/updateProfile/$', 'accounts.views.updateProfile'),
+    url(r'^accounts/addToProfile/$','accounts.views.add_to_profile'),
     url(r'^accounts/deleteItem/$', 'accounts.views.deleteItem'),
     url(r'^accounts/connect/$', 'accounts.views.connect'),
 
