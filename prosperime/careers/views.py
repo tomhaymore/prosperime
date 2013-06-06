@@ -15,7 +15,7 @@ from django.db.models import Count, Q
 
 
 # Prosperime
-from entities.models import Entity, Industry
+from entities.models import Entity, Industry, Region
 from careers.models import SavedPath, SavedPosition, Position, Career, GoalPosition, SavedCareer, IdealPosition, CareerDecision, SavedIndustry
 from accounts.models import Profile
 from social.models import Comment
@@ -48,23 +48,43 @@ def home(request):
 	# data['career_decisions'] = CareerDecision.objects.all()
 
 
-	# try:
-	# 	poi = SavedPath.objects.get(owner=user, title='queue')
-	# 	poi = poi.positions.all()
-	# except:
-	# 	poi = None
+	data = {
+		'educations' : Position.objects.filter(person=request.user,type="education"),
+		'positions' : Position.objects.filter(person=request.user).exclude(type="education"),
+		'locations':Region.objects.filter(people=request.user),
+		'goals':GoalPosition.objects.filter(owner=request.user)
+	}
 
-	# data['positions_of_interest'] = poi
+	return render_to_response('home_v6.html',data,context_instance=RequestContext(request))
 
-	industries = user.profile._industries()
-	if industries:
-		data['industry'] = industries[0].id
+def get_school_fragment(request,school_id=None):
+	c = careerlib.CareerPathBase()
+	# grab list of all schools affiliated with user
+	schools = [e for e in Entity.objects.filter(positions__person=request.user,positions__type="education").distinct()]
+	# if particular school selected, get details for just that school
+	if school_id:
+		school = Entity.object.get(pk=school_id)
+		degrees = [p.degree for p in Position.objects.filter(entity=school,type="education").distinct()]
+		careers = c.get_careers_in_schools([school])
+		jobs = c.get_first_jobs_from_schools([school])
+		paths = c.get_paths_from_schools([school])
 	else:
-		data['industry'] = None
-		## this means they either have 0 postions or ghetto ones
-	## need current industry, too
+		school = None
+		degrees = [p.degree for p in Position.objects.filter(entity__in=schools,type="education").distinct()]
+		careers = c.get_careers_in_schools(schools)
+		jobs = c.get_first_jobs_from_schools(schools)
+		paths = c.get_paths_from_schools(schools)
 
-	return render_to_response('home_v5.html',data,context_instance=RequestContext(request))
+	data = {
+		'school':school,
+		'schools':schools,
+		'degrees':degrees,
+		'careers':careers,
+		'jobs':jobs,
+		'paths':paths
+	}
+
+	return render_to_response("careers/home_school_fragment.html",data,context_instance=RequestContext(request))
 
 def schools(request):
 	return render_to_response("schools.html", context_instance=RequestContext(request))
@@ -1422,13 +1442,7 @@ def home_proto(request):
 		'pr':_split_and_jsonify(pr),
 		'associates':_split_and_jsonify(associates),
 	}
-
-
-
 	return HttpResponse(simplejson.dumps(data))
-
-
-
 
 	# render_to_response("home_v3.html", data, context_instance=RequestContext(request))
 
