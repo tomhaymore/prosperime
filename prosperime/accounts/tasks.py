@@ -1,6 +1,7 @@
 from celery import task
 from lilib import LIConnections, LIProfile
 import accounts.cblib as cblib
+from careers.careerlib import CareerMapBase
 ## somewhat useful for celery debugging
 # from celery.contrib import rdb
 
@@ -40,6 +41,11 @@ def process_li_profile(user_id,acct_id,**kwargs):
 	# li_parser = LIProfile(career_mapper)
 	li_parser = LIProfile()
 	li_parser.process_profile(user_id,acct_id)
+
+@task()
+def match_position(pos):
+	mapper = CareerMapBase()
+	mapper.match_position_to_ideals(pos)
 
 @task()
 def process_cb_people():
