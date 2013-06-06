@@ -1,0 +1,141 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+<!-- CSS -->
+<!-- <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/discover.css" /> -->
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/home.css" />
+<link type='text/css' rel='stylesheet' href='{{ STATIC_URL }}css/font-awesome.min.css' />
+
+
+
+<!-- Lato, Source Sans, Varela -->
+<!-- Javascript -->
+
+{% endblock %}
+
+
+{% block content %}
+<div id="home-splash-container">
+	<div class="inner-container">
+		<div id="profile-pic-container" class="pull-left">
+			<div class="center profile-subheader-white" >Eli Washington</div>
+			<div id="profile-pic" class="circle"></div>
+		</div>
+		<div id="schools-container" class="pull-left center icons-module">
+			<p class="i-header">Schools</p>
+			<a href="#schools/">
+				<div id="icon-schools" class="circle-small" data-cat="schools" ></div>
+			</a>
+			<ul id="home-schools-list" class="secret-list noshow" data-cat="schools">
+				{% for e in educations|slice:"3" %}
+					<li><a href="#schools/{{e.entity.id}}">{{e.degree}} at {{e.entity.name}}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+		<div id="experience-container" class="pull-left center icons-module">
+			<p class="i-header">Experience</p>
+			<a href="#positions/">
+				<div id="icon-experience" class="circle-small" data-cat="positions"></div>
+			</a>
+			<ul id="home-positions-list" class="secret-list noshow" data-cat="positions">
+				{% for p in positions|slice:"3" %}
+					<li><a href="#positions/{{p.ideal_position.id}}">{{p.title}} at {{p.entity.name}}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+		
+		<div id="locations-container" class="pull-left center icons-module">
+			<p class="i-header">Locations</p>
+			<a href="#locations/">
+				<div id="icon-locations" class="circle-small" data-cat="locations"></div>
+			</a>
+			<ul id="home-locations-list" class="secret-list noshow" data-cat="locations">
+				{% for l in locations|slice:"3" %}
+					<li><a href="#locations/{{l.id}}">{{l.name}}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+		<div id="goals-container" class="pull-left center icons-module">
+			<p class="i-header">Goals</p>
+			<a href="#goals/">
+				<div id="icon-goals" class="circle-small" data-cat="goals"></div>
+			</a>
+			<ul id="home-goals-list" class="secret-list noshow" data-cat="goals">
+				{% for g in goals|slice:"3" %}
+					<li><a href="#goals/{{g.position.id}}">{{g.position.title}}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+		<div class="clear"></div>
+	</div>
+</div>
+<div id="content-container" class="main-container">
+	<div id="home-left-sidebar" class="pull-left">
+		<div>
+			<a class="home-item home-menu-item selected" href="#feed">Feed</a>
+			<a class="home-item home-menu-item" href="#build">Build</a>
+			<a class="home-item home-menu-item" href="#compare">Compare</a>
+			<a class="home-item home-menu-item" href="#plan">Plan</a>
+		</div>
+	</div>
+	<div id="home-main-column" class="pull-left">
+		<!-- container for AJAX content -->
+	</div>
+	<div class="clear"></div>
+	<!-- Header Links -->
+
+	<!-- <div id="v5-container"> -->
+
+		
+
+	<!-- </div> -->
+</div>
+
+{% endblock %}
+
+{% block templates %}
+<script type="text/javascript">
+
+$(function() {
+
+	if ("onhashchange" in window) {
+	    console.log("browser supports hashchange");
+	}
+	 
+	function renderRoute() {
+	    console.log(location.hash);
+	    if (location.hash === "#schools/") {
+	        console.log("showing schools fragment");
+	        $.ajax({
+	        	url:"/careers/getSchoolFragment",
+	        	success:function(data){
+		        	$("div#home-main-column").html(data);
+		        },
+		        dataType:'html'
+		    });
+	    }
+	}
+	 
+	window.onhashchange = renderRoute;
+	renderRoute();
+	$("div.icons-module").find("div.circle-small").hover(
+		function(ev) {
+			var target = $(ev.target)
+			var cat = target.data("cat");
+			// $("ul[data-cat='"+cat+"']").show();
+			$("ul[data-cat='"+cat+"']").removeClass("noshow");
+		}
+	);
+	$("div.icons-module").mouseleave(function(ev) {
+		var target = $(ev.target).find("div.circle-small");
+		var cat = target.data("cat");
+		// $("ul[data-cat='"+cat+"']").hide();
+		$("ul[data-cat='"+cat+"']").addClass("noshow");
+	});
+});
+
+
+
+</script>
+
+{% endblock %}

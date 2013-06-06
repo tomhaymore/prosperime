@@ -1,0 +1,51 @@
+<p class="feature-page-header">Schools</p>
+
+{% if schools %}
+<ul class="flat feature-list">
+	{% for s in schools %} 
+		{% if s == school %}
+			<li class="selected"><a href="#schools/{{s.id}}">{{s.name}}</a></li>
+		{% else %}
+			<li><a href="#schools/{{s.id}}">{{s.name}}</a></li>
+		{% endif %}
+	{% endfor %}
+</ul>
+{% endif %}
+<div class="pull-left" style="width:300px;">
+<p>
+{% if degrees %}
+<p class="feature-page-subheader">Popular Degrees</p>
+<ul>
+	{% for d in degrees %}
+		<li>{{d}}</li>
+	{% endfor %}
+</ul>
+{% endif %}
+{% if careers %}
+<p class="feature-page-subheader">Popular Careers</p>
+<ul>
+	{% for c in careers %}
+		<li>{{c.name}}</li>
+	{% endfor %}
+</ul>
+{% endif %}
+{% if jobs %}
+<p class="feature-page-subheader">Popular First Jobs</p>
+<ul>
+	{% for j in jobs %}
+		<li>{{j.1.title}}</li>
+	{% endfor %}
+</ul>
+{% endif %}
+</div>
+<div class="pull-left" style="width:300px;">
+{% if paths %}
+<p class="feature-page-subheader">Top users</p>
+<ul>
+	{% for p in paths %}
+	<li>{{p.profile.full_name}}</li>
+	{% endfor %}
+</ul>
+{% endif %}
+</div>
+<div class="clear"></div>
