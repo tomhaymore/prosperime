@@ -1,0 +1,431 @@
+"New York-Newark-Jersey City, NY-NJ-PA ",19567410
+"Los Angeles-Long Beach-Anaheim, CA ",12828837
+"Chicago-Naperville-Elgin, IL-IN-WI ",9461105
+"Dallas-Fort Worth-Arlington, TX ",6426214
+"Houston-The Woodlands-Sugar Land, TX ",5920416
+"Philadelphia-Camden-Wilmington, PA-NJ-DE-MD ",5965343
+"Washington-Arlington-Alexandria, DC-VA-MD-WV ",5636232
+"Miami-Fort Lauderdale-West Palm Beach, FL ",5564635
+"Atlanta-Sandy Springs-Roswell, GA ",5286728
+"Boston-Cambridge-Newton, MA-NH ",4552402
+"San Francisco-Oakland-Hayward, CA ",4335391
+"Riverside-San Bernardino-Ontario, CA ",4224851
+"Phoenix-Mesa-Scottsdale, AZ ",4192887
+"Detroit-Warren-Dearborn, MI ",4296250
+"Seattle-Tacoma-Bellevue, WA ",3439809
+"Minneapolis-St. Paul-Bloomington, MN-WI ",3348859
+"San Diego-Carlsbad, CA ",3095313
+"Tampa-St. Petersburg-Clearwater, FL ",2783243
+"St. Louis, MO-IL ",2787701
+"Baltimore-Columbia-Towson, MD ",2710489
+"Denver-Aurora-Lakewood, CO ",2543482
+"Pittsburgh, PA ",2356285
+"Charlotte-Concord-Gastonia, NC-SC ",2217012
+"Portland-Vancouver-Hillsboro, OR-WA ",2226009
+"San Antonio-New Braunfels, TX ",2142508
+"Orlando-Kissimmee-Sanford, FL ",2134411
+"Sacramento–Roseville–Arden-Arcade, CA ",2149127
+"Cincinnati, OH-KY-IN ",2114580
+"Cleveland-Elyria, OH ",2077240
+"Kansas City, MO-KS ",2009342
+"Las Vegas-Henderson-Paradise, NV ",1951269
+"Columbus, OH ",1901974
+"Indianapolis-Carmel-Anderson, IN ",1887877
+"San Jose-Sunnyvale-Santa Clara, CA ",1836911
+"Austin-Round Rock, TX ",1716289
+"Nashville-Davidson–Murfreesboro–Franklin, TN ",1670890
+"Virginia Beach-Norfolk-Newport News, VA-NC ",1676822
+"Providence-Warwick, RI-MA ",1600852
+"Milwaukee-Waukesha-West Allis, WI ",1555908
+"Jacksonville, FL ",1345596
+"Memphis, TN-MS-AR ",1324829
+"Oklahoma City, OK ",1252987
+"Louisville/Jefferson County, KY-IN ",1235708
+"Richmond, VA ",1208101
+"New Orleans-Metairie, LA ",1189866
+"Hartford-West Hartford-East Hartford, CT ",1212381
+"Raleigh, NC ",1130490
+"Birmingham-Hoover, AL ",1128047
+"Buffalo-Cheektowaga-Niagara Falls, NY ",1135509
+"Salt Lake City, UT ",1087873
+"Rochester, NY ",1079671
+"Grand Rapids-Wyoming, MI ",988938
+"Tucson, AZ ",980263
+"Urban Honolulu, HI ",953207
+"Tulsa, OK ",937478
+"Fresno, CA ",930450
+"Bridgeport-Stamford-Norwalk, CT ",916829
+"Worcester, MA-CT ",916980
+"Albuquerque, NM ",887077
+"Omaha-Council Bluffs, NE-IA ",865350
+"Albany-Schenectady-Troy, NY ",870716
+"New Haven-Milford, CT ",862477
+"Bakersfield, CA ",839631
+"Knoxville, TN ",837571
+"Greenville-Anderson-Mauldin, SC ",824112
+"Oxnard-Thousand Oaks-Ventura, CA ",823318
+"El Paso, TX ",804123
+"Allentown-Bethlehem-Easton, PA-NJ ",821173
+"Baton Rouge, LA ",802484
+"McAllen-Edinburg-Mission, TX ",774769
+"Dayton, OH ",799232
+"Columbia, SC ",767598
+"Greensboro-High Point, NC ",723801
+"North Port-Sarasota-Bradenton, FL ",702281
+"Little Rock-North Little Rock-Conway, AR ",699757
+"Stockton-Lodi, CA ",685306
+"Akron, OH ",703200
+"Charleston-North Charleston, SC ",664607
+"Colorado Springs, CO ",645613
+"Syracuse, NY ",662577
+"Winston-Salem, NC ",640595
+"Cape Coral-Fort Myers, FL ",618754
+"Boise City, ID ",616561
+"Wichita, KS ",630919
+"Springfield, MA ",621570
+"Madison, WI ",605435
+"Lakeland-Winter Haven, FL ",602095
+"Ogden-Clearfield, UT ",597159
+"Toledo, OH ",610001
+"Deltona-Daytona Beach-Ormond Beach, FL ",590289
+"Des Moines-West Des Moines, IA ",569633
+"Jackson, MS ",567122
+"Augusta-Richmond County, GA-SC ",564873
+"Scranton–Wilkes-Barre–Hazleton, PA ",563631
+"Youngstown-Warren-Boardman, OH-PA ",565773
+"Harrisburg-Carlisle, PA ",549475
+"Provo-Orem, UT ",526810
+"Palm Bay-Melbourne-Titusville, FL ",543376
+"Chattanooga, TN-GA ",528143
+"Spokane-Spokane Valley, WA ",527753
+"Lancaster, PA ",519445
+"Durham-Chapel Hill, NC ",504357
+"Modesto, CA ",514453
+"Portland-South Portland, ME ",514098
+"Santa Rosa, CA ",483878
+"Lexington-Fayette, KY ",472099
+"Fayetteville-Springdale-Rogers, AR-MO ",463204
+"Lafayette, LA ",466750
+"Lansing-East Lansing, MI ",464036
+"Pensacola-Ferry Pass-Brent, FL ",448991
+"Visalia-Porterville, CA ",442179
+"Shreveport-Bossier City, LA ",439811
+"Springfield, MO ",436712
+"York-Hanover, PA ",434972
+"Corpus Christi, TX ",428185
+"Reno, NV ",425417
+"Port St. Lucie, FL ",424107
+"Asheville, NC ",424858
+"Santa Maria-Santa Barbara, CA ",423895
+"Huntsville, AL ",417593
+"Salinas, CA ",415057
+"Fort Wayne, IN ",416257
+"Vallejo-Fairfield, CA ",413344
+"Killeen-Temple, TX ",405300
+"Flint, MI ",425790
+"Brownsville-Harlingen, TX ",406220
+"Mobile, AL ",412992
+"Reading, PA ",411442
+"Beaumont-Port Arthur, TX ",403190
+"Canton-Massillon, OH ",404422
+"Manchester-Nashua, NH ",400721
+"Salem, OR ",390738
+"Myrtle Beach-Conway-North Myrtle Beach, SC-NC ",376722
+"Anchorage, AK ",380821
+"Davenport-Moline-Rock Island, IA-IL ",379690
+"Salisbury, MD-DE ",373802
+"Peoria, IL ",379186
+"Gulfport-Biloxi-Pascagoula, MS ",370702
+"Montgomery, AL ",374536
+"Tallahassee, FL ",367413
+"Fayetteville, NC ",366383
+"Trenton, NJ ",366513
+"Huntington-Ashland, WV-KY-OH ",364908
+"Hickory-Lenoir-Morganton, NC ",365497
+"Savannah, GA ",347611
+"Eugene, OR ",351715
+"Ann Arbor, MI ",344791
+"Rockford, IL ",349431
+"Ocala, FL ",331298
+"Naples-Immokalee-Marco Island, FL ",321520
+"Kalamazoo-Portage, MI ",326589
+"South Bend-Mishawaka, IN-MI ",319224
+"Spartanburg, SC ",313268
+"Evansville, IN-KY ",311552
+"Green Bay, WI ",306241
+"Columbus, GA-AL ",294865
+"Fort Collins, CO ",299630
+"Lincoln, NE ",302157
+"Roanoke, VA ",308707
+"Kingsport-Bristol-Bristol, TN-VA ",309544
+"Boulder, CO ",294567
+"Utica-Rome, NY ",299397
+"Lubbock, TX ",290805
+"Erie, PA ",280566
+"Fort Smith, AR-OK ",280467
+"Duluth, MN-WI ",279771
+"Atlantic City-Hammonton, NJ ",274549
+"San Luis Obispo-Paso Robles-Arroyo Grande, CA ",269637
+"Clarksville, TN-KY ",260625
+"Norwich-New London, CT ",274055
+"Kennewick-Richland, WA ",253340
+"Gainesville, FL ",264275
+"Santa Cruz-Watsonville, CA ",262382
+"Greeley, CO ",252825
+"Wilmington, NC ",254884
+"Merced, CA ",255793
+"Cedar Rapids, IA ",257940
+"Laredo, TX ",250304
+"Olympia-Tumwater, WA ",252264
+"Amarillo, TX ",251933
+"Waco, TX ",252772
+"Hagerstown-Martinsburg, MD-WV ",251599
+"Lynchburg, VA ",252634
+"Bremerton-Silverdale, WA ",251133
+"Binghamton, NY ",251725
+"Crestview-Fort Walton Beach-Destin, FL ",235865
+"Yakima, WA ",243231
+"Sioux Falls, SD ",228261
+"Topeka, KS ",233870
+"College Station-Bryan, TX ",228660
+"Champaign-Urbana, IL ",231891
+"Tuscaloosa, AL ",230162
+"Macon, GA ",232293
+"Appleton, WI ",225666
+"Charleston, WV ",227078
+"Charlottesville, VA ",218705
+"Chico, CA ",220000
+"Longview, TX ",214369
+"Fargo, ND-MN ",208777
+"Barnstable Town, MA ",215888
+"Tyler, TX ",209714
+"Las Cruces, NM ",209233
+"Burlington-South Burlington, VT ",211261
+"Prescott, AZ ",211033
+"Springfield, IL ",210170
+"Rochester, MN ",206877
+"Houma-Thibodaux, LA ",208178
+"Medford, OR ",203206
+"Lafayette-West Lafayette, IN ",201789
+"Florence, SC ",205566
+"Bellingham, WA ",201140
+"Lake Havasu City-Kingman, AZ ",200186
+"Lake Charles, LA ",199607
+"Johnson City, TN ",198716
+"Yuma, AZ ",195751
+"Elkhart-Goshen, IN ",197559
+"Saginaw, MI ",200169
+"Athens-Clarke County, GA ",192541
+"Racine, WI ",195408
+"Hilton Head Island-Bluffton-Beaufort, SC ",187010
+"Daphne-Fairhope-Foley, AL ",182265
+"St. Cloud, MN ",189093
+"Bloomington, IL ",186133
+"Panama City, FL ",184715
+"Warner Robins, GA ",179605
+"Gainesville, GA ",179684
+"Jacksonville, NC ",177772
+"Kingston, NY ",182493
+"Blacksburg-Christiansburg-Radford, VA ",178237
+"Redding, CA ",177223
+"Monroe, LA ",176441
+"El Centro, CA ",174528
+"Joplin, MO ",175518
+"Greenville, NC ",168148
+"Terre Haute, IN ",172425
+"Muskegon, MI ",172188
+"Sioux City, IA-NE-SD ",168563
+"East Stroudsburg, PA ",169842
+"Oshkosh-Neenah, WI ",166994
+"Waterloo-Cedar Falls, IA ",167819
+"Columbia, MO ",162642
+"Yuba City, CA ",166892
+"Dover, DE ",162310
+"Abilene, TX ",165252
+"Eau Claire, WI ",161151
+"Billings, MT ",158934
+"Punta Gorda, FL ",159978
+"Bloomington, IN ",159549
+"Bend-Redmond, OR ",157733
+"Bowling Green, KY ",158599
+"Pueblo, CO ",159063
+"Janesville-Beloit, WI ",160331
+"Jackson, MI ",160248
+"Kahului-Wailuku-Lahaina, HI ",154924
+"Iowa City, IA ",152586
+"Vineland-Bridgeton, NJ ",156898
+"Albany, GA ",157308
+"Niles-Benton Harbor, MI ",156813
+"State College, PA ",153990
+"Alexandria, LA ",153922
+"Decatur, AL ",153829
+"Burlington, NC ",151131
+"Bangor, ME ",153923
+"Madera, CA ",150865
+"Rocky Mount, NC ",152392
+"Midland, TX ",141671
+"Hanford-Corcoran, CA ",152982
+"Chambersburg-Waynesboro, PA ",149618
+"Monroe, MI ",152021
+"Wichita Falls, TX ",151306
+"Elizabethtown-Fort Knox, KY ",148338
+"Jefferson City, MO ",149807
+"Texarkana, TX-AR ",149198
+"Grand Junction, CO ",146723
+"Dothan, AL ",145639
+"Auburn-Opelika, AL ",140247
+"Florence-Muscle Shoals, AL ",147137
+"Hattiesburg, MS ",142842
+"Wheeling, WV-OH ",147950
+"Santa Fe, NM ",144170
+"St. George, UT ",138115
+"Valdosta, GA ",139588
+"Odessa, TX ",137130
+"Dalton, GA ",142227
+"Coeur d'Alene, ID ",138494
+"Johnstown, PA ",143679
+"Sebastian-Vero Beach, FL ",138028
+"Homosassa Springs, FL ",141236
+"Napa, CA ",136484
+"Rapid City, SD ",134598
+"Springfield, OH ",138333
+"Idaho Falls, ID ",133265
+"Flagstaff, AZ ",134421
+"La Crosse-Onalaska, WI-MN ",133665
+"Lebanon, PA ",133568
+"Battle Creek, MI ",136146
+"Wausau, WI ",134063
+"Morgantown, WV ",129709
+"Lawton, OK ",130291
+"Sierra Vista-Douglas, AZ ",131346
+"Winchester, VA-WV ",128472
+"Jackson, TN ",130011
+"Pittsfield, MA ",131219
+"Farmington, NM ",130044
+"Glens Falls, NY ",128923
+"Harrisonburg, VA ",125228
+"Logan, UT-ID ",125442
+"New Bern, NC ",126802
+"St. Joseph, MO-KS ",127329
+"Altoona, PA ",127089
+"Carbondale-Marion, IL ",126575
+"Beckley, WV ",124898
+"Goldsboro, NC ",122623
+"Jonesboro, AR ",121026
+"Hammond, LA ",121097
+"Mansfield, OH ",124475
+"Weirton-Steubenville, WV-OH ",124454
+"Sherman-Denison, TX ",120877
+"Watertown-Fort Drum, NY ",116229
+"Bismarck, ND ",114778
+"Staunton-Waynesboro, VA ",118502
+"Albany, OR ",116672
+"Mount Vernon-Anacortes, WA ",116901
+"Cleveland, TN ",115788
+"Muncie, IN ",117671
+"Anniston-Oxford-Jacksonville, AL ",118572
+"Williamsport, PA ",116111
+"Owensboro, KY ",114752
+"Sheboygan, WI ",115507
+"Morristown, TN ",113951
+"San Angelo, TX ",111823
+"Brunswick, GA ",112370
+"Kankakee, IL ",113449
+"Wenatchee, WA ",110884
+"Lawrence, KS ",110826
+"Michigan City-La Porte, IN ",111467
+"Missoula, MT ",109299
+"Decatur, IL ",110768
+"California-Lexington Park, MD ",105151
+"Sumter, SC ",107456
+"Lewiston-Auburn, ME ",107702
+"Bay City, MI ",107771
+"Lima, OH ",106331
+"Gadsden, AL ",104430
+"Ithaca, NY ",101564
+"Longview, WA ",102410
+"Cumberland, MD-WV ",103299
+"Fond du Lac, WI ",101633
+"The Villages, FL ",93420
+"Gettysburg, PA ",101407
+"Fairbanks, AK ",97581
+"Grand Forks, ND-MN ",98461
+"Sebring, FL ",98786
+"Mankato-North Mankato, MN ",96740
+"Manhattan, KS ",92719
+"Pine Bluff, AR ",100258
+"Cape Girardeau, MO-IL ",96275
+"Hot Springs, AR ",96024
+"Victoria, TX ",94003
+"Ocean City, NJ ",97265
+"Rome, GA ",96317
+"Dubuque, IA ",93653
+"Cheyenne, WY ",91738
+"Parkersburg-Vienna, WV ",92673
+"Ames, IA ",89542
+"Elmira, NY ",88830
+"Corvallis, OR ",85579
+"Bloomsburg-Berwick, PA ",85562
+"Midland, MI ",83629
+"Pocatello, ID ",82839
+"Grand Island, NE ",81850
+"Grants Pass, OR ",82713
+"Kokomo, IN ",82752
+"Great Falls, MT ",81327
+"Hinesville, GA ",77917
+"Danville, IL ",81625
+"Columbus, IN ",76794
+"Casper, WY ",75450
+"Walla Walla, WA ",62859
+"Lewiston, ID-WA ",60888
+"Carson City, NV ",55274
+Alabama,
+Alaska,
+Arizona,
+Arkansas,
+California,
+Colorado,
+Connecticut,
+Delaware,
+Florida,
+Georgia,
+Hawaii,
+Idaho,
+Illinois,
+Indiana,
+Iowa,
+Kansas,
+Kentucky,
+Louisiana,
+Maine,
+Maryland,
+Massachusetts,
+Michigan,
+Minnesota,
+Mississippi,
+Missouri,
+Montana,
+Nebraska,
+Nevada,
+New Hampshire,
+New Jersey,
+New Mexico,
+New York,
+North Carolina,
+North Dakota,
+Ohio,
+Oklahoma,
+Oregon,
+Pennsylvania,
+Rhode Island,
+South Carolina,
+South Dakota,
+Tennessee,
+Texas,
+Utah,
+Vermont,
+Virginia,
+Washington,
+West Virginia,
+Wisconsin,
+Wyoming,
