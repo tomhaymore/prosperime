@@ -800,7 +800,7 @@ class CareerPathBase(CareerBase):
 		final = False
 		users = User.objects.select_related("positions").filter(positions__entity__in=schools)
 		for u in users:
-			for p in u.positions.all():
+			for p in u.positions.all().order_by("start_date"):
 				if final:
 					continue
 				if next:
@@ -817,7 +817,7 @@ class CareerPathBase(CareerBase):
 						}
 				if p.entity in schools:
 					next = True
-		paths = sorted(paths.iteritems(),key=lambda x: x[1]['count'])
+		paths = sorted(paths.iteritems,key=lambda x: x[1]['count'],reverse=True)
 		return paths
 
 
