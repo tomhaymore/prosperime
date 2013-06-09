@@ -252,21 +252,20 @@ div.careers-header-row {
 	margin-top:15px;
 }
 
-.profile-subheader {
-	font-size:1.1em;
-	font-weight: bold;
-}
+
 
 #profile-pic {
 	margin-left:auto;
 	margin-right:auto;
 	border:2px solid #eeeeef;
 	cursor:pointer;
+	background-size: 100%;
 	transition: background-image 0.1s;
 }
 
 #profile-pic:hover {
 	background-image: url('/static/img/green_add.png');
+	background-size: 120%;
 }
 
 .personalize-info-container {
@@ -282,8 +281,13 @@ input.form-error {
 
 .personalize-list {
 	margin-bottom: 15px;
+	color:rgb(85,85,85);
+}
+
+.personalize-list li {
+	line-height: 30px;
 }
 
 .personalize-module {
-	margin-bottom:15px;
+	margin-bottom:30px;
 }
