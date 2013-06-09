@@ -817,7 +817,7 @@ class CareerPathBase(CareerBase):
 						}
 				if p.entity in schools:
 					next = True
-		paths = sorted(paths.iteritems,key=lambda x: x[1]['count'],reverse=True)
+		paths = sorted(paths.iteritems(),key=lambda x: x[1]['count'],reverse=True)
 		return paths
 
 
