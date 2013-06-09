@@ -6,7 +6,14 @@
 <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/home.css" />
 <link type='text/css' rel='stylesheet' href='{{ STATIC_URL }}css/font-awesome.min.css' />
 
-
+<style>
+{% if user.profile.default_profile_pic %}
+	#profile-pic {
+		background-image:url({{user.profile.default_profile_pic|safe}});
+		background-size: 100%;
+	}
+{% endif %}
+</style>
 
 <!-- Lato, Source Sans, Varela -->
 <!-- Javascript -->
@@ -22,48 +29,56 @@
 			<div id="profile-pic" class="circle"></div>
 		</div>
 		<div id="schools-container" class="pull-left center icons-module">
-			<p class="i-header">Schools</p>
+			<p class="i-header">Education</p>
 			<a href="#schools/">
-				<div id="icon-schools" class="circle-small" data-cat="schools" ></div>
+				<div id="icon-schools" class="circle-small" data-cat="schools" ><span class="icons-text">PhD</span></div>
 			</a>
 			<ul id="home-schools-list" class="secret-list noshow" data-cat="schools">
 				{% for e in educations|slice:"3" %}
 					<li><a href="#schools/{{e.entity.id}}">{{e.degree}} at {{e.entity.name}}</a></li>
 				{% endfor %}
+				<b class="border-notch notch"></b>
+				<b class="notch"></b>
 			</ul>
 		</div>
 		<div id="experience-container" class="pull-left center icons-module">
 			<p class="i-header">Experience</p>
 			<a href="#positions/">
-				<div id="icon-experience" class="circle-small" data-cat="positions"></div>
+				<div id="icon-experience" class="circle-small" data-cat="positions"><span class="icons-text">10+</span></div>
 			</a>
 			<ul id="home-positions-list" class="secret-list noshow" data-cat="positions">
 				{% for p in positions|slice:"3" %}
 					<li><a href="#positions/{{p.ideal_position.id}}">{{p.title}} at {{p.entity.name}}</a></li>
 				{% endfor %}
+				<b class="border-notch notch"></b>
+				<b class="notch"></b>
 			</ul>
 		</div>
 		
 		<div id="locations-container" class="pull-left center icons-module">
 			<p class="i-header">Locations</p>
 			<a href="#locations/">
-				<div id="icon-locations" class="circle-small" data-cat="locations"></div>
+				<div id="icon-locations" class="circle-small" data-cat="locations"><span class="icons-text">USA</span></div>
 			</a>
 			<ul id="home-locations-list" class="secret-list noshow" data-cat="locations">
 				{% for l in locations|slice:"3" %}
 					<li><a href="#locations/{{l.id}}">{{l.name}}</a></li>
 				{% endfor %}
+				<b class="border-notch notch"></b>
+				<b class="notch"></b>
 			</ul>
 		</div>
 		<div id="goals-container" class="pull-left center icons-module">
 			<p class="i-header">Goals</p>
 			<a href="#goals/">
-				<div id="icon-goals" class="circle-small" data-cat="goals"></div>
+				<div id="icon-goals" class="circle-small" data-cat="goals"><span class="icons-text">5+</span></div>
 			</a>
 			<ul id="home-goals-list" class="secret-list noshow" data-cat="goals">
 				{% for g in goals|slice:"3" %}
 					<li><a href="#goals/{{g.position.id}}">{{g.position.title}}</a></li>
 				{% endfor %}
+				<b class="border-notch notch"></b>
+				<b class="notch"></b>
 			</ul>
 		</div>
 		<div class="clear"></div>
@@ -105,7 +120,10 @@ $(function() {
 	function renderRoute() {
 	    console.log(location.hash);
 	    if (location.hash === "#schools/") {
+	        var cat = "schools";
 	        console.log("showing schools fragment");
+	        // trigger hover on header
+	        // $("ul[data-cat='"+cat+"']").removeClass("noshow");
 	        $.ajax({
 	        	url:"/careers/getSchoolFragment",
 	        	success:function(data){
@@ -132,6 +150,77 @@ $(function() {
 		// $("ul[data-cat='"+cat+"']").hide();
 		$("ul[data-cat='"+cat+"']").addClass("noshow");
 	});
+
+	var profile_task_id,
+		connections_task_id;
+
+	var update_task_status = function(id,status) {
+		// determine what class to add
+		if (status == "success") {
+			var msg_class = "success";
+			var msg_text = "We have completed syncing with your LinkedIn account. Please refresh the page to see what we were able to fill in automatically.";
+		} else if (status == "failure") {
+			var msg_class = "info";
+			var msg_text = "We have encountered an error processing your LinkedIn account.";
+		} else {
+			var msg_class = "info";
+			var msg_text = "We are still syncing your LinkedIn profile...";
+		}
+		// check if messages are present
+		var msg_container = $("div#messages");
+		if (!$.contains(document.documentElement,msg_container)) {
+			// messages div is not present, update
+			block = "<div id='messages'>\n<ul class='messages'>\n<li class="+msg_class+" data-task-id="+id+">"+msg_text+"</li>\n</ul>\n</div>";
+			$("div.messages-container").append(block);
+		} else {
+			// messages div is present, check to see if this particular message is present
+			var msg = $("li#[data-task-id='"+id+"']");
+			if(!$.contains(document.documentElement,msg)) {
+				// element does not exist, create
+				var message = "<li class='info' data-task-id="+id+">"+msg_text+"</li>";
+				$("ul.messages").append(message);
+			} else {
+				// message is already present
+				msg.removeClass();
+				msg.addClass(msg_class);
+			}
+		}
+	};
+	
+	var check_task = function(id) {
+		setTimeout(function() {
+			var url = "tasks/" + id + "/status"
+			$.ajax({
+					url:url,
+					success: function(data) {
+						if (data.task.status == "SUCCESS") {
+							// task already completed, updated with success message
+							update_task_status(id,'success');
+						} else if (data.task.status == "FAILURE") {
+							// task failed
+							update_task_status(id,'failure');
+						} else {
+							// task still pending
+							check_task();
+						}
+					},
+					dataType:"json"})
+		});
+
+	};
+	
+	var tasks ={% if tasks %} true {% else %} false {% endif %};
+	if (tasks == true) {
+		var profile_task_id = {{profile_task_id|safe}}
+		var connections_task_id = {{connections_task_id|safe}}
+	};	
+	if (profile_task_id != null) {
+		check_task(profile_task_id);
+	};
+	if (connections_task_id != null) {
+		check_task(connections_task_id);
+	};
+
 });
 
 
