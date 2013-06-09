@@ -52,8 +52,14 @@ def home(request):
 		'educations' : Position.objects.filter(person=request.user,type="education"),
 		'positions' : Position.objects.filter(person=request.user).exclude(type="education"),
 		'locations':Region.objects.filter(people=request.user),
-		'goals':GoalPosition.objects.filter(owner=request.user)
+		'goals':GoalPosition.objects.filter(owner=request.user),
+		'user':request.user
 	}
+
+	if "tasks" in request.session:
+		data['tasks'] = True
+		data['profile_task_id'] = request.session['tasks']['profile']
+		data['connections_task_id'] = request.session['tasks']['connections']
 
 	return render_to_response('home_v6.html',data,context_instance=RequestContext(request))
 
