@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import urlparse
 import math
 import json
+import os
 
 # import datetime
 
@@ -30,7 +31,7 @@ from accounts.models import Account, Profile, Picture, Connection
 from careers.models import SavedPath, CareerDecision, Position, SavedPosition, SavedCareer, GoalPosition, IdealPosition
 from entities.models import Entity, Region
 from accounts.tasks import process_li_profile, process_li_connections
-from accounts.forms import FinishAuthForm, AuthForm, RegisterForm, AddEducationForm, AddExperienceForm, AddGeographyForm, AddGoalForm
+from accounts.forms import FinishAuthForm, AuthForm, RegisterForm
 import utilities.helpers as helpers
 
 
@@ -109,7 +110,7 @@ def register(request):
 				auth_login(request,user)
 
 			# send to personalization
-			return HttpResponseRedirect('/personalize/')
+			return HttpResponseRedirect('/home/')
 	else:
 		form = RegisterForm()
 
@@ -186,8 +187,8 @@ def finish_login(request):
 			# grab cleaned values from form
 			username = form.cleaned_data['username']
 			email = form.cleaned_data['email']
-			location = form.cleaned_data['location']
-			headline = form.cleaned_data['headline']
+			# location = form.cleaned_data['location']
+			# headline = form.cleaned_data['headline']
 			password = form.cleaned_data['password']
 
 			# fetch LI data
@@ -196,10 +197,8 @@ def finish_login(request):
 
 			# check to see if dormant user already exists
 			try: 
-				print 'before try'
+				print '@ accounts.finish -- checking for dormant user'
 				user = User.objects.get(profile__status="dormant",account__uniq_id=linkedin_user_info['id'])
-				print 'after try'
-				print user
 				existing = True
 				user.profile.status = "active"
 				user.profile.save()
@@ -207,9 +206,9 @@ def finish_login(request):
 				user.username = username
 				user.is_active = True
 				user.save()
-				print "user already exists"
+				print "@ accounts.finish -- user already exists"
 			except:
-				print 'exception'
+				print '@ accounts.finish -- new user'
 				# create user
 				user = User.objects.create_user(username,email,password)
 				user.save()
@@ -217,7 +216,7 @@ def finish_login(request):
 				existing = False
 				user.profile.status = "active"
 				user.profile.save()
-				print "created new user"
+				print "@ accounts.finish -- created new user"
 			# make sure using right backend
 			request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
 			# log user in
@@ -230,14 +229,14 @@ def finish_login(request):
 			else:
 				# try logging in now with LinkedIn
 				request.session['_auth_user_backend'] = 'prosperime.accounts.backends.LinkedinBackend'
-				user = authenticate(acct_id=linkedin_user_info['id'])
-				
-			if user is not None:
-				auth_login(request,user)
-			else:
-				# somehow authentication failed, redirect with error message
-				messages.error(request, 'Something went wrong. Please try again.')
-				return render_to_response('accounts/finish_login.html',{'form':form},context_instance=RequestContext(request))
+				try:
+					user = authenticate(acct_id=linkedin_user_info['id'])
+					if user is not None:
+						auth_login(request,user)	
+				except:
+					# somehow authentication failed, redirect with error message
+					messages.error(request, 'Something went wrong. Please try again.')
+					return render_to_response('accounts/finish_login.html',{'form':form},context_instance=RequestContext(request))
 
 
 
@@ -245,19 +244,24 @@ def finish_login(request):
 			# user.profile.full_name = request.session['linkedin_user_info']['firstName'] + " " + request.session['linkedin_user_info']['lastName']		
 			user.profile.first_name = linkedin_user_info['firstName']
 			user.profile.last_name = linkedin_user_info['lastName']
-			user.profile.location = location
+			# user.profile.location = location
 			# check to see if user provided a headline
-			if headline:
-				user.profile.headline = headline
-			else:
-				user.profile.headline = linkedin_user_info['headline']
+			# if headline:
+			# 	user.profile.headline = headline
+			# else:
+			user.profile.headline = linkedin_user_info['headline']
 			user.profile.save()
 
 			# add pofile picture
-			if 'pictureUrl' in linkedin_user_info:
-				# _add_profile_pic(user,linkedin_user_info['pictureUrl'])
+			# if 'pictureUrl' in linkedin_user_info:
+			# 	# _add_profile_pic(user,linkedin_user_info['pictureUrl'])
+			# 	li_parser = LIProfile()
+			# 	li_parser.add_profile_pic(user,linkedin_user_info['pictureUrl'])
+
+			if 'pictureUrls' in linkedin_user_info:
 				li_parser = LIProfile()
-				li_parser.add_profile_pic(user,linkedin_user_info['pictureUrl'])
+				li_parser.add_profile_pic(user,linkedin_user_info['pictureUrls']['values'][0])
+
 
 			if existing:
 				# get existing LI account
@@ -289,7 +293,7 @@ def finish_login(request):
 
 			#return HttpResponseRedirect('/account/success')
 			if 'next' not in request.session:
-				return HttpResponseRedirect('/personalize/')
+				return HttpResponseRedirect('/home/')
 			else:
 				return HttpResponseRedirect(request.session['next'])
 	else:
@@ -358,7 +362,7 @@ def finish_link(request):
 	messages.success(request, 'Your LinkedIn account has been successfully linked.')
 
 	if 'next' not in request.session:
-		return HttpResponseRedirect('/personalize/')
+		return HttpResponseRedirect('/home/')
 	else:
 		return HttpResponseRedirect(request.session['next'])
 
@@ -664,8 +668,36 @@ def personalize(request):
 def add_to_profile(request):
 	# check for form submission
 	if request.POST:
-		print request.POST
+		from accounts.forms import AddEducationForm, AddExperienceForm, AddGeographyForm, AddGoalForm, AddProfilePicForm
+		from django.core.files import File
 		import accounts.tasks as tasks
+		if request.POST['type'] == "profile_pic":
+			# bind form
+			form = AddProfilePicForm(request.POST,request.FILES)
+			# validate form
+			if form.is_valid():
+				# create picture object
+				img_filename = request.user.profile.std_name() + ".jpg"
+				pic = Picture()
+				pic.person = request.user.profile
+				pic.source = 'user'
+				pic.save()
+				with open('tmp_img','wb') as f:
+					f.write(request.FILES['pic'].read())
+				with open('tmp_img','r') as f:
+					img_file = File(f)
+					pic.pic.save(img_filename,img_file,True)
+				os.remove('tmp_img')
+				response = {
+					'result':'success',
+					'pic':pic.pic.url
+				}
+			else:
+				response = {
+					'result':'failure',
+					'position':form.errors
+				}
+			return HttpResponse(json.dumps(response))
 		if request.POST['type'] == "education":
 			# bind form
 			form = AddEducationForm(request.POST)
