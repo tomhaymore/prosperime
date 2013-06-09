@@ -128,6 +128,9 @@ class AddGeographyForm(forms.Form):
 class AddGoalForm(forms.Form):
 	goal = forms.CharField(label="Goal")
 
+class AddProfilePicForm(forms.Form):
+	pic = forms.FileField(label="Profile picture")
+
 class AuthForm(AuthenticationForm):
 	# error_css_class = 'form_error'
 	# required_css_class = 'form_required'
