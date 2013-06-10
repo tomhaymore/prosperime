@@ -114,8 +114,8 @@
 
 
 // Main DST's
-var people = {{people|safe}}
-var positions = {{positions|safe}}
+var people = shuffle({{people|safe}})
+var positions = shuffle({{positions|safe}})
 var majors = {{majors|safe}}
 
 console.log("#Majors: "+ Object.keys(majors).length)
@@ -123,7 +123,8 @@ console.log("#People: "+people.length)
 console.log("#Positons: "+positions.length)
 
 // Constants
-var svg_width = 350; var svg_height = 600;  
+var svg_width = 350; var svg_height = 600; 
+var magic_number = 575; 
 // 600 is the upper limit of what fits on my laptop
 
 // Add Center divs (Majors)
@@ -191,8 +192,7 @@ svg_right = d3.select("#right").append("svg")
 	.attr("id", "svg-right")
 
 
-
-
+var y_offset = Math.floor(magic_number / people.length)
 
 // Add user nodes to left svg
 svg_left.selectAll("circle").data(people).enter().append("circle")
@@ -203,8 +203,8 @@ svg_left.selectAll("circle").data(people).enter().append("circle")
 		else return 120
 	})
 	.attr("cy", function(d, i) {
-		if ((i + 1) % 2 == 0) return i * 7
-		else return (i + 1) * 7
+		if ((i + 1) % 2 == 0) return i * y_offset
+		else return (i + 1) * y_offset
 	})
 	.attr("r", 4)
 	.attr("fill", "#fff")
@@ -215,6 +215,8 @@ svg_left.selectAll("circle").data(people).enter().append("circle")
 
 
 // Add position nodes to right svg
+y_offset = Math.floor(magic_number / positions.length)
+
 svg_right.selectAll("circle").data(positions).enter().append("circle")
 	.attr("cx", function(d, i) { // staggers nodes x-value
 		if (i % 4 == 0) return 270
@@ -223,8 +225,8 @@ svg_right.selectAll("circle").data(positions).enter().append("circle")
 		else return 300
 	})
 	.attr("cy", function(d, i) {
-		if ((i + 1) % 2 == 0) return i * 11
-		else return (i + 1) * 11
+		if ((i + 1) % 2 == 0) return i * y_offset
+		else return (i + 1) * y_offset
 	})
 	.attr("r", 5)
 	.attr("fill", "none")
@@ -267,7 +269,6 @@ for (key in majors) {
 	function d3_drawLines(container, x1, y1, x2, y2, index) {
 
 		var hinge = (container.attr("id") == "svg-right") ? 185 : 165;
-
 		var data = [{"x":x1, "y":y1}, {"x":hinge, "y":y1}, {"x":x2, "y":y2}]
 	
 		var line_gen = d3.svg.line()
@@ -275,9 +276,7 @@ for (key in majors) {
 			.y(function(d) { return d.y })
 			.interpolate("monotone")
 
-
 		container.append("svg:path")
-			// .attr("x1", x1).attr("y1", y1).attr("x2", x2).attr("y2", y2)
 			.attr("d", line_gen(data))
 			.attr("fill","none")
 			.attr("stroke", "rgba(104,105,107,0.1)")
@@ -287,14 +286,25 @@ for (key in majors) {
 		});
 	};
 
-	function d3_drawTooltip(container, x, y, text, id) {
-
+	function d3_drawTooltip(container, x, y, text, id, direction) {
 		container.append("div")
 			.text(text)
 			.attr("class", "abs person-box")
 			.style("left", x + "px")
 			.style("top", y + "px")
 			.attr("id", id)
+
+		if (direction == "left") {
+			// reposition to the other side
+			var width;
+			container.selectAll(".abs").each(function(d) {
+				width = parseInt(d3.select(this).style("width"))
+				console.log("was: "+ x + " w: " + width)
+				d3.select(this).style("left", x - width - 18 + "px")
+				console.log(d3.select(this).style("left"))
+			});
+		};
+		
 	};
 
 
@@ -320,7 +330,7 @@ for (key in majors) {
 
 			// draw tooltip
 			var parent_container = d3.select("#right")
-			d3_drawTooltip(parent_container, x, y, title, "position-hover-"+id)
+			d3_drawTooltip(parent_container, x, y, title, "position-hover-"+id, "right")
 		};
 	};
 
@@ -350,7 +360,7 @@ for (key in majors) {
 
 			// append tooltip
 			var parent_container = d3.select("#left")
-			d3_drawTooltip(parent_container, x, y, user_name, "person-hover-"+id)
+			d3_drawTooltip(parent_container, x, y, user_name, "person-hover-"+id, "left")
 		};
 	};
 
@@ -434,6 +444,10 @@ for (key in majors) {
 	// });
 
 
+	function shuffle(o) {
+	    for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+	    return o;
+	}
 
 
 </script>
