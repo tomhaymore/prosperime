@@ -576,7 +576,10 @@ class LIBase():
 
 	def get_position(self,user,co,data,**kwargs):
 		if kwargs.get('type') == 'ed':
-			pos = Position.objects.filter(entity=co,person=user,degree=data['degree'])
+			if 'degree' in data:
+				pos = Position.objects.filter(entity=co,person=user,degree=data['degree'])
+			else:
+				pos = None
 		else:
 			pos = Position.objects.filter(entity=co,person=user,title=data['title'])
 		if pos:
