@@ -10,6 +10,8 @@ from social.models import Comment
 
 class FeedBase():
 	
+	STOP = datetime.now() - timedelta(hours = 1024)
+
 	def get_univ_feed(self,user,**opts):
 		"""
 		Gathers universal feed items and returns list of dict items
@@ -49,4 +51,18 @@ class FeedBase():
 
 		return ordered_feed
 
+	def get_ideal_updates(self,user,ideal_id):
+		"""
+		gets updates related to a specific ideal position
+		"""
+
+		# get user connections and educations
+		connections = [u.id for u in user.profile.connections.all()]
+		educations = [u.id for u in User.objects.filter(positions__entity_id__in=user.profile.educations(),positions__type="education")]
+		
+		comments = Comment.objects.filter(type="idealposition",ideal_position__id=ideal_id).filter(Q(owner__in=connections) | Q(owner__in=educations)).filter(updated__gte=self.STOP)
+		unordered_feed = [{'type':'comment','id':c.id,'user_id':c.owner.id,'user_name':c.owner.profile.full_name(),'title':None,'body':c.body,'target_user_id':c.target_user().id,'target_user_name':c.target_user().profile.full_name(),'target_type':c.type,'target_name':c.target_name(),'target_id':c.target_id(),'date':c.updated,'stub':{'user_id':c.target_user().id,'user_name':c.target_user().profile.full_name(),'user_pic':c.target_user().profile.default_profile_pic(),'connected':c.target_user().id in connections,'saved_paths':len(c.target_user().savedPath.all()),'saved_positions':len(c.target_user().goal_position.all()),'path':None,'career':None,'position':None,'comment':{'body':c.body,'commenter_id':c.owner_id,'commenter_name':c.owner.profile.full_name(),'commenter_pic':c.owner.profile.default_profile_pic()}}} for c in comments]
+
+		ordered_feed = sorted(unordered_feed, key=operator.itemgetter('date'),reverse=True)
+		return ordered_feed
 
