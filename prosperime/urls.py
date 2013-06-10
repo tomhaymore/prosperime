@@ -89,6 +89,7 @@ urlpatterns = patterns('',
     url(r'^careers/addProgressDetails/$', 'careers.views.add_progress_detail'),
     url(r'^careers/getSchoolFragment/(?:/(?P<school_id>\d+))?/$', 'careers.views.get_school_fragment'),
     url(r'^careers/getSchoolFragment/$', 'careers.views.get_school_fragment'),
+    url(r'^careers/getFeedFragment/$', 'careers.views.get_feed_fragment'),
 
     ## Accounts - AJAX calls
     url(r'^accounts/updateProfile/$', 'accounts.views.updateProfile'),
