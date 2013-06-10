@@ -31,15 +31,17 @@ import utilities.helpers as helpers
 ################## CORE VIEWS ########################
 ######################################################
 
-
+DEGREES = {
+	'Doctor of Philosophy (PhD)':'PhD'
+}
 
 
 def home(request):
 	if not request.user.is_authenticated():
 		return HttpResponseRedirect('/welcome/')
 
-	data = {}
-	user = request.user
+	# data = {}
+	# user = request.user
 
 	# # data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
 	# # data['saved_paths'] = SavedPath.objects.filter(owner=user)
@@ -47,13 +49,21 @@ def home(request):
 	# data['saved_jobs'] = GoalPosition.objects.filter(owner=user)
 	# data['career_decisions'] = CareerDecision.objects.all()
 
+	# fetch data 
+	educations = Position.objects.filter(person=request.user,type="education")
+	positions = Position.objects.filter(person=request.user).exclude(type="education").order_by("-start_date")
+	locations = Region.objects.filter(people=request.user)
+	goals = GoalPosition.objects.filter(owner=request.user)
+	user = request.user
 
 	data = {
-		'educations' : Position.objects.filter(person=request.user,type="education"),
-		'positions' : Position.objects.filter(person=request.user).exclude(type="education"),
-		'locations':Region.objects.filter(people=request.user),
-		'goals':GoalPosition.objects.filter(owner=request.user),
-		'user':request.user
+		'educations' : educations,
+		'positions' : positions,
+		'locations': locations,
+		'goals' : goals,
+		'user' : request.user,
+		'latest_ed' : DEGREES[educations[0].degree],
+		'duration': careerlib.get_prof_longevity(user)
 	}
 
 

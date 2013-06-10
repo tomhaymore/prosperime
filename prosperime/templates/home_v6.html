@@ -10,7 +10,11 @@
 {% if user.profile.default_profile_pic %}
 	#profile-pic {
 		background-image:url({{user.profile.default_profile_pic|safe}});
-		background-size: 100%;
+		background-size: 115%;
+	}
+	#profile-pic:hover {
+		background-image:url({{user.profile.default_profile_pic|safe}});
+		background-size: 115%;
 	}
 {% endif %}
 </style>
@@ -31,7 +35,7 @@
 		<div id="schools-container" class="pull-left center icons-module">
 			<p class="i-header">Education</p>
 			<a href="#schools/">
-				<div id="icon-schools" class="circle-small" data-cat="schools" ><span class="icons-text">PhD</span></div>
+				<div id="icon-schools" class="circle-small" data-cat="schools" ><span class="icons-text">{{latest_ed}}</span></div>
 			</a>
 			<ul id="home-schools-list" class="secret-list noshow" data-cat="schools">
 				{% for e in educations|slice:"3" %}
@@ -44,7 +48,7 @@
 		<div id="experience-container" class="pull-left center icons-module">
 			<p class="i-header">Experience</p>
 			<a href="#positions/">
-				<div id="icon-experience" class="circle-small" data-cat="positions"><span class="icons-text">10+</span></div>
+				<div id="icon-experience" class="circle-small" data-cat="positions"><span class="icons-text">{{duration}}</span></div>
 			</a>
 			<ul id="home-positions-list" class="secret-list noshow" data-cat="positions">
 				{% for p in positions|slice:"3" %}
@@ -58,7 +62,7 @@
 		<div id="locations-container" class="pull-left center icons-module">
 			<p class="i-header">Locations</p>
 			<a href="#locations/">
-				<div id="icon-locations" class="circle-small" data-cat="locations"><span class="icons-text">USA</span></div>
+				<div id="icon-locations" class="circle-small" data-cat="locations"><span class="icons-text"></span></div>
 			</a>
 			<ul id="home-locations-list" class="secret-list noshow" data-cat="locations">
 				{% for l in locations|slice:"3" %}
@@ -71,7 +75,7 @@
 		<div id="goals-container" class="pull-left center icons-module">
 			<p class="i-header">Goals</p>
 			<a href="#goals/">
-				<div id="icon-goals" class="circle-small" data-cat="goals"><span class="icons-text">5+</span></div>
+				<div id="icon-goals" class="circle-small" data-cat="goals"><span class="icons-text"></span></div>
 			</a>
 			<ul id="home-goals-list" class="secret-list noshow" data-cat="goals">
 				{% for g in goals|slice:"3" %}

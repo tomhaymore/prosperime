@@ -34,6 +34,10 @@ def match_position_to_ideals(pos,test=False):
 	career_map = CareerMapBase()
 	return career_map.match_position_to_ideals(pos,test)
 
+def get_prof_longevity(user):
+	career_path = CareerPathBase()
+	return career_path.get_prof_longevity(user)
+
 # get focal careers
 def get_focal_careers(user,limit=10):
 	career_path = CareerPathBase()
@@ -819,6 +823,29 @@ class CareerPathBase(CareerBase):
 					next = True
 		paths = sorted(paths.iteritems(),key=lambda x: x[1]['count'],reverse=True)
 		return paths
+
+	def get_prof_longevity(self,user):
+		positions = Position.objects.filter(person=user).order_by("start_date").exclude(type="education")
+		start_date = positions[0].start_date
+		end_date = None
+		z = False
+		i = positions.count() - 1
+		while not z:
+			# print "@ get_prof_longevity -- cycling"
+			if positions[i].end_date:
+				z = True
+				end_date = positions[i].end_date
+			i = i - 1
+		
+		if end_date:
+			delta = end_date - start_date
+		else:
+			delta = datetime.datetime.today() - start_date
+
+		years = round(delta.days / 365.25,0)
+		if years > 10:
+			return "10+"
+		return years
 
 
 class CareerBuild(CareerPathBase):

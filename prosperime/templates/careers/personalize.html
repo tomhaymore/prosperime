@@ -6,6 +6,7 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/typeahead.min.js"></script> -->
 
 <script type="text/javascript" src="{{ STATIC_URL }}js/personalize.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.form.min.js"></script>
 <script type="text/css">
 
 </script>
@@ -19,12 +20,20 @@
 {% csrf_token %}
 <div id="content-container" class="main-container">
 	<p class="default-header">Tell us more</p>
-	<p class="main-sub-header">CareerTrail works best if you tell us more about yourself. That way we can personalize your experience. After all, you're here because you want to sift through the noise.</p>
+	<p class="main-sub-header">Prospr.Me works best if you tell us more about yourself. That way we can personalize your experience.</p>
+	<p>In a rush? <a href="/home">Skip ahead</a>, you can always add your information later.</p>
 
 	<div id="profile-pic-container" class="pull-left">
 		<!-- <div class="center profile-subheader" >You</div> -->
 		<div id="profile-pic" class="circle">
 		</div>
+		<div id="profile-pic-caption" class="center" style="display:none;">
+			Add a picture
+		</div>
+		<form id="profile-pic-form" method="POST" action="/accounts/addToProfile/" enctype="multipart/form-data">
+			<input type="hidden" name="type" value="profile_pic" />
+			<input type="file" name="pic" id="id_profile-pic-file" style="visibility:hidden;" />
+		</form>
 	</div>
 	<div id="personalize-form-container" class="pull-left">
 		<div class="personalize-module" data-info="education">
@@ -42,10 +51,10 @@
 						{% endif %}
 						from {{e.entity__name}} ({{e.end_date|date:'M Y'}})
 						{% if not e.degree %}
-							<a class="flat-button small-button ed-add-degree" data-pos-id="{{e.id}}">Add degree</a>
+							<!-- <a class="flat-button small-button ed-add-degree" data-pos-id="{{e.id}}">Add degree</a> -->
 						{% endif %}
 						{% if not e.field %}
-							<a class="flat-button small-button ed-add-field" data-pos-id="{{e.id}}">Add field</a>
+							<!-- <a class="flat-button small-button ed-add-field" data-pos-id="{{e.id}}">Add field</a> -->
 						{% endif %}
 					</li>
 				{% endfor %}
@@ -127,7 +136,7 @@
 		</div>
 		<div data-info="experience" class="personalize-info-container">
 			<p class="info-header">What experience matters?</p>
-			<p>Every position, from internships to partnerships, matters. CareerTrail matches each position to its own dataset of careers and helps you figure out where you're headed.</p>
+			<p>Every position, from internships to partnerships, matters. Prospr.Me matches each position to its own dataset of careers and helps you figure out where you're headed.</p>
 		</div>
 		<div data-info="geography" class="personalize-info-container">
 			<p class="info-header">Why is geography important?</p>
@@ -135,7 +144,7 @@
 		</div>
 		<div data-info="goals" class="personalize-info-container">
 			<p class="info-header">What should I even put here?</p>
-			<p>Put as much or as little as you like. The more CareerTrail knows about your goals, the more personalized content we can show you. It's okay if you don't know what you want to do -- that's what CareerTrail is for.</p>
+			<p>Put as much or as little as you like. The more Prospr.Me knows about your goals, the more personalized content we can show you. It's okay if you don't know what you want to do -- that's what Prospr.Me is for.</p>
 		</div>
 	</div>
 	<div class="clear"></div>
@@ -152,6 +161,8 @@
 $(function() {
 	var profile_task_id,
 		connections_task_id;
+
+	$("#profile-pic-form").ajaxForm();
 
 	var update_task_status = function(id,status) {
 		// determine what class to add
@@ -433,16 +444,45 @@ $(function() {
 	});
 
 	$("#pos-show-form").click(function() {
+		$(this).hide();
 		$("#pos-form-holder").show()
 	});
 
 	$("#ed-show-form").click(function() {
+		$(this).hide();
 		$("#ed-form-holder").show()
 	});
 
 	$("input").focus(function(){
 		$(this).removeClass("form-error");
 	});
+
+	$("#profile-pic").hover(function() {
+		$("#profile-pic-caption").toggle();
+		
+	})
+
+	$("#profile-pic").click(function(){
+		performClick(document.getElementById("id_profile-pic-file"));
+	})
+
+	var performClick = function(node) {
+	   var evt = document.createEvent("MouseEvents");
+	   evt.initEvent("click", true, false);
+	   node.dispatchEvent(evt);
+	};
+
+	$("#id_profile-pic-file").change(function() {
+		$("#profile-pic").css("background-image",$(this).val());
+		$("#profile-pic-form").ajaxSubmit({
+			url:"/accounts/addToProfile/",
+			success: function(data){
+				$("#profile-pic").css("background-image","url("+data['pic']+")");
+			},
+			method:"POST",
+			dataType: "json"
+		});
+	})
 
 	// $("#personalize-form-container").find("input").change( function() {
 		

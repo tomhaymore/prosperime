@@ -1,6 +1,9 @@
-<p class="feature-page-header">Schools</p>
+<div class="fragment-header">
+	<p class="feature-page-header">Schools</p>
+</div>
 
 {% if schools %}
+<div class="fragment-nav">
 <ul class="flat feature-list">
 	{% for s in schools %} 
 		{% if s == school %}
@@ -10,42 +13,60 @@
 		{% endif %}
 	{% endfor %}
 </ul>
+</div>
 {% endif %}
-<div class="pull-left" style="width:300px;">
+<div class="fragment-main-container pull-left">
 <p>
 {% if degrees %}
+<div class="fragment-module">
 <p class="feature-page-subheader">Popular Degrees</p>
-<ul>
+<ul class="fragment-list">
 	{% for d in degrees %}
 		<li>{{d}}</li>
 	{% endfor %}
 </ul>
+</div>
 {% endif %}
 {% if careers %}
+<div class="fragment-module">
 <p class="feature-page-subheader">Popular Careers</p>
-<ul>
+<ul class="fragment-list">
 	{% for c in careers %}
 		<li>{{c.name}}</li>
 	{% endfor %}
 </ul>
+</div>
 {% endif %}
 {% if jobs %}
+<div class="fragment-module">
 <p class="feature-page-subheader">Popular First Jobs</p>
-<ul>
+<ul class="fragment-list">
 	{% for j in jobs %}
 		<li>{{j.1.title}}</li>
 	{% endfor %}
 </ul>
+</div>
 {% endif %}
 </div>
-<div class="pull-left" style="width:300px;">
+<div class="fragment-right-container pull-left">
 {% if paths %}
+<div class="fragment-module">
 <p class="feature-page-subheader">Top users</p>
-<ul>
+<ul class="fragment-list">
 	{% for p in paths %}
-	<li>{{p.profile.full_name}}</li>
+	<li>
+		<div class="pull-left">
+			<img class="thumbnail" src="{{p.profile.default_profile_pic}}" />
+		</div>
+		<div class="pull-left">
+			<p>{{p.profile.full_name}}</p>
+				<p>{{p.profile.current_position}}</p>
+		</div>
+		<div class="clear"></div>
+	</li>
 	{% endfor %}
 </ul>
+</div>
 {% endif %}
 </div>
 <div class="clear"></div>
