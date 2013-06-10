@@ -359,7 +359,29 @@ div.splash-module {
 	transition:opacity 0.2s;
 }
 
-#splash-img-1:hover {
+#splash-img-alumni {
+	width:375px;
+	margin-left:40px;
+	opacity: 0.75;
+	transition:opacity 0.2s;
+}
+
+#splash-img-plan {
+	width:425;
+	/*margin-left:30px;*/
+	margin-right:40px;
+	opacity: 0.75;
+	transition:opacity 0.2s;
+}
+
+#splash-img-advice {
+	width:425px;
+	margin-left:35px;
+	opacity: 0.75;
+	transition:opacity 0.2s;
+}
+
+#splash-img-1:hover, #splash-img-alumni:hover, #splash-img-plan:hover, #splash-img-advice:hover {
 	opacity:1;
 }
 
@@ -443,7 +465,7 @@ div.splash-circle {
 	margin-left:auto;
 	margin-right:auto;*/
 	padding-top:10px;
-	background-color:rgb(192,192,192);
+	background-color:rgba(200,200,200,0.8);
 }
 
 .promo-module {
@@ -464,8 +486,8 @@ div.splash-circle {
 }
 
 .promo-body {
-	font-size: 1.2em;
-	line-height:1.5em;
+	font-size: 1.3em;
+	line-height:2.0em;
 }
 
 p.promo-message-header {
