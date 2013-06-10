@@ -787,11 +787,11 @@ class CareerPathBase(CareerBase):
 		all_careers = [{'id':c[0],'name':c[1]['name']} for c in careers]
 		return all_careers
 
-	def get_paths_from_schools(self,schools,user=None):
+	def get_paths_from_schools(self,schools,user=None,limit=5):
 		"""
 		returns a set of user paths that contain the school
 		"""
-		users = User.objects.filter(positions__entity__in=schools).distinct()
+		users = User.objects.filter(positions__entity__in=schools).distinct()[:5]
 		return users
 
 	def get_first_jobs_from_schools(self,schools,user=None):

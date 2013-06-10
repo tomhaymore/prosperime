@@ -5,7 +5,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 ## from Prosperme
-from careers.models import SavedPath, GoalPosition, Position
+from careers.models import SavedPath, GoalPosition, Position, IdealPosition
 
 class Notification(models.Model):
 	target = models.ForeignKey(User,related_name='notifications')
@@ -20,6 +20,7 @@ class Comment(models.Model):
 	owner = models.ForeignKey(User,related_name="comments")
 	path = models.ForeignKey(SavedPath,related_name="comments",null=True)
 	position = models.ForeignKey(Position,related_name="comments",null=True)
+	ideal_position = models.ForeignKey(IdealPosition,related_name="comments",null=True)
 	goal_position = models.ForeignKey(GoalPosition,related_name="comments",null=True)
 	meta = models.CharField(max_length=150,null=True)
 	index = models.IntegerField(null=True)
@@ -52,3 +53,5 @@ class Comment(models.Model):
 			return self.position.id
 		elif self.type == "goalposition":
 			return self.goal_position.id
+		elif self.type == "idealposition":
+			return self.ideal_position.id

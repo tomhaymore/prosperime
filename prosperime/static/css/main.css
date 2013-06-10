@@ -115,8 +115,9 @@ a.flat-button:hover {
 }
 
 .button-small {
-	height:16px;
-	line-height:16px;
+	height:12px;
+	line-height:12px;
+	font-size:12px;
 }
 
 .blue-button {
@@ -1436,7 +1437,7 @@ input.tt-hint {
 .feature-page-header {
 	font-size:2.5em;
 	color:rgb(41,98,152);
-	margin-top:25px;
+	/*margin-top:25px;*/
 	/*margin-bottom:25px;*/
 	font-family:"Helvetica Neue",Helvetica, "Lato";
 	
@@ -1768,7 +1769,7 @@ a.inline-link:hover {
 }
 
 .profile-subheader-white {
-	font-size:1.4em;
+	font-size:1.2em;
 	font-weight: 400;
 	padding:4px;
 	color:#fffffe;
@@ -1786,4 +1787,8 @@ img.thumbnail {
 
 input.adj_checkbox {
 	margin: 0 10px 7px 0;
+}
+
+.block {
+	display:inline-block;
 }

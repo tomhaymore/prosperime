@@ -29,7 +29,7 @@
 <div id="home-splash-container">
 	<div class="inner-container">
 		<div id="profile-pic-container" class="pull-left">
-			<div class="center profile-subheader-white" >Eli Washington</div>
+			<div class="center profile-subheader-white" >{{user.profile.full_name}}</div>
 			<div id="profile-pic" class="circle"></div>
 		</div>
 		<div id="schools-container" class="pull-left center icons-module">
@@ -47,7 +47,7 @@
 		</div>
 		<div id="experience-container" class="pull-left center icons-module">
 			<p class="i-header">Experience</p>
-			<a href="#positions/">
+			<a href="#experience/">
 				<div id="icon-experience" class="circle-small" data-cat="positions"><span class="icons-text">{{duration}}</span></div>
 			</a>
 			<ul id="home-positions-list" class="secret-list noshow" data-cat="positions">
@@ -64,26 +64,30 @@
 			<a href="#locations/">
 				<div id="icon-locations" class="circle-small" data-cat="locations"><span class="icons-text"></span></div>
 			</a>
-			<ul id="home-locations-list" class="secret-list noshow" data-cat="locations">
-				{% for l in locations|slice:"3" %}
-					<li><a href="#locations/{{l.id}}">{{l.name}}</a></li>
-				{% endfor %}
-				<b class="border-notch notch"></b>
-				<b class="notch"></b>
-			</ul>
+			{% if locations %}
+				<ul id="home-locations-list" class="secret-list noshow" data-cat="locations">
+					{% for l in locations|slice:"3" %}
+						<li><a href="#locations/{{l.id}}">{{l.name}}</a></li>
+					{% endfor %}
+					<b class="border-notch notch"></b>
+					<b class="notch"></b>
+				</ul>
+			{% endif %}
 		</div>
 		<div id="goals-container" class="pull-left center icons-module">
 			<p class="i-header">Goals</p>
 			<a href="#goals/">
 				<div id="icon-goals" class="circle-small" data-cat="goals"><span class="icons-text"></span></div>
 			</a>
-			<ul id="home-goals-list" class="secret-list noshow" data-cat="goals">
-				{% for g in goals|slice:"3" %}
-					<li><a href="#goals/{{g.position.id}}">{{g.position.title}}</a></li>
-				{% endfor %}
-				<b class="border-notch notch"></b>
-				<b class="notch"></b>
-			</ul>
+			{% if goals %}
+				<ul id="home-goals-list" class="secret-list noshow" data-cat="goals">
+					{% for g in goals|slice:"3" %}
+						<li><a href="#goals/{{g.position.id}}">{{g.position.title}}</a></li>
+					{% endfor %}
+					<b class="border-notch notch"></b>
+					<b class="notch"></b>
+				</ul>
+			{% endif %}
 		</div>
 		<div class="clear"></div>
 	</div>
@@ -91,10 +95,14 @@
 <div id="content-container" class="main-container">
 	<div id="home-left-sidebar" class="pull-left">
 		<div>
-			<a class="home-item home-menu-item selected" href="#feed">Feed</a>
-			<a class="home-item home-menu-item" href="#build">Build</a>
-			<a class="home-item home-menu-item" href="#compare">Compare</a>
-			<a class="home-item home-menu-item" href="#plan">Plan</a>
+			<ul id="home-left-nav">
+				<li><a class="home-item home-menu-item selected" href="#feed/">Feed</a></li>
+				<li><a class="home-item home-menu-item" href="#schools/">Schools</a></li>
+				<li><a class="home-item home-menu-item" href="#experience/">Experience</a></li>
+				<!-- <li><a class="home-item home-menu-item" href="#build">Build</a></li>
+				<li><a class="home-item home-menu-item" href="#compare">Compare</a></li>
+				<li><a class="home-item home-menu-item" href="#plan">Plan</a></li> -->
+			</ul>
 		</div>
 	</div>
 	<div id="home-main-column" class="pull-left">
@@ -126,10 +134,27 @@ $(function() {
 	    if (location.hash === "#schools/") {
 	        var cat = "schools";
 	        console.log("showing schools fragment");
-	        // trigger hover on header
-	        // $("ul[data-cat='"+cat+"']").removeClass("noshow");
+	        // switch out left sidebar
+	        $("a.home-menu-item").removeClass("selected");
+	        $("a.home-menu-item[href='#schools/']").addClass("selected");
+	        // var nav = "<li><a class='home-item home-menu-item selected' href='overview'>Overview</a></li>";
+	        // $("ul#home-left-nav").append(nav)
+	        // fetch data
 	        $.ajax({
 	        	url:"/careers/getSchoolFragment",
+	        	success:function(data){
+		        	$("div#home-main-column").html(data);
+		        },
+		        dataType:'html'
+		    });
+	    } else if (location.hash == "#feed/") {
+	    	console.log("showing feed");
+	    	// switch out left sidebar
+	    	$("a.home-menu-item").removeClass("selected");
+	    	$("a.home-menu-item[href='#feed/']").addClass("selected");
+	    	 // fetch data
+	        $.ajax({
+	        	url:"/careers/getFeedFragment",
 	        	success:function(data){
 		        	$("div#home-main-column").html(data);
 		        },
@@ -148,11 +173,18 @@ $(function() {
 			$("ul[data-cat='"+cat+"']").removeClass("noshow");
 		}
 	);
-	$("div.icons-module").mouseleave(function(ev) {
+	$("div.icons-module").mouseout(function(ev) {
 		var target = $(ev.target).find("div.circle-small");
 		var cat = target.data("cat");
 		// $("ul[data-cat='"+cat+"']").hide();
 		$("ul[data-cat='"+cat+"']").addClass("noshow");
+	});
+
+	$("ul.secret-list").mouseleave(function(ev) {
+		// var target = $(ev.target).find("div.circle-small");
+		// var cat = target.data("cat");
+		// // $("ul[data-cat='"+cat+"']").hide();
+		$(this).addClass("noshow");
 	});
 
 	var profile_task_id,
@@ -224,6 +256,19 @@ $(function() {
 	if (connections_task_id != null) {
 		check_task(connections_task_id);
 	};
+
+	$("a.fragment-list-link").on('hover',function() {
+		console.log('hover');
+	});
+
+	$("a.fragment-list-link").on('hover',function() {
+		console.log('hover');
+		var ideal_id = $(this).data('ideal-id');
+		$("span.fragment-info[data-ideal-id="+ideal_id+"]").show();
+	},function() {
+		var ideal_id = $(this).data('ideal-id');
+		$("span.fragment-info[data-ideal-id="+ideal_id+"]").hide();
+	});
 
 });
 

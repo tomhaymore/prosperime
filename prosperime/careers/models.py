@@ -204,6 +204,7 @@ class SavedIndustry(models.Model):
 class IdealPosition(models.Model):
 
 	title = models.CharField(max_length=450, null=True)
+	long_title = models.CharField(max_length=450,null=True)
 	description = models.TextField(null=True)
 	level = models.IntegerField(null=True)
 	cat = models.CharField(max_length=45,null=True,blank=True)

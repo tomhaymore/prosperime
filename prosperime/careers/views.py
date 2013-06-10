@@ -23,6 +23,7 @@ from social.models import Comment
 import careers.careerlib as careerlib
 from careers.seedlib import SeedBase
 from social.feedlib import FeedBase
+import social.feedlib as feedlib
 
 import utilities.helpers as helpers
 
@@ -32,7 +33,8 @@ import utilities.helpers as helpers
 ######################################################
 
 DEGREES = {
-	'Doctor of Philosophy (PhD)':'PhD'
+	'Doctor of Philosophy (PhD)':'PhD',
+	'B.A. Political Science':'BA'
 }
 
 
@@ -50,7 +52,7 @@ def home(request):
 	# data['career_decisions'] = CareerDecision.objects.all()
 
 	# fetch data 
-	educations = Position.objects.filter(person=request.user,type="education")
+	educations = Position.objects.filter(person=request.user,type="education").order_by("start_date")
 	positions = Position.objects.filter(person=request.user).exclude(type="education").order_by("-start_date")
 	locations = Region.objects.filter(people=request.user)
 	goals = GoalPosition.objects.filter(owner=request.user)
@@ -62,7 +64,7 @@ def home(request):
 		'locations': locations,
 		'goals' : goals,
 		'user' : request.user,
-		'latest_ed' : DEGREES[educations[0].degree],
+		'latest_ed' : educations[0].ideal_position.title[:5],
 		'duration': careerlib.get_prof_longevity(user)
 	}
 
@@ -80,32 +82,49 @@ def home(request):
 
 def get_school_fragment(request,school_id=None):
 	c = careerlib.CareerPathBase()
+	f = feedlib.FeedBase()
 	# grab list of all schools affiliated with user
 	schools = [e for e in Entity.objects.filter(positions__person=request.user,positions__type="education").distinct()]
 	# if particular school selected, get details for just that school
 	if school_id:
 		school = Entity.object.get(pk=school_id)
-		degrees = [p.degree for p in Position.objects.filter(entity=school,type="education").distinct()]
-		careers = c.get_careers_in_schools([school])
-		jobs = c.get_first_jobs_from_schools([school])
+		degrees = [{'id':p.id,'title':p.title,'long_title':p.long_title,'description':p.description} for p in IdealPosition.objects.filter(cat="ed",position__entity=school).annotate(pop=Count("position__id")).distinct().order_by("-pop")[:5]]
+		# degrees = [p.degree for p in Position.objects.filter(entity=school,type="education").exclude(degree=None).distinct()]
+		# careers = c.get_careers_in_schools([school])
+		jobs = c.get_first_jobs_from_schools([school]),
 		paths = c.get_paths_from_schools([school])
 	else:
 		school = None
-		degrees = [p.degree for p in Position.objects.filter(entity__in=schools,type="education").distinct()]
-		careers = c.get_careers_in_schools(schools)
-		jobs = c.get_first_jobs_from_schools(schools)
+		degrees = [{'id':p.id,'title':p.title,'long_title':p.long_title,'description':p.description} for p in IdealPosition.objects.filter(cat="ed",position__entity__in=schools).annotate(pop=Count("position__id")).distinct().order_by("-pop")[:5]]
+		# degrees = [p.degree for p in Position.objects.filter(entity__in=schools,type="education").exclude(degree=None).distinct()]
+		# careers = c.get_careers_in_schools(schools)
+		# jobs = c.get_first_jobs_from_schools(schools),
 		paths = c.get_paths_from_schools(schools)
+
+	# get updates for degrees
+	for d in degrees:
+		d['updates'] = f.get_ideal_updates(request.user,d['id'])
 
 	data = {
 		'school':school,
 		'schools':schools,
 		'degrees':degrees,
-		'careers':careers,
-		'jobs':jobs,
+		# 'careers':careers
+		# 'jobs':jobs,
 		'paths':paths
 	}
-
+	print 'hello'
 	return render_to_response("careers/home_school_fragment.html",data,context_instance=RequestContext(request))
+
+def get_feed_fragment(request):
+	feeder = FeedBase() 
+	feed = feeder.get_univ_feed(request.user)
+
+	data = {
+		'feed':feed
+	}
+
+	return render_to_response("social/home_feed_fragment.html",data,context_instance=RequestContext(request))
 
 def schools(request):
 	return render_to_response("schools.html", context_instance=RequestContext(request))
