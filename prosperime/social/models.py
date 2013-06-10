@@ -19,10 +19,11 @@ class Notification(models.Model):
 	def __unicode__(self):
 		return self.type + " for " + self.target.username
 
+
 class Thread(models.Model):
 	name = models.CharField(max_length=450,null=True)
 	summary = models.TextField(null=True)
-	followers = models.ManyToManyField(User,related_name="followers",through=FollowThread)
+	followers = models.ManyToManyField(User,related_name="followers",through="FollowThread")
 	created = models.DateTimeField(auto_now_add=True, null=True)
 	updated = models.DateTimeField(auto_now=True, null=True)
 
@@ -40,7 +41,8 @@ class Comment(models.Model):
 	updated = models.DateTimeField(auto_now=True, null=True)
 
 	def __unicode__(self):
-		return "Comment #" + self.index + " on " + self.thread.name
+		return "Comment #" + str(self.index) + " on " + self.thread.name
+
 
 class FollowThread(models.Model):
 	thread = models.ForeignKey(Thread)
@@ -58,7 +60,7 @@ class Vote(models.Model):
 	updated = models.DateTimeField(auto_now=True, null=True)
 
 	def __unicode__(self):
-		if self.value = 1:
+		if self.value == 1:
 			return "Up vote by " + self.owner.username + " on " + self.comment
 		else:
 			return "Down vote by " + self.owner.username + " on " + self.comment
