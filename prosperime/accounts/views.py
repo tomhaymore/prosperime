@@ -39,7 +39,7 @@ def login(request):
 	# from django.contrib.auth.forms import AuthenticationForm
 	# print request.session['_auth_user_backend']
 	if request.user.is_authenticated():
-		return HttpResponseRedirect('/feed/')
+		return HttpResponseRedirect('/home/')
 	if request.method == "POST":
 		# make sure using proper authentication backend
 		request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
@@ -51,7 +51,7 @@ def login(request):
 			if user is not None:
 				auth_login(request,user)
 				messages.success(request, 'You have successfully logged in.')
-				return HttpResponseRedirect('/feed/')
+				return HttpResponseRedirect('/home/')
 		
 	else:
 		form = AuthForm()
@@ -293,7 +293,7 @@ def finish_login(request):
 
 			#return HttpResponseRedirect('/account/success')
 			if 'next' not in request.session:
-				return HttpResponseRedirect('/home/')
+				return HttpResponseRedirect('/home/#schools/')
 			else:
 				return HttpResponseRedirect(request.session['next'])
 	else:
