@@ -16,39 +16,50 @@ class Notification(models.Model):
 	created = models.DateTimeField(auto_now_add=True, null=True)
 	updated = models.DateTimeField(auto_now=True, null=True)
 
+	def __unicode__(self):
+		return self.type + " for " + self.target.username
+
+class Thread(models.Model):
+	name = models.CharField(max_length=450,null=True)
+	summary = models.TextField(null=True)
+	followers = models.ManyToManyField(User,related_name="followers",through=FollowThread)
+	created = models.DateTimeField(auto_now_add=True, null=True)
+	updated = models.DateTimeField(auto_now=True, null=True)
+
+	def __unicode__(self):
+		return self.name
+
 class Comment(models.Model):
 	owner = models.ForeignKey(User,related_name="comments")
-	path = models.ForeignKey(SavedPath,related_name="comments",null=True)
-	position = models.ForeignKey(Position,related_name="comments",null=True)
-	goal_position = models.ForeignKey(GoalPosition,related_name="comments",null=True)
+	thread = models.ForeignKey(Thread,related_name="comments")
 	meta = models.CharField(max_length=150,null=True)
 	index = models.IntegerField(null=True)
-	type = models.CharField(max_length=150,null=True)
 	body = models.TextField(null=True)
 	status = models.CharField(max_length=15,default="active")
 	created = models.DateTimeField(auto_now_add=True, null=True)
 	updated = models.DateTimeField(auto_now=True, null=True)
 
-	def target_user(self):
-		if self.type == "path":
-			return self.path.owner
-		elif self.type == "position":
-			return self.position.person
-		elif self.type == "goalposition":
-			return self.goal_position.owner
+	def __unicode__(self):
+		return "Comment #" + self.index + " on " + self.thread.name
 
-	def target_name(self):
-		if self.type == "path":
-			return self.path.title
-		elif self.type == "position":
-			return self.position.title
-		elif self.type == "goalposition":
-			return self.goal_position.position.title
+class FollowThread(models.Model):
+	thread = models.ForeignKey(Thread)
+	user = models.ForeignKey(User)
+	status = models.CharField(max_length=45,default="active")
+	created = models.DateTimeField(auto_now_add=True, null=True)
+	updated = models.DateTimeField(auto_now=True, null=True)
 
-	def target_id(self):
-		if self.type == "path":
-			return self.path.id
-		elif self.type == "position":
-			return self.position.id
-		elif self.type == "goalposition":
-			return self.goal_position.id
+class Vote(models.Model):
+	owner = models.ForeignKey(User,related_name="votes")
+	comment = models.ForeignKey(Comment,related_name="votes")
+	value = models.IntegerField(default=1)
+	type = models.CharField(max_length=50,null=True)
+	created = models.DateTimeField(auto_now_add=True, null=True)
+	updated = models.DateTimeField(auto_now=True, null=True)
+
+	def __unicode__(self):
+		if self.value = 1:
+			return "Up vote by " + self.owner.username + " on " + self.comment
+		else:
+			return "Down vote by " + self.owner.username + " on " + self.comment
+

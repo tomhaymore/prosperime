@@ -183,7 +183,7 @@ class IdealPositionBase(PositionBase):
 		"""
 		returns top people for ideal id, based on time in position
 		"""
-		import operator
+		# import operator
 		users = User.objects.filter(positions__ideal_position=ideal_pos).order_by("-positions__start_date")
 		return users
 
@@ -199,10 +199,11 @@ class IdealPositionBase(PositionBase):
 		# print entities
 		
 		# entities_list = [{'name':e.name,'id':e.id,'descr':e.description,'no_employees':e.no_employees,'locations':[o.city for o in e.offices.all()]} for e in entities]
-		entities_list = [{'name':e.name,'id':e.id,'descr':e.description,'no_employees':e.no_employees} for e in entities]
 		focal_entity = entity
-		entities_list.append({'name':focal_entity.name,'id':focal_entity.id,'descr':focal_entity.description,'no_employees':focal_entity.no_employees})
-
+		entities_list = [{'name':focal_entity.name,'id':focal_entity.id,'descr':focal_entity.description,'no_employees':focal_entity.no_employees}]
+		new_entities_list = [{'name':e.name,'id':e.id,'descr':e.description,'no_employees':e.no_employees} for e in entities]
+		entities_list.extend(new_entities_list)
+		# entities_list.append({'name':focal_entity.name,'id':focal_entity.id,'descr':focal_entity.description,'no_employees':focal_entity.no_employees})
 		# print entities_list
 
 		return entities_list
@@ -214,11 +215,15 @@ class IdealPositionBase(PositionBase):
 		# fetch ideal position object
 		ideal_pos = IdealPosition.objects.get(pk=ideal_pos_id)
 
-		users = User.objects.filter(positions__ideal_position=ideal_pos).order_by("profile__status").distinct()[:limit]
+
+		# users = User.objects.filter(positions__ideal_position=ideal_pos).prefetch_related('positions').annotate(nopos=Count('positions__id')).exclude(nopos__lte=1).distinct()[:limit]
+
+		users = User.objects.filter(positions__ideal_position=ideal_pos).annotate(nopos=Count('positions__id')).exclude(nopos__lte=1).distinct()[:limit]
+
 
 		# breakout all positions, in oder
 		for u in users:
-			print u.id
+			# print u.id
 			paths[u.id] = [{
 				'pos_title':p.title,
 				'pos_id':p.id,
@@ -229,7 +234,7 @@ class IdealPositionBase(PositionBase):
 				'entity_id':p.entity.id,
 				'start_date': p.start_date.year if p.start_date else None ,
 				'end_date':p.end_date.year if p.end_date else None,
-				'duration':(p.end_date - p.start_date).days/365.25 if p.start_date and p.end_date else None
+				'duration':(p.end_date - p.start_date).days/365.25 if p.start_date and p.end_date else None # calculate duration if dates are present
 				} for p in u.positions.all() if p is not None]
 			# paths[u.id] = [{'pos_title':p.title,'pos_id':p.id,'ideal_title': p.ideal_position.title if p.ideal_position else None,'ideal_id':p.ideal_position_id if p.ideal_position else None,'entity':p.entity.name,'entity_id':p.entity.id,'start_date': p.start_date.year if p.start_date else None ,'end_date':p.end_date.year if p.end_date else None} for p in u.positions.all() if p is not None]
 			paths[u.id] = sorted(paths[u.id],key=operator.itemgetter('start_date'))
