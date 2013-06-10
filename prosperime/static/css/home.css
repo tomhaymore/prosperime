@@ -677,7 +677,7 @@ a.selected {
 
 .secret-list {
 	/*display:none;*/
-	/*position:relative;*/
+	position:absolute;
 	color:#181818;
 	font-size:0.9em;
 	line-heigh:1.0em;
@@ -752,7 +752,8 @@ a.selected {
 
 .notch {
     position: absolute;
-	top: 95px;
+	/*top: 95px;*/
+	top:-10px;
 	left: 78px;
 	margin: 0;
 	border-top: 0;
@@ -772,7 +773,8 @@ a.selected {
 
 .border-notch {
 	border-bottom-color: #cccccd; 
-	top: 94px;
+	/*top: 94px;*/
+	top:-11px;
 }
 
 span.icons-text {
