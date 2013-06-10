@@ -56,10 +56,15 @@ def home(request):
 		'user':request.user
 	}
 
+
 	if "tasks" in request.session:
 		data['tasks'] = True
 		data['profile_task_id'] = request.session['tasks']['profile']
 		data['connections_task_id'] = request.session['tasks']['connections']
+	else:
+		data['tasks'] = False
+		data['profile_task_id'] = None
+		data['connections_task_id'] = None
 
 	return render_to_response('home_v6.html',data,context_instance=RequestContext(request))
 
