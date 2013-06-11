@@ -204,6 +204,14 @@ def progress(request):
 	else:
 		formatted_positions = []
 
+
+	owner_positions = self.user.positions.all().order_by('-start_date').exclude(type="education")
+	if owner_positions.exists():
+		owner_current_position = {"title":owner_positions[0].title, "entity_id":owner_positions[0].id, "entity_logo":owner_positions[0].default_logo()}
+
+	else:
+		owner_current_position = None
+
 	data = {
 		"authenticated":request.user.is_authenticated(),
 		"options":options,

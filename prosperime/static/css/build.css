@@ -36,7 +36,7 @@ div#are-you-sure-prompt {
 
 div.call-out-text {
 	font-size:1.2em;
-	margin-bottom:10px;
+	margin-bottom::;px;
 	line-height:27px;
 }
 
@@ -181,7 +181,7 @@ div#info-box-container {
 	width:28%;
 	display:inline-block;
 	vertical-align: top;
-	color:#68696b;
+	color:# ;
 }
 
 div.main-message {
