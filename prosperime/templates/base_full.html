@@ -36,7 +36,7 @@
 {% block head %} {% endblock %}
 <head> 
 	<title>
-		{% block title %}ProsprMe: Find the Right Path for You {% endblock %}
+		{% block title %}ProsperMe: Find the Right Path for You {% endblock %}
 	</title>
 </head>
 
@@ -49,11 +49,10 @@
 					<div class="log-container pull-left">
 						<!-- <a class="brand" href="/">Prosperime</a> -->
 						
-						{% if user.is_authenticated %}
-							<a href="/feed/"><img class="main-logo" src="{{STATIC_URL}}img/main_logo.png" /></a>
-						{% else %}
-							<a href="/welcome/"><img class="main-logo" src="{{STATIC_URL}}img/main_logo.png"/></a>
-						{% endif %}
+						
+						<a href="/feed/"><img class="main-logo" src="{{STATIC_URL}}img/splash_logo.png" /></a>
+						
+						
 					</div>
 					<div class="pull-right">
 						<ul class="topbar-nav pull-right">

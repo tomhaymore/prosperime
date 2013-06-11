@@ -1,0 +1,42 @@
+<div id="header-container">
+	<p class="feature-page-header">Feed</p>
+</div>
+{% if feed|length > 0 %}
+	{% for f in feed %}
+		{% autoescape on %}
+		<div class="feed-item" onmouseover="render_thumbnail({{f.stub}}, '{{f.type}}', {{f.body}})"onmouseout="close_thumbnail()">
+		{% endautoescape %}
+		{% if f.type == "savedcareer" %}
+			<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> is interested in <a href="/career/{{f.id}}/">{{f.title}}</a>
+		{% elif f.type == "careerpath" %}
+			<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> created the career path <a href="/path/{{f.id}}">{{f.title}}</a>
+		{% elif f.type == "goalposition" %}
+			<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> is interestered in becoming a <a href="/position/{{f.id}}">{{f.title}}</a>
+		{% elif f.type == "newuser" %}
+			<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> joined Prosperime!
+		{% elif f.type == "comment" %}
+			<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> commented on 
+			
+			{% if user.id == f.target_user_id %}
+				your 
+			{% else %}
+				<a href="/profile/{{f.target_user_id}}">{{f.target_user_name}}'s</a>		
+			{% endif %}
+			
+			{{f.target_type}} <a href="/build/{{f.target_id}}">{{f.target_name}}</a>: 
+			{% if f.body|length > 30 %}
+				{{f.body|slice:":35"}}..."
+			{% else %}
+				{{f.body}}
+			{% endif %}
+		{% endif %}
+
+		</div>
+		<div class="feed-item-timestamp pull-right">
+				{{f.date}}
+		</div>
+	{% endfor %}
+	<!-- <div id="more">More</div> -->
+{% else %}
+	<p>Sorry, no updates available right now.</p>
+{% endif %}
