@@ -488,20 +488,6 @@
 		}
 	}
 
-	// Responds to selecting a goal position
-	var positionSelected = function() {
-		// Get selected ideal_id
-		var ideal_id = $("#goal-position-box :selected").val()
-
-		// Else, AJAX for results
-		$.get("/careers/getProgress", {"ideal_id":ideal_id}, function(response) {
-			if (response["result"] == "success") {
-				getAndRenderResults(response)
-			} else {
-				console.log("Failure: " + response["errors"])
-			}
-		}, "json")
-	};
 
 	// Goes back to the search box, erases current results
 	var backToSearch = function() {
@@ -688,7 +674,9 @@
 						"display_text":data.data.degree + ", " + data.data.field + " at " + data.data.entity
 						});
 					//console.log(path);
-					rerenderProgressBar(path)
+					// rerenderProgressBar(path)
+					if (path.length == 1) createUserPathBar(path)
+					addPositionToExistingPath(path)
 				} else {
 					console.log('failure');
 					console.log(data.errors);
@@ -728,7 +716,9 @@
 						"display_text":data.data.title + " at " + data.data.entity
 					});
 					// console.log(path);
-					rerenderProgressBar(path)
+					// rerenderProgressBar(path)
+					if (path.length == 1) createUserPathBar(path)
+					addPositionToExistingPath(path)
 				} else {
 					// display error
 					console.log('failure');
@@ -749,30 +739,24 @@
 
 	// Render the progress bar with newly entered data
 		// Currently, re-rendering entire bar to adjust widths
-	var rerenderProgressBar = function(path) {
-		if (path.length == 1) { // first position
+	// var rerenderProgressBar = function(path) {
 
-			// Create progress bar
-			$("#progress-wrapper .section-header :last").after("<div class='v2-duration-bar'></div>").after("<div class='v2-bar'></div>").css("visibility", "visible").fadeIn(250)
-
-			// allow "show results" button to be clicked
-			$("#tell-us-more-results-button").css("visibility", "visible").hide().fadeIn(250)
-
-		} else // empty existing
-			$("#progress-wrapper .v2-bar").empty()
+	// 	 else // empty existing
+	// 		$("#progress-wrapper .v2-bar").empty()
 	
 
-		// Get new width
+	// 	// Get new width
 
-		var $container = $("#progress-wrapper .v2-bar")
-		var $d_container = $("#progress-wrapper .v2-duration-bar")
+	// 	var $container = $("#progress-wrapper .v2-bar")
+	// 	var $d_container = $("#progress-wrapper .v2-duration-bar")
 
-		renderV2Path($container, $d_container, path)
-		$(".v2-item", $container).each(function() {
-			resizeText(this)
-		});
+	// 	renderV2Path($container, $d_container, path)
+	// 	$(".v2-item", $container).each(function() {
+	// 		resizeText(this)
+	// 	});
 
-	}
+	// }
+
 
 	/**************/
 	/* Viz V2 API */
@@ -801,6 +785,46 @@
 		// Have to do this after b/c widths have to be set
 		if (!is_user) addStacking(path, $container, width)
 		$($container).hide().fadeIn(250)
+	};
+
+
+	// Creates a V2 bar inside the progress wrapper for the first time
+	//	should only be called once!
+	var createUserPathBar = function(path) {
+
+		// Create progress bar
+		$("#progress-wrapper .section-header :last").after("<div class='v2-duration-bar'></div>").after("<div class='v2-bar'></div>").css("visibility", "visible").fadeIn(250)
+
+		// allow "show results" button to be clicked
+		$("#tell-us-more-results-button").css("visibility", "visible").hide().fadeIn(250)
+	};
+
+	var addPositionToExistingPath = function(path) {
+
+		// get container, d_container, newest position
+		var $container = $("#progress-wrapper .v2-bar")
+		var $d_container = $("#progress-wrapper .v2-duration-bar")
+		var new_position = path[path.length -1]
+		var new_width = Math.floor(100/(path.length+1)) - 2
+
+		// resize existing path items
+		$(".v2-item", $container).each(function() {
+			$(this).animate({"width":new_width+"%"}, "250", function() {
+				resizeText(this)
+			});
+		});
+
+		// add links to newest pos
+		$($container).append("<div class='v2-bar-link'></div>") 
+		$($d_container).append("<div class='v2-duration-bar-link'></div>")
+
+		// add newest position
+		addV2UserItem(new_position, $container, new_width, path.length-1)
+		addV2Duration(new_position, $d_container, new_width)
+
+		$(".v2-item :last", $container).hide().fadeIn(250, function() {
+			resizeText(this)
+		});
 	};
 
 
@@ -875,6 +899,9 @@
 		};
 	};
 
+	// Manually add the green '+' box
+	//	Note that this can be called safely if box already exists
+	//	will not create a duplicate
 	var addTellUsMoreEndPosition = function() {
 		if ($("#progress-wrapper .v2-bar .v2-item-prompt").length == 0) {
 
@@ -884,6 +911,7 @@
 		};
 	};
 
+	// Manually remove the green '+' box
 	var removeTellUsMoreEndPosition = function() {
 		$("#progress-wrapper .v2-bar .v2-bar-link :last").fadeOut(250, function() { $(this).remove() });
 		$("#progress-wrapper .v2-bar .v2-item-prompt").fadeOut(250, function() { $(this).remove() });
@@ -908,6 +936,7 @@
 			});
 			$(this).hover(function() {
 				$(this).css("background-color", "rgba(41,128,185,0.7)")
+
 			}, function() {
 				$(this).css("background-color","rgba(256,256,255,0.7)")
 			});
@@ -977,21 +1006,6 @@
 		$("#inline-form-container").animate({'opacity':0}, '250', function() { $(this).empty() })
 	};
 
-	// Hides all elements but main search box
-	var restoreCanvas = function() {
-		var wrappers = ["progress", "results", "tell-us-more", "call-to-build", "get-info", "form"]
-
-		for (var j = 0; j < wrappers.length; j++) {
-			var text = "#"+wrappers[j]+"-wrapper"
-			if (!$(text).hasClass("not-shown")) {
-				$(text).fadeOut(250, function() {
-					$(this).addClass("not-shown")
-				});
-			};
-		};
-	};
-
-
 
 	// Creates select input form for months
 	var month_select = function() {
@@ -1016,11 +1030,9 @@
 	TODO: 
 		: colors?
 
-		: "Let us know" needs to send us an email somehow or store info
 		: Change link color, header color
 		: Toy w/ Colors!
 		: check date entry HTML5 date input? (tell me more)
-		: if re-select a position midway through, clear all
 		: need to fail safe if no results returned
 		: proper resizing
 		: render colors backwards from opacity = 1
@@ -1032,16 +1044,9 @@
 		: Idea -- iterate through and animate widths to new, then drop in other one somehow.... animate from 0?
 
 
--- move "Your Path" farther down, maybe 35-50px
--- remove "null" positions
 -- give buttons different colors -- one blue, one green
--- change "Don't like what you see?" section:
-     -- remove "Tell us more about yourself" button and instead append one square at the end of the path that is green and says "Add"
 
 
--- make the new "add position box' work
-	-- render on first fetch, goback
-	-- hide on tell us more
 -- make new build work
 -- if time permits, allow entity hover --> description
 */

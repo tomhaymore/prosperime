@@ -82,7 +82,6 @@ urlpatterns = patterns('',
     url(r'^careers/testIdealPaths/$', 'careers.views.test_ideal_paths'),
     url(r'^careers/testBuildPaths/$', 'careers.views.test_build_paths'),
     url(r'^api/list_careers/$', 'careers.views.list_careers'),
-    url(r'^careers/getProgress/$', 'careers.views.get_progress'),
     url(r'^careers/addProgressDetails/$', 'careers.views.add_progress_detail'),
 
     ## Accounts - AJAX calls
@@ -117,6 +116,8 @@ urlpatterns = patterns('',
     url(r'^next/','careers.views.next'),
     url(r'^rand/$', 'accounts.views.random_profile'),
     url(r'^home2/$', 'careers.views.home_proto'),
+
+    url(r'^proto/$', 'careers.views.proto'),
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     # url(r'^prosperime/', include('prosperime.foo.urls')),
 

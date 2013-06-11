@@ -30,7 +30,97 @@ import utilities.helpers as helpers
 ######################################################
 ################## CORE VIEWS ########################
 ######################################################
+def proto(request):
 
+	data = cache.get("data")
+
+
+
+	if data is not None:
+		return render_to_response("careers/d3.html",data,context_instance=RequestContext(request))
+	else:
+
+		people = []
+		positions = []
+		majors = {}
+
+		majors_set = set()
+		people_set = set()
+		positions_set = set()
+
+		counter = 0
+
+		acceptable_majors = ["Science, Technology, and Society", "English", "Psychology", "Management Science & Engineering", "Computer Science", "International Relations", "Political Science", "Economics", "Human Biology", "Product Design", "History", "Civil Engineering", "Electrical Engineering", "Physics", "Symbolic Systems", "Mechanical Engineering", "Spanish", "Public Policy", "Materials Science & Engineering", "Biomechanical Engineering", "Mathematics", "Classics", "Feminist Studies", "Mathematical and Computational Sciences", "Atmosphere and Energy Engineering", "Urban Studies", "Chemistry", "Chemical Engineering", "Religious Studies", "Earth Systems"]
+		base_positions = Position.objects.filter(type="education", field__in=acceptable_majors).exclude(ideal_position=None).select_related("person")
+		
+		for p in base_positions:
+			first_ideal = p.person.profile.first_ideal()
+
+			# Majors
+			if first_ideal:
+				if p.field not in majors_set:
+					majors_set.add(p.field)
+					majors[p.field] = {"people":[p.person.id], "positions":[first_ideal.id], "index":len(majors_set)}
+				else:
+					majors[p.field]["people"].append(p.person.id)
+					majors[p.field]["positions"].append(first_ideal.id)
+
+				# People
+				if p.person.id not in people_set:
+
+					people_set.add(p.person.id)
+					people.append({'name':p.person.profile.full_name(), 'id':p.person.id})
+
+					counter += 1	
+					if counter == 72:
+						break;
+
+
+				if first_ideal.id not in positions_set:
+					positions_set.add(first_ideal.id)
+					positions.append({'title':first_ideal.title, 'id':first_ideal.id})
+
+
+	
+		# ideal_positions_set = set()
+		# majors_dict = {}
+
+		# all_people = Profile.objects.all()
+		# for p in all_people:
+		# 	first_ideal = p.first_ideal()
+
+		# 	# Make sure they have a first position
+		# 	if first_ideal:
+		# 		# Add to people list
+		# 		people.append({'name':p.full_name(), 'id':p.id})
+		# 		# Add to position list
+		# 		if first_ideal.id not in ideal_positions_set:
+		# 			ideal_positions_set.add(first_ideal)
+		# 			positions.append({'title':first_ideal.title, 'id':first_ideal.id})
+
+		# majored_positions = Position.objects.filter(type="education").exclude(field=None)
+		# for m in majored_positions:
+		# 	if m.field not in majors_dict:
+		# 		majors_dict[m.field] = 1
+		# 		majors.append({'major':m.field, 'id':m.id})
+		# 	else:
+		# 		majors_dict[m.field] = majors_dict[m.field] + 1
+
+		# print majors
+		# print "###################"
+		# print people
+		# print "###################"
+		# print positions
+
+
+		data = {
+			"majors":json.dumps(majors),
+			"positions":json.dumps(positions),
+			"people":json.dumps(people),
+		}
+		cache.set("data",data,1500)
+
+	return render_to_response("careers/d3.html",data,context_instance=RequestContext(request))
 
 
 
@@ -94,6 +184,9 @@ def test_ideal_paths(request):
 
 def progress(request):
 
+# <<<<<<< HEAD
+# 	applicable_positions = IdealPosition.objects.filter(level=4).annotate(pop=Count('position__id')).order_by("-pop")
+# =======
 	# ghetto way of finding positions that we can give info on
 	# applicable_positions = Position.objects.filter(ideal_position__level=4)
 	applicable_positions = IdealPosition.objects.annotate(pop=Count('position__id')).filter(level=4,pop__gte=3).order_by("-pop")[:10]
@@ -103,9 +196,6 @@ def progress(request):
 	# 		ideal_positions.append(a.ideal_position)
 
 	options = [{'title':i.title,'ideal_id':i.id} for i in applicable_positions]
-	# options = []
-	# for i in ideal_positions:
-	# 	options.append({'title':i.title, 'ideal_id':i.id})
 
 	# If we know user, get existing pos
 	if request.user.is_authenticated():
@@ -122,19 +212,6 @@ def progress(request):
 
 	return render_to_response("careers/on_track.html", data, context_instance=RequestContext(request))
 
-def get_progress(request):
-	response = {}
-
-	if not request.is_ajax:
-		response["result"] = "failure"
-		response["errors"] = "incorrect request type"
-		return HttpResponse(json.dumps(response))
-
-	ideal_id = request.GET.get("ideal_id")
-
-	response["result"] = "success"
-
-	return HttpResponse(json.dumps(response))
 
 def add_progress_detail(request):
 	# initialize response
