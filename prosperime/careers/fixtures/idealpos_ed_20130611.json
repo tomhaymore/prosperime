@@ -1,0 +1,288 @@
+[
+	{
+		"title":"M.S.EngMgmt.",
+		"long_title":"M.S. Engineering Management",
+		"major":"Engineering Management",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["masters of science engineering management"]
+				}
+			]
+	},
+	{
+		"title":"B.A.P.P.",
+		"long_title":"Bachelor of Arts Public Policy",
+		"major":"Public Policy",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba public policy"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Cinema & Television",
+		"long_title":"B.A. Cinema & Television",
+		"major":"Cinema & Television",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of arts cinematelevision"]
+				}
+			]
+	},
+	{
+		"title":"Ph.D. Operations Research",
+		"long_title":"Ph.D. in Operations Research",
+		"major":"Operations Research",
+		"level":3,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["phd operations research"]
+				}
+			]
+	},
+	{
+		"title":"A.A.",
+		"long_title":"Associate of Arts",
+		"major":"General Education",
+		"level":0,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["aa","associate in arts","associate of arts","associates of arts"]
+				}
+			]
+	},
+	{
+		"title":"A.A.Lib.",
+		"long_title":"Associate of Arts Liberal Arts",
+		"major":"Liberal Arts",
+		"level":0,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["aa liberal arts"]
+				}
+			]
+	},
+
+	{
+		"title":"A.S.",
+		"long_title":"Associate of Science",
+		"major":"General Education",
+		"level":0,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["associate in science","associate of science"]
+				}
+			]
+	},
+	{
+		"title":"M.S. MS&E",
+		"long_title":"M.S. Management Science & Engineering",
+		"major":"Management Science & Engineering",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ms management science and engineering","masters degree management science engineering","meng management science and engineering","ms management science engineering"]
+				}
+			]
+	},
+	{
+		"title":"B.A.S.",
+		"long_title":"",
+		"major":"Applied Science",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bas","bachelor of arts and sciences"]
+				}
+			]
+	},
+	{
+		"title":"B.A.S. Biological Sciences",
+		"long_title":"B.A.S. Biological Sciences",
+		"major":"Biological Sciences",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bas biological sciences"]
+				}
+			]
+	},
+	{
+		"title":"B.A. STS",
+		"long_title":"B.A. Science, Technology & Society",
+		"major":"Science Technology & Society",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of arts science technology society"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Biology",
+		"long_title":"B.S. Biology",
+		"major":"Biology",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs biologybiological"]
+				}
+			]
+	},
+	{
+		"title":"B.Eng. Computer Engineering",
+		"long_title":"B.Eng. Computer Engineering",
+		"major":"Computer Engineering",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["be computer engineering"]
+				}
+			]
+	},
+	{
+		"title":"M.S. Management Science",
+		"long_title":"Master of Science in Management Science",
+		"major":"Management Science",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["master of science in management science","ms management science"]
+				}
+			]
+	},
+	{
+		"title":"B.S.MechEng.",
+		"long_title":"B.S. Mechanical Engineering",
+		"major":"Mechanical Engineering",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of engineering mechanical engineering","bs mechanical engineering"]
+				}
+			]
+	},
+	{
+		"title":"B.A.Comm.",
+		"long_title":"B.A. Communication",
+		"major":"Communications",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba mass communication","bachelor of arts corporate communications"]
+				}
+			]
+	},
+	{
+		"title":"M.S. Environmental Management",
+		"long_title":"M.S. Environmental Management",
+		"major":"Environmental Management",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["masters environmental management"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Environmental Health",
+		"long_title":"B.S. Environmental Health",
+		"major":"Environmental Health",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs environmentalenvironmental"]
+				}
+			]
+	},
+	{
+		"title":"M.S. Operations Research",
+		"long_title":"Master of Science in Operations Research",
+		"major":"Operations Research",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["master of science operations research"]
+				}
+			]
+	}
+]
