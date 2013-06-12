@@ -178,6 +178,10 @@ center.selectAll("div").data(Object.keys(majors)).enter().append("div")
 			var position_node = d3.select("#position-"+majors[d]["positions"][p])
 			positionMouseout(position_node)
 		}
+	})
+
+	.on("click", function(d) {
+		window.location = "/major/" + majors[d]["id"][0] + "/"
 	});
 
 // Create SVG containers
