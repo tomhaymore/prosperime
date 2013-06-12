@@ -59,7 +59,7 @@ def proto(request):
 		
 		# assemble all the positions
 		# base_positions = Position.objects.filter(type="education",entity__in=schools).exclude(ideal_position=None).select_related("person")
-		base_positions = Position.objects.filter(type="education",ideal_position__level=1).exclude(ideal_position=None).select_related("person")
+		base_positions = Position.objects.filter(type="education",ideal_position__level=1).exclude(ideal_position=None,person__profile__status="crunchbase").select_related("person")
 
 		for p in base_positions:
 			first_ideal = p.person.profile.first_ideal()
@@ -67,6 +67,7 @@ def proto(request):
 			# Majors
 			if first_ideal:
 				if p.ideal_position.major is None:
+					continue
 					print p.title, p.degree, p.field
 					print p.ideal_position, p.ideal_position.id
 				if p.ideal_position.major not in majors_set:
@@ -128,7 +129,7 @@ def proto(request):
 		# print "###################"
 		# print positions
 
-		majors["Human Basket-weaving and other Anthropological Endeavors"] = {"id":1,"people":[],"positions":[],"index":len(majors_set)}
+		# majors["Human Basket-weaving and other Anthropological Endeavors"] = {"id":1,"people":[],"positions":[],"index":len(majors_set)}
 		data = {
 			"majors":json.dumps(majors),
 			"positions":json.dumps(positions),
@@ -191,7 +192,7 @@ def major(request,major_id):
 	major = IdealPosition.objects.get(pk=major_id)
 
 	# get schools
-	focal_schools = list(Entity.objects.filter(type="school",positions__person=request.user).values_list('id'))
+	focal_schools = Entity.objects.filter(positions__person=request.user).values_list('id')
 	schools_in = Entity.objects.filter(positions__ideal_position=major,id__in=focal_schools).annotate(pos=Count("positions__id")).values("id","name","pos").distinct()
 	schools_all = Entity.objects.filter(positions__ideal_position=major).annotate(pos=Count("positions__id")).values("id","name","pos").distinct()
 

@@ -21,7 +21,7 @@
 			text-align:center;
 			padding:2px;
 			width:250px;
-			font-size:0.8em;
+			font-size:0.9em;
 			-moz-box-sizing: border-box;
 			-webkit-box-sizing: border-box;
 			box-sizing: border-box;
@@ -191,7 +191,7 @@ center.selectAll("div").data(Object.keys(majors)).enter().append("div")
 	})
 
 	.on("click", function(d) {
-		window.location = "/major/" + majors[d]["id"][0] + "/"
+		window.location = "/majors/" + majors[d]["id"][0] + "/"
 	});
 
 // Create SVG containers

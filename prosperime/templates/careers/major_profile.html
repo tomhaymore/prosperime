@@ -11,21 +11,25 @@
 
 
 <div id="content-container" class="main-container">
-	<p class="feature-page-header">{{major.long_title}}</p>
+	{% if major.long_title %}
+		<p class="feature-page-header">{{major.long_title}}</p>
+	{% else %}
+		<p class="feature-page-header">{{major.title}}</p>
+	{% endif %}
 	{% if major.description %}
 		<p class="main-sub-header">{{major.description}}</p>
 	{% endif %}
 	<p>Prosper.me gets better the more people that use it. Tell your friends!</p>
 
 	<div id="career-profile-container">
-		<div class="career-profile-nav-container">
-			<!-- <span class="main-sub-header pull-left">View stats for: </span> -->
+	<!-- 	<div class="career-profile-nav-container">
+			
 			<a class="career-profile-nav pull-left selected" data-view="network">Your Network</a> 
 			<a class="career-profile-nav pull-left unselected" data-view="all">Prosper.me Community</a>
 			<div class="clear"></div>
 			
-		</div>
-		<div class="career-perspective" data-view="network">
+		</div> -->
+		<div class="career-perspective" data-view="network" style="display:none;">
 			<div id="career-left-pane" class="pull-left">
 				<div class="career-module">
 					{% if network.schools %}
@@ -82,7 +86,7 @@
 			</div>
 			<div class="clear"></div>
 		</div>
-		<div class="career-perspective" data-view="all" style="display:none;">
+		<div class="career-perspective" data-view="all">
 			<div id="career-left-pane" class="pull-left">
 				<div class="career-module">
 					{% if all.schools %}
