@@ -177,6 +177,13 @@ div#content-container {
 	margin-top:15px;
 }
 
+div#wide-content-container {
+	width:1000px;
+	margin-right: auto;
+	margin-left: auto;
+	margin-top:15px;
+}
+
 div.main-container {
 	/*margin-left:auto;
 	margin-right:auto;
