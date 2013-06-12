@@ -153,33 +153,33 @@ def home(request):
 	# data['career_decisions'] = CareerDecision.objects.all()
 
 	# fetch data 
-	educations = Position.objects.filter(person=request.user,type="education").order_by("start_date")
-	positions = Position.objects.filter(person=request.user).exclude(type="education").order_by("-start_date")
-	locations = Region.objects.filter(people=request.user)
-	goals = GoalPosition.objects.filter(owner=request.user)
-	user = request.user
+	# educations = Position.objects.filter(person=request.user,type="education").order_by("start_date")
+	# positions = Position.objects.filter(person=request.user).exclude(type="education").order_by("-start_date")
+	# locations = Region.objects.filter(people=request.user)
+	# goals = GoalPosition.objects.filter(owner=request.user)
+	# user = request.user
 
-	data = {
-		'educations' : educations,
-		'positions' : positions,
-		'locations': locations,
-		'goals' : goals,
-		'user' : request.user,
-		'latest_ed' : educations[0].ideal_position.title[:5],
-		'duration': careerlib.get_prof_longevity(user)
-	}
+	# data = {
+	# 	'educations' : educations,
+	# 	'positions' : positions,
+	# 	'locations': locations,
+	# 	'goals' : goals,
+	# 	'user' : request.user,
+	# 	'latest_ed' : educations[0].ideal_position.title[:5],
+	# 	'duration': careerlib.get_prof_longevity(user)
+	# }
 
 
-	if "tasks" in request.session:
-		data['tasks'] = True
-		data['profile_task_id'] = request.session['tasks']['profile']
-		data['connections_task_id'] = request.session['tasks']['connections']
-	else:
-		data['tasks'] = False
-		data['profile_task_id'] = None
-		data['connections_task_id'] = None
+	# if "tasks" in request.session:
+	# 	data['tasks'] = True
+	# 	data['profile_task_id'] = request.session['tasks']['profile']
+	# 	data['connections_task_id'] = request.session['tasks']['connections']
+	# else:
+	# 	data['tasks'] = False
+	# 	data['profile_task_id'] = None
+	# 	data['connections_task_id'] = None
 
-	return render_to_response('home_v6.html',data,context_instance=RequestContext(request))
+	return render_to_response('home_v5.html',context_instance=RequestContext(request))
 
 def major(request,major_id):
 	"""
