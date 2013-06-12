@@ -21,12 +21,13 @@
 			text-align:center;
 			padding:2px;
 			width:250px;
-			font-size:0.9em;
+			font-size:0.8em;
 			-moz-box-sizing: border-box;
 			-webkit-box-sizing: border-box;
 			box-sizing: border-box;
 			border-radius:4px;
 			cursor:pointer;
+			overflow:hidden;
       	}
 
      	.block { 
@@ -131,7 +132,15 @@ var magic_number = 575;
 // Add Center divs (Majors)
 center = d3.select("#center")
 center.selectAll("div").data(Object.keys(majors)).enter().append("div")
-	.text(function(d) { return d })
+	.text(function(d) { 
+
+		// Thomas -- just change this # to the max that fit on a line
+		if (d.length >= 36)
+			// AND this to that number - 3
+			return d.substring(0,33) + "..."
+		else
+			return d 
+	})
 	.attr("class", "box")
 	.attr("id", function(d) { return "major-" + majors[d]["index"]})
 	.attr("data-index", function(d, i) { return i })
@@ -218,6 +227,50 @@ svg_left.selectAll("circle").data(people).enter().append("circle")
 	.attr("id", function(d) { return "person-"+d.id })
 	.attr("data-name", function(d) { return d.name })
 
+	.on("mouseover", function(d) {
+
+		// Get major div
+		var major_node = d3.select("#major-"+d.major_index)
+		// Add hover to it
+		major_node.attr("class", "box major-hover")
+		// Make lines blue
+		var line_selector = major_node.attr("id").split("-")[1]
+		lineMouseover(d3.selectAll(".line-"+line_selector))
+		
+		// Trigger hover on user dots
+		for (p in majors[d.major]["people"]) {
+			var user_node = d3.select("#person-"+majors[d.major]["people"][p])
+			userMouseOver(user_node)
+		};
+
+		// Trigger hover on position dots
+		for (p in majors[d.major]["positions"]) {
+			var position_node = d3.select("#position-"+majors[d.major]["positions"][p])
+			positionMouseover(position_node)
+		}
+	})
+	.on("mouseout", function(d) {
+		// get major node
+		var major_node = d3.select("#major-"+d.major_index)
+		// normalize class
+		major_node.attr("class", "box")
+
+		// Make lines grey again
+		lineMouseout(d3.selectAll(".line-"+d.major_index))
+
+		// Remove user hover
+		for (p in majors[d.major]["people"]) {
+			var user_node = d3.select("#person-"+majors[d.major]["people"][p])
+			userMouseOut(user_node)
+		};
+
+		// Trigger hover on position dots
+		for (p in majors[d.major]["positions"]) {
+			var position_node = d3.select("#position-"+majors[d.major]["positions"][p])
+			positionMouseout(position_node)
+		}
+	});
+
 
 // Add position nodes to right svg
 y_offset = Math.floor(magic_number / positions.length)
@@ -240,6 +293,48 @@ svg_right.selectAll("circle").data(positions).enter().append("circle")
 	.attr("id", function(d) { return "position-"+d.id })
 	.attr("data-title", function(d) { return d.title })
 
+	.on("mouseover", function(d) {
+		// Get major div
+		var major_node = d3.select("#major-"+d.major_index)
+		// Add hover to it
+		major_node.attr("class", "box major-hover")
+		// Make lines blue
+		var line_selector = major_node.attr("id").split("-")[1]
+		lineMouseover(d3.selectAll(".line-"+line_selector))
+		
+		// Trigger hover on user dots
+		for (p in majors[d.major]["people"]) {
+			var user_node = d3.select("#person-"+majors[d.major]["people"][p])
+			userMouseOver(user_node)
+		};
+
+		// Trigger hover on position dots
+		for (p in majors[d.major]["positions"]) {
+			var position_node = d3.select("#position-"+majors[d.major]["positions"][p])
+			positionMouseover(position_node)
+		}
+	})
+	.on("mouseout", function(d) {
+		// get major node
+		var major_node = d3.select("#major-"+d.major_index)
+		// normalize class
+		major_node.attr("class", "box")
+
+		// Make lines grey again
+		lineMouseout(d3.selectAll(".line-"+d.major_index))
+
+		// Remove user hover
+		for (p in majors[d.major]["people"]) {
+			var user_node = d3.select("#person-"+majors[d.major]["people"][p])
+			userMouseOut(user_node)
+		};
+
+		// Trigger hover on position dots
+		for (p in majors[d.major]["positions"]) {
+			var position_node = d3.select("#position-"+majors[d.major]["positions"][p])
+			positionMouseout(position_node)
+		}
+	});
 
 // Add all connecting lines
 for (key in majors) {
@@ -299,16 +394,16 @@ for (key in majors) {
 			.style("top", y + "px")
 			.attr("id", id)
 
-		if (direction == "left") {
-			// reposition to the other side
-			var width;
-			container.selectAll(".abs").each(function(d) {
-				width = parseInt(d3.select(this).style("width"))
-				console.log("was: "+ x + " w: " + width)
-				d3.select(this).style("left", x - width - 18 + "px")
-				console.log(d3.select(this).style("left"))
-			});
-		};
+		// if (direction == "left") {
+		// 	// reposition to the other side
+		// 	var width;
+		// 	container.selectAll(".abs").each(function(d) {
+		// 		width = parseInt(d3.select(this).style("width"))
+		// 		//console.log("was: "+ x + " w: " + width)
+		// 		d3.select(this).style("left", x - width - 18 + "px")
+		// 		//console.log(d3.select(this).style("left"))
+		// 	});
+		// };
 		
 	};
 

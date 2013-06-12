@@ -85,7 +85,7 @@ def proto(request):
 				if p.person.id not in people_set:
 
 					people_set.add(p.person.id)
-					people.append({'name':p.person.profile.full_name(), 'id':p.person.id})
+					people.append({'name':p.person.profile.full_name(), 'id':p.person.id, "major_index":majors[p.ideal_position.major]["index"], "major":p.ideal_position.major})
 
 					counter += 1	
 					if counter == 72:
@@ -94,7 +94,7 @@ def proto(request):
 
 				if first_ideal.id not in positions_set:
 					positions_set.add(first_ideal.id)
-					positions.append({'title':first_ideal.title, 'id':first_ideal.id})
+					positions.append({'title':first_ideal.title, 'id':first_ideal.id, "major_index":majors[p.ideal_position.major]["index"], "major":p.ideal_position.major})
 
 
 	
@@ -128,7 +128,7 @@ def proto(request):
 		# print "###################"
 		# print positions
 
-
+		majors["Human Basket-weaving and other Anthropological Endeavors"] = {"id":1,"people":[],"positions":[],"index":len(majors_set)}
 		data = {
 			"majors":json.dumps(majors),
 			"positions":json.dumps(positions),
