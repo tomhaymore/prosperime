@@ -190,7 +190,8 @@ def finish_login(request):
 		# form submitted
 		form = FinishAuthForm(request.POST)
 		if form.is_valid():
-
+			from accounts.models import Pref
+			import accounts.emaillib as emaillib
 			# grab cleaned values from form
 			username = form.cleaned_data['username']
 			email = form.cleaned_data['email']
@@ -224,6 +225,16 @@ def finish_login(request):
 				user.profile.status = "active"
 				user.profile.save()
 				print "@ accounts.finish -- created new user"
+			# send welcome email
+			welcome = emaillib.WelcomeEmail(user)
+			welcome.send_email()
+			# add email prefs
+			if form.cleaned_data['notification']:
+				pref = Pref(user=user,name="notification",value=1)
+				pref.save()
+			else:
+				pref = Pref(user=user,name="notification",value=0)
+				pref.save()
 			# make sure using right backend
 			request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
 			# log user in
