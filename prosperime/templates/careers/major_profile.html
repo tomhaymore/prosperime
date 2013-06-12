@@ -15,61 +15,145 @@
 	{% if major.description %}
 		<p class="main-sub-header">{{major.description}}</p>
 	{% endif %}
+	<p>Prosper.me gets better the more people that use it. Tell your friends!</p>
 
 	<div id="career-profile-container">
 		<div class="career-profile-nav-container">
 			<!-- <span class="main-sub-header pull-left">View stats for: </span> -->
 			<a class="career-profile-nav pull-left selected" data-view="network">Your Network</a> 
-			<a class="career-profile-nav pull-left unselected" data-view="all">Prospr.me Community</a>
+			<a class="career-profile-nav pull-left unselected" data-view="all">Prosper.me Community</a>
 			<div class="clear"></div>
 			
 		</div>
-		<div class="career-module">
-			{% if first_jobs %}
-			<p class="feature-page-subheader">Popular First Jobs</p>
-			<ul class="fragment-list">
-				{% for j in first_jobs %}
-					<li>{{j.1.title}}</li>
-				{% endfor %}
-			</ul>
-			{% endif %}
+		<div class="career-perspective" data-view="network">
+			<div id="career-left-pane" class="pull-left">
+				<div class="career-module">
+					{% if network.schools %}
+					<p class="feature-page-subheader">School Overview</p>
+					<ul class="career-list">
+						{% for s in network.schools %}
+							<li>{{s.name}} <span class="info-badge">{{s.pos}}</span></li>
+						{% endfor %}
+					</ul>
+					{% endif %}
+				</div>
+				<div class="career-module">
+					{% if network.first_jobs %}
+					<p class="feature-page-subheader">Popular First Jobs</p>
+					<ul class="career-list">
+						{% for j in network.first_jobs %}
+							<li>{{j.1.title}} <span class="info-badge">{{j.1.count}}</span></li>
+						{% endfor %}
+					</ul>
+					{% endif %}
+				</div>
+				<div class="career-module">
+					{% if network.careers %}
+					<p class="feature-page-subheader">Popular Careers</p>
+					<ul class="career-list">
+						{% for c in network.careers %}
+							<li>{{c.name}}</li>
+						{% endfor %}
+					</ul>
+					{% endif %}
+				</div>
+			</div>
+			<div id="career-right-pane" class="pull-left">
+				<div class="career-module">
+					{% if network.paths %}
+						<p class="feature-page-subheader">Where are they now?</p>
+						<ul class="career-list">
+						{% for p in network.paths|slice:"5" %}
+							<li>
+								<div class="pull-left">
+									<img class="thumbnail" src="{{p.profile.default_profile_pic}}" />
+								</div>
+								<div class="pull-left user-info-stub">
+									<p>{{p.profile.full_name}}</p>
+									<p>{{p.profile.current_position}}</p>
+										
+								</div>
+								<div class="clear"></div>
+							</li>
+						{% endfor %}
+						</ul>
+					{% endif %}
+				</div>
+			</div>
+			<div class="clear"></div>
 		</div>
-		<div class="career-module">
-			{% if careers %}
-			<p class="feature-page-subheader">Popular Careers</p>
-			<ul class="fragment-list">
-				{% for c in careers %}
-					<li>{{c.name}}</li>
-				{% endfor %}
-			</ul>
-			{% endif %}
+		<div class="career-perspective" data-view="all" style="display:none;">
+			<div id="career-left-pane" class="pull-left">
+				<div class="career-module">
+					{% if all.schools %}
+					<p class="feature-page-subheader">School Overview</p>
+					<ul class="career-list">
+						{% for s in all.schools %}
+							<li>{{s.name}} <span class="info-badge">{{s.pos}}</span></li>
+						{% endfor %}
+					</ul>
+					{% endif %}
+				</div>
+				<div class="career-module">
+					{% if all.first_jobs %}
+					<p class="feature-page-subheader">Popular First Jobs</p>
+					<ul class="career-list">
+						{% for j in all.first_jobs %}
+							<li>{{j.1.title}} <span class="info-badge">{{j.1.count}}</span></li>
+						{% endfor %}
+					</ul>
+					{% endif %}
+				</div>
+				<div class="career-module">
+					{% if all.careers %}
+					<p class="feature-page-subheader">Popular Careers</p>
+					<ul class="career-list">
+						{% for c in all.careers %}
+							<li>{{c.name}}</li>
+						{% endfor %}
+					</ul>
+					{% endif %}
+				</div>
+			</div>
+			<div id="career-right-pane" class="pull-left">
+				<div class="career-module">
+					{% if all.paths %}
+						<p class="feature-page-subheader">Where are they now?</p>
+						<ul class="career-list">
+						{% for p in all.paths|slice:"5" %}
+							<li>
+								<div class="pull-left">
+									<img class="thumbnail" src="{{p.profile.default_profile_pic}}" />
+								</div>
+								<div class="pull-left user-info-stub">
+									<p>{{p.profile.full_name}}</p>
+									<p>{{p.profile.current_position}}</p>
+								</div>
+								<div class="clear"></div>
+							</li>
+						{% endfor %}
+						</ul>
+					{% endif %}
+				</div>
+			</div>
+			<div class="clear"></div>
 		</div>
-		<div class="career-module">
-			{% if paths %}
-				<p class="feature-page-subheader">Users</p>
-				<ul class="fragment-list">
-				{% for p in paths %}
-					<li>
-						<div class="pull-left">
-							<img class="thumbnail" src="{{p.profile.default_profile_pic}}" />
-						</div>
-						<div class="pull-left">
-							<p>{{p.profile.full_name}}</p>
-								
-						</div>
-						<div class="clear"></div>
-					</li>
-				{% endfor %}
-				</ul>
-			{% endif %}
-		</div>
-				
-
 			
 	</div>
 </div>
 
+{% endblock %}
 
-
-
+{% block templates %}
+<script type="text/javascript">
+$(function() {
+	$("a.career-profile-nav").click(function() {
+		var view = $(this).data('view');
+		$("a.career-profile-nav").removeClass("selected").addClass("unselected");
+		$(this).addClass("selected").removeClass("unselected");
+		$("div.career-perspective").hide();
+		$("div.career-perspective[data-view='"+view+"']").show();
+	});
+})
+</script>
 {% endblock %}

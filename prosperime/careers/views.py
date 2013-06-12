@@ -186,26 +186,49 @@ def major(request,major_id):
 	view for detailed information on a particular major
 	"""
 	C = careerlib.CareerPathBase()
+
 	# get degree
 	major = IdealPosition.objects.get(pk=major_id)
 
+	# get schools
+	focal_schools = list(Entity.objects.filter(type="school",positions__person=request.user).values_list('id'))
+	schools_in = Entity.objects.filter(positions__ideal_position=major,id__in=focal_schools).annotate(pos=Count("positions__id")).values("id","name","pos").distinct()
+	schools_all = Entity.objects.filter(positions__ideal_position=major).annotate(pos=Count("positions__id")).values("id","name","pos").distinct()
+
 	# get first jobs
-	first_jobs = C.get_first_jobs_from_major(major)
+	first_jobs_in = C.get_first_jobs_from_major(major,request.user)
+	first_jobs_all = C.get_first_jobs_from_major(major)
 
 	# get careers
-	careers = C.get_careers_from_major(major)
+	careers_in = C.get_careers_from_major(major,request.user)
+	careers_all = C.get_careers_from_major(major)
 
 	# get paths
-	paths = User.objects.filter(positions__ideal_position=major)
+	paths_in = User.objects.filter(positions__ideal_position=major,positions__entity_id__in=focal_schools)
+	paths_all = User.objects.filter(positions__ideal_position=major)
 
 	# get comments
 	# TODO
 
+	data_in = {
+		'first_jobs':first_jobs_in,
+		'paths':paths_in,
+		'careers':careers_in,
+		'schools':schools_in
+	}
+
+	data_all = {
+		
+		'first_jobs':first_jobs_all,
+		'paths':paths_all,
+		'careers':careers_all,
+		'schools':schools_all
+	}
+
 	data = {
 		'major':major,
-		'first_jobs':first_jobs,
-		'paths':paths,
-		'careers':careers
+		'network':data_in,
+		'all':data_all
 	}
 
 	return render_to_response('careers/major_profile.html',data,context_instance=RequestContext(request))

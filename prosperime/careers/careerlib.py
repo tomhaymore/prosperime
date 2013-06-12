@@ -792,7 +792,11 @@ class CareerPathBase(CareerBase):
 		returns list of careers from users with same degree
 		"""
 		# get relevant users
-		users = User.objects.filter(positions__ideal_position=major)
+		if user:
+			schools = Entity.objects.filter(type="school",positions__person=user)
+			users = User.objects.filter(positions__ideal_position=major,positions__entity__in=schools)
+		else:
+			users = User.objects.filter(positions__ideal_position=major)
 		# get focal careers
 		careers = self.get_focal_careers(users)
 		# restructure into easier list
@@ -813,8 +817,13 @@ class CareerPathBase(CareerBase):
 		paths = {}
 		next = False
 		final = False
-		# get all users who shared major
-		users = User.objects.select_related("positions").filter(positions__ideal_position=major,profile__status="active")
+		# if user is set, restrict to network
+		if user:
+			schools = Entity.objects.filter(type="school",positions__person=user)
+			users = User.objects.select_related("positions").filter(positions__ideal_position=major,positions__entity__in=schools,profile__status="active")
+		else:
+			# get all users who shared major
+			users = User.objects.select_related("positions").filter(positions__ideal_position=major,profile__status="active")
 		# loop through
 		for u in users:
 			for p in u.positions.all().order_by("start_date"):
