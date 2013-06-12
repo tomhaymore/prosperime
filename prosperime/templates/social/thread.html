@@ -33,7 +33,7 @@
 		
 				<div class="row network-following">
 					<div class="right span9">From Your Network</div>
-					<div class="left span3">11</div>
+					<div class="left span3">{{network_followers}}</div>
 				</div>
 				
 				<div class="row follow">
@@ -164,30 +164,44 @@
 		$(".left", this).toggleClass("orange-hover")
 	});
 
-	$(".follow").hover(function(e) {
-		$(".left", this).toggleClass("yellow-hover")
-	});
+	// If following, allow unfollow
+	if ("{{is_following}}" == "True") {
+		styleFollowing()
+		$(".follow .left").click(function(e) { unfollowThread(e, this) })
+	// Else activate follow option
+	} else {
+		$(".follow").hover(function(e) {
+			$(".left", this).toggleClass("yellow-hover")
+		});
 
-	$(".follow .left").click(function(e) { followThread(e, this) })
+		$(".follow .left").click(function(e) { followThread(e, this) })
+	}
+	
 
 
-	// Voting hovers & clicks
-	$(".upvote").hover(function(e) {
-		console.log('here')
-		$(this).toggleClass("upvote-hover")
-	}).click(function() { upvote(this) })
+	// Voting hovers and clicks 
+		// w/ Delayed binding for added elements
+	$(document).on({
+		mouseenter: function(e) { $(this).addClass("downvote-hover") },
+		mouseleave: function(e) { $(this).removeClass("downvote-hover") },
+		click: function(e) { downvote(this) }
+	}, ".downvote").on({
+		mouseenter: function(e) { $(this).addClass("upvote-hover") },
+		mouseleave: function(e) { $(this).removeClass("upvote-hover") },
+		click: function(e) { upvote(this) }
+	}, ".upvote").on({
+		mouseenter: function(e) {
+			$(this).prev().addClass("upvote-hover")
+			$(this).next().addClass("downvote-hover")
+		},
+		mouseleave: function(e) {
+			$(this).prev().removeClass("upvote-hover")
+			$(this).next().removeClass("downvote-hover")
+		}
+	}, ".votes")
 
-	$(".downvote").hover(function(e) {
-		$(this).toggleClass("downvote-hover")
-	}).click(function() { downvote(this) });
 
-	$(".votes").hover(function(e) {
-		$(this).prev().addClass("upvote-hover")
-		$(this).next().addClass("downvote-hover")
-	}, function(e) {
-		$(this).prev().removeClass("upvote-hover")
-		$(this).next().removeClass("downvote-hover")
-	});
+
 
 	// Social icon hovers & clicks
 	$(".icons-container .row i").each(function() {
@@ -273,11 +287,12 @@
 			// Change text
 			$(".follow .right").html("Following")
 			// Unbind hover
-			$(".follow").unbind("mouseenter mouseleave click")
-			// Bind unfollow event
-			$(this).parent().click(function(e) { unfollowThread(e, this) });
+			$(".follow").unbind("mouseenter mouseleave")
+			// Unbind click & bind follow event
+			$(this).unbind("click").click(function(e) { unfollowThread(e, this) });
 		});
 
+		// Post to DB
 		var thread_id = {{thread_id}}
 		$.post("/social/followThread/", {"thread_id":thread_id, "csrfmiddlewaretoken":"{{csrf_token}}"}, function(response) {
 			console.log(response)
@@ -287,7 +302,47 @@
 	};
 
 	var unfollowThread = function(ev, el) {
-		console.log("unfollowing thread...")
+
+		// Can't unfollow if not following
+		if (!$(el).hasClass("disabled")) return false;
+
+		// Fade out
+		$(el).fadeOut(400, function() {
+			// Animate to colored star
+			$("i", this).css("color", "#ECF0F1")
+			// Fade in, remove handlers, add click
+			$(this).fadeIn(400).unbind("click").click(function(e) {
+				followThread(e, this)
+			});
+			// Change text
+			$(".follow .right").html("Follow")
+			// Add hover
+			$(".follow").hover(function(e) {
+				$(".left", this).addClass("yellow-hover")
+			}, function (e) {
+				$(".left", this).removeClass("yellow-hover")
+			});
+
+		});
+
+		// Post to DB
+		var thread_id = {{thread_id}}
+		$.post("/social/unfollowThread/", {"thread_id":thread_id, "csrfmiddlewaretoken":"{{csrf_token}}"}, function(response) {
+			console.log(response)
+			// TODO: if fails, try again?
+		}, "json")
+
+	};
+
+	// Styles the '.following' div if user is following thread
+	function styleFollowing() {
+		var container = $(".follow .left")
+		// Change star color
+		$("i", container).css("color", "rgba(241,196,15,1)")
+		// Change display text
+		$(".follow .right").html("Following")
+		// Add disabled class
+		$(container).addClass("disabled")
 	};
 
 	var postComment = function(ev) {
@@ -313,6 +368,9 @@
 			}));
 			// Animate comment in
 			$(".comment-row :last").css("opacity", 0).animate({"opacity":1}, "400")
+
+			// Clear textarea
+			$("#prompt-textarea").val("")
 		}, "json");
 	};
 
