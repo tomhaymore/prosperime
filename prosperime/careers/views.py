@@ -15,7 +15,7 @@ from django.db.models import Count, Q
 
 
 # Prosperime
-from entities.models import Entity, Industry
+from entities.models import Entity, Industry, Region
 from careers.models import SavedPath, SavedPosition, Position, Career, GoalPosition, SavedCareer, IdealPosition, CareerDecision, SavedIndustry
 from accounts.models import Profile
 from social.models import Comment
@@ -23,6 +23,7 @@ from social.models import Comment
 import careers.careerlib as careerlib
 from careers.seedlib import SeedBase
 from social.feedlib import FeedBase
+import social.feedlib as feedlib
 
 import utilities.helpers as helpers
 
@@ -32,14 +33,14 @@ import utilities.helpers as helpers
 ######################################################
 def proto(request):
 
-	data = cache.get("data")
+	# try to get from cache
+	data = cache.get("majors_viz_"+str(request.user.id))
 
-
-
+	# test if cache worked
 	if data is not None:
 		return render_to_response("careers/d3.html",data,context_instance=RequestContext(request))
 	else:
-
+		# missed cache, get data
 		people = []
 		positions = []
 		majors = {}
@@ -50,20 +51,35 @@ def proto(request):
 
 		counter = 0
 
+		# get schools from user
+		schools = Entity.objects.filter(li_type="school",positions__person=request.user,positions__type="education").distinct()
+
 		acceptable_majors = ["Science, Technology, and Society", "English", "Psychology", "Management Science & Engineering", "Computer Science", "International Relations", "Political Science", "Economics", "Human Biology", "Product Design", "History", "Civil Engineering", "Electrical Engineering", "Physics", "Symbolic Systems", "Mechanical Engineering", "Spanish", "Public Policy", "Materials Science & Engineering", "Biomechanical Engineering", "Mathematics", "Classics", "Feminist Studies", "Mathematical and Computational Sciences", "Atmosphere and Energy Engineering", "Urban Studies", "Chemistry", "Chemical Engineering", "Religious Studies", "Earth Systems"]
-		base_positions = Position.objects.filter(type="education", field__in=acceptable_majors).exclude(ideal_position=None).select_related("person")
+		# base_positions = Position.objects.filter(type="education", field__in=acceptable_majors).exclude(ideal_position=None).select_related("person")
 		
+		# assemble all the positions
+		# base_positions = Position.objects.filter(type="education",entity__in=schools).exclude(ideal_position=None).select_related("person")
+		base_positions = Position.objects.filter(type="education",ideal_position__level=1).exclude(ideal_position=None).select_related("person")
+
 		for p in base_positions:
 			first_ideal = p.person.profile.first_ideal()
 
 			# Majors
 			if first_ideal:
-				if p.field not in majors_set:
-					majors_set.add(p.field)
-					majors[p.field] = {"people":[p.person.id], "positions":[first_ideal.id], "index":len(majors_set)}
+				if p.ideal_position.major is None:
+					print p.title, p.degree, p.field
+					print p.ideal_position, p.ideal_position.id
+				if p.ideal_position.major not in majors_set:
+					majors_set.add(p.ideal_position.major)
+					majors[p.ideal_position.major] = {"id":[p.ideal_position.id],"people":[p.person.id], "positions":[first_ideal.id], "index":len(majors_set)}
+				# if p.field not in majors_set:
+				# 	majors_set.add(p.field)
+				# 	majors[p.field] = {"people":[p.person.id], "positions":[first_ideal.id], "index":len(majors_set)}
 				else:
-					majors[p.field]["people"].append(p.person.id)
-					majors[p.field]["positions"].append(first_ideal.id)
+					# majors[p.field]["people"].append(p.person.id)
+					# majors[p.field]["positions"].append(first_ideal.id)
+					majors[p.ideal_position.major]["people"].append(p.person.id)
+					majors[p.ideal_position.major]["positions"].append(first_ideal.id)
 
 				# People
 				if p.person.id not in people_set:
@@ -118,18 +134,17 @@ def proto(request):
 			"positions":json.dumps(positions),
 			"people":json.dumps(people),
 		}
-		cache.set("data",data,1500)
+		
+		cache.set("majors_viz_"+str(request.user.id),data,1500)
 
 	return render_to_response("careers/d3.html",data,context_instance=RequestContext(request))
-
-
 
 def home(request):
 	if not request.user.is_authenticated():
 		return HttpResponseRedirect('/welcome/')
 
-	data = {}
-	user = request.user
+	# data = {}
+	# user = request.user
 
 	# # data['user_careers'] = Career.objects.filter(positions__person__id=user.id)
 	# # data['saved_paths'] = SavedPath.objects.filter(owner=user)
@@ -137,24 +152,109 @@ def home(request):
 	# data['saved_jobs'] = GoalPosition.objects.filter(owner=user)
 	# data['career_decisions'] = CareerDecision.objects.all()
 
+	# fetch data 
+	educations = Position.objects.filter(person=request.user,type="education").order_by("start_date")
+	positions = Position.objects.filter(person=request.user).exclude(type="education").order_by("-start_date")
+	locations = Region.objects.filter(people=request.user)
+	goals = GoalPosition.objects.filter(owner=request.user)
+	user = request.user
 
-	# try:
-	# 	poi = SavedPath.objects.get(owner=user, title='queue')
-	# 	poi = poi.positions.all()
-	# except:
-	# 	poi = None
+	data = {
+		'educations' : educations,
+		'positions' : positions,
+		'locations': locations,
+		'goals' : goals,
+		'user' : request.user,
+		'latest_ed' : educations[0].ideal_position.title[:5],
+		'duration': careerlib.get_prof_longevity(user)
+	}
 
-	# data['positions_of_interest'] = poi
 
-	industries = user.profile._industries()
-	if industries:
-		data['industry'] = industries[0].id
+	if "tasks" in request.session:
+		data['tasks'] = True
+		data['profile_task_id'] = request.session['tasks']['profile']
+		data['connections_task_id'] = request.session['tasks']['connections']
 	else:
-		data['industry'] = None
-		## this means they either have 0 postions or ghetto ones
-	## need current industry, too
+		data['tasks'] = False
+		data['profile_task_id'] = None
+		data['connections_task_id'] = None
 
-	return render_to_response('home_v5.html',data,context_instance=RequestContext(request))
+	return render_to_response('home_v6.html',data,context_instance=RequestContext(request))
+
+def major(request,major_id):
+	"""
+	view for detailed information on a particular major
+	"""
+	C = careerlib.CareerPathBase()
+	# get degree
+	major = IdealPosition.objects.get(pk=major_id)
+
+	# get first jobs
+	first_jobs = C.get_first_jobs_from_major(major)
+
+	# get careers
+	careers = C.get_careers_from_major(major)
+
+	# get paths
+	paths = User.objects.filter(positions__ideal_position=major)
+
+	# get comments
+	# TODO
+
+	data = {
+		'major':major,
+		'first_jobs':first_jobs,
+		'paths':paths,
+		'careers':careers
+	}
+
+	return render_to_response('careers/major_profile.html',data,context_instance=RequestContext(request))
+
+def get_school_fragment(request,school_id=None):
+	c = careerlib.CareerPathBase()
+	f = feedlib.FeedBase()
+	# grab list of all schools affiliated with user
+	schools = [e for e in Entity.objects.filter(positions__person=request.user,positions__type="education").distinct()]
+	# if particular school selected, get details for just that school
+	if school_id:
+		school = Entity.object.get(pk=school_id)
+		degrees = [{'id':p.id,'title':p.title,'long_title':p.long_title,'description':p.description} for p in IdealPosition.objects.filter(cat="ed",position__entity=school).annotate(pop=Count("position__id")).distinct().order_by("-pop")[:5]]
+		# degrees = [p.degree for p in Position.objects.filter(entity=school,type="education").exclude(degree=None).distinct()]
+		# careers = c.get_careers_in_schools([school])
+		jobs = c.get_first_jobs_from_schools([school]),
+		paths = c.get_paths_from_schools([school])
+	else:
+		school = None
+		degrees = [{'id':p.id,'title':p.title,'long_title':p.long_title,'description':p.description} for p in IdealPosition.objects.filter(cat="ed",position__entity__in=schools).annotate(pop=Count("position__id")).distinct().order_by("-pop")[:5]]
+		# degrees = [p.degree for p in Position.objects.filter(entity__in=schools,type="education").exclude(degree=None).distinct()]
+		# careers = c.get_careers_in_schools(schools)
+		# jobs = c.get_first_jobs_from_schools(schools),
+		paths = c.get_paths_from_schools(schools)
+
+	# get updates for degrees
+	for d in degrees:
+		d['updates'] = f.get_ideal_updates(request.user,d['id'])
+
+	data = {
+		'school':school,
+		'schools':schools,
+		'degrees':degrees,
+		# 'careers':careers
+		# 'jobs':jobs,
+		'paths':paths
+	}
+	print 'hello'
+	return render_to_response("careers/home_school_fragment.html",data,context_instance=RequestContext(request))
+
+def get_feed_fragment(request):
+	feeder = FeedBase() 
+	feed = feeder.get_univ_feed(request.user)
+
+	data = {
+		'feed':feed
+	}
+
+	return render_to_response("social/home_feed_fragment.html",data,context_instance=RequestContext(request))
 
 def schools(request):
 	return render_to_response("schools.html", context_instance=RequestContext(request))
@@ -1507,13 +1607,7 @@ def home_proto(request):
 		'pr':_split_and_jsonify(pr),
 		'associates':_split_and_jsonify(associates),
 	}
-
-
-
 	return HttpResponse(simplejson.dumps(data))
-
-
-
 
 	# render_to_response("home_v3.html", data, context_instance=RequestContext(request))
 

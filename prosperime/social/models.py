@@ -5,7 +5,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 ## from Prosperme
-from careers.models import SavedPath, GoalPosition, Position
+from careers.models import SavedPath, GoalPosition, Position, IdealPosition
 
 class Notification(models.Model):
 	target = models.ForeignKey(User,related_name='notifications')
@@ -64,4 +64,3 @@ class Vote(models.Model):
 			return "Up vote by " + self.owner.username + " on " + self.comment
 		else:
 			return "Down vote by " + self.owner.username + " on " + self.comment
-

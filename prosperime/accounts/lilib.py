@@ -576,7 +576,10 @@ class LIBase():
 
 	def get_position(self,user,co,data,**kwargs):
 		if kwargs.get('type') == 'ed':
-			pos = Position.objects.filter(entity=co,person=user,degree=data['degree'])
+			if 'degree' in data:
+				pos = Position.objects.filter(entity=co,person=user,degree=data['degree'])
+			else:
+				pos = None
 		else:
 			pos = Position.objects.filter(entity=co,person=user,title=data['title'])
 		if pos:
@@ -851,7 +854,7 @@ class LIProfile(LIBase):
 	def fetch_profile(self):
 
 		# set fields to fetch from API
-		fields = "(headline,id,first-name,last-name,picture-url,positions:(start-date,end-date,title,is-current,summary,company:(id)),public-profile-url,educations:(school-name,field-of-study,degree,start-date,end-date))"
+		fields = "(headline,id,first-name,last-name,picture-urls::(original),positions:(start-date,end-date,title,is-current,summary,company:(id)),public-profile-url,educations:(school-name,field-of-study,degree,start-date,end-date))"
 		
 		# construct url
 		api_url = "http://api.linkedin.com/v1/people/id=%s:%s?format=json" % (self.acct.uniq_id,fields,)
@@ -865,7 +868,7 @@ class LIProfile(LIBase):
 
 		resp, content = client.request(api_url)
 
-		return simplejson.loads(content)
+		return json.loads(content)
 
 	# def add_profile_pic(self,user,url):
 	# 	img = None
@@ -1454,91 +1457,93 @@ class LIConnections(LIBase):
 						if pos is None:
 							self.add_ed_position(user,inst,p) 
 
-class LITest(LIBase):
+# class LITest(LIBase):
 
-	def process_public_page(self,url):
-		# fetch html and soup it
+# 	def process_public_page(self,url):
+# 		# fetch html and soup it
 		
-		# html = self.get_public_page(url)
-		html = urllib2.urlopen(url)
-		soup = BeautifulSoup(html)
+# 		# html = self.get_public_page(url)
+# 		html = urllib2.urlopen(url)
+# 		soup = BeautifulSoup(html)
 
-		# get all profile container divs
-		divs = soup.find_all("div","section",id=re.compile("^profile"))
+# 		# get all profile container divs
+# 		divs = soup.find_all("div","section",id=re.compile("^profile"))
 
-		# loop throuh each div
-		for d in divs:
-			# identify type
-			if d['id'] == 'profile-experience':
-				# extract position data
-				positions = self.extract_pos_from_public_page(d)
-				for p in positions:
-					print p
+# 		# loop throuh each div
+# 		for d in divs:
+# 			# identify type
+# 			if d['id'] == 'profile-experience':
+# 				# extract position data
+# 				positions = self.extract_pos_from_public_page(d)
+# 				for p in positions:
+# 					print p
 							
-			elif d['id'] == 'profile-education':
-				ed_positions = self.extract_ed_pos_from_public_page(d)
-				# for p in ed_positions:
-					# print p
+# 			elif d['id'] == 'profile-education':
+# 				ed_positions = self.extract_ed_pos_from_public_page(d)
+# 				# for p in ed_positions:
+# 					# print p
 
-	def extract_pos_from_public_page(self,data):
-		# initialize positions array
-		positions = []
-		# get all position divs
-		raw_positions = data.find_all("div","position")
-		# loop through each position
-		for p in raw_positions:
-			# get title of position
-			title = p.find("div","postitle").span.contents[0]
-			# get uniq ue name of company
-			co_uniq_name = p.find("a","company-profile-public")
-			if co_uniq_name:
-				co_uniq_name = co_uniq_name.get('href')
-				m = re.search("(?<=\/company\/)([\w-]*)",co_uniq_name)
-				co_uniq_name = m.group(0).strip()
-				# print co_uniq_name
-				# get start and end dates
-				start_date = p.find("abbr","dtstart")
-				if start_date is not None:
-					start_date = start_date.get('title')
-				try:
-					end_date = p.find('abbr','dtstamp').get('title')
-					current = True
-				except:
-					current = False
+# 	def extract_pos_from_public_page(self,data):
+# 		# initialize positions array
+# 		positions = []
+# 		# get all position divs
+# 		raw_positions = data.find_all("div","position")
+# 		# loop through each position
+# 		for p in raw_positions:
+# 			# get title of position
+# 			title = p.find("div","postitle").span.contents[0]
+# 			# get uniq ue name of company
+# 			co_uniq_name = p.find("a","company-profile-public")
+# 			if co_uniq_name:
+# 				co_uniq_name = co_uniq_name.get('href')
+# 				m = re.search("(?<=\/company\/)([\w-]*)",co_uniq_name)
+# 				co_uniq_name = m.group(0).strip()
+# 				# print co_uniq_name
+# 				# get start and end dates
+# 				start_date = p.find("abbr","dtstart")
+# 				if start_date is not None:
+# 					start_date = start_date.get('title')
+# 				try:
+# 					end_date = p.find('abbr','dtstamp').get('title')
+# 					current = True
+# 				except:
+# 					current = False
 
-				try:
-					end_date = p.find("abbr","dtend").get("title")
-				except:
-					end_date = None
-				# get descriptions
-				try:
-					descr = p.find("p","description").contents[0]
-				except:
-					descr = None
-				# append to main positions array
-				positions.append({'title':title,'co_uniq_name':co_uniq_name,'startDate':start_date,'endDate':end_date,'summary':descr,'isCurrent':current})
-		return positions
+# 				try:
+# 					end_date = p.find("abbr","dtend").get("title")
+# 				except:
+# 					end_date = None
+# 				# get descriptions
+# 				try:
+# 					descr = p.find("p","description").contents[0]
+# 				except:
+# 					descr = None
+# 				# append to main positions array
+# 				positions.append({'title':title,'co_uniq_name':co_uniq_name,'startDate':start_date,'endDate':end_date,'summary':descr,'isCurrent':current})
+# 		return positions
 
-	def extract_ed_pos_from_public_page(self,data):
-		# initialize positions array
-		positions = []
-		# get all position divs
-		raw_positions = data.find_all("div","position")
-		# loop through each position
-		for p in raw_positions:
-			inst_uniq_id = p.get('id')
-			inst_name = p.h3.contents[0].strip()
-			try:
-				degree = p.find("span","degree").contents[0]
+# 	def extract_ed_pos_from_public_page(self,data):
+# 		# initialize positions array
+# 		positions = []
+# 		# get all position divs
+# 		raw_positions = data.find_all("div","position")
+# 		# loop through each position
+# 		for p in raw_positions:
+# 			inst_uniq_id = p.get('id')
+# 			inst_name = p.h3.contents[0].strip()
+# 			try:
+# 				degree = p.find("span","degree").contents[0]
 				
-			except:
-				degree = None
-			try:
-				major = p.find("span","major").contents[0]
-			except:
-				major = None
-			positions.append({'inst_uniq_id':inst_uniq_id,'inst_name':inst_name,'degree':degree,'fieldofStudy':major})
-		return positions
+# 			except:
+# 				degree = None
+# 			try:
+# 				major = p.find("span","major").contents[0]
+# 			except:
+# 				major = None
+# 			positions.append({'inst_uniq_id':inst_uniq_id,'inst_name':inst_name,'degree':degree,'fieldofStudy':major})
+# 		return positions
+
+
 
 class LITest(LIBase):
 	
@@ -1549,7 +1554,7 @@ class LITest(LIBase):
 
 	def test_profile(self):
 
-		fields = "(picture-url,email-address,headline,id,firstName,lastName,positions:(id,title),api-standard-profile-request:(url),public-profile-url,educations:(school-name,field-of-study,degree,start-date,end-date))"
+		fields = "(picture-urls::(original),email-address,headline,id,firstName,lastName,positions:(id,title),api-standard-profile-request:(url),public-profile-url,educations:(school-name,field-of-study,degree,start-date,end-date))"
 
 		api_url = "http://api.linkedin.com/v1/people/~:" + fields + "?format=json"
 

@@ -4,6 +4,9 @@ import datetime
 
 # from Django
 from django.db import models
+from django.contrib.auth.models import User
+
+# from prosperme
 
 class Entity(models.Model):
 
@@ -121,3 +124,13 @@ class Office(models.Model):
 
 	def name(self):
 		return self.entity.name + " office"	
+
+class Region(models.Model):
+	name = models.CharField(max_length=450)
+	cat = models.CharField(max_length=150,default="undefined") # for reerencing MSA, city, interstate, etc.
+	people = models.ManyToManyField(User,related_name="regions")
+	created = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
+
+	def __unicode__(self):
+		return self.region.name

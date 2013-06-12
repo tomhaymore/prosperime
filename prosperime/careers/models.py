@@ -65,8 +65,8 @@ class Position(models.Model):
 	duration_in_months = property(duration_in_months)
 
 	def duration_in_years(self):
-		if self.duration_in_months():
-			return round(float(self.duration_in_months()) / 12,2)
+		if self.duration_in_months:
+			return round(float(self.duration_in_months) / 12,2)
 		return None
 
 	def safe_start_time(self):
@@ -204,12 +204,15 @@ class SavedIndustry(models.Model):
 class IdealPosition(models.Model):
 
 	title = models.CharField(max_length=450, null=True)
-	description = models.TextField(null=True)
+	long_title = models.CharField(max_length=450,null=True,blank=True)
+	description = models.TextField(null=True,blank=True)
 	level = models.IntegerField(null=True)
 	cat = models.CharField(max_length=45,null=True,blank=True)
+	major = models.CharField(max_length=450,null=True,blank=True)
+	parent = models.ForeignKey("self",null=True,blank=True)
 	careers = models.ManyToManyField(Career,related_name="ideal_positions")
 	people = models.ManyToManyField(User,through='GoalPosition')
-	matches = models.TextField(null=True)
+	matches = models.TextField(null=True,blank=True)
 	status = models.CharField(max_length=15,default="active")
 	created = models.DateTimeField(auto_now_add=True, null=True)
 	updated = models.DateTimeField(auto_now=True, null=True)

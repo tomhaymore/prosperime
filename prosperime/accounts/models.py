@@ -165,11 +165,15 @@ class Profile(models.Model):
         self.save()
 
     def current_position(self):
-        positions = self.user.positions.all().order_by('-start_date').exclude(type="education")
+        positions = self.user.positions.all().exclude(type="education",title=None).order_by('-start_date')
         if positions.exists():
             return str(positions[0].title) + " at " + str(positions[0].entity.name)
         else:
             return None
+
+
+    def prof_longevity(self):
+        return careerlib.get_prof_longevity(self.user)
 
     def first_ideal(self):
         positions = self.user.positions.all().exclude(ideal_position=None).exclude(type="education").exclude(title="Student").order_by("start_date").select_related("entity")
@@ -183,6 +187,19 @@ class Profile(models.Model):
 
     def bio_simple_pretty_print(self):
         return [(p.title + " at " + p.entity.name + " --> ") for p in self.user.positions.all()]
+
+
+class Pref(models.Model):
+    user = models.ForeignKey(User,related_name="prefs")
+    name = models.CharField(max_length=50)
+    value = models.CharField(max_length=450)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=15,default="active")
+
+    def __unicode__(self):
+        return self.name + ": " + self.value
+
 
 class Picture(models.Model):
 

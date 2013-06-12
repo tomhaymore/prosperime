@@ -16,6 +16,8 @@
 <!-- JS -->
 	<script type="text/javascript" src="{{ STATIC_URL }}js/json2.js"></script>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/themes/base/jquery-ui.css" type="text/css" media="all" /> 
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js" type="text/javascript"></script>
 
 	<!-- Should add JQuery if Google CDN Fails --> 
 	<script type="text/javascript">
@@ -34,7 +36,7 @@
 {% block head %} {% endblock %}
 <head> 
 	<title>
-		{% block title %}ProsprMe: Don't work, prosper {% endblock %}
+		{% block title %}ProsperMe: Find the Right Path for You {% endblock %}
 	</title>
 </head>
 
@@ -47,11 +49,10 @@
 					<div class="log-container pull-left">
 						<!-- <a class="brand" href="/">Prosperime</a> -->
 						
-						{% if user.is_authenticated %}
-							<a href="/feed/"><img class="main-logo" src="{{STATIC_URL}}img/main_logo.png" /></a>
-						{% else %}
-							<a href="/welcome/"><img class="main-logo" src="{{STATIC_URL}}img/main_logo.png"/></a>
-						{% endif %}
+						
+						<a href="/feed/"><img class="main-logo" src="{{STATIC_URL}}img/splash_logo.png" /></a>
+						
+						
 					</div>
 					<div class="pull-right">
 						<ul class="topbar-nav pull-right">
@@ -63,9 +64,9 @@
 		                		<li>
 									<a href="/feed/">Home</a>
 								</li>
-		                		<li>
+		                		<!-- <li>
 		                			<a href="/search/">Search</a>
-		                		</li>
+		                		</li> -->
 		                		<li>
 		                			<a href="/account/logout/">Logout</a>
 		                		</li>
@@ -93,7 +94,6 @@
      <div class="background-container">
 		 <div class="messages-container">
 			{% block message %} 
-
 				{% if messages %}
 					<div id="messages">
 						<ul class="messages">
@@ -103,11 +103,8 @@
 						</ul>
 					</div>
 				{% endif %}
-			
 			{% endblock %}
-
 			{% block extramessage %}
-
 			{% endblock %}
 
 		</div>
@@ -119,11 +116,11 @@
 	   
 	    <div class="container-fluid splash-container">
 	        
-	        <div class="row-fluid">
-	      		<span class="span12">
+	      <!--   <div class="row-fluid">
+	      		<span class="span12"> -->
 	      			{% block content %} {% endblock %}
-	      		</span>
-	      	</div>
+	      	<!-- 	</span>
+	      	</div> -->
 	      	<div class="row-fluid">
 		        <!-- <span class="span11 offset1"> -->
 		        	{% block promo %} {% endblock %}

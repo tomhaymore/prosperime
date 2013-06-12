@@ -15,28 +15,27 @@
 {% block content %}
 
 <div id="content-container" class="main-container">
-
-	<div class="thread-header row">
+	<div class="thread-header row-fluid">
 		<div class="span12">
 			<div class="thread-main-header">Thread</div>
 			<div class="question-header"><span class="quote">&#147;</span>{{comments.0.body}}<span class="quote">&#148;</span></div>
 		</div>
 	</div>
 
-	<div class="row question-container">
+	<div class="row-fluid question-container">
 		<div class="span2">
 			<div class="question-controls">
-				<div class="row total-following">
+				<div class="row-fluid total-following">
 					<div class="right span9">Total Followers</div>
 					<div class="left span3">{{total_followers}}</div>
 				</div>
 		
-				<div class="row network-following">
+				<div class="row-fluid network-following">
 					<div class="right span9">From Your Network</div>
 					<div class="left span3">{{network_followers}}</div>
 				</div>
 				
-				<div class="row follow">
+				<div class="row-fluid follow">
 					<div class="right span9">Follow</div>
 					<div class="left span3"><i class="icon-star icon-large"></i></div>
 				</div>
@@ -52,7 +51,7 @@
 			<!-- {% if owner_current_position %}
 			<div class="block">
 				<div class="owner-current-position">
-					<!-- <img src="{{owner_current_position.entity_logo}}"/> -->
+					 <img src="{{owner_current_position.entity_logo}}"/> -->
 				<!-- 	<img class="logo" src="/media/logos/kaazing_corporation/Kaazing Corporation_1.png"/>
 					<div class="owner-current-position-title">{{owner_current_position.title}}</div>
 
@@ -83,7 +82,7 @@
 
 	{% for c in comments %}
 		{% if not forloop.first %}
-			<div class="row comment-row">
+			<div class="row-fluid comment-row">
 				<div id="{{c.id}}" class="comment-container offset1 span10">
 					<!-- Controls -->
 					<div class="span1">
@@ -122,12 +121,12 @@
 		</div>
 
 	
-		</br></br>
+		<br/><br/>
 
 		<div class="prompt-main">
-			<div class="question-header">Know someone who would be perfect for this thread? </br> Invite them to join the conversation.</div>
+			<div class="question-header">Know someone who would be perfect for this thread? <br/> Invite them to join the conversation.</div>
 			<div class="icons-container">
-				<div class="row">
+				<div class="row-fluid">
 					<div class="span3"><div class="icon-wrapper"><i class="icon-facebook icon-3x"></i></div></div>
 
 					<div class="span3"><div class="icon-wrapper"><i class="icon-twitter icon-3x"></i></div></div>
@@ -204,7 +203,7 @@
 
 
 	// Social icon hovers & clicks
-	$(".icons-container .row i").each(function() {
+	$(".icons-container .row-fluid i").each(function() {
 		$(this).hover(function(e) {
 			if ($(this).hasClass("icon-google-plus"))
 				$(this).toggleClass("google-plus")
@@ -367,7 +366,7 @@
 				"body":body,
 			}));
 			// Animate comment in
-			$(".comment-row :last").css("opacity", 0).animate({"opacity":1}, "400")
+			$(".comment-row-fluid :last").css("opacity", 0).animate({"opacity":1}, "400")
 
 			// Clear textarea
 			$("#prompt-textarea").val("")
@@ -391,7 +390,7 @@
 
 <script type="text/template" id="comment-template">
 
-		<div class="row comment-row">
+		<div class="row-fluid comment-row">
 		<div id="<%=id%>" class="comment-container offset1 span10">
 
 			<div class="span1">

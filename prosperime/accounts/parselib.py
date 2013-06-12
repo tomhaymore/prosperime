@@ -17,11 +17,118 @@ from entities.models import Entity
 
 class ParseBase():
 
+	# init lists for matching
+	ENTITIES_LIST = []
+	POSITIONS_LIST = []
+	POSITION_DICT = {}
+
 	# set max size of ngram
 	NGRAM_MAX = 10
 
 	# set min size of ngram
 	NGRAM_MIN = 1
+
+	# init list for all missed positions
+	MISSSED_POSITIONS = []
+
+	# init alpha list
+	abc = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+	# init degrees list
+	DEGREES = [
+		'BA',
+		'BS',
+		'AB',
+		'MA',
+		'LLM',
+		'LLD',
+		'Bachelor of Science',
+		'MJS',
+		'MPH',
+		'M.Litt',
+		'MPP',
+		'EdD',
+		'Doctorate in Geology',
+		'prelaw',
+		'Bachelor of Law',
+		'doctoral degree',
+		'JD',
+		'Juris Doctor',
+		'MBA',
+		'MCP',
+		'MD',
+		'Master of Divinity',
+		'PhD',
+		'DBA',
+		'BSc',
+		'BArch',
+		'SB',
+		'ScB',
+		'BAAS',
+		'BEng',
+		'BE',
+		'BSE',
+		'BESc',
+		'BSEng',
+		'BASc',
+		'BTech',
+		'BSEE',
+		'BBA',
+		'BAcy',
+		'BAcc',
+		'DDS',
+		'BN',
+		'BNSc',
+		'BSN',
+		'DVM',
+		'PharmD',
+		'BVSc',
+		'BVMS',
+		'BFA',
+		'MFA',
+		'LLB',
+		'MEd',
+		'Master of Architecture',
+		'Bachelor of Engineering',
+		'MS Ed',
+		'Bachelor of Arts',
+		'Juris Doctorate',
+		'MS',
+		'AA',
+		'Associate of Arts',
+		'Doctor of Philosophy',
+		'MPS',
+		'MSEE',
+		'MPA',
+		'Fulbright Scholarship',
+		'graduate work',
+		'attended',
+		'studied'
+	]
+
+	DEGREES = [d.lower() for d in DEGREES]
+
+	DEGREES.sort(key=len,reverse=True)
+
+	def _init_entity_list(self):
+		self.ENTITIES_LIST = [{'name':self._standardize_names(e.name),'id':e.id} for e in Entity.objects.all()]
+
+	def _init_position_list(self):
+		all_positions = set([p.title for p in Position.objects.exclude(Q(title=None) | Q(title=""))])
+		pos_list = [self._standardize_names(p) for p in all_positions]
+		pos_dict = {}
+		for p in all_positions:
+			pos_dict[self._standardize_names(p)] = p
+		# pos_list = [{'string':p.title,'match':self._standardize_names(p.title)} for p in Position.objects.exclude(Q(title=None) | Q(title=""))]
+		all_ideals = [p.title for p in IdealPosition.objects.exclude(title=None)]
+		ideal_pos_list = [self._standardize_names(p.title) for p in IdealPosition.objects.exclude(title=None)]
+		for p in ideal_pos_list:
+			norm_title = self._standardize_names(p)
+			if norm_title not in pos_dict:
+				pos_dict[norm_title] = p
+		full_list = pos_list + ideal_pos_list
+		self.POSITIONS_LIST = list(set(full_list))
+		self.POSITION_DICT = pos_dict
 
 	def get_json(self,url):
 		print "fetching..." + str(url)
@@ -63,6 +170,48 @@ class ParseBase():
 
 		return None
 
+	def _match_entity(self,ngrams):
+		matched_ents = [{'name':len(e['name']),'id':e['id']} for e in self.ENTITIES_LIST if e['name'] in ngrams]
+		if matched_ents:
+			sorted_matched_ents = sorted(matched_ents,key=itemgetter('name'),reverse=True)
+			entity = Entity.objects.get(pk=sorted_matched_ents[0]['id'])
+			return entity
+		return None
+
+	def _match_position(self,ngrams):
+		matched_pos = [p for p in self.POSITIONS_LIST if p in ngrams]
+		# if anything matched, sort by length of string
+		if matched_pos:
+			sorted_matched_pos = sorted(matched_pos,key=len,reverse=True)
+			title = self.POSITION_DICT[sorted_matched_pos[0]]
+			return title
+		return None
+
+	def _match_degree(self,ngrams):
+		matched_degrees = [d for d in self.DEGREES if d in ngrams]
+		if matched_degrees:
+			degree = matched_degrees[0].upper()
+			return degree
+		return None
+
+	def _extract_dates(self,pos):
+		# set defaults
+		start_date = None
+		end_date = None
+		splits = pos.split('.')
+		for s in splits:
+			if 'commission' in s:
+				# it's a start date
+				# dates = re.findall("((January|February|March|April|May|June|July|August|September|October|November|December)\s\d{1,2}\,\s\d{4})",pos)
+				# start_date = datetime.strftime(dates[2][0],"%B %d, %Y")
+				date = re.search("((January|February|March|April|May|June|July|August|September|October|November|December)\s\d{1,2}\,\s\d{4})",s)
+				start_date = datetime.strftime(date.group(0),"%B %d, %Y")
+			elif 'terminated' i s:
+				# it's an end date
+				date = re.search("((January|February|March|April|May|June|July|August|September|October|November|December)\s\d{1,2}\,\s\d{4})",s)
+				end_date = datetime.strftime(date.group(0),"%B %d, %Y")
+		return start_date, end_date
+
 	def _tokenize(self,data):
 		"""
 		tokenizes position title based on spaces
@@ -99,6 +248,13 @@ class ParseBase():
 
 			return ngrams
 		return None
+
+	def _log_missed_positions(self):
+		import datetime
+		filename = "parselib_missed_positions_" + str(datetime.datetime.now()).replace(" ","_") + ".json"
+		f = open(filename,'w')
+		f.write(json.dumps(self.MISSSED_POSITIONS))
+		f.close()
 
 class ParseBG(ParseBase):
 
@@ -202,8 +358,6 @@ class ParseBG(ParseBase):
 	DOB_BOUNDARY = 1920
 
 	soup = bs4.BeautifulSoup
-
-	abc = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 	SENATE = None
 
@@ -535,13 +689,6 @@ class ParseBG(ParseBase):
 		self.parse_positions(soup,person)
 		return "Success",None
 
-	def _log_missed_positions(self):
-		import datetime
-		filename = "parselib_missed_positions_" + str(datetime.datetime.now()).replace(" ","_") + ".json"
-		f = open(filename,'w')
-		f.write(json.dumps(self.MISSSED_POSITIONS))
-		f.close()
-
 	def parse_people(self):
 		full = "000000"
 		for a in self.abc:
@@ -560,3 +707,82 @@ class ParseBG(ParseBase):
 				i += 1
 		# print all missed positions
 		self._log_missed_positions()
+
+class ParseFJC(ParseBase):
+
+	# init global variables
+
+	NGRAMS = []
+
+	def parse_positions(self,soup,person):
+		data = str(soup.find_all('table')[2].dd)
+		splits = data_bio.split('\n')
+		for s in splits:
+			# check for empty splits
+			if s is not '':
+				self.NGRAMS = self._extract_ngrams(self._tokenize(pos))
+				entity = self._match_entity(self.NGRAMS)
+				title = self._match_position(self.NGRAMS)
+				degree = self._match_degree(self.NGRAMS)
+				datas = self._extract_dates(self.NGRAMS)
+				if entity:
+					params = {
+						'entity':entity,
+						'title':title
+					}
+					if degree:
+						params['type'] = 'education'
+						params['degree'] = degree
+					self.add_position(params)
+
+	def add_person(self,soup):
+		# init dictionary for profile data
+		# params = dict()
+		data = soup.find_all('table')[2]
+		raw_names = " ".split(data.font.get_text())
+		if len(raw_names) > 1:
+			first_name = raw_names[1]
+			last_name = raw_names[0]
+		username = "%s%s_%s" % (first_name,last_name,'fjc')
+		person = ''
+		# person = User(username=username[:30],first_name=first_name,last_name=last_name)
+		# personn.save()
+		# # add profile
+		# person.profile.first_name = first_name
+		# person.profile.last_name = last_name
+		# person.profile.status = "bioguide"
+		# person.profile.save()
+		print "@ parselib -- added " + first_name + " " + last_name
+		return person
+	
+
+
+	def parse_person(self,url):
+		# get data
+		soup = self.get_soup(url)
+		# check for empty page
+		if self._is_end(soup):
+			return None, "False"
+		# parse data into person
+		person = self.add_person(soup)
+		self.parse_positions(soup,person)
+		return "Success",None
+
+	def parse_people(self):
+		# init base url
+		base_search_url = "http://www.fjc.gov/servlet/nAsearch?lname="
+		base_url = "http://www.fjc.gov/servlet/nGetInfo?jid="
+		# cycle through search results
+		i = 1
+		stop_first = False
+		stop = False
+		while not stop:
+			# compile full url
+			full_url = "http://www.fjc.gov/servlet/nGetInfo?jid=%d" % (i,)
+			# retrieve and store person details
+			res, status = self.parse_person(full_url)
+			# check to see if res was false twice in a row
+			if status = "false" and not stop_first:
+				stop_first = True
+			elif status = "false" and stop_first:
+				stop = True

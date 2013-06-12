@@ -13,87 +13,77 @@
 
 <div id="splash-home">
 
-	<div class="span10 offset1">
-		<p class="splash-message-header">Don't just work, prosper!</p>
-		<p class="splash-message-subheader">ProsperMe helps you discover actual career paths from real people in your network.</p>
-		<p class="text-center splash-submessage no-hover">
-			<a id="get-started-button" class="flat-button green-button center" href="/account/register">Get started</a>
-		</p>
-	</div>
+	<div class="splash-inner-container">
+		<div class="splash-module pull-left">
+			<p class="splash-message-header">Find the right path for you</p>
+			<p class="splash-message-subheader">Connect with fellow alumns</p>
+			<p class="splash-message-subheader">Explore possible career paths</p>
+			<p class="splash-message-subheader">Seek and share career advice</p>
+			<p class="splash-submessage no-hover">
+				<a id="get-started-button" class="flat-button green-button" href="/account/register">Get started</a>
+			</p>
+			<div class="clear"></div>
+		</div>
+
+		<div class="splash-module pull-left">
+			<img src="/static/img/splash_1.png" id="splash-img-1"/>
+		</div>
 
 	<div class="clear"></div>
+	</div>
 
+</div>
+
+<div class="promo-container">
+<div class="promo-module">
+	<div class="promo-left pull-left">
+		<img src="/static/img/splash_alumni_1.png" id="splash-img-alumni" />
+	</div>
+	<div class="promo-right pull-left">
+		<p class="promo-header">Connect with alumni and find mentors</p>
+		<p class="promo-body">Your alumni network is probably your most valuable asset during your career. Whether you're looking for a new job or just advice on your next career move, fellow alums have been down the same road before and can offer useful advice. Before you know it, you'll be offering advice to other alums too.</p>
+	</div>
+	<div class="clear"></div>
+</div>
+</div>
+
+<div class="promo-container-grey">
+<div class="promo-module">
+	<div class="promo-left pull-left">
+		<p class="promo-header">Ask for and share advice</p>
+		<p class="promo-body">Whether you realize or not, you've got a lot of career-related information stored inside your head. And your fellow alums are the same. Together, you can swap and share advice on what jobs, careers and companies you should be taking a look at. Bottom line: there's no reason to make these choices alone.</p>
+
+	</div>
+	<div class="promo-right pull-left">
+		<img src="/static/img/splash_advice_1.png" id="splash-img-advice" />
+	</div>
+	<div class="clear"></div>
+</div>
+
+</div>
+<div class="promo-container">
+<div class="promo-module">
+	<div class="promo-full">
+		<p class="feature-page-subheader">Interested? Signing up takes only a second.</p>
+		<p class="splash-submessage no-hover">
+				<a id="get-started-button" class="flat-button green-button" href="/account/register">Get started</a>
+			</p>
+	</div>
+	<!-- <div class="promo-left pull-left">
+		<img src="/static/img/splash_plan_1.png" id="splash-img-plan" />
+	</div>
+	<div class="promo-right pull-left">
+		
+		<p class="promo-header">Explore possible career paths</p>
+		<p class="promo-body">When you're just graduating, and even for a few years affter, you can feel confused by the bewildering array of seeming opportunities. You shouldn't try to sort through it all on your own. Hundreds, if not thousands, of other people have traveled down the same road and can share their experiences.</p>
+	</div>
+	<div class="clear"></div> -->
+</div>
 </div>
 {% endblock %}
 
 {% block promo %}
-<div id="promo-message-container">
-	<div id="promo-message-inner">
 
-		<!-- Explore Career Paths -->
-		<div class="row">
-			<div class="span6 promo-header-container column-left">
-				<div class="promo-header">
-					Explore Career Paths
-				</div>
-				<div class="promo-text">
-					See the career paths of industry leaders, celebrities, and others. Learn from ther decisions, step-by-step, and build your own plans using their foundation.
-				</div>
-				<div class="flat-button blue-button button-large promo-button" onclick="register()">Start Exploring</div>
-
-			</div>
-
-			<div class="span6 promo-image-containe column-right">
-				<img src="/static/img/welcome-explore-2.png"/>
-			</div>
-
-		</div>
-
-		<!-- Build Career Paths -->
-		<div class="row">
-
-			<div class="span6 promo-image-container column-left">
-				<img src="/static/img/welcome-build-2.png"/>
-			</div>
-
-			<div class="span6 promo-header-container column-right">
-				<div class="promo-header">
-					Build Your Own Career
-				</div>
-				<div class="promo-text">
-					Build your future career path one position at a time. With each new position, ProsperMe will show you what opportunitites come next until you reach your dream job.
-				</div>
-				<div class="flat-button blue-button button-large promo-button" onclick="register()">Start Building</div>
-			</div>
-		</div>
-
-		<!-- Plan Next Steps -->
-		<div class="row">
-
-			<div class="span6 promo-header-container column-left">
-				<div class="promo-header">
-					Plan Your Next Steps
-				</div>
-				<div class="promo-text">
-					Planning a career change? See the the people, companies, and careers that will help you transition to your next opportunity.
-				</div>
-				<div class="flat-button blue-button button-large  promo-button" onclick="register()">See What's Next</div>
-			</div>
-			<div class="span6 promo-image-container column-right">
-				<img src="/static/img/welcome-next-2.png"/>
-			</div>
-
-			
-		</div>	
-	</div>
-
-
-</div>
-<script type="text/javascript">
-	var register=function() {
-		window.location="/account/register"
-	};
-</script>
 
 {% endblock %}
 
@@ -101,7 +91,5 @@
 
 {% endblock %}
 
-{% block footer %}
 
-{% endblock %}
 

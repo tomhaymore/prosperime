@@ -34,6 +34,10 @@ def match_position_to_ideals(pos,test=False):
 	career_map = CareerMapBase()
 	return career_map.match_position_to_ideals(pos,test)
 
+def get_prof_longevity(user):
+	career_path = CareerPathBase()
+	return career_path.get_prof_longevity(user)
+
 # get focal careers
 def get_focal_careers(user,limit=10):
 	career_path = CareerPathBase()
@@ -693,10 +697,10 @@ class CareerPathBase(CareerBase):
 		key, d = tup
 		return d['score']
 
-	def get_focal_careers(self,user,limit=5):
+	def get_focal_careers(self,users,limit=5):
 		from operator import itemgetter
 		# get all user positions
-		positions = Position.objects.filter(person=user)
+		positions = Position.objects.filter(person__in=users)
 		# init array
 		careers = {}
 		# init vars
@@ -772,6 +776,124 @@ class CareerPathBase(CareerBase):
 		careers = sorted(careers_dict.iteritems(),key=lambda (k,v):v['num_people'],reverse=True)
 
 		return careers
+
+	def get_careers_in_schools(self,schools,user=None):
+		# get all users related to school
+		school_ids = [s.id for s in schools]
+		users = User.objects.filter(positions__entity__id__in=school_ids)
+		# get focal careers
+		careers = self.get_focal_careers(users)
+		# restructure into easier list
+		all_careers = [{'id':c[0],'name':c[1]['name']} for c in careers]
+		return all_careers
+
+	def get_careers_from_major(self,major,user=None):
+		"""
+		returns list of careers from users with same degree
+		"""
+		# get relevant users
+		users = User.objects.filter(positions__ideal_position=major)
+		# get focal careers
+		careers = self.get_focal_careers(users)
+		# restructure into easier list
+		all_careers = [{'id':c[0],'name':c[1]['name']} for c in careers]
+
+	def get_paths_from_schools(self,schools,user=None,limit=5):
+		"""
+		returns a set of user paths that contain the school
+		"""
+		users = User.objects.filter(positions__entity__in=schools,profile__status="active").distinct()[:5]
+		return users
+
+	def get_first_jobs_from_major(self,major,user=None):
+		"""
+		returns a list of first jobs users held after completing a particular major
+		"""
+		# init global vars
+		paths = {}
+		next = False
+		final = False
+		# get all users who shared major
+		users = User.objects.select_related("positions").filter(positions__ideal_position=major,profile__status="active")
+		# loop through
+		for u in users:
+			for p in u.positions.all().order_by("start_date"):
+
+				if final:
+					continue
+				if next:
+					# exclude education positions
+					if p.type == "education":
+						continue
+					if not p.ideal_position:
+						continue
+					if p.ideal_position.id in paths:
+						paths[p.ideal_position.id]['count'] += 1
+					else:
+						paths[p.ideal_position.id] = {
+							'title':p.ideal_position.title,
+							'id':p.id,
+							'ideal_id':p.ideal_position.id,
+							'count':1
+						}
+				if p.ideal_position == major:
+					next = True
+		paths = sorted(paths.iteritems(),key=lambda x: x[1]['count'],reverse=True)
+		return paths
+
+	def get_first_jobs_from_schools(self,schools,user=None):
+		""" 
+		returns a list of first jobs users held after leaving school
+		"""
+		# init global vars
+		paths = {}
+		next = False
+		final = False
+		users = User.objects.select_related("positions").filter(positions__entity__in=schools)
+		for u in users:
+			for p in u.positions.all().order_by("start_date"):
+				if final:
+					continue
+				if next:
+					if not p.ideal_position:
+						continue
+					if p.ideal_position.id in paths:
+						paths[p.ideal_position.id]['count'] += 1
+					else:
+						paths[p.ideal_position.id] = {
+							'title':p.ideal_position.title,
+							'id':p.id,
+							'ideal_id':p.ideal_position.id,
+							'count':1
+						}
+				if p.entity in schools:
+					next = True
+		paths = sorted(paths.iteritems(),key=lambda x: x[1]['count'],reverse=True)
+		return paths
+
+	def get_prof_longevity(self,user):
+		positions = Position.objects.filter(person=user).order_by("start_date").exclude(type="education")
+		start_date = positions[0].start_date
+		end_date = None
+		z = False
+		i = positions.count() - 1
+		while not z:
+			# print "@ get_prof_longevity -- cycling"
+			if positions[i].end_date:
+				z = True
+				end_date = positions[i].end_date
+			i = i - 1
+		
+		if end_date:
+			delta = end_date - start_date
+		else:
+			delta = datetime.datetime.today() - start_date
+
+		years = round(delta.days / 365.25,0)
+		if years > 10:
+			return "10+"
+		return years
+
 
 class CareerBuild(CareerPathBase):
 
@@ -999,6 +1121,13 @@ class CareerMapBase():
 				title = " ".join([title,pos.degree])
 			if pos.field:
 				title = " ".join([title,pos.field])
+			# remove any "with honors" mentions
+			pattern = re.compile(re.escape(" with honors"), re.IGNORECASE)
+			title = pattern.sub("",title)
+			# remove any forward slashes
+			pattern = re.compile(re.escape("/"),re.IGNORECASE)
+			title = pattern.sub(" ",title)
+
 		else:
 			title = pos.title
 		if title:
@@ -1079,19 +1208,21 @@ class CareerMapBase():
 		"""
 		# fetch matching information for ideal positions and matching career ids
 		# careers = Career.objects.values('id','pos_titles')
-		ideals = IdealPosition.objects.values('id','matches').exclude(matches=None)
+		ideals = IdealPosition.objects.values('id','matches').exclude(matches=None).exclude(matches='')
 
+		# init excluded set
+		excluded = [2018,2031,2039,2041,2044,2045,2054]
 		# init career map dictionary
 		ideal_positions_map = {}
 
 		for i in ideals:
-			
-			matches = json.loads(i['matches'])
-			# add career-to-position title mapping, reduced to lower case
-			# if matches is not None:
-			# 	titles = [t.lower() for t in titles]
-			
-			ideal_positions_map[i['id']] = matches
+			if i['id'] not in excluded:
+				matches = json.loads(i['matches'])
+				# add career-to-position title mapping, reduced to lower case
+				# if matches is not None:
+				# 	titles = [t.lower() for t in titles]
+				
+				ideal_positions_map[i['id']] = matches
 
 		self.positions_to_ideals_map = ideal_positions_map
 
@@ -1205,7 +1336,7 @@ class CareerMapBase():
 							elif m['type'] == 'education':
 								# check to see if degree and / or field of study is in the string
 								for tt in m['title']:
-									if tt in t:
+									if tt == t:
 										is_match = True
 								if is_match == True:
 									ideals.append(k)	
@@ -1289,6 +1420,7 @@ class EdMapper(CareerMapBase):
 		"""
 		fill in ideal position map dictionary
 		"""
+		
 		# fetch matching information for ideal positions and matching career ids
 		# ideals = IdealPosition.objects.filter(cat="ed").values('id','matches').exclude(matches=None).extra(order_by=[len("-title")])
 		ideals = IdealPosition.objects.filter(cat="ed").values('id','matches').exclude(matches=None)
@@ -1298,7 +1430,10 @@ class EdMapper(CareerMapBase):
 
 		for i in ideals:
 			
-			matches = json.loads(i['matches'])
+			try:
+				matches = json.loads(i['matches'])
+			except:
+				continue
 			
 			ideal_positions_map[i['id']] = matches
 
@@ -1537,7 +1672,10 @@ class CareerImportBase():
 				continue
 			except ObjectDoesNotExist:
 				# create new ideal position
-				ipos = IdealPosition(title=i['title'],description=i['description'])
+				if 'description' in i:
+					ipos = IdealPosition(title=i['title'],description=i['description'])
+				else:
+					ipos = IdealPosition(title=i['title'])
 				print "@ import_initial_ideals() -- new ideal"
 			
 			# loop through all the listed industries
@@ -1576,6 +1714,8 @@ class CareerImportBase():
 				ipos.level = i['level']
 			if 'cat' in i:
 				ipos.cat = i['cat']
+			if 'major' in i:
+				ipos.major = i['major']
 			else:
 				ipos.level = 1
 			ipos.save()

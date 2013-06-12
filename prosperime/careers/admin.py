@@ -8,7 +8,7 @@ class CareerAdmin(admin.ModelAdmin):
 	search_fields = ['long_name','short_name']
 
 class IdealPositionAdmin(admin.ModelAdmin):
-	pass
+	search_fields = ['title','long_title','description','major']
 
 class SavedCareerAdmin(admin.ModelAdmin):
 	pass

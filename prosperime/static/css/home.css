@@ -532,14 +532,263 @@ div.v5-button a {
 	color:#fffffe;
 }
 
+#home-splash-container {
+	background-color:#fff;
+	height:200px;
+	background-image:url('/static/img/home_splash_bg.png');
+	/*background-image:url('/static/img/home_gradient_bg.png');*/
+	background-repeat:repeat-x; 
+	margin-bottom:25px;
+}
+
+.circle {
+	display:block;
+	width:100px;
+	height:100px;
+	border-radius:50px;
+	background-image:url('/media/pictures/anon.jpg');
+	background-position:50% 50%;
+    background-repeat:no-repeat; 
+}
+
+.circle-small {
+	display:block;
+	width:60px;
+	height:60px;
+	border-radius:30px;
+	background-color: #fff;
+	background-position:50% 50%;
+    background-repeat:no-repeat; 
+    cursor: pointer;
+}
+
+div#icon-schools {
+	
+	background-color:rgb(48,91,152);
+	/*background-image: url('/static/img/book-icon-small.png');*/
+	margin-left:auto;
+	margin-right:auto;
+	border:2px solid rgb(92,92,92);
+}
+
+div#icon-experience {
+	
+	background-color:rgb(48,91,152);
+	/*background-image: url('/static/img/book-icon-small.png');*/
+	margin-left:auto;
+	margin-right:auto;
+	border:2px solid rgb(92,92,92);
+}
+
+div#icon-goals {
+	
+	background-color:rgb(48,91,152);
+	/*background-image: url('/static/img/book-icon-small.png');*/
+	margin-left:auto;
+	margin-right:auto;
+	border:2px solid rgb(92,92,92);
+}
+
+div#icon-locations {
+	
+	background-color:rgb(48,91,152);
+	/*background-image: url('/static/img/book-icon-small.png');*/
+	margin-left:auto;
+	margin-right:auto;
+	border:2px solid rgb(92,92,92);
+}
+
+div#schools-container {
+	position:relative;
+	/*top:72px;*/
+	/*left:50px;*/
+	/*width:75px;*/
+}
+
+div#experience-container {
+	position:relative;
+	/*top:72px;*/
+	left:50px;
+	/*width:75px;*/
+}
+
+div#locations-container {
+	position:relative;
+	/*top:72px;*/
+	left:100px;
+	/*width:75px;*/
+}
+div#goals-container {
+	position:relative;
+	/*top:72px;*/
+	left:150px;
+	/*width:75px;*/
+}
+
+#profile-pic-container {
+	width:200px;
+	margin-top:0px;
+}
+
+#profile-pic {
+	margin-left:auto;
+	margin-right:auto;
+	border:2px solid rgb(92,92,92);
+	cursor:pointer;
+	background-image:url('/media/pictures/anon.jpg');
+	transition: background-image 0.1s;
+}
+
+#profile-pic:hover {
+	background-image: url('/static/img/green_add.png');
+	background-size:115%;
+}
+
+.i-header {
+	font-size:1.1em;
+	font-weight: 400;
+	color:#fffffe;
+	margin-bottom:10px;
+	display:inline-block;
+}
+
+#home-left-sidebar {
+	width: 175px;
+	padding-left:10px;
+}
+
+a.home-item {
+	display:block;
+	font-size:1.1em;
+	padding:10px 14px;
+	width: 100px;
+}
+
+a.home-menu-item:hover {
+	background-color: rgb(41,98,152);
+	color:#f0f0f0;
+	text-decoration: none;
+}
+
+a.selected {
+	background-color: rgb(41,98,152);
+	color:#f0f0f0;
+}
+
+.secret-list {
+	/*display:none;*/
+	position:absolute;
+	color:#181818;
+	font-size:0.9em;
+	line-heigh:1.0em;
+	transition:all 0.2s;
+	text-align: left;
+	border: 1px solid #cccccd;
+	padding: 5px;
+	margin-top: 10px;
+	opacity: 0.9;
+	z-index: 8;
+	background-color: #fff;
+	border-radius: 2px;
+	width: 95%;
+}
 
 
+.secret-list li {
+	margin-top:6px;
+}
 
+.secret-list li a {
+	color:#181818;
+	display:inline-block;
+	/*padding-right: 5px;*/
+	padding:2px 2px 2px 2px;
+	width:95%;
+}
 
+.secret-list li a:hover {
+	color:#fffffe;
+	background-color:#181818;
+	text-decoration: none;
+}
 
+.icons-module {
+	top:38px;
+	width: 175px;
+}
 
+.circle-small:hover {
+	background-color:rgb(48,91,152);
+}
 
+.noshow {
+	display:none;
+}
 
+.fragment-module {
+	margin-bottom: 10px;
+}
 
+.fragment-module:hover {
+	/*border:1px solid #333332;*/
+	/*-webkit-box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow: 0 1px 10px rgba(0,0,0,0.1);
+	box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);*/
+}
 
+.fragment-main-container {
+	width:450px;
+	/*padding:5px;*/
+}
 
+.fragment-right-container {
+	width:250;
+	padding:5px;
+}
+
+.fragment-list {
+	padding-right:10px;
+}
+
+.fragment-list li {
+	margin-bottom:10px;
+	margin-top:15px;
+}
+
+.fragment-info {
+	display:none;
+	position:relative;
+}
+
+.notch {
+    position: absolute;
+	/*top: 95px;*/
+	top:-10px;
+	left: 78px;
+	margin: 0;
+	border-top: 0;
+	border-left: 10px solid transparent;
+	border-right: 10px solid transparent;
+	border-bottom: 10px solid #fffffe;
+	padding: 0;
+	width: 0;
+	height: 0;
+	font-size: 0;
+	line-height: 0;
+     /* ie6 transparent fix */
+    _border-right-color: pink;
+    _border-left-color: pink;
+    _filter: chroma(color=pink);
+}
+
+.border-notch {
+	border-bottom-color: #cccccd; 
+	/*top: 94px;*/
+	top:-11px;
+}
+
+span.icons-text {
+	line-height: 60px;
+	font-size: 18px;
+	color: #fffffe;
+}

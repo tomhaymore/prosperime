@@ -5,6 +5,26 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.utils.safestring import mark_safe
 from django.contrib.auth import authenticate
 
+date_formats = [
+		'%Y-%m-%d',       # '2006-10-25'
+		'%m/%d/%Y',       # '10/25/2006'
+		# '%m/%d/%y',		  # '10/25/06'
+		# '%b %d %Y',      # 'Oct 25 2006'
+		# '%b %d, %Y',      # 'Oct 25, 2006'
+		# '%d %b %Y',       # '25 Oct 2006'
+		# '%d %b, %Y',      # '25 Oct, 2006'
+		# '%B %d %Y',       # 'October 25 2006'
+		# '%B %d, %Y',      # 'October 25, 2006'
+		# '%d %B %Y',       # '25 October 2006'
+		# '%d %B, %Y'      # '25 October, 2006'
+		'%Y-%m',
+		'%m/%y',
+		'%m/%Y',
+		'%b %Y',
+		'%B %Y',
+		'%Y'
+		]
+
 class TermsField(forms.BooleanField):
 	"Check that user agreed, return custom message."
 
@@ -18,6 +38,7 @@ class RegisterForm(forms.Form):
 	error_css_class = 'form_error'
 	required_css_class = 'form_required'
 
+	full_name = forms.CharField(label="Full name")
 	username = forms.CharField(label="Username")
 	email = forms.EmailField(label="Email")
 	location = forms.CharField(label="Location",required=False)
@@ -87,6 +108,28 @@ class FinishAuthForm(forms.Form):
 			raise forms.ValidationError('You must agree to the Terms of Service and Privacy Policy to use Prospr.me.')
 		else:
 			return terms
+
+class AddEducationForm(forms.Form):
+	degree = forms.CharField(label="Degree")
+	field = forms.CharField(label="Field of Study",required=False)
+	school = forms.CharField(label="School")
+	end_date = forms.DateField(label="End date",input_formats=date_formats)
+
+class AddExperienceForm(forms.Form):
+	title = forms.CharField(label="Title")
+	description = forms.CharField(label="Descrption",required=False)
+	entity = forms.CharField(label="Organization")
+	start_date = forms.DateField(label="Start date",input_formats=date_formats,required=False)
+	end_date = forms.DateField(label="End date",input_formats=date_formats,required=False)
+
+class AddGeographyForm(forms.Form):
+	region = forms.CharField(label="Region")
+
+class AddGoalForm(forms.Form):
+	goal = forms.CharField(label="Goal")
+
+class AddProfilePicForm(forms.Form):
+	pic = forms.FileField(label="Profile picture")
 
 class AuthForm(AuthenticationForm):
 	# error_css_class = 'form_error'

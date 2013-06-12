@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import urlparse
 import math
 import json
+import os
 
 # import datetime
 
@@ -19,16 +20,18 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.utils import simplejson
-from accounts.forms import FinishAuthForm, AuthForm, RegisterForm
+
 from django.contrib import messages
 from lilib import LIProfile
-from accounts.tasks import process_li_profile, process_li_connections
+
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
 # Prosperime
 from accounts.models import Account, Profile, Picture, Connection
-from careers.models import SavedPath, CareerDecision, Position, SavedPosition, SavedCareer, GoalPosition
-from entities.models import Entity
-
+from careers.models import SavedPath, CareerDecision, Position, SavedPosition, SavedCareer, GoalPosition, IdealPosition
+from entities.models import Entity, Region
+from accounts.tasks import process_li_profile, process_li_connections
+from accounts.forms import FinishAuthForm, AuthForm, RegisterForm
 import utilities.helpers as helpers
 
 
@@ -36,7 +39,7 @@ def login(request):
 	# from django.contrib.auth.forms import AuthenticationForm
 	# print request.session['_auth_user_backend']
 	if request.user.is_authenticated():
-		return HttpResponseRedirect('/feed/')
+		return HttpResponseRedirect('/home/')
 	if request.method == "POST":
 		# make sure using proper authentication backend
 		request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
@@ -48,7 +51,7 @@ def login(request):
 			if user is not None:
 				auth_login(request,user)
 				messages.success(request, 'You have successfully logged in.')
-				return HttpResponseRedirect('/feed/')
+				return HttpResponseRedirect('/home/')
 		
 	else:
 		form = AuthForm()
@@ -107,7 +110,7 @@ def register(request):
 				auth_login(request,user)
 
 			# send to personalization
-			return HttpResponseRedirect('/personalize/careers/')
+			return HttpResponseRedirect('/home/')
 	else:
 		form = RegisterForm()
 
@@ -184,8 +187,8 @@ def finish_login(request):
 			# grab cleaned values from form
 			username = form.cleaned_data['username']
 			email = form.cleaned_data['email']
-			location = form.cleaned_data['location']
-			headline = form.cleaned_data['headline']
+			# location = form.cleaned_data['location']
+			# headline = form.cleaned_data['headline']
 			password = form.cleaned_data['password']
 
 			# fetch LI data
@@ -194,10 +197,8 @@ def finish_login(request):
 
 			# check to see if dormant user already exists
 			try: 
-				print 'before try'
+				print '@ accounts.finish -- checking for dormant user'
 				user = User.objects.get(profile__status="dormant",account__uniq_id=linkedin_user_info['id'])
-				print 'after try'
-				print user
 				existing = True
 				user.profile.status = "active"
 				user.profile.save()
@@ -205,9 +206,9 @@ def finish_login(request):
 				user.username = username
 				user.is_active = True
 				user.save()
-				print "user already exists"
+				print "@ accounts.finish -- user already exists"
 			except:
-				print 'exception'
+				print '@ accounts.finish -- new user'
 				# create user
 				user = User.objects.create_user(username,email,password)
 				user.save()
@@ -215,7 +216,7 @@ def finish_login(request):
 				existing = False
 				user.profile.status = "active"
 				user.profile.save()
-				print "created new user"
+				print "@ accounts.finish -- created new user"
 			# make sure using right backend
 			request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
 			# log user in
@@ -228,14 +229,14 @@ def finish_login(request):
 			else:
 				# try logging in now with LinkedIn
 				request.session['_auth_user_backend'] = 'prosperime.accounts.backends.LinkedinBackend'
-				user = authenticate(acct_id=linkedin_user_info['id'])
-				
-			if user is not None:
-				auth_login(request,user)
-			else:
-				# somehow authentication failed, redirect with error message
-				messages.error(request, 'Something went wrong. Please try again.')
-				return render_to_response('accounts/finish_login.html',{'form':form},context_instance=RequestContext(request))
+				try:
+					user = authenticate(acct_id=linkedin_user_info['id'])
+					if user is not None:
+						auth_login(request,user)	
+				except:
+					# somehow authentication failed, redirect with error message
+					messages.error(request, 'Something went wrong. Please try again.')
+					return render_to_response('accounts/finish_login.html',{'form':form},context_instance=RequestContext(request))
 
 
 
@@ -243,19 +244,24 @@ def finish_login(request):
 			# user.profile.full_name = request.session['linkedin_user_info']['firstName'] + " " + request.session['linkedin_user_info']['lastName']		
 			user.profile.first_name = linkedin_user_info['firstName']
 			user.profile.last_name = linkedin_user_info['lastName']
-			user.profile.location = location
+			# user.profile.location = location
 			# check to see if user provided a headline
-			if headline:
-				user.profile.headline = headline
-			else:
-				user.profile.headline = linkedin_user_info['headline']
+			# if headline:
+			# 	user.profile.headline = headline
+			# else:
+			user.profile.headline = linkedin_user_info['headline']
 			user.profile.save()
 
 			# add pofile picture
-			if 'pictureUrl' in linkedin_user_info:
-				# _add_profile_pic(user,linkedin_user_info['pictureUrl'])
+			# if 'pictureUrl' in linkedin_user_info:
+			# 	# _add_profile_pic(user,linkedin_user_info['pictureUrl'])
+			# 	li_parser = LIProfile()
+			# 	li_parser.add_profile_pic(user,linkedin_user_info['pictureUrl'])
+
+			if 'pictureUrls' in linkedin_user_info:
 				li_parser = LIProfile()
-				li_parser.add_profile_pic(user,linkedin_user_info['pictureUrl'])
+				li_parser.add_profile_pic(user,linkedin_user_info['pictureUrls']['values'][0])
+
 
 			if existing:
 				# get existing LI account
@@ -287,7 +293,7 @@ def finish_login(request):
 
 			#return HttpResponseRedirect('/account/success')
 			if 'next' not in request.session:
-				return HttpResponseRedirect('/personalize/careers/')
+				return HttpResponseRedirect('/home/#schools/')
 			else:
 				return HttpResponseRedirect(request.session['next'])
 	else:
@@ -349,20 +355,14 @@ def finish_link(request):
 
 	# save task ids to session
 	request.session['tasks'] = {
-		'profile': {
-			'status':profile_task.ready(),
-			'id':profile_task.id
-			},
-		'connections': {
-			'status':connections_task.ready(),
-			'id':connections_task.id
-			}
+		'profile': profile_task.id,
+		'connections': connections_task.id
 	}
 
-	messages.success(request, 'Your LinkedIn account has been successfully linked. Please refresh the page to see changes.')
+	messages.success(request, 'Your LinkedIn account has been successfully linked.')
 
 	if 'next' not in request.session:
-		return HttpResponseRedirect('/personalize/careers/')
+		return HttpResponseRedirect('/home/')
 	else:
 		return HttpResponseRedirect(request.session['next'])
 
@@ -638,6 +638,182 @@ def deleteItem(request):
 
 	return HttpResponse(simplejson.dumps(response))
 
+@login_required
+def personalize(request):
+	'''
+	asks users for more information about their goals and whatnot
+	'''
+	# check to see if tasks information is in session
+	tasks = False
+	profile_task_id = 99
+	connections_task_id = 'null'
+	if "tasks" in request.session:
+		tasks = True
+		profile_task_id = request.session['tasks']['profile']
+		connections_task_id = request.session['tasks']['connections']
+
+	data = {
+		'tasks':tasks,
+		'profile_task_id':profile_task_id,
+		'connections_task_id':connections_task_id,
+		'educations':Position.objects.filter(person=request.user,type="education").values("id","degree","field","entity__name","end_date"),
+		'positions':Position.objects.filter(person=request.user).exclude(type="education").values("id","title","entity__name","start_date","end_date"),
+		'geographies':Region.objects.filter(people=request.user).values("name","id"),
+		'goals':GoalPosition.objects.filter(owner=request.user).values("position__title","id")
+	}
+
+	return render_to_response('careers/personalize.html',data,context_instance=RequestContext(request))
+
+@login_required
+def add_to_profile(request):
+	# check for form submission
+	if request.POST:
+		from accounts.forms import AddEducationForm, AddExperienceForm, AddGeographyForm, AddGoalForm, AddProfilePicForm
+		from django.core.files import File
+		import accounts.tasks as tasks
+		if request.POST['type'] == "profile_pic":
+			# bind form
+			form = AddProfilePicForm(request.POST,request.FILES)
+			# validate form
+			if form.is_valid():
+				# create picture object
+				img_filename = request.user.profile.std_name() + ".jpg"
+				pic = Picture()
+				pic.person = request.user.profile
+				pic.source = 'user'
+				pic.save()
+				with open('tmp_img','wb') as f:
+					f.write(request.FILES['pic'].read())
+				with open('tmp_img','r') as f:
+					img_file = File(f)
+					pic.pic.save(img_filename,img_file,True)
+				os.remove('tmp_img')
+				response = {
+					'result':'success',
+					'pic':pic.pic.url
+				}
+			else:
+				response = {
+					'result':'failure',
+					'position':form.errors
+				}
+			return HttpResponse(json.dumps(response))
+		if request.POST['type'] == "education":
+			# bind form
+			form = AddEducationForm(request.POST)
+			# validate form
+			if form.is_valid():
+				try:
+					school = Entity.objects.get(name=form.cleaned_data['school'])
+				except MultipleObjectsReturned:
+					school = Entity.objects.filter(name=form.cleaned_data['school'])[0]
+				except ObjectDoesNotExist:
+					school = Entity(name=form.cleaned_data['school'])
+					school.save()
+
+				ed = Position(type="education",entity=school,end_date=form.cleaned_data['end_date'],degree=form.cleaned_data['degree'],field=form.cleaned_data['field'],person=request.user)
+				ed.save()
+				# kick off task to process for career matches
+				tasks.match_position(ed)
+				position_data = {
+					'degree':ed.degree,
+					'pos_id':ed.id,
+					'field':ed.field,
+					'entity':ed.entity.name
+				}
+				response = {
+					'result':'success',
+					'position':position_data
+				}
+			else:
+				response = {
+					'result':'failure',
+					'errors':form.errors
+				}
+			return HttpResponse(json.dumps(response))
+		if request.POST['type'] == "experience":
+			# bind form
+			form = AddExperienceForm(request.POST)
+			# validate form
+			if form.is_valid():
+				try:
+					entity = Entity.objects.get(name=form.cleaned_data['entity'])
+				except MultipleObjectsReturned:
+					entity = Entity.objects.filter(name=form.cleaned_data['entity'])[0]
+				except ObjectDoesNotExist:
+					entity = Entity(name=form.cleaned_data['entity'])
+					entity.save()
+
+				pos = Position(
+					type="professional",
+					entity=entity,
+					person=request.user,
+					start_date=form.cleaned_data['start_date'],
+					end_date=form.cleaned_data['end_date'],
+					title=form.cleaned_data['title']
+					)
+				pos.save()
+				# kick off task to process career matches
+				tasks.match_position(pos)
+				# return json response
+				position_data = {
+					'title':pos.title,
+					'pos_id':pos.id,
+					'entity':pos.entity.name
+				}
+				response = {
+					'result':'success',
+					'position':position_data
+				}
+				
+			else:
+				response = {
+					'result':'failure',
+					'errors':form.errors
+				}
+			return HttpResponse(json.dumps(response))
+		if request.POST['type'] == "geography":
+			# bind form
+			form = AddGeographyForm(request.POST)
+			# validate form
+			if form.is_valid():
+				try:
+					reg = Region.objects.get(name=form.cleaned_data['region'])
+				except MultipleObjectsReturned:
+					reg = Region.objects.filter(name=form.cleaned_data['region'])[0]
+				reg.people.add(request.user)
+				response = {
+					'result':'success',
+					'geo':reg.name
+				}
+			else:
+				response = {
+					'result':'failure',
+					'errors':form.errors
+				}
+			return HttpResponse(json.dumps(response))
+		if request.POST['type'] == "goal":
+			# bind form
+			form = AddGoalForm(request.POST)
+			# validate form
+			if form.is_valid():
+				try:
+					ideal = IdealPosition.objects.get(title=form.cleaned_data['goal'])
+				except MultipleObjectsReturned:
+					ideal = IdealPosition.objects.filter(title=form.cleaned_data['goal'])[0]
+				g = GoalPosition(position=ideal,owner=request.user)
+				g.save()
+				response = {
+					'result':'success',
+					'goal':g.position.title
+				}
+			else:
+				response = {
+					'result':'failure',
+					'errors':form.errors
+				}
+			return HttpResponse(json.dumps(response))
+
 
 # Called after a goal position, saved career is added to a profile, allowing
 #	backbone to refresh the template
@@ -646,32 +822,33 @@ def updateProfile(request):
 	response = {}
 	query = request.GET.getlist('query')
 
-	if not query:
-		response["result"] = 'failure'
+	if query:
+
+		if query[0] == "goalPositions":
+
+			goal_positions_queryset = GoalPosition.objects.filter(owner=request.user).select_related("position")
+			goal_positions = []
+			for pos in goal_positions_queryset:
+				goal_positions.append(_ideal_position_to_json(pos.position))
+
+			response["data"] = goal_positions
+
+		elif query[0] == "savedCareers":
+
+			goal_careers_queryset = SavedCareer.objects.filter(owner=request.user).select_related("career")
+			goal_careers = []
+			for career in goal_careers_queryset:
+				goal_careers.append(_saved_career_to_json(career.career))
+
+			response["data"] = goal_careers
+
+		else:
+			response["data"] = None
+
+		response["result"] = "success"
 		return HttpResponse(simplejson.dumps(response))
 
-	if query[0] == "goalPositions":
-
-		goal_positions_queryset = GoalPosition.objects.filter(owner=request.user).select_related("position")
-		goal_positions = []
-		for pos in goal_positions_queryset:
-			goal_positions.append(_ideal_position_to_json(pos.position))
-
-		response["data"] = goal_positions
-
-	elif query[0] == "savedCareers":
-
-		goal_careers_queryset = SavedCareer.objects.filter(owner=request.user).select_related("career")
-		goal_careers = []
-		for career in goal_careers_queryset:
-			goal_careers.append(_saved_career_to_json(career.career))
-
-		response["data"] = goal_careers
-
-	else:
-		response["data"] = None
-
-	response["result"] = "success"
+	response["result"] = 'failure'
 	return HttpResponse(simplejson.dumps(response))
 
 

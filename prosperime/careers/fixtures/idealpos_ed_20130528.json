@@ -1,7 +1,7 @@
 [
 	{
 		"title":"B.S.",
-		"description":"",
+		"long_title":"Bachelor of Science",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -15,7 +15,8 @@
 	},
 	{
 		"title":"B.S.Anthro",
-		"description":"Bachelor of Science in Anthropology",
+		"long_title":"Bachelor of Science in Anthropology",
+		"major":"Anthropology",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -23,13 +24,29 @@
 			[
 				{
 					"type":"education",
-					"title":["bachelor of science in anthropology","bsanthro","bs anthropology"]
+					"title":["bachelor of science in anthropology","bsanthro","bs anthropology","student physical and biological anthroplogy"]
+				}
+			]
+	},
+	{
+		"title":"B.A.Anthro",
+		"long_title":"B.A. in Anthropology",
+		"major":"Anthropology",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of arts in anthropology","baanthro","ba anthropology"]
 				}
 			]
 	},
 	{
 		"title":"B.S.ChemE",
-		"description":"Bachelor of Science in Chemical Engineering",
+		"long_title":"Bachelor of Science in Chemical Engineering",
+		"major":"Chemical Engineering",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -37,13 +54,14 @@
 			[
 				{
 					"type":"education",
-					"title":["bachelor of science in chemical engineering","bscheme","bs chemical engineering"]
+					"title":["bachelor of science in chemical engineering","bscheme","bs chemical engineering","student chemical engineering"]
 				}
 			]
 	},
 	{
 		"title":"B.S.E.E.",
-		"description":"Bachelor of Science in Electrical Engineering",
+		"long_title":"Bachelor of Science in Electrical Engineering",
+		"major":"Electrical Engineering",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -51,13 +69,14 @@
 			[
 				{
 					"type":"education",
-					"title":["bachelor of science in electrical engineering","bsee","bs electrical engineering"]
+					"title":["bachelor of science in electrical engineering","bachelor of science in electrical engineering","bsee","bs electrical engineering","be electrical engineering","bs electrical and electronics engineering","btech electrical and electronics engineering","student electrical engineering"]
 				}
 			]
 	},
 	{
 		"title":"M.S.E.E.",
-		"description":"Master of Science in Electrical Engineering",
+		"long_title":"Master of Science in Electrical Engineering",
+		"major":"Electrical Engineering",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -65,13 +84,14 @@
 			[
 				{
 					"type":"education",
-					"title":["master of science in electrical engineering","msee","ms electrical engineering"]
+					"title":["master of science in electrical engineering","msee","ms electrical engineering","masters degree electrical and electronics engineering"]
 				}
 			]
 	},
 	{
 		"title":"B.S. Industrial Engineering",
-		"description":"Bachelor of Science in Industrial Engineering",
+		"long_title":"Bachelor of Science in Industrial Engineering",
+		"major":"Industrial Engineering",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -85,7 +105,8 @@
 	},
 	{
 		"title":"B.A.Sc.",
-		"description":"Bachelor of Applied Science",
+		"long_title":"Bachelor of Applied Science",
+		"major":null,
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -99,7 +120,8 @@
 	},
 	{
 		"title":"B.A.A.S.",
-		"description":"Bachelor of Applied Arts and Science",
+		"long_title":"Bachelor of Applied Arts and Science",
+		"major":null,
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -113,7 +135,8 @@
 	},
 	{
 		"title":"B.Arch.",
-		"description":"Bachelor of Architecture",
+		"long_title":"Bachelor of Architecture",
+		"major":"Architecture",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -127,7 +150,8 @@
 	},
 	{
 		"title":"M.Arch.",
-		"description":"Master of Architecture",
+		"long_title":"Master of Architecture",
+		"major":"Architecture",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -141,7 +165,8 @@
 	},
 	{
 		"title":"M.S.I.E.",
-		"description":"Master of Science in Industrial Engineering",
+		"long_title":"Master of Science in Industrial Engineering",
+		"major":"Industrial Engineering",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -154,8 +179,9 @@
 			]
 	},
 	{
-		"title":"B.S. Management Science",
-		"description":"Bachelor of Science in Management Science",
+		"title":"B.S. MS&E",
+		"long_title":"B.S. Management Science & Engineering",
+		"major":"Management Science & Engineering",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -163,13 +189,74 @@
 			[
 				{
 					"type":"education",
-					"title":["bachelor of science in management science","bs management science"]
+					"title":["bachelor of science management science engineering","bs management science engineering","bs management science engineering","bachelor of science mse","bachelors of science management science engineering","bs mse","bs degree management science engineering"]
+				}
+			]
+	},
+	{
+		"title":"M.S. MS&E",
+		"long_title":"M.S. Management Science & Engineering",
+		"major":"Management Science & Engineering",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["master of science management science engineering","ms management science engineering","meng management science engineering","ms management science engineering","master of science mse","masters degree management science engineering"]
+				}
+			]
+	},
+	{
+		"title":"Ph.D. MS&E",
+		"long_title":"Ph.D. Management Science & Engineering",
+		"major":"Management Science & Engineering",
+		"level":3,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["phd management science engineering","doctorate management science engineering","doctor of philosophy management science engineering"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Management Science",
+		"long_title":"Bachelor of Science in Management Science",
+		"major":"Management Science",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of science in management science","bs management science","bachelor of science management science","bachelors management science","student management science","student management"]
+				}
+			]
+	},
+	{
+		"title":"Ph.D. Management Science",
+		"long_title":"Ph.D. in Management Science",
+		"major":"Management Science",
+		"level":3,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["doctorate in management science","phd management science"]
 				}
 			]
 	},
 	{
 		"title":"B.Tech.",
-		"description":"Bachelor of Technology",
+		"long_title":"Bachelor of Technology",
+		"major":"Technology",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -183,7 +270,7 @@
 	},
 	{
 		"title":"B.A.",
-		"description":"",
+		"long_title":"Bachelor of Arts",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -191,13 +278,29 @@
 			[
 				{
 					"type":"education",
-					"title":["bachelor of arts","ba","ab"]
+					"title":["bachelor of arts","ba","ab","bachelor of art"]
 				}
 			]
 	},
 	{
 		"title":"B.A.S.",
-		"description":"",
+		"long_title":"",
+		"major":"Applied Science",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bas","bachelor of arts and sciences"]
+				}
+			]
+	},
+	{
+		"title":"B.A.S. Biological Sciences",
+		"long_title":"B.A.S. Biological Sciences",
+		"major":"Biological Sciences",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -211,7 +314,8 @@
 	},
 	{
 		"title":"B.F.A.",
-		"description":"",
+		"long_title":"",
+		"major":"Fine Arts",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -225,7 +329,8 @@
 	},
 	{
 		"title":"B.A. Philosophy, Politics and Economics",
-		"description":"",
+		"long_title":"",
+		"major":"Philosohpy, Politics and Economics",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -238,8 +343,9 @@
 			]
 	},
 	{
-		"title":"B.S. in Mechanical Engineering",
-		"description":"",
+		"title":"B.S.MechEng.",
+		"long_title":"B.S. Mechanical Engineering",
+		"major":"Mechanical Engineering",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -247,13 +353,44 @@
 			[
 				{
 					"type":"education",
-					"title":["bachelor of science in mechanical engineering","bs in mechanical engineering"]
+					"title":["bachelor of science in mechanical engineering","bs in mechanical engineering","bs mechanical engineering","beng mechanical engineering","beng me","student mechanical engineering"]
+				}
+			]
+	},
+	{
+		"title":"M.S.MechEng.",
+		"long_title":"M.S. Mechanical Engineering",
+		"major":"Mechanical Engineering",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["master of science in mechanical engineering","ms in mechanical engineering","ms mechanical engineering","meng mechanical engineering","meng me"]
 				}
 			]
 	},
 	{
 		"title":"B.S. in Symoblic Systems",
-		"description":"",
+		"long_title":"",
+		"level":1,
+		"major":"Symobolic Systems",
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of science in symoblic systems","bs symbolic systems","symbolic systems"]
+				}
+			]
+	},
+	{
+		"title":"B.S. in Earth Systems",
+		"long_title":"",
+		"major":"Earth Systems",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -261,13 +398,14 @@
 			[
 				{
 					"type":"education",
-					"title":["bachelor of science in symoblic systems","bs symbolic systems"]
+					"title":["bachelor of science in earth systems","bs earth systems"]
 				}
 			]
 	},
 	{
 		"title":"B.B.A.",
-		"description":"",
+		"major":"Business Administration",
+		"long_title":"Bachelor of Business Administration",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -275,13 +413,28 @@
 			[
 				{
 					"type":"education",
-					"title":["bachelor of business administration","bba"]
+					"title":["bachelor of business administration","bba","bs business administration"]
+				}
+			]
+	},
+	{
+		"title":"B.B.F.",
+		"major":"Business Finance",
+		"long_title":"Bachelor of Business Finance",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of business finance","bbf"]
 				}
 			]
 	},
 	{
 		"title":"M.A.",
-		"description":"",
+		"long_title":"",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -295,8 +448,9 @@
 	},
 	{
 		"title":"M.Phil.",
-		"description":"Master of Philosophy",
+		"long_title":"Master of Philosophy",
 		"level":2,
+		"major":"Philosophy",
 		"cat":"ed",
 		"careers":[595],
 		"matches":
@@ -308,8 +462,23 @@
 			]
 	},
 	{
+		"title":"M.Phil.Econ.",
+		"long_title":"Master of Philosophy Economics",
+		"level":2,
+		"major":"Economics",
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["master of philosophy economics","mphil economics"]
+				}
+			]
+	},
+	{
 		"title":"M.S.",
-		"description":"Master of Science",
+		"long_title":"Master of Science",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -317,13 +486,14 @@
 			[
 				{
 					"type":"education",
-					"title":["master of science","ma"]
+					"title":["master of science","ms"]
 				}
 			]
 	},
 	{
 		"title":"M.S. Audio Engineering",
-		"description":"Master of Science in Audio Engineering",
+		"long_title":"Master of Science in Audio Engineering",
+		"major":"Audio Engineering",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -331,13 +501,14 @@
 			[
 				{
 					"type":"education",
-					"title":["master of science in audio engineering","ms audio engineering"]
+					"title":["master of science in audio engineering","ms audio engineering","master of audio engineering"]
 				}
 			]
 	},
 	{
 		"title":"M.S. Operations Research",
-		"description":"Master of Science in Operations Research",
+		"long_title":"Master of Science in Operations Research",
+		"major":"Operations Research",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -345,13 +516,28 @@
 			[
 				{
 					"type":"education",
-					"title":["master of science in operations research","ms operations research"]
+					"title":["master of science in operations research","ms operations research","ms operation research"]
+				}
+			]
+	},
+	{
+		"title":"Ph.D. Operations Research",
+		"long_title":"Ph.D. in Operations Research",
+		"major":"Operations Research",
+		"level":3,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["phd in operations research","doctorate operations research"]
 				}
 			]
 	},
 	{
 		"title":"M.Eng.",
-		"description":"Master of Engineering",
+		"long_title":"Master of Engineering",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -364,8 +550,23 @@
 			]
 	},
 	{
+		"title":"M.Eng.Mfg.",
+		"long_title":"Master of Engineering Manufacturing",
+		"level":2,
+		"cat":"ed",
+		"major":"Manufacturing",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["meng manufacturing","master of engineering manufacturing"]
+				}
+			]
+	},
+	{
 		"title":"B.Eng.",
-		"description":"Bachelor of Engineering",
+		"long_title":"Bachelor of Engineering",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -379,7 +580,8 @@
 	},
 	{
 		"title":"M.B.A.",
-		"description":"",
+		"long_title":"",
+		"major":"Business Administration",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -393,7 +595,8 @@
 	},
 	{
 		"title":"Executive M.B.A.",
-		"description":"",
+		"long_title":"",
+		"major":"Business Administration",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -407,8 +610,9 @@
 	},
 	{
 		"title":"D.B.A.",
-		"description":"Doctor of Business Administration",
-		"level":2,
+		"long_title":"Doctor of Business Administration",
+		"major":"Business Administration",
+		"level":3,
 		"cat":"ed",
 		"careers":[595],
 		"matches":
@@ -421,7 +625,8 @@
 	},
 	{
 		"title":"M.I.M.",
-		"description":"",
+		"long_title":"",
+		"major":"Management",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -435,7 +640,8 @@
 	},
 	{
 		"title":"B.S.B.A.",
-		"description":"Bachelor of Science in Business Administration",
+		"long_title":"Bachelor of Science in Business Administration",
+		"major":"Business Administration",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -449,7 +655,7 @@
 	},
 	{
 		"title":"A.A.S.",
-		"description":"Associate of Arts and Sciences",
+		"long_title":"Associate of Arts and Sciences",
 		"level":0,
 		"cat":"ed",
 		"careers":[595],
@@ -462,8 +668,8 @@
 			]
 	},
 	{
-		"title":"A.A.",
-		"description":"Associate of Arts",
+		"title":"A.A.S. Interior Design",
+		"long_title":"Associate of Arts and Sciences Interior Design",
 		"level":0,
 		"cat":"ed",
 		"careers":[595],
@@ -471,13 +677,42 @@
 			[
 				{
 					"type":"education",
-					"title":["aa","associate in arts","associate of arts"]
+					"title":["aas interior design","associate in arts and sciences interior design","associate of arts and sciences interior design"]
+				}
+			]
+	},
+	{
+		"title":"A.A.",
+		"long_title":"Associate of Arts",
+		"level":0,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["aa","associate in arts","associate of arts","associates of arts"]
+				}
+			]
+	},
+	{
+		"title":"A.A.Psych.",
+		"long_title":"Associate of Arts in Psychology",
+		"major":"Psychology",
+		"level":0,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["aa psych","associate in arts psychology","associate of arts psychology"]
 				}
 			]
 	},
 	{
 		"title":"A.S.",
-		"description":"Associate of Science",
+		"long_title":"Associate of Science",
 		"level":0,
 		"cat":"ed",
 		"careers":[595],
@@ -491,7 +726,7 @@
 	},
 	{
 		"title":"Ph.D.",
-		"description":"",
+		"long_title":"",
 		"level":3,
 		"cat":"ed",
 		"careers":[595],
@@ -505,7 +740,7 @@
 	},
 	{
 		"title":"GED",
-		"description":"",
+		"long_title":"",
 		"level":0,
 		"cat":"ed",
 		"careers":[595],
@@ -519,7 +754,8 @@
 	},
 	{
 		"title":"B.A. Sociology",
-		"description":"",
+		"long_title":"",
+		"major":"Sociology",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -527,13 +763,14 @@
 			[
 				{
 					"type":"education",
-					"title":["ba sociology","bachelor of arts in sociology"]
+					"title":["ba sociology","bachelor of arts in sociology","bachelors of arts sociology"]
 				}
 			]
 	},
 	{
 		"title":"B.A. Political Science",
-		"description":"",
+		"long_title":"",
+		"major":"Political Science",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -541,13 +778,14 @@
 			[
 				{
 					"type":"education",
-					"title":["ba political science","bachelor of arts in political science"]
+					"title":["ba political science","bachelors degree political science","bachelor of arts in political science","bachelor of arts political science"]
 				}
 			]
 	},
 	{
-		"title":"B.A. International Relations",
-		"description":"",
+		"title":"B.S. Political Science",
+		"long_title":"B.S. Political Science",
+		"major":"Political Science",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -555,13 +793,60 @@
 			[
 				{
 					"type":"education",
-					"title":["ba international relations","bachelor of arts in international relations"]
+					"title":["bs political science","bachelor of science in political science"]
+				}
+			]
+	},
+	{
+		"title":"M.S. Political Science",
+		"long_title":"M.S. Political Science",
+		"major":"Political Science",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ms political science","master of science in political science"]
+				}
+			]
+	},
+	{
+		"title":"B.A. International Political Economy",
+		"long_title":"B.A. International Political Economy",
+		"major":"International Political Economy",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba international political economy","bachelor of arts in international political economy"]
+				}
+			]
+	}
+	,
+	{
+		"title":"B.A. International Relations",
+		"long_title":"",
+		"major":"International Relations",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba international relations","bachelor of arts in international relations","bachelor of arts international relations"]
 				}
 			]
 	},
 	{
 		"title":"B.A. Economics",
-		"description":"Bachelor of Arts in Economics",
+		"long_title":"Bachelor of Arts in Economics",
+		"major":"Economics",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -569,13 +854,14 @@
 			[
 				{
 					"type":"education",
-					"title":["ba economics","bachelor of arts in economics"]
+					"title":["ba economics","bachelor of arts in economics","bachelor of arts economics","bachelors economics","ab economics","student faculty of economics","student economics"]
 				}
 			]
 	},
 	{
-		"title":"B.S. Economics",
-		"description":"",
+		"title":"B.S.Econ.",
+		"long_title":"B.S. Economics",
+		"major":"Economics",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -583,13 +869,14 @@
 			[
 				{
 					"type":"education",
-					"title":["bs economics","bs in economics","bachelor of science in economics"]
+					"title":["bs economics","bs in economics","bachelor of science in economics","bs economic"]
 				}
 			]
 	},
 	{
-		"title":"JD",
-		"description":"",
+		"title":"J.D.",
+		"long_title":"Juris Doctor",
+		"major":"Law",
 		"level":3,
 		"cat":"ed",
 		"careers":[595],
@@ -603,7 +890,8 @@
 	},
 	{
 		"title":"M.C.P.",
-		"description":"Master of City Planning",
+		"long_title":"Master of City Planning",
+		"major":"City Planning",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -616,8 +904,9 @@
 			]
 	},
 	{
-		"title":"M.Ed.",
-		"description":"Master of Education",
+		"title":"M.Ed. Reading and ESL",
+		"long_title":"M.E.d Reading and ESL",
+		"major":"Reading and ESL",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -625,13 +914,29 @@
 			[
 				{
 					"type":"education",
-					"title":["edm","med","master of education","msed"]
+					"title":["edm readng and esl","med reading and esl","master of education reading and esl","msed reading and esl","ma education reading and esl"]
+				}
+			]
+	},
+	{
+		"title":"M.Ed.",
+		"long_title":"Master of Education",
+		"major":"Education",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["edm","med","master of education","msed","ma education"]
 				}
 			]
 	},
 	{
 		"title":"D.Ed.",
-		"description":"Doctor of Education",
+		"long_title":"Doctor of Education",
+		"major":"Education",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -645,7 +950,8 @@
 	},
 	{
 		"title":"M.D.",
-		"description":"Doctor of Medicine",
+		"long_title":"Doctor of Medicine",
+		"major":"Medicine",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -659,7 +965,8 @@
 	},
 	{
 		"title":"M.Div.",
-		"description":"Master of Divinity",
+		"long_title":"Master of Divinity",
+		"major":"Divinity",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -667,13 +974,14 @@
 			[
 				{
 					"type":"education",
-					"title":["mdiv","master of divinity","divm"]
+					"title":["mdiv","master of divinity","divm","masters divinity"]
 				}
 			]
 	},
 	{
 		"title":"L.L.B.",
-		"description":"Bachelor of Laws",
+		"long_title":"Bachelor of Laws",
+		"major":"Law",
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -687,7 +995,8 @@
 	},
 	{
 		"title":"L.L.M.",
-		"description":"Master of Laws",
+		"long_title":"Master of Laws",
+		"major":"Law",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -701,7 +1010,8 @@
 	},
 	{
 		"title":"M.J.S.",
-		"description":"Master of Judicial Studies",
+		"long_title":"Master of Judicial Studies",
+		"major":"Judicial Studies",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -715,7 +1025,8 @@
 	},
 	{
 		"title":"M.P.H.",
-		"description":"Master of Public Health",
+		"long_title":"Master of Public Health",
+		"major":"Public Health",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -729,7 +1040,8 @@
 	},
 	{
 		"title":"M.Litt.",
-		"description":"Master of Literature",
+		"long_title":"Master of Literature",
+		"major":"Literature",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -742,8 +1054,24 @@
 			]
 	},
 	{
+		"title":"B.A.P.P.",
+		"long_title":"Bachelor of Arts Public Policy",
+		"major":"Public Policy",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bapp","bachelor of public policy","bachelor of arts public policy"]
+				}
+			]
+	},
+	{
 		"title":"M.P.P.",
-		"description":"Master of Public Policy",
+		"long_title":"Master of Public Policy",
+		"major":"Public Policy",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -757,7 +1085,8 @@
 	},
 	{
 		"title":"L.L.D.",
-		"description":"Doctor of Laws",
+		"long_title":"Doctor of Laws",
+		"major":"Law",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -771,7 +1100,8 @@
 	},
 	{
 		"title":"B.Acc.",
-		"description":"Bachelor of Accountancy",
+		"long_title":"Bachelor of Accountancy",
+		"major":"Accounting",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -779,13 +1109,14 @@
 			[
 				{
 					"type":"education",
-					"title":["bacc","bac","bacy","bpacy","bpa","bpac","bpacc","bsa","bachelor of science in accounting","bachelor of accounting","bachelor of science in accounting"]
+					"title":["bacc","bac","bacy","bpacy","bpa","bpac","bpacc","bsa","bachelor of science in accounting","bachelor of accounting","bachelor of science in accounting","bachelors accounting"]
 				}
 			]
 	},
 	{
 		"title":"M.Acc.",
-		"description":"Master of Accountancy",
+		"long_title":"Master of Accountancy",
+		"major":"Accounting",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -793,13 +1124,14 @@
 			[
 				{
 					"type":"education",
-					"title":["macc","mac","macy","mpacy","mpac","mpacc","msa","master of science in accounting"]
+					"title":["macc","mac","macy","mpacy","mpac","mpacc","msa","master of science in accounting","masters degree accounting"]
 				}
 			]
 	},
 	{
 		"title":"Certificate in Forensic Science",
-		"description":"Certificate in forensic science",
+		"long_title":"Certificate in forensic science",
+		"major":"Forensic Science",
 		"level":0,
 		"cat":"ed",
 		"careers":[595],
@@ -813,8 +1145,9 @@
 	},
 	{
 		"title":"Ph.D. Geology",
-		"description":"Doctor of Geology",
-		"level":2,
+		"long_title":"Doctor of Geology",
+		"major":"Geology",
+		"level":3,
 		"cat":"ed",
 		"careers":[595],
 		"matches":
@@ -827,7 +1160,8 @@
 	},
 	{
 		"title":"D.D.S.",
-		"description":"Doctor of Dental Science",
+		"long_title":"Doctor of Dental Science",
+		"major":"Dental Science",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -841,7 +1175,8 @@
 	},
 	{
 		"title":"B.N.",
-		"description":"Bachelor of Nursing",
+		"long_title":"Bachelor of Nursing",
+		"major":"Nursing",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -855,7 +1190,8 @@
 	},
 	{
 		"title":"B.V.Sc.",
-		"description":"Bachelor of Veterinary Science",
+		"long_title":"Bachelor of Veterinary Science",
+		"major":"Veterinary Science",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -869,7 +1205,8 @@
 	},
 	{
 		"title":"D.V.M.",
-		"description":"Doctor of Veterinary Medicine",
+		"long_title":"Doctor of Veterinary Medicine",
+		"major":"Veterinary Medicine",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -883,7 +1220,8 @@
 	},
 	{
 		"title":"Pharm.D.",
-		"description":"Doctor of Pharmacy",
+		"long_title":"Doctor of Pharmacy",
+		"major":"Pharmacy",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -897,7 +1235,8 @@
 	},
 	{
 		"title":"M.P.S.",
-		"description":"Master of Professional Studies",
+		"long_title":"Master of Professional Studies",
+		"major":"Professional Studies",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -911,7 +1250,8 @@
 	},
 	{
 		"title":"M.P.A.",
-		"description":"Master of Public Administration",
+		"long_title":"Master of Public Administration",
+		"major":"Public Administration",
 		"level":2,
 		"cat":"ed",
 		"careers":[595],
@@ -925,7 +1265,8 @@
 	},
 	{
 		"title":"Fulbright Scholarship",
-		"description":"Fulbright Scholarship",
+		"long_title":"Fulbright Scholarship",
+		"major":null,
 		"level":1,
 		"cat":"ed",
 		"careers":[595],
@@ -934,6 +1275,1072 @@
 				{
 					"type":"education",
 					"title":["fulbright"]
+				}
+			]
+	},
+	{
+		"title":"B.A.Hist.",
+		"long_title":"B.A. History",
+		"major":"History",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba history","bachelor of arts history","bahist","ba degree history"]
+				}
+			]
+	}
+	,
+	{
+		"title":"B.A.Psych.",
+		"long_title":"B.A. Pscyhology",
+		"major":"Psychology",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bapsych","ba psych","ba psychology","bachelor of arts pscyhology","bachelors degree psychology"]
+				}
+			]
+	},
+	{
+		"title":"B.S.EngMgmt.",
+		"long_title":"B.S. Engineering Management",
+		"major":"Engineering Management",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs engineering management","bachelor of science engineering management","bachelor of science in management engineering"]
+				}
+			]
+	},
+	{
+		"title":"M.S.EngMgmt.",
+		"long_title":"M.S. Engineering Management",
+		"major":"Engineering Management",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ms engineering management","master of science engineering management","master of science in management engineering","masters of science engineering management"]
+				}
+			]
+	},
+	{
+		"title":"B.A.EngSci.",
+		"long_title":"B.A. Engineering Science",
+		"major":"Engineering Sciences",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba engineering sciences","bachelor of arts engineering sciences"]
+				}
+			]
+	},
+	{
+		"title":"B.S.EngSci.",
+		"long_title":"B.S. Engineering Science",
+		"major":"Engineering Sciences",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs engineering sciences","bachelor of science engineering sciences"]
+				}
+			]
+	},
+	{
+		"title":"B.S.Civil Engineering",
+		"long_title":"B.S. Civil Engineering",
+		"major":"Civil Engineering",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs civil engineering","bachelor of science civil engineering"]
+				}
+			]
+	},
+	{
+		"title":"B.S.CS.",
+		"long_title":"B.S. Computer Science",
+		"major":"Computer Science",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bse computer science","bs computer science","bachelor of science computer science","bs cs","bachelor of science cs","bachelors computer science"]
+				}
+			]
+	},
+	{
+		"title":"M.S.CS.",
+		"long_title":"M.S. Computer Science",
+		"major":"Computer Science",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ms computer science","master of science computer science","ms cs","master of science cs","masters computer science"]
+				}
+			]
+	},
+	{
+		"title":"Ph.D.CS.",
+		"long_title":"Ph.D. Computer Science",
+		"major":"Computer Science",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["phd computer science","doctor of science computer science","ms cs","doctor of science cs","doctorate computer science"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Cinema & Television",
+		"long_title":"B.A. Cinema & Television",
+		"major":"Cinema & Television",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba cinematelevision","ba cinema television"]
+				}
+			]
+	},
+	{
+		"title":"B.A.Eng.",
+		"long_title":"B.A. English",
+		"major":"English",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba english","bachelor of arts english"]
+				}
+			]
+	},
+	{
+		"title":"M.S. Systems Engineering",
+		"long_title":"B.A. Systems Engineering",
+		"major":"Systems Engineering",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ms systems engineering"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Markets & Culture",
+		"long_title":"B.A. Markets & Culture",
+		"major":"Markets & Culture",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba markets culture","bachelor of arts markets culture","major markets and culture"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Human Biology",
+		"long_title":"B.A. Human Biology",
+		"major":"Human Biology",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba human biology","bachelor of arts human biology"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Biology",
+		"long_title":"B.A. Biology",
+		"major":"Biology",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba biology"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Biology",
+		"long_title":"B.S. Biology",
+		"major":"Biology",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs biology"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Energy Resources Engineering",
+		"long_title":"B.A. Energy Resources Engineering",
+		"major":"Energy Resources Engineering",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs energy resources engineering"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Mathematical and Computational Sciences",
+		"long_title":"B.S. Mathematical and Computational Sciences",
+		"major":"Mathematical and Computational Sciences",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs mathematical and computational sciences"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Feminist Studies",
+		"long_title":"B.A. Feminist Studies",
+		"major":"Feminist Studies",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba feminist studies"]
+				}
+			]
+	},
+	{
+		"title":"M.A. Classics",
+		"long_title":"M.A. Classics",
+		"major":"Classics",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ma classics"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Bioengineering",
+		"long_title":"B.S. Bioengineering",
+		"major":"Bioengineering",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs bionegineering","student bionegineering"]
+				}
+			]
+	},
+	{
+		"title":"M.A. Sports Psychology",
+		"long_title":"M.A. Sports Psychology",
+		"major":"Sports Psychology",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ma sports psychology"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Physical Education",
+		"long_title":"B.A. Physical Education",
+		"major":"Physical Education",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba physical education"]
+				}
+			]
+	},
+	{
+		"title":"B.A.Comm.",
+		"long_title":"B.A. Communication",
+		"major":"Communications",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba communication","ba mass communications"]
+				}
+			]
+	},
+	{
+		"title":"M.A.Comm.",
+		"long_title":"M.A. Communication",
+		"major":"Communications",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ma communication","ma communications"]
+				}
+			]
+	},
+	{
+		"title":"M.S. Software Engineering",
+		"long_title":"M.S. Software Engineering",
+		"major":"Software Engineering",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ms software engineering"]
+				}
+			]
+	},
+	{
+		"title":"B.Eng. Computer Engineering",
+		"long_title":"B.Eng. Computer Engineering",
+		"major":"Computer Engineering",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["beng computer engineering"]
+				}
+			]
+	},
+	{
+		"title":"B.A. STS",
+		"long_title":"B.A. Science, Technology & Society",
+		"major":"Science Technology & Society",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba science technology society","ba sts","bachelors science technology and society","bas science technology and society"]
+				}
+			]
+	},
+	{
+		"title":"Ph.D. Ling.",
+		"long_title":"Ph.D. Linguistics",
+		"major":"Linguistics",
+		"level":3,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["phd linguistics"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Ling.",
+		"long_title":"B.A. Linguistics",
+		"major":"Linguistics",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba linguistics"]
+				}
+			]
+	},
+	{
+		"title":"Otolaryngology Resident",
+		"long_title":"Otolaryngology Resident",
+		"major":"Otolaryngology",
+		"level":4,
+		"cat":"ed",
+		"careers":[169],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["otolaryngology resident","otolaryngology residency"]
+				}
+			]
+	},
+	{
+		"title":"Neurotology Fellowship",
+		"long_title":"Neurotology Fellowship",
+		"major":"Neurotology",
+		"level":4,
+		"cat":"ed",
+		"careers":[169],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["neurotology fellowship","fellowship neurotology"]
+				}
+			]
+	},
+	{
+		"title":"B.S.PhysSci.",
+		"long_title":"B.S. Physiological Science",
+		"level":2,
+		"major":"Physiological Science",
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs physiological science"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Urban Development",
+		"long_title":"B.A. Urban Development",
+		"major":"Urban Development",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bachelor of science in urban development","ba urban development"]
+				}
+			]
+	},
+	{
+		"title":"B.A. French",
+		"long_title":"B.A. French",
+		"major":"French",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba french","student french language"]
+				}
+			]
+	},
+	{
+		"title":"Ph.D. Environment",
+		"long_title":"Ph.D. Environment",
+		"major":"Environment",
+		"level":3,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["phd environment"]
+				}
+			]
+	},
+	{
+		"title":"M.S. Environmental Management",
+		"long_title":"M.S. Environmental Management",
+		"major":"Environmental Management",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ms environmental management"]
+				}
+			]
+	},
+	{
+		"title":"Ph.D. Finance",
+		"long_title":"Ph.D. Finance",
+		"major":"Finance",
+		"level":3,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["phd finance"]
+				}
+			]
+	},
+	{
+		"title":"M.S. Finance",
+		"long_title":"M.S. Finance",
+		"major":"Finance",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ms finance","master finance"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Finance",
+		"long_title":"B.S. Finance",
+		"major":"Finance",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs finance","bachelors degree finance","student finance","student capital markets"]
+				}
+			]
+	},
+	{
+		"title":"M.S. Quantitative Finance",
+		"long_title":"M.S. Quantitative Finance",
+		"major":"Quantitative Finance",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ms quantitative finance"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Music",
+		"long_title":"B.A. Music",
+		"major":"Music",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba music","student music theory"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Government",
+		"long_title":"B.A. Government",
+		"major":"Government",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba government","bachelors degree american government"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Environmental Health",
+		"long_title":"B.S. Environmental Health",
+		"major":"Environmental Health",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs environmental health","bs environmental"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Journalism",
+		"long_title":"B.A. Journalism",
+		"major":"Journalism",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba journalism","bachelor of arts journalism","student convergence journalism"]
+				}
+			]
+	},
+	{
+		"title":"M.A. Journalism",
+		"long_title":"M.A. Journalism",
+		"major":"Journalism",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ma journalism","masters broadcast and international journalism"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Marketing",
+		"long_title":"B.S. Marketing",
+		"major":"Marketing",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs marketing","student marketing"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Journalism",
+		"long_title":"B.S. Journalism",
+		"major":"Journalism",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba journalism"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Religion",
+		"long_title":"B.S. Religion",
+		"major":"Religion",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba religion"]
+				}
+			]
+	},
+	{
+		"title":"B.S. International Business",
+		"long_title":"B.S. International Business",
+		"major":"International Business",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba international business","student international business"]
+				}
+			]
+	},
+	{
+		"title":"MFA Theater",
+		"long_title":"MFA Theater",
+		"major":"Theater",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["mfa theater","mfa theatre"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Industrial Distribution",
+		"long_title":"B.S. Industrial Distribution",
+		"major":"Industrial Distribution",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs industrial distribution"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Marine Biology",
+		"long_title":"B.S. Maring Biology",
+		"major":"Maring Biology",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs marine biology"]
+				}
+			]
+	},
+	{
+		"title":"M.S.MS.",
+		"long_title":"M.S. Materials Science",
+		"major":"Materials Science",
+		"level":2,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ms materials science"]
+				}
+			]
+	},
+	{
+		"title":"B.S.Math",
+		"long_title":"B.S. Mathemtics",
+		"major":"Mathematics",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs mathematics","bachelors degree mathematics"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Design",
+		"long_title":"B.S. Design",
+		"major":"Design",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs design"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Chinese",
+		"long_title":"B.A. Chinese",
+		"major":"Chinese",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba chinese"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Spanish",
+		"long_title":"B.A. Spanish",
+		"major":"Spanish",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba spanish","student spanish language"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Environmental Studies",
+		"long_title":"B.A. Environmental Studies",
+		"major":"Environmental Studies",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba environmental studies"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Human & Organizational Development",
+		"long_title":"B.S. Human & Organizational Development",
+		"major":"Human & Organizational Development",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs human organizational development"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Sports Management",
+		"long_title":"B.S. Sports Management",
+		"major":"Sports Management",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs sports management","bs sport management"]
+				}
+			]
+	},
+	{
+		"title":"M.A. Learning, Design & Technology",
+		"long_title":"M.A. Learning, Design & Technology",
+		"major":"Learning, Design & Technology",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ma learning, design technology"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Comparative International Political Economy",
+		"long_title":"B.A. Comparative International Political Economy",
+		"major":"Comparative International Political Economy",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba comparative international political economy"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Engineering Product Design",
+		"long_title":"B.S. Engineering Product Design",
+		"major":"Engineering Product Design",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs engineering product design"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Physics",
+		"long_title":"B.S. Physics",
+		"major":"Physics",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs physics"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Biomechanical Engineering",
+		"long_title":"B.S. Biomechanical Engineering",
+		"major":"Biomechanical Engineering",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs biomechanical engineering"]
+				}
+			]
+	},
+	{
+		"title":"B.S. Applied Physiology",
+		"long_title":"B.S. Applied Physiology",
+		"major":"Applied Physiology",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["bs applied physiology"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Near and Middle Eastern Studies",
+		"long_title":"B.A. Near and Middle Eastern Studies",
+		"major":"Near and Middle Eastern Studies",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba near and middle eastern studies","student near and middle eastern studies"]
+				}
+			]
+	},
+	{
+		"title":"B.A. International Development",
+		"long_title":"B.A. International Development",
+		"major":"International Development",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba international development","student international development"]
+				}
+			]
+	},
+	{
+		"title":"B.A. Political Economy",
+		"long_title":"B.A. Political Economy",
+		"major":"Political Economy",
+		"level":1,
+		"cat":"ed",
+		"careers":[595],
+		"matches":
+			[
+				{
+					"type":"education",
+					"title":["ba political economy","student political economy"]
 				}
 			]
 	}

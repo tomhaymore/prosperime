@@ -2,95 +2,500 @@
 
 {% block head %}
 <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/personalize.css" />
-<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/typeahead.min.css" />
-<script type="text/javascript" src="{{ STATIC_URL }}js/typeahead.min.js"></script>
+<!-- <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/typeahead.min.css" />
+<script type="text/javascript" src="{{ STATIC_URL }}js/typeahead.min.js"></script> -->
 
 <script type="text/javascript" src="{{ STATIC_URL }}js/personalize.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.form.min.js"></script>
+<script type="text/css">
+
+</script>
 {% endblock %}
 
 {% block extramessage %}
-
-{% if data.tasks %}
-
-	{% if data.tasks.profile %}
-		<p id="task-profile-status" data-task-id="{{data.tasks.profile.id}}"></p>
-	{% endif %}
-
-	{% if data.tasks.connections %}
-		<p id="task-connections-status" data-task-id="{{data.tasks.connections.id}}"></p>
-	{% endif %}
-
-{% endif %}
 
 {% endblock %}
 
 {% block content %}
 {% csrf_token %}
 <div id="content-container" class="main-container">
-	<p class="splash-header">Personalize</p>
-	<p class="main-sub-header"><span class="callout-text">Prosperime</span> works best when you help it learn more about you. Based on your professional profile and network, the following careers and jobs seem like they'd be the most intersting to you. Please select which ones you're most interested in or enter your own.</p>
+	<p class="default-header">Tell us more</p>
+	<p class="main-sub-header">Prospr.Me works best if you tell us more about yourself. That way we can personalize your experience.</p>
+	<p>In a rush? <a href="/home">Skip ahead</a>, you can always add your information later.</p>
 
-	<div id="careers-container">
-		<!-- <div class="general-nav-container">
-			<div class="pull-left general-nav-selected"><a id="pers-nav-network" href="#network">Your Network</a></div>
-			<div class="pull-left general-nav-unselected"><a id="discover-nav-justlikeyou" href="#justlikeyou">Just Like You</a></div>
-			<div class="clear"></div>
-		</div> -->
-		<div class="personalize-careers-container pull-left">
-			<div class="personalize-careers">
-				<p class="main-header ">Careers</p>
-				<!-- header row -->
-				<!-- <div class="pull-left careers-header-row"></div>
-				<div class="pull-left careers-stats-container">
-					<ul class="careers-stats">
-						<li>people</li>
-						<li>positions</li>
-						<li>companies</li>
-					</ul>
-				</div> -->
-				<div class="clear"></div>
-				<!-- <p class="main-sub-header">Just like you</p> -->
-					<ul class="personalize-career-list">
-					{% for c in careers.similar %}
-						<li>
-							<div class="personalize-career-entry personalize-unselected" data-career-id="{{c.id}}">
-								<!-- <input type="checkbox" class="personalize-checkbox med-checkbox-input pull-left" id="personalize-career-{{c.id}}" data-career-id="{{c.id}}"/>-->
-								<span class="personalize-icon-container">&nbsp;<i class="icon-ok icon-white"></i></span>
-								<a class="careers-name">
-								{{c.name}}
-								</a>
-								<div class="clear"></div>
-							</div>
-						</li>
-					{% endfor %}
-					</ul>
+	<div id="profile-pic-container" class="pull-left">
+		<!-- <div class="center profile-subheader" >You</div> -->
+		<div id="profile-pic" class="circle">
+		</div>
+		<div id="profile-pic-caption" class="center" style="display:none;">
+			Add a picture
+		</div>
+		<form id="profile-pic-form" method="POST" action="/accounts/addToProfile/" enctype="multipart/form-data">
+			<input type="hidden" name="type" value="profile_pic" />
+			<input type="file" name="pic" id="id_profile-pic-file" style="visibility:hidden;" />
+		</form>
+	</div>
+	<div id="personalize-form-container" class="pull-left">
+		<div class="personalize-module" data-info="education">
+			<p class="form-header">Education</p>
+			<ul id="personalize-educations" class="personalize-list">
+			{% if educations %}
 				
-			
-			
+				{% for e in educations %}
+					<li data-pos-id={{p.id}}>
+						{% if e.degree %}
+							{{e.degree}}
+						{% endif %}
+						{% if e.field %}
+							in {{e.field}}
+						{% endif %}
+						from {{e.entity__name}} ({{e.end_date|date:'M Y'}})
+						{% if not e.degree %}
+							<!-- <a class="flat-button small-button ed-add-degree" data-pos-id="{{e.id}}">Add degree</a> -->
+						{% endif %}
+						{% if not e.field %}
+							<!-- <a class="flat-button small-button ed-add-field" data-pos-id="{{e.id}}">Add field</a> -->
+						{% endif %}
+					</li>
+				{% endfor %}
+			{% endif %}
+			</ul>
+			{% if educations %}
+			<a class="" id="ed-show-form">Add more education</a>
+			<div id="ed-form-holder" style="display:none;">
+				<p><input name="ed-degree" id="id_ed-degree" type="text" class="flat-input" data-autocomplete="degree" placeholder="degree" />
+				<p><input name="ed-field" id="id_ed-field" type="text" class="flat-input" data-autocomplete="field" placeholder="field / major" />
+				<p><input name="ed-school" id="id_ed-school" type="text" class="flat-input" data-autocomplete="school" placeholder="school" />
+				<p><input name="ed-grad" id="id_ed-grad" type="text" class="flat-input" placeholder="graduated (mm/yyyy)" >
+				<p><a class="flat-button small-button blue-button" id="ed-add-field">Add education</a>
 			</div>
-			
-		</div>
-		<div class="personalize-jobs-container pull-left">
-			<p class="main-header">Jobs</p>
-			<p>Enter any job you'd like to have or would like to learn more about.</p>
-			<span>
-				<input type="text" id="personalize-job-name" class="large-text-input" />
-			</span>
-			<span>
-				<button id="personalize-add-job" class="general-add-button">Add</button>
-			</span>
-			<div class="personalize-jobs-list-container">
-				<ul class="personalize-jobs-list" id="personalize-jobs-list">
-
-				</ul>
+			{% else %}
+			<div id="ed-form-holder">
+				<p><input name="ed-degree" id="id_ed-degree" type="text" class="flat-input" data-autocomplete="degree" placeholder="degree" />
+				<p><input name="ed-field" id="id_ed-field" type="text" class="flat-input"data-autocomplete="field" placeholder="field / major" />
+				<p><input name="ed-school" id="id_ed-school" type="text" class="flat-input" data-autocomplete="school" placeholder="school" />
+				<p><input name="ed-grad" id="id_ed-grad" type="text" class="flat-input" placeholder="graduate (mm/yyyy)" >
+				<p><a class="flat-button small-button blue-button" id="ed-add-field">Add education</a>
 			</div>
+			{% endif %}
 		</div>
-		<div class="clear"></div>
-		<div class="personalize-progress-container">
-			<button id="personalize-next-button" class="general-add-button">Next</button> or <a href="/home">skip ahead</a>
-			<div class="clear"></div>
+		<div class="personalize-module" data-info="experience">
+			<p class="form-header">Experience</p>
+			<ul id="personalize-positions" class="personalize-list">
+			{% if positions %}
+				
+				{% for p in positions %}
+					<li data-pos-id={{p.id}}>{{p.title}} at {{p.entity__name}} ({{p.start_date|date:'M Y'}} - {{p.end_date|date:'M Y'}})</li>
+				{% endfor %}
+			{% endif %}	
+			</ul>
+			{% if positions %}
+			<a class="" id="pos-show-form">Add more positions</a>
+			<div id="pos-form-holder" style="display:none;">
+				<p><input name="pos-title" id="id_pos-title" type="text" class="flat-input" data-autocomplete="title" placeholder="title" />
+				<p><input name="pos-org" id="id_pos-org" type="text" class="flat-input" data-autocomplete="organization" placeholder="org" />
+				<p><input name="pos-start" id="id_pos-start" type="date" class="flat-input-small" placeholder="start date" > to <input name="pos-end" id="id_pos-end" type="date" class="flat-input-small" placeholder="end date" >
+				<p><a class="flat-button small-button blue-button" id="pos-add-field">Add experience</a>
+			</div>
+			{% else %}
+			<div id="pos-form-holder">
+				<p><input name="pos-title" id="id_pos-title" type="text" class="flat-input" data-autocomplete="title" placeholder="title" />
+				<p><input name="pos-org" id="id_pos-org" type="text" class="flat-input" data-autocomplete="organization" placeholder="org" />
+				<p><input name="pos-start" id="id_pos-start" type="date" class="flat-input-small" placeholder="start date" > to <input name="pos-end" id="id_pos-end" type="date" class="flat-input-small" placeholder="end date" >
+				<p><a class="flat-button small-button blue-button" id="pos-add-field">Add experience</a>
+			</div>
+			{% endif %}
+		</div>
+		<div class="personalize-module" data-info="geography">
+			<p class="form-header">Geography</p>
+			<label for="id_geography">Where would you like to live?</label>
+			<ul id="personalize-geo" class="personalize-list">
+				{% for g in geographies %}
+					<li>{{g.name}}</li>
+				{% endfor %}
+			</ul>
+			<input placeholder="Enter a region, city, or state" id="id_geography" name="geography" type="text" class="flat-input" data-autocomplete="geography"/> <button class="general-add-button" id="add-geo">Add</button>
+			<!-- <p><a class="" id="geo-add">Add more geography</a> -->
+		</div>
+		<div class="personalize-module" data-info="goals">
+			<p class="form-header">Goals</p>
+			<label for="id_goal">What would you like to do?</label>
+			<ul id="personalize-goals" class="personalize-list">
+				{% for g in goals %}
+					<li>{{g.title}}</li>
+				{% endfor %}
+			</ul>
+			<input placeholder="Enter a job or career" id="id_goal" name="goal" type="text" class="flat-input" data-autocomplete="goal" /> <button class="general-add-button" id="add-goal">Add</button>
+			<!-- <a class="" id="geo-add">Add more goals</a> -->
 		</div>
 	</div>
+	<div id="personalize-info-container" class="pull-left">
+		<div data-info="education" class="personalize-info-container">
+			<p class="info-header">How much does my education matter?</p>
+			<p>For most of us, our career begins with school. But it's not just the school that matters -- different degrees and fields can have diferent outcomes, so be as specific as you can.</p>
+		</div>
+		<div data-info="experience" class="personalize-info-container">
+			<p class="info-header">What experience matters?</p>
+			<p>Every position, from internships to partnerships, matters. Prospr.Me matches each position to its own dataset of careers and helps you figure out where you're headed.</p>
+		</div>
+		<div data-info="geography" class="personalize-info-container">
+			<p class="info-header">Why is geography important?</p>
+			<p>It can be easy to forget, but where you want to live has a huge impact on what kind of careers are available. Whether it's technology in Silicon Valley, banking in New York, energy in Houston, each area has its own unique set of jobs.</p>
+		</div>
+		<div data-info="goals" class="personalize-info-container">
+			<p class="info-header">What should I even put here?</p>
+			<p>Put as much or as little as you like. The more Prospr.Me knows about your goals, the more personalized content we can show you. It's okay if you don't know what you want to do -- that's what Prospr.Me is for.</p>
+		</div>
+	</div>
+	<div class="clear"></div>
+	<div class="left125 top25">
+		<a class="flat-button green-button" style="width:100px;" href="/home">Next</a> or <a href="/home">skip ahead</a>
+	</div>
+	
 </div>
 
+{% endblock %}
+
+{% block templates %}
+<script type="text/javascript">
+$(function() {
+	var profile_task_id,
+		connections_task_id;
+
+	$("#profile-pic-form").ajaxForm();
+
+	var update_task_status = function(id,status) {
+		// determine what class to add
+		if (status == "success") {
+			var msg_class = "success";
+			var msg_text = "We have completed syncing with your LinkedIn account. Please refresh the page to see what we were able to fill in automatically.";
+		} else if (status == "failure") {
+			var msg_class = "info";
+			var msg_text = "We have encountered an error processing your LinkedIn account.";
+		} else {
+			var msg_class = "info";
+			var msg_text = "We are still syncing your LinkedIn profile...";
+		}
+		// check if messages are present
+		var msg_container = $("div#messages");
+		if (!$.contains(document.documentElement,msg_container)) {
+			// messages div is not present, update
+			block = "<div id='messages'>\n<ul class='messages'>\n<li class="+msg_class+" data-task-id="+id+">"+msg_text+"</li>\n</ul>\n</div>";
+			$("div.messages-container").append(block);
+		} else {
+			// messages div is present, check to see if this particular message is present
+			var msg = $("li#[data-task-id='"+id+"']");
+			if(!$.contains(document.documentElement,msg)) {
+				// element does not exist, create
+				var message = "<li class='info' data-task-id="+id+">"+msg_text+"</li>";
+				$("ul.messages").append(message);
+			} else {
+				// message is already present
+				msg.removeClass();
+				msg.addClass(msg_class);
+			}
+		}
+	};
+	
+	var check_task = function(id) {
+		setTimeout(function() {
+			var url = "tasks/" + id + "/status"
+			$.ajax({
+					url:url,
+					success: function(data) {
+						if (data.task.status == "SUCCESS") {
+							// task already completed, updated with success message
+							update_task_status(id,'success');
+						} else if (data.task.status == "FAILURE") {
+							// task failed
+							update_task_status(id,'failure');
+						} else {
+							// task still pending
+							check_task();
+						}
+					},
+					dataType:"json"})
+		});
+
+	};
+	
+	var tasks ={% if tasks %} true {% else %} false {% endif %};
+	if (tasks == true) {
+		var profile_task_id = {{profile_task_id|safe}}
+		var connections_task_id = {{connections_task_id|safe}}
+	};	
+	if (profile_task_id != null) {
+		check_task(profile_task_id);
+	};
+	if (connections_task_id != null) {
+		check_task(connections_task_id);
+	};
+
+	
+
+	var base_url = "/careers/api";
+
+	var urls = {
+		
+	}
+
+	var get_suggestions = function(type) {
+
+	};
+
+	// init timeout holder
+	var timer;
+	$("input[data-autocomplete='degree']").autocomplete({
+		source: "/entities/suggest/degree/"
+	});
+	$("input[data-autocomplete='field']").autocomplete({
+		source: "/entities/suggest/field/"
+	});
+	$("input[data-autocomplete='school']").autocomplete({
+		source: "/entities/suggest/school/"
+	});
+	$("input[data-autocomplete='title']").autocomplete({
+		source: "/entities/suggest/title/"
+	});
+	$("input[data-autocomplete='organization']").autocomplete({
+		source: "/entities/suggest/organization/"
+	});
+	$("input[data-autocomplete='goal']").autocomplete({
+		source: "/entities/suggest/goal/"
+	});
+	$("input[data-autocomplete='geography']").autocomplete({
+		source: "/entities/suggest/geography/"
+	});
+
+	$(".personalize-module").hover(
+		function() {
+			var module = $(this).data('info');
+			$(".personalize-info-container").hide();
+			$("div[data-info='"+module+"']").show();
+		},
+		function() {
+			var module = $(this).data('info');
+			$("div[data-info='"+module+"'].personalize-info-container").hide();
+		}
+	);
+
+	$("#ed-add-field").click(function() {
+		console.log("trying to add education...")
+		var valid = true;
+		var degree = $("#id_ed-degree");
+		var degree_placeholder = degree.attr("placeholder");
+		var field = $("#id_ed-field");
+		var field_placeholder = field.attr("placeholder");
+		var school = $("#id_ed-school");
+		var school_placeholder = school.attr("placeholder");
+		var grad = $("#id_ed-grad");
+		var grad_placeholder = grad.attr("placeholer");
+		// form validation
+		if (degree.val() == undefined || degree.val() == "") {
+			degree.addClass("form-error").val("Please add a degree");
+			valid = false;
+		};
+		if (school.val() == undefined || school.val() == "") {
+			school.addClass("form-error").val("Please add a school");
+			valid = false;
+		};
+		if (grad.val() == undefined || grad.val() == "") {
+			grad.addClass("form-error").val("Please add a graduation year");
+			valid = false;
+		};
+		// test if form is valid
+		if (valid) {
+			console.log('valid info')
+			// compile data for post
+			var post_data = {
+				"type" : "education",
+				"degree" : degree.val(),
+				"field" : field.val(),
+				"school" : school.val(),
+				"end_date" : grad.val()
+			};
+			// add to profile
+			$.post('/accounts/addToProfile/',post_data,function(data) {
+				if (data['result'] == "success") {
+					if (data['position']['field'] != null) {
+						var block = "<li data-pos-id="+data['position']['pos_id']+">"+data['position']['degree']+" in "+data['position']['field'] + " at " + data['position']['entity']+"</li>";
+					} else {
+						var block = "<li data-pos-id="+data['position']['pos_id']+">"+data['position']['degree']+" at " + data['position']['entity']+"<a class='flat-button small-button ed-add-field' data-pos-id="+data['position']['pos_id']+">Add field</a></li>";
+					}
+					$("ul#personalize-educations").append(block);
+					degree.val(degree_placeholder);
+					field.val(field_placeholder);
+					school.val(school_placeholder);
+					grad.val(grad_placeholder);
+				};
+			},'json');
+		}
+	});
+
+	$("#pos-add-field").click(function() {
+		console.log("trying to add a position...")
+		var valid = true;
+		var title = $("#id_pos-title");
+		var title_placeholder = title.attr("placeholder");
+		var entity = $("#id_pos-org");
+		var entity_placeholder = entity.attr("placeholder");
+		var start_date = $("#id_pos-start");
+		var start_date_placeholder = start_date.attr("placeholder");
+		var end_date = $("#id_pos-end");
+		var end_date_placeholder = end_date.attr("placeholder");
+		// form validation
+		if (title.val() == undefined || title.val() == "") {
+			title.addClass("form-error").val("Please add a position title");
+			valid = false;
+		};
+		if (entity.val() == undefined || entity.val() == "") {
+			entity.addClass("form-error").val("Please add an organization");
+			valid = false;
+		};
+		if ((start_date.val() == undefined || start_date.val() == "") && (end_date.val() == undefined || end_date.val() == "")) {
+			if (start_date.val() == undefined || start_date.val() == "") {
+				start_date.addClass("form-error").val("Please add a start date");	
+			}
+			if (end_date.val() == undefined || end_date.val() == "") {
+				end_date.addClass("form-error").val("End date is optional");	
+			}
+			valid = false;
+		};
+		// test if form is valid
+		if (valid) {
+			// compile data for post
+			var post_data = {
+				"type" : "experience",
+				"title" : title.val(),
+				"entity" : entity.val(),
+				"start_date" : start_date.val(),
+				"end_date" : end_date.val()
+			};
+			// add to profile
+			$.post('/accounts/addToProfile/',post_data,function(data) {
+				if (data['result'] == "success") {
+					var block = "<li data-pos-id="+data['position']['pos_id']+">"+data['position']['title']+" at " + data['position']['entity']+"</li>";
+					$("ul#personalize-positions").append(block);
+					title.val(title_placeholder);
+					entity.val(entity_placeholder);
+					start_date.val(start_date_placeholder);
+					end_date.val(end_date_placeholder);
+				};
+			},'json');
+		}
+	});
+
+	$("button#add-geo").click(function() {
+		console.log("trying to add a region...")
+		var valid = true;
+		var geo = $("#id_geography");
+		var geo_placeholder = geo.attr("placeholder");
+		// form validation
+		if (geo.val() == undefined || geo.val() == "") {
+			geo.addClass("form-error").val("Please enter a location");
+			valid = false;
+		};
+		
+		// test if form is valid
+		if (valid) {
+			// compile data for post
+			var post_data = {
+				"type" : "geography",
+				"region" : geo.val(),
+			};
+			// add to profile
+			$.post('/accounts/addToProfile/',post_data,function(data) {
+				if (data['result'] == "success") {
+					var block = "<li>"+data['geo']+"</li>";
+					$("ul#personalize-geo").append(block);
+					geo.val(geo_placeholder);
+				};
+			},'json');
+		}
+	});
+
+	$("button#add-goal").click(function() {
+		console.log("trying to add a goal...")
+		var valid = true;
+		var goal = $("#id_goal");
+		var goal_placeholder = goal.attr("placeholder");
+		// form validation
+		if (goal.val() == undefined || goal.val() == '') {
+			goal.addClass("form-error").val("Please enter a goal");
+			valid = false;
+		};
+		
+		// test if form is valid
+		if (valid) {
+			// compile data for post
+			var post_data = {
+				"type" : "goal",
+				"goal" : goal.val(),
+			};
+			// add to profile
+			$.post('/accounts/addToProfile/',post_data,function(data) {
+				if (data['result'] == "success") {
+					var block = "<li>"+data['goal']+"</li>";
+					$("ul#personalize-goals").append(block);
+					goal.val(goal_placeholder);
+				};
+			},'json');
+		}
+	});
+
+	$("#pos-show-form").click(function() {
+		$(this).hide();
+		$("#pos-form-holder").show()
+	});
+
+	$("#ed-show-form").click(function() {
+		$(this).hide();
+		$("#ed-form-holder").show()
+	});
+
+	$("input").focus(function(){
+		$(this).removeClass("form-error");
+	});
+
+	$("#profile-pic").hover(function() {
+		$("#profile-pic-caption").toggle();
+		
+	})
+
+	$("#profile-pic").click(function(){
+		performClick(document.getElementById("id_profile-pic-file"));
+	})
+
+	var performClick = function(node) {
+	   var evt = document.createEvent("MouseEvents");
+	   evt.initEvent("click", true, false);
+	   node.dispatchEvent(evt);
+	};
+
+	$("#id_profile-pic-file").change(function() {
+		$("#profile-pic").css("background-image",$(this).val());
+		$("#profile-pic-form").ajaxSubmit({
+			url:"/accounts/addToProfile/",
+			success: function(data){
+				$("#profile-pic").css("background-image","url("+data['pic']+")");
+			},
+			method:"POST",
+			dataType: "json"
+		});
+	})
+
+	// $("#personalize-form-container").find("input").change( function() {
+		
+	// 	clearTimeout(timer);
+	// 	timer = setTimeout(function() {
+	// 		data = get_suggestions($(this).data("autocomplete"));
+	// 		if (data.status != "error") {
+	// 			append_suggestions(data);
+	// 		}
+	// 	},1000);
+	// })
+
+})
+
+</script>
 {% endblock %}

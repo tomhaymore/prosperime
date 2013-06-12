@@ -1,6 +1,7 @@
 # from Python
 import datetime
 import math
+import json
 
 # from Django
 # from django.contrib.auth import authenticate, login as auth_login
@@ -17,9 +18,9 @@ from django.core.cache import cache
 
 
 # Prosperime
-from entities.models import Entity, Office, Financing, Industry
+from entities.models import Entity, Office, Financing, Industry, Region
 from accounts.models import Picture, Profile
-from careers.models import SavedPath, CareerDecision, Position, Career
+from careers.models import SavedPath, CareerDecision, Position, Career, IdealPosition
 #from entities.careerlib import CareerSimBase
 import careers.careerlib as careerlib
 
@@ -39,6 +40,76 @@ import careers.careerlib as careerlib
 
 # 	return render_to_response('home.html',data,context_instance=RequestContext(request))
 
+DEGREES = [
+	'BA',
+	'BS',
+	'AB',
+	'MA',
+	'LLM',
+	'LLD',
+	'Bachelor of Science',
+	'MJS',
+	'MPH',
+	'M.Litt',
+	'MPP',
+	'EdD',
+	'Doctorate in Geology',
+	'prelaw',
+	'Bachelor of Law',
+	'doctoral degree',
+	'JD',
+	'Juris Doctor',
+	'MBA',
+	'MCP',
+	'MD',
+	'Master of Divinity',
+	'PhD',
+	'DBA',
+	'BSc',
+	'BArch',
+	'SB',
+	'ScB',
+	'BAAS',
+	'BEng',
+	'BE',
+	'BSE',
+	'BESc',
+	'BSEng',
+	'BASc',
+	'BTech',
+	'BSEE',
+	'BBA',
+	'BAcy',
+	'BAcc',
+	'DDS',
+	'BN',
+	'BNSc',
+	'BSN',
+	'DVM',
+	'PharmD',
+	'BVSc',
+	'BVMS',
+	'BFA',
+	'MFA',
+	'LLB',
+	'MEd',
+	'Master of Architecture',
+	'Bachelor of Engineering',
+	'MS Ed',
+	'Bachelor of Arts',
+	'Juris Doctorate',
+	'MS',
+	'AA',
+	'Associate of Arts',
+	'Doctor of Philosophy',
+	'MPS',
+	'MSEE',
+	'MPA',
+	'Fulbright Scholarship',
+	'graduate work',
+	'attended',
+	'studied'
+]
 
 def contact(request):
 	data = {}
@@ -100,6 +171,44 @@ def profile_org(request, org_id):
 
 	return render_to_response('accounts/profile_org.html', response, context_instance=RequestContext(request))
 
+@login_required
+def suggest(request,cat):
+	response = {}
+	# check request type
+	print request.GET.getlist('term')
+	if request.GET.getlist('term'):
+		# data = []
+		term = request.GET['term']
+		if cat == 'degree':
+			degrees = Position.objects.filter(degree__istartswith=term,type="education").exclude(Q(degree=None) | Q(degree='')).values("degree").distinct()[:5]
+			data = [d['degree'] for d in degrees]
+		elif cat == 'field':
+			fields = Position.objects.filter(field__istartswith=term,type="education").exclude(Q(field=None) | Q(field='')).values("field").distinct()[:5]
+			data = [f['field'] for f in fields]
+		elif cat == 'school':
+			schools = Entity.objects.filter(type="school",name__istartswith=term).values("name").distinct()[:5]
+			data = [s['name'] for s in schools]
+		elif cat == 'title':
+			titles = Position.objects.filter(title__istartswith=term).values("title").distinct()[:5]
+			data = [t['title'] for t in titles]
+		elif cat == 'organization':
+			orgs = Entity.objects.filter(name__istartswith=term).values("name").distinct()[:5]
+			data = [o['name'] for o in orgs]
+		elif cat == 'goal':
+			goals = IdealPosition.objects.filter(title__istartswith=term).values("title").distinct()[:5]
+			data = [g['title'] for g in goals]
+		elif cat == 'geography':
+			geo = Region.objects.filter(name__istartswith=term).values("name").distinct()[:5]
+			data = [g['name'] for g in geo]
+		if data:
+			return HttpResponse(json.dumps(data))
+		else:
+			return HttpResponse(json.dumps([]))
+
+	response["result"] = "failure"
+	response["errors"] = "Incorrect request type"
+	return HttpResponse(json.dumps(response))
+	
 
 def _get_paths_in_career(user,career):
 

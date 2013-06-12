@@ -6,7 +6,6 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Examples:
     url(r'^$', 'careers.views.home', name='home'),
     url(r'^home/$', 'careers.views.home'),
     url(r'^welcome/$','entities.views.welcome'),
@@ -27,6 +26,8 @@ urlpatterns = patterns('',
     url(r'^feed/$', 'careers.views.feed'),
     url(r'^build/$', 'careers.views.build'),
     url(r'^schools/$', 'careers.views.schools'),
+    url(r'^majors/$', 'careers.views.proto'), # need to change
+    url(r'^majors/(\d+)/$','careers.views.major'),
 
     url(r'^progress/$', 'careers.views.progress'), # Am I on Track?
     
@@ -36,6 +37,8 @@ urlpatterns = patterns('',
     url(r'^plan/$', 'careers.views.plan'),
     url(r'^plan/(\d+)/$', 'careers.views.plan'),
 
+
+    url(r'^personalize/$','accounts.views.personalize'),
     # Social Views
     url(r'^thread/(\d+)/$', 'social.views.thread'),
 
@@ -63,6 +66,10 @@ urlpatterns = patterns('',
     url(r'^path/(\d+)/$','entities.views.path'),
     url(r'^careers/$','entities.views.careers'),
 
+    ## Entities - API
+
+    url(r'^entities/suggest/(\w+)/$','entities.views.suggest'),
+
     ## Careers - AJAX calls
     url(r'^careers/addDecision/$', 'careers.views.addDecision'),
     url(r'^careers/addIndustry/$', 'careers.views.addIndustry'),
@@ -87,9 +94,13 @@ urlpatterns = patterns('',
     url(r'^careers/testBuildPaths/$', 'careers.views.test_build_paths'),
     url(r'^api/list_careers/$', 'careers.views.list_careers'),
     url(r'^careers/addProgressDetails/$', 'careers.views.add_progress_detail'),
+    url(r'^careers/getSchoolFragment/(?:/(?P<school_id>\d+))?/$', 'careers.views.get_school_fragment'),
+    url(r'^careers/getSchoolFragment/$', 'careers.views.get_school_fragment'),
+    url(r'^careers/getFeedFragment/$', 'careers.views.get_feed_fragment'),
 
     ## Accounts - AJAX calls
     url(r'^accounts/updateProfile/$', 'accounts.views.updateProfile'),
+    url(r'^accounts/addToProfile/$','accounts.views.add_to_profile'),
     url(r'^accounts/deleteItem/$', 'accounts.views.deleteItem'),
     url(r'^accounts/connect/$', 'accounts.views.connect'),
 
