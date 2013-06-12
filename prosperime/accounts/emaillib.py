@@ -22,8 +22,8 @@ class WelcomeEmail():
 	origin = "welcome@prospr.me"
 
 	# fetch templates
-	plaintext = get_template('templates/accounts/emails/welcome_email.txt')
-	htmlformat    = get_template('templates/accounts/emails/welcome_email.html')
+	plaintext = get_template('emails/welcome_email.txt')
+	htmlformat    = get_template('emails/welcome_email.html')
 
 
 
@@ -34,11 +34,11 @@ class WelcomeEmail():
 			})
 		text_content = self.plaintext.render(d)
 		html_content = self.htmlformat.render(d)
-		self.msg = EmailMultiAlternatives(self.subject,text_content,self.origin,user.email)
+		self.msg = EmailMultiAlternatives(self.subject,text_content,self.origin,[user.email])
 		self.msg.attach_alternative(html_content, "text/html")
 		self.backend.open()
 
-	def send_email():
-		self.backend.send_messages(self.msg)
+	def send_email(self):
+		self.backend.send_messages([self.msg])
 		self.backend.close()
 
