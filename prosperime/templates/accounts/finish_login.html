@@ -27,6 +27,8 @@
 		<li><label for="id_confirm_password">Confirm Password:</label>
 			{{form.confirm_password.errors}}
 			<input class="flat-input" type="password" name="confirm_password" id="id_confirm_password" /></li>
+		<li><input class="adj_checkbox" type="checkbox" name="notification" id="id_notification" checked="checked"/>Keep me informed about Prosper.me updates and news.
+			{{form.notification.errors}} </li>
 		<li class="form_required"><input class="adj_checkbox" type="checkbox" name="terms" id="id_terms" />I have read and understand the <a href='/terms'>Terms of Service</a> and <a href='/privacy'>Privacy Policy</a>
 			{{form.terms.errors}} </li>
 		

@@ -85,7 +85,8 @@ class FinishAuthForm(forms.Form):
 	terms = forms.BooleanField(required=True,
 							label=mark_safe("I have read and understand the <a href='/terms'>Terms of Service</a> and <a href='/privacy'>Privacy Policy</a>."),
 							error_messages={'required':'You must agree to the Terms of Service and Privacy Policy to use Prospr.me.'})
-
+	notification = forms.BooleanField(required=False,label=mark_safe("Please keep me updated on changes and improvements to Prosper.me."))
+	
 	def clean_username(self):
 		username = self.cleaned_data['username']
 		if username and User.objects.filter(username__exact=username).count():
