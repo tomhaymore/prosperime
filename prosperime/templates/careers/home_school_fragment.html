@@ -1,0 +1,100 @@
+<div class="fragment-header">
+	<p class="feature-page-header">Schools</p>
+</div>
+
+{% if schools %}
+<div class="fragment-nav">
+<ul class="flat feature-list">
+	{% for s in schools %} 
+		{% if s == school %}
+			<li class="selected"><a href="#schools/{{s.id}}">{{s.name}}</a></li>
+		{% else %}
+			<li><a href="#schools/{{s.id}}">{{s.name}}</a></li>
+		{% endif %}
+	{% endfor %}
+</ul>
+</div>
+{% endif %}
+<div class="fragment-main-container pull-left">
+<p>
+{% if degrees %}
+<div class="fragment-module">
+<p class="feature-page-subheader">Popular Degrees</p>
+<ul class="fragment-list">
+	{% for d in degrees %}
+		{% if d.long_title %}
+			<li>
+				<span class="block pull-left"><a class="fragment-list-link" data-ideal-id={{d.id}}>{{d.long_title}} ({{d.title}})</a></span>
+				<div class="fragment-info" data-ideal-id={{d.id}}>
+					{{d.description}}
+					{% if d.updates %}
+						<p>Updates</p>
+						<ul>
+						{% for u in d.updates %}
+							<li>u.body</li>
+						{% endfor %}
+						</ul>
+					{% endif %}
+					<span class="fragment-stats">
+						<p>First job: <a href="/degree/{{d.id}}">see more</a></p>
+						<p>Number of grads: {{d.pop}}</p>
+					</span>
+					<a href="/degree/{{d.id}}">Details</a>
+				</div>
+				<!-- <span class="block pull-right"><a class="blue-button button-small flat-button" title="Keep track of this degree" data-ideal-id={{d.id}}>Follow</a></span> -->
+				<span class="block clear"></span>
+			</li>
+		{% else %}
+			<li>
+				<span class="block pull-left">{{d.title}}</span>
+				<!-- <span class="block pull-right"><a class="blue-button button-small flat-button" title="Keep track of this degree" data-ideal-id={{d.id}}>Follow</a></span> -->
+				<span class="block clear"></span>
+			</li>
+		{% endif %}
+	{% endfor %}
+</ul>
+</div>
+{% endif %}
+{% if careers %}
+<div class="fragment-module">
+<p class="feature-page-subheader">Popular Careers</p>
+<ul class="fragment-list">
+	{% for c in careers %}
+		<li>{{c.name}}</li>
+	{% endfor %}
+</ul>
+</div>
+{% endif %}
+{% if jobs %}
+<div class="fragment-module">
+<p class="feature-page-subheader">Popular First Jobs</p>
+<ul class="fragment-list">
+	{% for j in jobs %}
+		<li>{{j.1.title}}</li>
+	{% endfor %}
+</ul>
+</div>
+{% endif %}
+</div>
+<div class="fragment-right-container pull-left">
+{% if paths %}
+<div class="fragment-module">
+<p class="feature-page-subheader">Top users</p>
+<ul class="fragment-list">
+	{% for p in paths %}
+	<li>
+		<div class="pull-left">
+			<img class="thumbnail" src="{{p.profile.default_profile_pic}}" />
+		</div>
+		<div class="pull-left">
+			<p>{{p.profile.full_name}}</p>
+				
+		</div>
+		<div class="clear"></div>
+	</li>
+	{% endfor %}
+</ul>
+</div>
+{% endif %}
+</div>
+<div class="clear"></div>

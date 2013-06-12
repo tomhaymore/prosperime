@@ -1,0 +1,75 @@
+{% extends "base_full.html" %}
+{% load cache %}
+{% block head %}
+
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/career.css" />
+
+{% endblock %}
+
+{% block content %}
+
+
+
+<div id="content-container" class="main-container">
+	<p class="feature-page-header">{{major.long_title}}</p>
+	{% if major.description %}
+		<p class="main-sub-header">{{major.description}}</p>
+	{% endif %}
+
+	<div id="career-profile-container">
+		<div class="career-profile-nav-container">
+			<!-- <span class="main-sub-header pull-left">View stats for: </span> -->
+			<a class="career-profile-nav pull-left selected" data-view="network">Your Network</a> 
+			<a class="career-profile-nav pull-left unselected" data-view="all">Prospr.me Community</a>
+			<div class="clear"></div>
+			
+		</div>
+		<div class="career-module">
+			{% if first_jobs %}
+			<p class="feature-page-subheader">Popular First Jobs</p>
+			<ul class="fragment-list">
+				{% for j in first_jobs %}
+					<li>{{j.1.title}}</li>
+				{% endfor %}
+			</ul>
+			{% endif %}
+		</div>
+		<div class="career-module">
+			{% if careers %}
+			<p class="feature-page-subheader">Popular Careers</p>
+			<ul class="fragment-list">
+				{% for c in careers %}
+					<li>{{c.name}}</li>
+				{% endfor %}
+			</ul>
+			{% endif %}
+		</div>
+		<div class="career-module">
+			{% if paths %}
+				<p class="feature-page-subheader">Users</p>
+				<ul class="fragment-list">
+				{% for p in paths %}
+					<li>
+						<div class="pull-left">
+							<img class="thumbnail" src="{{p.profile.default_profile_pic}}" />
+						</div>
+						<div class="pull-left">
+							<p>{{p.profile.full_name}}</p>
+								
+						</div>
+						<div class="clear"></div>
+					</li>
+				{% endfor %}
+				</ul>
+			{% endif %}
+		</div>
+				
+
+			
+	</div>
+</div>
+
+
+
+
+{% endblock %}
