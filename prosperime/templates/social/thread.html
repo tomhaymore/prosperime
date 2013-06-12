@@ -15,28 +15,27 @@
 {% block content %}
 
 <div id="content-container" class="main-container">
-
-	<div class="thread-header row">
+	<div class="thread-header row-fluid">
 		<div class="span12">
 			<div class="thread-main-header">Thread</div>
 			<div class="question-header"><span class="quote">&#147;</span>{{comments.0.body}}<span class="quote">&#148;</span></div>
 		</div>
 	</div>
 
-	<div class="row question-container">
+	<div class="row-fluid question-container">
 		<div class="span2">
 			<div class="question-controls">
-				<div class="row total-following">
+				<div class="row-fluid total-following">
 					<div class="right span9">Total Followers</div>
 					<div class="left span3">{{total_followers}}</div>
 				</div>
 		
-				<div class="row network-following">
+				<div class="row-fluid network-following">
 					<div class="right span9">From Your Network</div>
-					<div class="left span3">11</div>
+					<div class="left span3">{{network_followers}}</div>
 				</div>
 				
-				<div class="row follow">
+				<div class="row-fluid follow">
 					<div class="right span9">Follow</div>
 					<div class="left span3"><i class="icon-star icon-large"></i></div>
 				</div>
@@ -52,7 +51,7 @@
 			<!-- {% if owner_current_position %}
 			<div class="block">
 				<div class="owner-current-position">
-					<!-- <img src="{{owner_current_position.entity_logo}}"/> -->
+					 <img src="{{owner_current_position.entity_logo}}"/> -->
 				<!-- 	<img class="logo" src="/media/logos/kaazing_corporation/Kaazing Corporation_1.png"/>
 					<div class="owner-current-position-title">{{owner_current_position.title}}</div>
 
@@ -83,7 +82,7 @@
 
 	{% for c in comments %}
 		{% if not forloop.first %}
-			<div class="row comment-row">
+			<div class="row-fluid comment-row">
 				<div id="{{c.id}}" class="comment-container offset1 span10">
 					<!-- Controls -->
 					<div class="span1">
@@ -122,12 +121,12 @@
 		</div>
 
 	
-		</br></br>
+		<br/><br/>
 
 		<div class="prompt-main">
-			<div class="question-header">Know someone who would be perfect for this thread? </br> Invite them to join the conversation.</div>
+			<div class="question-header">Know someone who would be perfect for this thread? <br/> Invite them to join the conversation.</div>
 			<div class="icons-container">
-				<div class="row">
+				<div class="row-fluid">
 					<div class="span3"><div class="icon-wrapper"><i class="icon-facebook icon-3x"></i></div></div>
 
 					<div class="span3"><div class="icon-wrapper"><i class="icon-twitter icon-3x"></i></div></div>
@@ -164,33 +163,47 @@
 		$(".left", this).toggleClass("orange-hover")
 	});
 
-	$(".follow").hover(function(e) {
-		$(".left", this).toggleClass("yellow-hover")
-	});
+	// If following, allow unfollow
+	if ("{{is_following}}" == "True") {
+		styleFollowing()
+		$(".follow .left").click(function(e) { unfollowThread(e, this) })
+	// Else activate follow option
+	} else {
+		$(".follow").hover(function(e) {
+			$(".left", this).toggleClass("yellow-hover")
+		});
 
-	$(".follow .left").click(function(e) { followThread(e, this) })
+		$(".follow .left").click(function(e) { followThread(e, this) })
+	}
+	
 
 
-	// Voting hovers & clicks
-	$(".upvote").hover(function(e) {
-		console.log('here')
-		$(this).toggleClass("upvote-hover")
-	}).click(function() { upvote(this) })
+	// Voting hovers and clicks 
+		// w/ Delayed binding for added elements
+	$(document).on({
+		mouseenter: function(e) { $(this).addClass("downvote-hover") },
+		mouseleave: function(e) { $(this).removeClass("downvote-hover") },
+		click: function(e) { downvote(this) }
+	}, ".downvote").on({
+		mouseenter: function(e) { $(this).addClass("upvote-hover") },
+		mouseleave: function(e) { $(this).removeClass("upvote-hover") },
+		click: function(e) { upvote(this) }
+	}, ".upvote").on({
+		mouseenter: function(e) {
+			$(this).prev().addClass("upvote-hover")
+			$(this).next().addClass("downvote-hover")
+		},
+		mouseleave: function(e) {
+			$(this).prev().removeClass("upvote-hover")
+			$(this).next().removeClass("downvote-hover")
+		}
+	}, ".votes")
 
-	$(".downvote").hover(function(e) {
-		$(this).toggleClass("downvote-hover")
-	}).click(function() { downvote(this) });
 
-	$(".votes").hover(function(e) {
-		$(this).prev().addClass("upvote-hover")
-		$(this).next().addClass("downvote-hover")
-	}, function(e) {
-		$(this).prev().removeClass("upvote-hover")
-		$(this).next().removeClass("downvote-hover")
-	});
+
 
 	// Social icon hovers & clicks
-	$(".icons-container .row i").each(function() {
+	$(".icons-container .row-fluid i").each(function() {
 		$(this).hover(function(e) {
 			if ($(this).hasClass("icon-google-plus"))
 				$(this).toggleClass("google-plus")
@@ -273,11 +286,12 @@
 			// Change text
 			$(".follow .right").html("Following")
 			// Unbind hover
-			$(".follow").unbind("mouseenter mouseleave click")
-			// Bind unfollow event
-			$(this).parent().click(function(e) { unfollowThread(e, this) });
+			$(".follow").unbind("mouseenter mouseleave")
+			// Unbind click & bind follow event
+			$(this).unbind("click").click(function(e) { unfollowThread(e, this) });
 		});
 
+		// Post to DB
 		var thread_id = {{thread_id}}
 		$.post("/social/followThread/", {"thread_id":thread_id, "csrfmiddlewaretoken":"{{csrf_token}}"}, function(response) {
 			console.log(response)
@@ -287,7 +301,47 @@
 	};
 
 	var unfollowThread = function(ev, el) {
-		console.log("unfollowing thread...")
+
+		// Can't unfollow if not following
+		if (!$(el).hasClass("disabled")) return false;
+
+		// Fade out
+		$(el).fadeOut(400, function() {
+			// Animate to colored star
+			$("i", this).css("color", "#ECF0F1")
+			// Fade in, remove handlers, add click
+			$(this).fadeIn(400).unbind("click").click(function(e) {
+				followThread(e, this)
+			});
+			// Change text
+			$(".follow .right").html("Follow")
+			// Add hover
+			$(".follow").hover(function(e) {
+				$(".left", this).addClass("yellow-hover")
+			}, function (e) {
+				$(".left", this).removeClass("yellow-hover")
+			});
+
+		});
+
+		// Post to DB
+		var thread_id = {{thread_id}}
+		$.post("/social/unfollowThread/", {"thread_id":thread_id, "csrfmiddlewaretoken":"{{csrf_token}}"}, function(response) {
+			console.log(response)
+			// TODO: if fails, try again?
+		}, "json")
+
+	};
+
+	// Styles the '.following' div if user is following thread
+	function styleFollowing() {
+		var container = $(".follow .left")
+		// Change star color
+		$("i", container).css("color", "rgba(241,196,15,1)")
+		// Change display text
+		$(".follow .right").html("Following")
+		// Add disabled class
+		$(container).addClass("disabled")
 	};
 
 	var postComment = function(ev) {
@@ -312,7 +366,10 @@
 				"body":body,
 			}));
 			// Animate comment in
-			$(".comment-row :last").css("opacity", 0).animate({"opacity":1}, "400")
+			$(".comment-row-fluid :last").css("opacity", 0).animate({"opacity":1}, "400")
+
+			// Clear textarea
+			$("#prompt-textarea").val("")
 		}, "json");
 	};
 
@@ -333,7 +390,7 @@
 
 <script type="text/template" id="comment-template">
 
-		<div class="row comment-row">
+		<div class="row-fluid comment-row">
 		<div id="<%=id%>" class="comment-container offset1 span10">
 
 			<div class="span1">

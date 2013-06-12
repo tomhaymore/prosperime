@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 /* Common Elements */
 
 .left-indent {
@@ -197,6 +199,7 @@ div.main-container {
 	min-height: 250px;
 	margin-bottom:15px;
 }
+>>>>>>> 374331e94bf3aa7e3020b9688fabfdebc94dea26
 
 div#main-container {
 	background-color:#fff;
@@ -1606,7 +1609,7 @@ div.general-nav-container div {
 	padding: 5px 10px 5px 10px;
 	background-color: rgb(41,98,152);
 	/*margin-right: 15px;*/
-	width: 50px
+	width: 50px;
 	transition: background 0.5s;
 	-moz-transition: background 0.5s;
 	-webkit-transition: background 0.5s;
@@ -1623,7 +1626,7 @@ div.general-nav-container div {
 	background-color: #fff;
 	padding: 5px 10px 5px 10px;
 	/*margin-right: 15px;*/
-	width: 50px
+	width: 50px;
 	transition: background 0.5s;
 	-moz-transition: background 0.5s;
 	-webkit-transition: background 0.5s;
@@ -1807,4 +1810,205 @@ input.adj_checkbox {
 
 .block {
 	display:inline-block;
+<<<<<<< HEAD
 }
+
+div#content-container {
+	width:1000px;
+	margin-right:auto;
+	margin-left:auto;
+	margin-top:15px;
+}
+
+div#wide-content-container {
+	width:1000px;
+	margin-right: auto;
+	margin-left: auto;
+	margin-top:15px;
+}
+
+div.main-container {
+	/*margin-left:auto;
+	margin-right:auto;
+	width:1100px;*/
+	background-color: #fff;
+	padding:5px;
+	/*-webkit-box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);*/
+	/*-moz-box-shadow: 0 1px 10px rgba(0,0,0,0.1);*/
+	/*box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);*/
+	margin-top:15px;
+	min-height: 250px;
+	margin-bottom:15px;
+}
+
+/* Common Elements */
+
+.left-indent {
+	margin-left:28px;
+}
+
+.strong {
+	font-weight:bold;
+}
+
+/* Bootstrap Tabs */
+.nav-tabs>.active>a {
+	background-color:rgb(41,98,152);
+	color:#fffffe;
+}
+
+.nav-tabs>.active>a:hover {
+	background-color:rgb(41,98,152);
+	color:#fffffe;
+}
+
+.nav-tabs>li>a:hover {
+	border:none;
+}
+
+.nav-tabs>li>a {
+	color:#333;
+}
+
+.nav-tabs {
+	font-size:1.2em;
+	border-bottom:1px solid rgb(41,98,152);
+}
+
+/* Header that looks like Tab */
+div.h-header {
+	background-color: rgb(41,98,152);
+	color: #fff;
+	margin-right: 2px;
+	padding-top:8px;
+	padding-bottom:8px;
+	padding-right:12px;
+	padding-left:12px;
+	border-radius:2px 2px 0 0;
+	line-height:20px;
+	cursor: pointer;
+	text-decoration: none;
+	display:inline-block;
+	font-size:1.2em;
+}
+
+div.h-header-container {
+	width:100%;
+	border-bottom:1px solid rgb(41,98,152);
+}
+
+div.header-large {
+	font-size:1.6em;
+}
+
+/* General */
+
+a {
+	cursor: pointer;
+}
+
+/* Flat Button */
+.flat-button {
+	display:inline-block;
+	vertical-align:middle;
+	margin-top:5px;
+	width:auto;
+	/*height:24px;*/
+	line-height:24px;
+	min-width:16px;
+	padding:7px 10px 7px 10px;
+	font-size:14px;
+	font-weight:normal;
+	text-align:center;
+	background-color:#fffffe;
+	border-radius:2px;
+	border:none;
+	cursor:pointer;
+	font-weight:500;
+	transition: all 0.2s;
+	-moz-transition: all 0.2s;
+	-webkit-transition: all 0.2s;
+	-o-transition: all 0.2s;
+}
+
+a.flat-button:hover {
+	text-decoration:none;
+	color:#ffffff;
+	/*font-weight: bold;*/
+	/*transition:, color 2s;*/
+}
+
+.flat-button a:hover {
+	text-decoration:none;
+	color:#fffffe;
+}
+
+.green-button {
+	background-color: #339933;
+	color:#fffffe;
+}
+
+/*.blue-button {
+	background-color: #265f98;
+	color:#fffffe;
+}*/
+
+.inline-button {
+	display:inline-block;
+}
+
+.button-small {
+	height:12px;
+	line-height:12px;
+	font-size:12px;
+}
+
+.blue-button {
+	background-color:rgb(41,98,152);
+	color:#fffffe;
+}
+
+.lightblue-button {
+	background-color:#6FB6D4;
+	color:#fffffe;
+}
+
+.wide-button {
+	width: 150px;
+}
+
+.button-large {
+	height:auto;
+	width:auto;
+	font-size:1.6em;
+	padding:6px 8px;
+}
+
+
+
+
+/* Components */
+
+html, body {
+	height:100%;
+}
+
+body {
+	/*padding-top:40px;*/
+	/*background-color:whitesmoke;*/
+	font-family: "Arimo","Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+	/*font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;*/
+	margin: 0;
+	/*margin-bottom:0px;*/
+}
+
+div.background-container {
+	/*background-color:whitesmoke;*/
+	background-color:#fff;
+	min-height:100%;
+	height: auto !important;
+	/*margin:0 auto -60px;*/
+
+}
+
+

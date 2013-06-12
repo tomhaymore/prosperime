@@ -31,11 +31,14 @@ def thread(request, thread_id):
 		is_following = False
 
 	total_followers = thread.followers.all().count()
+	## TODO: implement way to get "# followers from your network"
+	network_followers = total_followers
 
 	data = {
 		"thread_id":thread_id,
 		"is_following":is_following,
 		"total_followers":total_followers,
+		"network_followers":network_followers,
 		"comments":[{"owner_name":c.owner.profile.first_name, "owner_id":c.owner.id, "owner_pic":c.owner.profile.default_profile_pic(), "goal":c.meta, "body":c.body, "id":c.id, "votes":Vote.objects.filter(owner=c.owner).count(), "created":helpers._formatted_date(c.created), "modified":helpers._formatted_date(c.updated)} for c in comments],
 		"owner_current_position":owner_current_position,
 	}
@@ -89,6 +92,30 @@ def followThread(request):
 # Deletes FollowThread object between given thread + user
 def unfollowThread(request):
 	response = {}
+
+	try:
+		thread = Thread.objects.get(id=request.POST.get("thread_id"))
+	except:
+		response = {
+			"result":"failure",
+			"errors":"No thread id or thread not found"
+		}
+		return HttpResponse(json.dumps(response))
+
+	try:
+		follow = FollowThread.objects.get(thread=thread, user=request.user)
+		follow.delete()
+
+		response = {
+			"result":"success",
+		}
+
+	except:
+		response = {
+			"result":"failure",
+			"errors":"Error writing to DB",
+		}
+
 
 	return HttpResponse(json.dumps(response))
 
