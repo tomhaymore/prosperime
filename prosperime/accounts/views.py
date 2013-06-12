@@ -79,6 +79,13 @@ def register(request):
 	if request.user.is_authenticated():
 		return HttpResponseRedirect('/feed/')
 
+	return render_to_response('accounts/register_li_only.html',context_instance=RequestContext(request))
+
+def register_old(request):
+
+	if request.user.is_authenticated():
+		return HttpResponseRedirect('/feed/')
+
 	if request.method == "POST":
 		form = RegisterForm(request.POST)
 
