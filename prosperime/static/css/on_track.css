@@ -217,6 +217,9 @@ div.end-item {
 	font-size:1.6em;
 	line-height:36px;
 	margin-bottom:8px;
+	width:300px;
+	text-align: center;
+	
 }
 
 #img-placeholder {
