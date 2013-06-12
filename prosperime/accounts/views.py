@@ -1016,7 +1016,7 @@ def _prepare_positions_for_timeline(positions):
 
 		if pos.start_date and pos.title: # ignore no start_date
 
-			formatted_pos['duration'] = pos.duration_in_months() + 1 ## so 6/11 - 6/11 != 0
+			formatted_pos['duration'] = pos.duration_in_months + 1 ## so 6/11 - 6/11 != 0
 			formatted_pos['id'] = pos.id
 			
 			# Assumption: no end date = current
