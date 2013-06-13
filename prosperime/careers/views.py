@@ -62,17 +62,18 @@ def proto(request):
 		base_positions = Position.objects.filter(type="education",ideal_position__level=1).exclude(ideal_position=None,person__profile__status="crunchbase").select_related("person")
 
 		for p in base_positions:
-			first_ideal = p.person.profile.first_ideal()
-
+			# first_ideal = p.person.profile.first_ideal()
+			first_ideal = p.person.profile.first_ideal_job()
+			
 			# Majors
 			if first_ideal:
 				if p.ideal_position.major is None:
-					continue
 					print p.title, p.degree, p.field
 					print p.ideal_position, p.ideal_position.id
+					continue
 				if p.ideal_position.major not in majors_set:
 					majors_set.add(p.ideal_position.major)
-					majors[p.ideal_position.major] = {"id":[p.ideal_position.id],"people":[p.person.id], "positions":[first_ideal.id], "index":len(majors_set)}
+					majors[p.ideal_position.major] = {"id":[p.ideal_position.id],"people":[p.person.id], "positions":[first_ideal['ideal_position__id']], "index":len(majors_set)}
 				# if p.field not in majors_set:
 				# 	majors_set.add(p.field)
 				# 	majors[p.field] = {"people":[p.person.id], "positions":[first_ideal.id], "index":len(majors_set)}
@@ -80,7 +81,7 @@ def proto(request):
 					# majors[p.field]["people"].append(p.person.id)
 					# majors[p.field]["positions"].append(first_ideal.id)
 					majors[p.ideal_position.major]["people"].append(p.person.id)
-					majors[p.ideal_position.major]["positions"].append(first_ideal.id)
+					majors[p.ideal_position.major]["positions"].append(first_ideal['ideal_position__id'])
 
 				# People
 				if p.person.id not in people_set:
@@ -93,9 +94,9 @@ def proto(request):
 						break;
 
 
-				if first_ideal.id not in positions_set:
-					positions_set.add(first_ideal.id)
-					positions.append({'title':first_ideal.title, 'id':first_ideal.id, "major_index":majors[p.ideal_position.major]["index"], "major":p.ideal_position.major})
+				if first_ideal['ideal_position__id'] not in positions_set:
+					positions_set.add(first_ideal['ideal_position__id'])
+					positions.append({'title':first_ideal['ideal_position__title'], 'id':first_ideal['ideal_position__id'], "major_index":majors[p.ideal_position.major]["index"], "major":p.ideal_position.major})
 
 
 	
