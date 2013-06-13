@@ -46,6 +46,24 @@ class Profile(models.Model):
     prefs = models.TextField(null=True)
     # profile_pic = models.ImageField(max_length=450, upload_to=_get_profile_pic_path, blank=True, null=True)
 
+    # returns first real job after first education
+    def first_ideal_job(self):
+        positions = self.user.positions.exclude(ideal_position=None).values('id','start_date','end_date','type','ideal_position__id','ideal_position__title','ideal_position__level','title','entity__name','entity__id').order_by("start_date")
+        ed  = None
+        next = False
+        for p in positions:
+            # check flag
+            if next and ed and p['start_date'] > ed['end_date']:
+                # make sure there is an ideal position atached here
+                if p['ideal_position__id']:
+                    return p
+            elif next:
+                return p
+            # if this is first education position, grab next position
+            if p['type'] == "education" and p['ideal_position__level'] > 0:
+                next = True
+                ed = p
+
     # returns a dictionary w/ frequencies of each career
     def get_all_careers(self):
         career_dict = {}
@@ -175,7 +193,7 @@ class Profile(models.Model):
     def prof_longevity(self):
         return careerlib.get_prof_longevity(self.user)
 
-    def first_ideal(self):
+    def first_name_ideal(self):
         positions = self.user.positions.all().exclude(ideal_position=None).exclude(type="education").exclude(title="Student").order_by("start_date").select_related("entity")
         if positions.exists():
             return positions[0].ideal_position
