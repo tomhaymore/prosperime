@@ -1,3 +1,76 @@
+/* New Thread Form */
+input#title-input {
+	font-size:1.1em;
+	line-height:75px;
+	width:90%;
+	margin:auto;
+	height:75px;
+}
+
+div.input-button {
+	width:65px;
+	height:65px;
+	border-radius:65px;
+	background-color: #3498DB;
+	color:#ECF0F1;
+	line-height:80px;
+	text-align:center;
+	font-size:1.8em;
+	margin:0 auto;
+	margin-top:8px;
+	cursor:pointer;
+	opacity:0;
+}
+
+div.completed-button {
+	width:115px;
+	height:55px;
+	border-radius:4px;
+	background-color: #95A5A6; /* grey */
+	color:#ECF0F1;
+	line-height:55px;
+	text-align:center;
+	font-size:1.8em;
+	margin:0 auto;
+	margin-top:8px;
+	cursor:pointer;
+}
+
+div.sub-text {
+	text-align:center;
+	font-size:1.1em;
+	line-height:24px;
+}
+
+div#title-div { display:none; }
+
+div.move-up {
+	padding-top:0px;
+}
+
+#new-question-textarea {
+	width:90%;
+	font-size:1.2em;
+	line-height:28px;
+	height:125px;
+}
+
+.move-left { padding-right:30px; }
+
+/*.icon-wrapper { text-align:center; }
+*/
+.center { text-align:center; }
+
+.no-border { border:none; }
+
+.call-to-action {
+	text-align:center;
+	background-color:#27AE60;
+	color:#ECF0F1;
+	width:125px;
+	margin-top:25px;
+	visibility: hidden;
+}
 
 
 /* Question */
