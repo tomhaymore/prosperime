@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-=======
+
 /* Common Elements */
 
 .left-indent {
@@ -367,8 +366,8 @@ div.splash-module {
 
 #splash-img-1 {
 	width:515px;
-	opacity: 0.75;
-	transition:opacity 0.2s;
+	opacity: 1;
+	/*transition:opacity 0.2s;*/
 	margin-left:25px;
 }
 
@@ -395,7 +394,7 @@ div.splash-module {
 }
 
 #splash-img-1:hover, #splash-img-alumni:hover, #splash-img-plan:hover, #splash-img-advice:hover {
-	opacity:1;
+	/*opacity:1;*/
 }
 
 div.splash-inner-container {
