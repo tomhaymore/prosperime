@@ -26,7 +26,7 @@ urlpatterns = patterns('',
     url(r'^feed/$', 'careers.views.feed'),
     url(r'^build/$', 'careers.views.build'),
     url(r'^schools/$', 'careers.views.schools'),
-    url(r'^majors/$', 'careers.views.proto'), # need to change
+    url(r'^majors/$', 'careers.views.majors'),
     url(r'^majors/(\d+)/$','careers.views.major'),
 
     url(r'^progress/$', 'careers.views.progress'), # Am I on Track?
@@ -99,6 +99,8 @@ urlpatterns = patterns('',
     url(r'^careers/getSchoolFragment/(?:/(?P<school_id>\d+))?/$', 'careers.views.get_school_fragment'),
     url(r'^careers/getSchoolFragment/$', 'careers.views.get_school_fragment'),
     url(r'^careers/getFeedFragment/$', 'careers.views.get_feed_fragment'),
+    url(r'^careers/getMajorsData/$', 'careers.views.get_majors_data'),
+
 
     ## Accounts - AJAX calls
     url(r'^accounts/updateProfile/$', 'accounts.views.updateProfile'),
