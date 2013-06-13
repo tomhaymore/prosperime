@@ -213,7 +213,7 @@ EMAIL_HOST_PASSWORD = os.environ.get('MANDRILL_APIKEY',None)
 EMAIL_HOST_USER = os.environ.get('MANDRILL_USERNAME',None)
 EMAIL_HOST = "smtp.mandrillapp.com"
 EMAIL_PORT = 587
-
+SERVER_EMAIL = "admin@prospr.me"
 
 import dj_database_url
 DATABASES['default'] =  dj_database_url.config()

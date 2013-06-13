@@ -192,7 +192,7 @@ def major(request,major_id):
 	major = IdealPosition.objects.get(pk=major_id)
 
 	# get schools
-	focal_schools = Entity.objects.filter(positions__person=request.user).values_list('id')
+	focal_schools = [e['id'] for e in Entity.objects.filter(positions__person=request.user,positions__type="education").values('id')]
 	schools_in = Entity.objects.filter(positions__ideal_position=major,id__in=focal_schools).annotate(pos=Count("positions__id")).values("id","name","pos").distinct()
 	schools_all = Entity.objects.filter(positions__ideal_position=major).annotate(pos=Count("positions__id")).values("id","name","pos").distinct()
 

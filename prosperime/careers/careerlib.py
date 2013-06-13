@@ -819,8 +819,8 @@ class CareerPathBase(CareerBase):
 		final = False
 		# if user is set, restrict to network
 		if user:
-			schools = Entity.objects.filter(type="school",positions__person=user)
-			users = User.objects.select_related("positions").filter(positions__ideal_position=major,positions__entity__in=schools,profile__status="active")
+			schools = [e['id'] for e in Entity.objects.filter(positions__person=user,positions__type="education").values('id')]
+			users = User.objects.select_related("positions").filter(positions__ideal_position=major,positions__entity__id__in=schools)
 		else:
 			# get all users who shared major
 			users = User.objects.select_related("positions").filter(positions__ideal_position=major,profile__status="active")
