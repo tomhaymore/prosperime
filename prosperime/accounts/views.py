@@ -213,7 +213,7 @@ def finish_registration(request):
 	user.save()	
 	
 	# send welcome email
-	welcome = emaillib.WelcomeEmail(user)
+	welcome = emaillib.WelcomeEmail(user,password)
 	welcome.send_email()
 	logger.info("sent welcome email to user: "+linkedin_user_info['emailAddress'])
 	

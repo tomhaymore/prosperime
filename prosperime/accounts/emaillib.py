@@ -27,11 +27,11 @@ class WelcomeEmail():
 
 
 
-	def __init__(self,user):
+	def __init__(self,user,pw):
 		# get context for email message
 		d = Context({
 			'full_name':user.profile.full_name(),
-			'password':user.password
+			'password':pw
 			})
 		text_content = self.plaintext.render(d)
 		html_content = self.htmlformat.render(d)
