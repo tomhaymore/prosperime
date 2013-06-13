@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 # from Prosperime
 from careers.models import SavedPath, SavedCareer, GoalPosition
-from social.models import Comment
+from social.models import Comment, Thread, FollowThread
 
 class FeedBase():
 	
@@ -37,6 +37,7 @@ class FeedBase():
 		positions = GoalPosition.objects.filter(Q(owner__in=connections) | Q(owner__in=educations)).filter(updated__gte=stop)
 		users = User.objects.filter(Q(id__in=connections) | Q(id__in=educations)).filter(date_joined__gte=stop, profile__status="active")
 		comments = Comment.objects.filter(Q(owner__in=connections) | Q(owner__in=educations)).filter(updated__gte=stop)
+		# threads = Thread.objects.filter(Q(owner__in=connections) | Q(owner__in=educations)).filter(updated__gte=stop)
 
 		# concatenate into one list
 		unordered_feed = [{'type':'careerpath','id':p.id,'user_id':p.owner_id,'user_name':p.owner.profile.full_name(),'title':p.title,'body':None,'target_user_name':None,'target_user_id':None,'target_type':None,'target_name':None,'target_id':None,'date':p.date_modified,'stub':{'user_id':p.owner_id,'user_name':p.owner.profile.full_name(),'user_pic':p.owner.profile.default_profile_pic(),'connected':p.owner_id in connections,'saved_paths':len(p.owner.savedPath.all()),'saved_positions':len(p.owner.goal_position.all()),'path':p.path_simple(),'career':None,'position':None,'comment':None}} for p in paths]
@@ -62,6 +63,7 @@ class FeedBase():
 				'commenter_pic':c.owner.profile.default_profile_pic()
 				}
 			} for c in comments])
+		# unordered_feed.extend([{'type':'thread','id':t.id,'user_id':t.owner.id,'user_name':t.owner.profile.full_name(),'title':t.name,'body':t.summary,'path':None,'career':None,'position':None} for t in threads])
 
 		ordered_feed = sorted(unordered_feed, key=operator.itemgetter('date'),reverse=True)
 

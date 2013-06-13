@@ -47,11 +47,11 @@ def thread(request, thread_id):
 	return render_to_response("social/thread.html",data,context_instance=RequestContext(request))
 
 
-    # url(r'^social/followThread/$', 'social.views.followThread'),
-    # url(r'^social/updateLikes/$', 'social.views.updateLikes'),
-    # url(r'^social/postComment/$', 'social.views.postComment'),
+def create_thread(request):
 
-
+	data = {}
+	data["foo"] = "bar"
+	return render_to_response("social/createThread.html", data, context_instance=RequestContext(request))
 
 
 
@@ -170,6 +170,35 @@ def postComment(request):
 		"created":helpers._formatted_date(datetime.datetime.now())
 	}
 	
+
+	return HttpResponse(json.dumps(response))
+
+# Creates a thread given a thread title, user, and comment body
+def createThread(request):
+
+	response = {}
+
+	try:
+		title = request.POST.get("title")
+		body = request.POST.get("body")
+	except:
+		response["result"] = "failure"
+		response["errors"] = "Missing data from template."
+		return HttpResponse(json.dumps(response))
+
+	t = Thread()
+	t.name = title
+	t.save()
+
+	c = Comment()
+	c.owner = request.user
+	c.thread = t
+	c.index = 0
+	c.body = body
+	c.save()
+
+	response["result"] = "success"
+	response["thread_id"] = t.id
 
 	return HttpResponse(json.dumps(response))
 

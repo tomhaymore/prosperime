@@ -39,8 +39,10 @@ urlpatterns = patterns('',
 
 
     url(r'^personalize/$','accounts.views.personalize'),
+
     # Social Views
     url(r'^thread/(\d+)/$', 'social.views.thread'),
+    url(r'^thread/$', 'social.views.create_thread'),
 
 
     # url(r'^personalize/$','careers.views.personalize_careers_jobs'),
@@ -104,14 +106,15 @@ urlpatterns = patterns('',
     url(r'^accounts/deleteItem/$', 'accounts.views.deleteItem'),
     url(r'^accounts/connect/$', 'accounts.views.connect'),
 
-    ## Social
-    url(r'^social/saveComment/$', 'social.views.saveComment'),
-
     ## Social -- AJAX calls
+    url(r'^social/saveComment/$', 'social.views.saveComment'),
     url(r'^social/followThread/$', 'social.views.followThread'),
     url(r'^social/unfollowThread/$', 'social.views.unfollowThread'),   
     url(r'^social/updateVotes/$', 'social.views.updateVotes'),
     url(r'^social/postComment/$', 'social.views.postComment'),
+    url(r'^social/createThread/$', 'social.views.createThread'),
+
+
 
     url(r'^decisions/', 'careers.views.getDecisions'),
     url(r'^login/','accounts.views.login'),
