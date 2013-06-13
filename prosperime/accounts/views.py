@@ -311,7 +311,7 @@ def finish_login(request):
 
 			#return HttpResponseRedirect('/account/success')
 			if 'next' not in request.session:
-				return HttpResponseRedirect('/majorss/')
+				return HttpResponseRedirect('/majors/')
 			else:
 				return HttpResponseRedirect(request.session['next'])
 	else:
