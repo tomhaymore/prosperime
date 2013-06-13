@@ -779,7 +779,7 @@ class LIProfile(LIBase):
 
 		access_token = dict(cgi.parse_qsl(content))
 				
-		fields = "(headline,id,first-name,last-name,picture-url)"
+		fields = "(headline,id,first-name,last-name,picture-url,email-address)"
 
 		api_url = "http://api.linkedin.com/v1/people/~:" + fields + "?format=json"
 		 

@@ -437,15 +437,19 @@ a.splash-message, p.splash-message {
 	vertical-align: middle;
 }
 
-p.splash-submessage a {
-	color:#e6e6e6;
+.splash-submessage a {
+	color:#fffffe;
 	/*color:rgb(43, 46, 48);*/
-	font-size: 1.0em;
+	font-size: 0.9em;
 	line-height: 1.2em;
-	vertical-align: middle;
+	/*vertical-align: middle;*/
+	display:block;
+	width:47%;
+	text-align:center;
+	font-weight:normal;
 }
 
-p.splash-submessage a:hover {
+.splash-submessage a:hover {
 	color:#fff;
 	text-decoration: underline;
 } 
