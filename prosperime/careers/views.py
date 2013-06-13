@@ -143,7 +143,8 @@ def proto(request):
 def home(request):
 	if not request.user.is_authenticated():
 		return HttpResponseRedirect('/welcome/')
-
+	else:
+		return HttpResponseRedirect('/majors/')
 	# data = {}
 	# user = request.user
 
