@@ -80,3 +80,38 @@ p.stats-header {
 	height:40px;
 	text-align: center;
 }
+
+.career-module {
+	margin-bottom:15px;
+}
+
+#career-left-pane {
+	width:500px;
+}
+
+#career-right-pane {
+	width:450px;
+}
+
+.career-list li {
+	line-height:24px;
+}
+
+.info-badge {
+	display:inline-block;
+	/*height:16px;*/
+	color:#fffffe;
+	background-color:rgb(48,91,152);
+	/*min-width:15px;*/
+	padding: 1px 10px 1px 10px;
+	font-size: 12px;
+	border-radius: 1px;
+}
+
+.user-info-stub {
+	max-width:350px;
+}
+
+.user-info-stub p {
+	margin-bottom:5px;
+}

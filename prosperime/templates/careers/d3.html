@@ -21,7 +21,7 @@
 			text-align:center;
 			padding:2px;
 			width:250px;
-			font-size:0.8em;
+			font-size:0.9em;
 			-moz-box-sizing: border-box;
 			-webkit-box-sizing: border-box;
 			box-sizing: border-box;
@@ -125,7 +125,7 @@ console.log("#People: "+people.length)
 console.log("#Positons: "+positions.length)
 
 // Constants
-var svg_width = 350; var svg_height = 600; 
+var svg_width = 350; var svg_height = 1100; 
 var magic_number = 575; 
 // 600 is the upper limit of what fits on my laptop
 
@@ -191,7 +191,7 @@ center.selectAll("div").data(Object.keys(majors)).enter().append("div")
 	})
 
 	.on("click", function(d) {
-		window.location = "/major/" + majors[d]["id"][0] + "/"
+		window.location = "/majors/" + majors[d]["id"][0] + "/"
 	});
 
 // Create SVG containers

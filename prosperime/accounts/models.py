@@ -85,7 +85,7 @@ class Profile(models.Model):
 
 
     def get_all_careers(self,limit=5):
-       careers = careerlib.get_focal_careers(self.user,limit)
+       careers = careerlib.get_focal_careers([self.user],limit)
        return careers
 
     # Properties of the Profile object

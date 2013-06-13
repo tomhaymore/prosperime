@@ -267,7 +267,7 @@ ul.nav-list {
 }
 
 img.main-logo {
-	height:50px;
+	height:40px;
 	margin-top: 5px;
 }
 
@@ -369,6 +369,7 @@ div.splash-module {
 	width:515px;
 	opacity: 0.75;
 	transition:opacity 0.2s;
+	margin-left:25px;
 }
 
 #splash-img-alumni {

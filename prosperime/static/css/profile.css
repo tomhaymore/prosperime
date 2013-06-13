@@ -97,8 +97,12 @@ p.profile-list {
 div.profile-details-container {
 	margin-left:10px;
 	margin-right:25px;
-	width:450px;
+	width:400px;
 	height:200px;
+}
+
+div.careers-list {
+	width:250px;
 }
 
 #profile-careers-container {

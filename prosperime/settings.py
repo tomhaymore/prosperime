@@ -136,6 +136,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    # 'django.middleware.common.BrokenLinkEmailsMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware'
 )
 
@@ -207,6 +208,12 @@ LOGGING = {
         },
     }
 }
+
+EMAIL_HOST_PASSWORD = os.environ.get('MANDRILL_APIKEY',None)
+EMAIL_HOST_USER = os.environ.get('MANDRILL_USERNAME',None)
+EMAIL_HOST = "smtp.mandrillapp.com"
+EMAIL_PORT = 587
+
 
 import dj_database_url
 DATABASES['default'] =  dj_database_url.config()

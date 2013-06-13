@@ -10,8 +10,8 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/viz.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/drag_and_drop.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js"></script>
-<!-- <script type="text/javascript" src="{{ STATIC_URL }}js/raphael.js"></script> -->
-<script type="text/javascript" src="http://github.com/DmitryBaranovskiy/raphael/raw/master/raphael-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+<!-- <script type="text/javascript" src="http://github.com/DmitryBaranovskiy/raphael/raw/master/raphael-min.js"></script> -->
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.autocomplete.min.js"></script>
 
 <script type="text/javascript">
@@ -106,11 +106,11 @@ $.ajaxSetup({
 			{% endif %}
 		</div>
 		<div class="profile-careers-container pull-left">
-			<div class="pull-left">
+			<div class="pull-left careers-list">
 				<p class="feature-page-subheader" style="display:inline-block;width:200px;">Career Breakdown</p>
 				{% if top_careers %}
 					<ul>
-					{% for c in top_careers %}
+					{% for c in top_careers|slice:"5" %}
 						<p id="profile-career-list-{{c.1.id}}" class="profile-list">{{c.1.name}}</p>
 					{% endfor %}
 					</ul>
@@ -122,7 +122,7 @@ $.ajaxSetup({
 				<div class="profile-careers" id="career-chart-data">
 					{% if top_careers %}
 					<ul class="profile-career-chart-list">
-					{% for c in top_careers %}
+					{% for c in top_careers|slice:"5" %}
 						<li class="profile-career-chart-item" data-id="{{c.0}}" data-score="{{c.1.score}}" data-name="{{c.1.name}}">{{c.1.name}}</li>
 					{% endfor %}
 					</ul>

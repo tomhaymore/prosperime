@@ -51,7 +51,7 @@ def login(request):
 			if user is not None:
 				auth_login(request,user)
 				messages.success(request, 'You have successfully logged in.')
-				return HttpResponseRedirect('/home/')
+				return HttpResponseRedirect('/majors/')
 		
 	else:
 		form = AuthForm()
@@ -77,7 +77,14 @@ def use(request):
 def register(request):
 
 	if request.user.is_authenticated():
-		return HttpResponseRedirect('/feed/')
+		return HttpResponseRedirect('/majors/')
+
+	return render_to_response('accounts/register_li_only.html',context_instance=RequestContext(request))
+
+def register_old(request):
+
+	if request.user.is_authenticated():
+		return HttpResponseRedirect('/majors/')
 
 	if request.method == "POST":
 		form = RegisterForm(request.POST)
@@ -110,7 +117,7 @@ def register(request):
 				auth_login(request,user)
 
 			# send to personalization
-			return HttpResponseRedirect('/home/')
+			return HttpResponseRedirect('/majors/')
 	else:
 		form = RegisterForm()
 
@@ -183,7 +190,8 @@ def finish_login(request):
 		# form submitted
 		form = FinishAuthForm(request.POST)
 		if form.is_valid():
-
+			from accounts.models import Pref
+			import accounts.emaillib as emaillib
 			# grab cleaned values from form
 			username = form.cleaned_data['username']
 			email = form.cleaned_data['email']
@@ -217,6 +225,16 @@ def finish_login(request):
 				user.profile.status = "active"
 				user.profile.save()
 				print "@ accounts.finish -- created new user"
+			# send welcome email
+			welcome = emaillib.WelcomeEmail(user)
+			welcome.send_email()
+			# add email prefs
+			if form.cleaned_data['notification']:
+				pref = Pref(user=user,name="notification",value=1)
+				pref.save()
+			else:
+				pref = Pref(user=user,name="notification",value=0)
+				pref.save()
 			# make sure using right backend
 			request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
 			# log user in
@@ -293,7 +311,7 @@ def finish_login(request):
 
 			#return HttpResponseRedirect('/account/success')
 			if 'next' not in request.session:
-				return HttpResponseRedirect('/home/#schools/')
+				return HttpResponseRedirect('/majorss/')
 			else:
 				return HttpResponseRedirect(request.session['next'])
 	else:
@@ -362,7 +380,7 @@ def finish_link(request):
 	messages.success(request, 'Your LinkedIn account has been successfully linked.')
 
 	if 'next' not in request.session:
-		return HttpResponseRedirect('/home/')
+		return HttpResponseRedirect('/majors/')
 	else:
 		return HttpResponseRedirect(request.session['next'])
 
@@ -1009,7 +1027,7 @@ def _prepare_positions_for_timeline(positions):
 
 		if pos.start_date and pos.title: # ignore no start_date
 
-			formatted_pos['duration'] = pos.duration_in_months() + 1 ## so 6/11 - 6/11 != 0
+			formatted_pos['duration'] = pos.duration_in_months + 1 ## so 6/11 - 6/11 != 0
 			formatted_pos['id'] = pos.id
 			
 			# Assumption: no end date = current

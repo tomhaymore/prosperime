@@ -59,7 +59,7 @@ def proto(request):
 		
 		# assemble all the positions
 		# base_positions = Position.objects.filter(type="education",entity__in=schools).exclude(ideal_position=None).select_related("person")
-		base_positions = Position.objects.filter(type="education",ideal_position__level=1).exclude(ideal_position=None).select_related("person")
+		base_positions = Position.objects.filter(type="education",ideal_position__level=1).exclude(ideal_position=None,person__profile__status="crunchbase").select_related("person")
 
 		for p in base_positions:
 			first_ideal = p.person.profile.first_ideal()
@@ -67,6 +67,7 @@ def proto(request):
 			# Majors
 			if first_ideal:
 				if p.ideal_position.major is None:
+					continue
 					print p.title, p.degree, p.field
 					print p.ideal_position, p.ideal_position.id
 				if p.ideal_position.major not in majors_set:
@@ -128,7 +129,7 @@ def proto(request):
 		# print "###################"
 		# print positions
 
-		majors["Human Basket-weaving and other Anthropological Endeavors"] = {"id":1,"people":[],"positions":[],"index":len(majors_set)}
+		# majors["Human Basket-weaving and other Anthropological Endeavors"] = {"id":1,"people":[],"positions":[],"index":len(majors_set)}
 		data = {
 			"majors":json.dumps(majors),
 			"positions":json.dumps(positions),
@@ -153,59 +154,82 @@ def home(request):
 	# data['career_decisions'] = CareerDecision.objects.all()
 
 	# fetch data 
-	educations = Position.objects.filter(person=request.user,type="education").order_by("start_date")
-	positions = Position.objects.filter(person=request.user).exclude(type="education").order_by("-start_date")
-	locations = Region.objects.filter(people=request.user)
-	goals = GoalPosition.objects.filter(owner=request.user)
-	user = request.user
+	# educations = Position.objects.filter(person=request.user,type="education").order_by("start_date")
+	# positions = Position.objects.filter(person=request.user).exclude(type="education").order_by("-start_date")
+	# locations = Region.objects.filter(people=request.user)
+	# goals = GoalPosition.objects.filter(owner=request.user)
+	# user = request.user
 
-	data = {
-		'educations' : educations,
-		'positions' : positions,
-		'locations': locations,
-		'goals' : goals,
-		'user' : request.user,
-		'latest_ed' : educations[0].ideal_position.title[:5],
-		'duration': careerlib.get_prof_longevity(user)
-	}
+	# data = {
+	# 	'educations' : educations,
+	# 	'positions' : positions,
+	# 	'locations': locations,
+	# 	'goals' : goals,
+	# 	'user' : request.user,
+	# 	'latest_ed' : educations[0].ideal_position.title[:5],
+	# 	'duration': careerlib.get_prof_longevity(user)
+	# }
 
 
-	if "tasks" in request.session:
-		data['tasks'] = True
-		data['profile_task_id'] = request.session['tasks']['profile']
-		data['connections_task_id'] = request.session['tasks']['connections']
-	else:
-		data['tasks'] = False
-		data['profile_task_id'] = None
-		data['connections_task_id'] = None
+	# if "tasks" in request.session:
+	# 	data['tasks'] = True
+	# 	data['profile_task_id'] = request.session['tasks']['profile']
+	# 	data['connections_task_id'] = request.session['tasks']['connections']
+	# else:
+	# 	data['tasks'] = False
+	# 	data['profile_task_id'] = None
+	# 	data['connections_task_id'] = None
 
-	return render_to_response('home_v6.html',data,context_instance=RequestContext(request))
+	return render_to_response('home_v5.html',context_instance=RequestContext(request))
 
 def major(request,major_id):
 	"""
 	view for detailed information on a particular major
 	"""
 	C = careerlib.CareerPathBase()
+
 	# get degree
 	major = IdealPosition.objects.get(pk=major_id)
 
+	# get schools
+	focal_schools = Entity.objects.filter(positions__person=request.user).values_list('id')
+	schools_in = Entity.objects.filter(positions__ideal_position=major,id__in=focal_schools).annotate(pos=Count("positions__id")).values("id","name","pos").distinct()
+	schools_all = Entity.objects.filter(positions__ideal_position=major).annotate(pos=Count("positions__id")).values("id","name","pos").distinct()
+
 	# get first jobs
-	first_jobs = C.get_first_jobs_from_major(major)
+	first_jobs_in = C.get_first_jobs_from_major(major,request.user)
+	first_jobs_all = C.get_first_jobs_from_major(major)
 
 	# get careers
-	careers = C.get_careers_from_major(major)
+	careers_in = C.get_careers_from_major(major,request.user)
+	careers_all = C.get_careers_from_major(major)
 
 	# get paths
-	paths = User.objects.filter(positions__ideal_position=major)
+	paths_in = User.objects.filter(positions__ideal_position=major,positions__entity_id__in=focal_schools)
+	paths_all = User.objects.filter(positions__ideal_position=major)
 
 	# get comments
 	# TODO
 
+	data_in = {
+		'first_jobs':first_jobs_in,
+		'paths':paths_in,
+		'careers':careers_in,
+		'schools':schools_in
+	}
+
+	data_all = {
+		
+		'first_jobs':first_jobs_all,
+		'paths':paths_all,
+		'careers':careers_all,
+		'schools':schools_all
+	}
+
 	data = {
 		'major':major,
-		'first_jobs':first_jobs,
-		'paths':paths,
-		'careers':careers
+		'network':data_in,
+		'all':data_all
 	}
 
 	return render_to_response('careers/major_profile.html',data,context_instance=RequestContext(request))
