@@ -5,6 +5,16 @@ import careers.careerlib as careerlib
 from careers.models import Position
 
 @task()
+def set_first_ideal_jobs():
+	"""
+	goes through all users and sets their first ideal job
+	"""
+	path = careerlib.CareerPathBase()
+	users = User.objects.all()
+	for u in users:
+		u.profile.set_first_ideal_job()
+
+@task()
 def match_unmatched_positions():
 	"""
 	fetches and matches all unmatched positions
