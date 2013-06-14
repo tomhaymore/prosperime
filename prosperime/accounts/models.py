@@ -116,6 +116,14 @@ class Profile(models.Model):
         pos = Position.objects.filter(person=self.user)
         return len(pos)
 
+    # Used in /major/id
+    def first_and_last_positions(self):
+        positions = self.user.positions.all().order_by("-start_date").exclude(type="education")
+        if positions.exists():
+            return [positions[0], positions[len(positions) - 1]]
+        else:
+            return None
+
     def latest_position(self):
         positions = self.user.positions.all().order_by('-start_date').exclude(type="education")
         if positions.exists():

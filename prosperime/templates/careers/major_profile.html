@@ -22,14 +22,14 @@
 	<!-- <p>Prosper.me gets better the more people that use it. Tell your friends!</p> -->
 
 	<div id="career-profile-container">
-	<!-- 	<div class="career-profile-nav-container">
+	<!-- <div class="career-profile-nav-container">
 			
 			<a class="career-profile-nav pull-left selected" data-view="network">Your Network</a> 
 			<a class="career-profile-nav pull-left unselected" data-view="all">Prosper.me Community</a>
 			<div class="clear"></div>
 			
 		</div> -->
-		<div class="career-perspective" data-view="network" style="display:none;">
+		<!-- <div class="career-perspective" data-view="network" style="display:none;">
 			<div id="career-left-pane" class="pull-left">
 				<div class="career-module">
 					{% if network.schools %}
@@ -142,7 +142,24 @@
 			</div>
 			<div class="clear"></div>
 		</div>
-			
+			 -->
+
+		{% for p in paths %}
+		<div class="row-fluid path-row">
+			<div class="span2 center">
+				<img class="major-profile-pic" src="{{p.profile_pic}}" />
+				<div class="path-person-title">{{p.full_name}}</div>
+			</div>
+			<div class="span4 path-position">
+				{{p.first_title}} at {{p.first_entity}}
+			</div>
+			<div class="span2 spacer"> </div>
+			<div class="span4 path-position">
+				{{p.latest_title}} at {{p.latest_entity}}
+			</div>
+		</div>
+		{% endfor %}
+
 	</div>
 </div>
 
@@ -158,6 +175,39 @@ $(function() {
 		$("div.career-perspective").hide();
 		$("div.career-perspective[data-view='"+view+"']").show();
 	});
+
+
+	// Hover for path rows
+	$(".path-row").on("mouseenter", function(ev) {
+		$(this).addClass("path-row-hover")
+	}).on("mouseleave", function(ev) {
+		$(this).removeClass("path-row-hover")
+	});
+
+
+
+
 })
 </script>
+
+<!-- Not tested -->
+<script type="text/template" id="path-row-template">
+	
+		<div class="row-fluid path-row">
+			<div class="span2 center">
+				<img class="major-profile-pic" src="<%=profile_pic%>" />
+				<div class="path-person-title"><%=full_name%></div>
+			</div>
+			<div class="span4 path-position">
+				<%=first_title%> at <%=p.first_entity%>
+			</div>
+			<div class="span2 spacer"> </div>
+			<div class="span4 path-position">
+				<%=p.latest_title%> at <%=p.latest_entity%>
+			</div>
+		</div>
+
+
+</script>
+
 {% endblock %}
