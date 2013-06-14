@@ -346,12 +346,14 @@ div#messages {
 /* Home page */
 
 div#splash-home {
-	background-image: url('/static/img/bg-gradient-1.png');
+	/*background-image: url('/static/img/bg-gradient-1.png');*/
 	margin:0;
 	padding: 45px 0 15px 0; 
 	/*height:200px;*/
-	background-color: rgb(45, 110, 184);
-	background-repeat: repeat-y;
+	/*background-color: rgb(45, 110, 184);*/
+	background-image: url('/static/img/blue_texture_1.png');
+	/*background-repeat: repeat-y;*/
+	background-repeat:repeat;
 }
 
 div.splash-container {

@@ -29,6 +29,7 @@ urlpatterns = patterns('',
     url(r'^schools/$', 'careers.views.schools'),
     url(r'^majors/$', 'careers.views.majors'),
     url(r'^majors/(\d+)/$','careers.views.major'),
+    url(r'^majors/v/(\d+)/$', 'careers.views.single_major'),
 
     url(r'^progress/$', 'careers.views.progress'), # Am I on Track?
     
