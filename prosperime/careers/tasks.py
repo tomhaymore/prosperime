@@ -3,6 +3,7 @@ from celery import task
 # from prosperme
 import careers.careerlib as careerlib
 from careers.models import Position
+from django.contrib.auth.models import User
 
 @task()
 def set_first_ideal_jobs():
