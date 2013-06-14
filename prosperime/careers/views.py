@@ -44,6 +44,7 @@ def single_major(request, major_id):
 ######################################################
 ################## CORE VIEWS ########################
 ######################################################
+@login_required
 def majors(request):
 
 	# try to get from cache
@@ -102,6 +103,7 @@ def home(request):
 
 	return render_to_response('home_v5.html',context_instance=RequestContext(request))
 
+@login_required
 def major(request,major_id):
 	"""
 	view for detailed information on a particular major
