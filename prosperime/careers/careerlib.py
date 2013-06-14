@@ -348,11 +348,16 @@ class CareerSimBase():
 		return careers
 
 class CareerPathBase(CareerBase):
+	
+	def profile_get_majors_data(self):
+		import cProfile
+
+		cProfile.runctx('self.get_majors_data()',globals(),locals())
 
 	def entry_positions_stats(self,user,career):
 
 		# get all positions
-		positions = Position.objects.values('person_id','title').filter(careers=career).order_by('start_date')
+		positions = positionson.objects.values('person_id','title').filter(careers=career).order_by('start_date')
 
 		# init array of all connections
 		connections = [u['user_id'] for u in user.profile.connections.values('user_id')]
@@ -903,6 +908,107 @@ class CareerPathBase(CareerBase):
 			return "10+"
 		return years
 
+
+	def get_majors_data(self,**opts):
+		"""
+		returns data on majors, first jobs and users
+		"""
+		# get optional params
+
+		user = opts.get('user',None)
+
+		people = []
+		positions = []
+		majors = {}
+
+		majors_set = set()
+		people_set = set()
+		positions_set = set()
+
+		counter = 0
+
+		# get schools from user
+		if user:
+			schools = Entity.objects.filter(li_type="school",positions__person=user,positions__type="education").distinct()
+		else:
+			schools = None
+
+		# acceptable_majors = ["Science, Technology, and Society", "English", "Psychology", "Management Science & Engineering", "Computer Science", "International Relations", "Political Science", "Economics", "Human Biology", "Product Design", "History", "Civil Engineering", "Electrical Engineering", "Physics", "Symbolic Systems", "Mechanical Engineering", "Spanish", "Public Policy", "Materials Science & Engineering", "Biomechanical Engineering", "Mathematics", "Classics", "Feminist Studies", "Mathematical and Computational Sciences", "Atmosphere and Energy Engineering", "Urban Studies", "Chemistry", "Chemical Engineering", "Religious Studies", "Earth Systems"]
+		# base_positions = Position.objects.filter(type="education", field__in=acceptable_majors).exclude(ideal_position=None).select_related("person")
+		
+		# get ideals
+		first_ideals = dict((u['id'],u['profile__first_ideal_job']) for u in User.objects.values('id','profile__first_ideal_job'))
+
+		# assemble all the positions
+		
+		if schools:
+			# base_positions = Position.objects.filter(type="education",entity__in=schools).exclude(ideal_position=None).select_related("person")
+			base_positions = Position.objects.filter(type="education",entity__in=schools).exclude(ideal_position=None).values('ideal_position__major','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
+		else:
+			# base_positions = Position.objects.filter(type="education",ideal_position__level=1).exclude(ideal_position=None,person__profile__status="crunchbase").select_related("person")
+			print "getting positions..."
+			# base_positions = Position.objects.filter(type="education",ideal_position__level=1).exclude(ideal_position=None,person__profile__status="crunchbase").exclude(ideal_position=None).values('ideal_position__major','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
+			base_positions = Position.objects.filter(type="education",ideal_position__level=1).values('person__profile__status','ideal_position__major','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
+		print "looping through positions..."
+		for p in base_positions:
+			if p['person__profile__status'] == 'crunchbase':
+				continue
+			# first_ideal = p.person.profile.first_ideal()
+			# first_ideal = p.person.profile.first_ideal_job()
+			# first_ideal = User.objects.get(id=p['person__id']).profile.first_ideal_job()
+			# print first_ideals[p['person__id']]
+			# first_ideal = IdealPosition.objects.get(id=first_ideals[p['person__id']]).values('id','major','title')
+			
+			if first_ideals[p['person__id']] is not None:
+				first_ideal = IdealPosition.objects.get(position__id=first_ideals[p['person__id']])
+			else:
+				first_ideal = None
+			print first_ideal
+			# first_ideal = first_ideals[p['person__id']]
+			
+			# get full name
+			full_name = " ".join([p['person__profile__first_name'],p['person__profile__last_name']])
+			# Majors
+			if first_ideal:
+				if p['ideal_position__major'] is None:
+					continue
+					# print p.title, p.degree, p.field
+					# print p.ideal_position, p.ideal_position.id
+				if p['ideal_position__major'] not in majors_set:
+					majors_set.add(p['ideal_position__major'])
+					majors[p['ideal_position__major']] = {"id":[p['person__id']],"people":[p['person__id']], "positions":[first_ideal.id], "index":len(majors_set)}
+				# if p.field not in majors_set:
+				# 	majors_set.add(p.field)
+				# 	majors[p.field] = {"people":[p.person.id], "positions":[first_ideal.id], "index":len(majors_set)}
+				else:
+					# majors[p.field]["people"].append(p.person.id)
+					# majors[p.field]["positions"].append(first_ideal.id)
+					majors[p['ideal_position__major']]["people"].append(p['person__id'])
+					majors[p['ideal_position__major']]["positions"].append(first_ideal.id)
+
+				# People
+				if p['person__id'] not in people_set:
+
+					people_set.add(p['person__id'])
+					people.append({'name':full_name, 'id':p['person__id'], "major_index":majors[p['ideal_position__major']]["index"], "major":p['ideal_position__major']})
+
+					counter += 1	
+					if counter == 72:
+						break;
+
+
+				if first_ideal.id not in positions_set:
+					positions_set.add(first_ideal.id)
+					positions.append({'title':first_ideal.title, 'id':first_ideal.id, "major_index":majors[p['ideal_position__major']]["index"], "major":p['ideal_position__major']})
+
+		data = {
+			"majors":json.dumps(majors),
+			"positions":json.dumps(positions),
+			"people":json.dumps(people),
+			"result":"success"
+		}
+
+		return data
 
 class CareerBuild(CareerPathBase):
 

@@ -1,5 +1,6 @@
 # Python
 import datetime
+import cProfile
 
 # Django
 from django.db import models
@@ -31,6 +32,10 @@ class Account(models.Model):
 
 class Profile(models.Model):
 
+    def profile_first_ideal_job(self):
+
+        cProfile.runctx('self.set_first_ideal_job()',globals(),locals())
+
     def _get_profile_pic_path(self, filename):
         path = "pictures/" + self.person.std_name() + "/" + filename
         return path
@@ -44,25 +49,34 @@ class Profile(models.Model):
     connections = models.ManyToManyField('self',through="Connection",symmetrical=False,related_name="connections+")
     status = models.CharField(max_length=15,default="active")
     prefs = models.TextField(null=True)
+    first_ideal_job = models.ForeignKey(Position,null=True,blank=True)
     # profile_pic = models.ImageField(max_length=450, upload_to=_get_profile_pic_path, blank=True, null=True)
 
     # returns first real job after first education
-    def first_ideal_job(self):
+    def set_first_ideal_job(self):
         positions = self.user.positions.exclude(ideal_position=None).values('id','start_date','end_date','type','ideal_position__id','ideal_position__title','ideal_position__level','title','entity__name','entity__id').order_by("start_date")
         ed = None
         next = False
         for p in positions:
             # check flag
-            if next and ed['end_date'] and p['start_date'] > ed['end_date']:
+            if next and ed['end_date'] and p['start_date'] and p['start_date'] > ed['end_date']:
                 # make sure there is an ideal position atached here
                 if p['ideal_position__id']:
-                    return p
+                    # return p
+                    self.first_ideal_job = Position.objects.get(id=p['id'])
+                    self.save()
             elif next:
-                return p
+                # return p
+                self.first_ideal_job = Position.objects.get(id=p['id'])
+                self.save()
             # if this is first education position, grab next position
             if p['type'] == "education" and p['ideal_position__level'] > 0:
                 next = True
                 ed = p
+        # check to see if there were simply no ed positions
+        if ed is None and positions.exists():
+            self.first_ideal_job = Position.objects.get(id=positions[0]['id'])
+            self.save()
 
     # returns a dictionary w/ frequencies of each career
     def get_all_careers(self):
@@ -247,4 +261,18 @@ def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
 
+def update_first_ideal_job(sender,instance,**kwargs):
+    """
+    listens for addition of new positions, updates first_ideal_job accordingly
+    """
+    # make sure position has an ideal position
+    if instance.ideal_position:
+        # get user profile attached to
+        instance.person.profile.set_first_ideal_job()
+        
+    else:
+        pass
+
 post_save.connect(create_user_profile, sender=User)
+
+post_save.connect(update_first_ideal_job, sender=Position)
