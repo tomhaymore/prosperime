@@ -850,6 +850,12 @@ class LIProfile(LIBase):
 					pos = self.get_position(self.user,inst,p,type="ed")
 					if pos is None:
 						self.add_ed_position(self.user,inst,p)
+		# match all positions to ideals
+		for p in self.user.positions.all():
+			careerlib.match_position_to_ideals(p)
+		# set first ideal job
+		self.user.profile.set_first_ideal_job()
+
 
 	def fetch_profile(self):
 
@@ -983,14 +989,24 @@ class LIConnections(LIBase):
 					if self.logging:
 						print "@process_connections: user is partial, create rest" + c['firstName'] + ' ' + c['lastName']
 					user = self.process_connection_and_finish_user(user,c)
+					# match all positions to ideals
+					for p in user.positions.all():
+						careerlib.match_position_to_ideals(p)
+					# process first_ideal_position
+					user.profile.set_first_ideal_job()
 				else:
 					if self.logging:
 						print "@process_connections: create new user: " + c['firstName'] + ' ' + c['lastName']
 					user = self.process_connection_and_create_user(c)
+					# match all positions to ideals
+					for p in user.positions.all():
+						careerlib.match_position_to_ideals(p)
+					# process first_ideal_position
+					user.profile.set_first_ideal_job()
 				
 				# Either way, create the connection object
-				if user is not None:
-					self.add_connection(self.user, user)
+				# if user is not None:
+				# 	self.add_connection(self.user, user)
 
 
 
