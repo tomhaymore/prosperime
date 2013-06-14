@@ -48,7 +48,8 @@ def single_major(request, major_id):
 def majors(request):
 
 	# try to get from cache
-	data = cache.get("majors_viz_"+str(request.user.id))
+	# data = cache.get("majors_viz_"+str(request.user.id))
+	data = cache.get("majors_viz")
 
 	# test if cache worked
 	if data is not None:
@@ -2109,6 +2110,7 @@ def get_majors_data(request):
 		}
 		
 		cache.set("majors_viz_"+str(request.user.id),data,1500)
+		cache.set("majors_viz",data,1500)
 
 
 	return HttpResponse(json.dumps(data))
