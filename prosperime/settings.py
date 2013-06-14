@@ -171,7 +171,7 @@ INSTALLED_APPS = (
     # 'saved_paths',
     'careers',
     'social',
-    'django_extensions',
+    # 'django_extensions',
     # 'debug_toolbar'
     # 'south',
     # 'jsonify',
