@@ -255,10 +255,18 @@ def finish_registration(request):
 		'connections': connections_task.id
 	}
 
-	if 'next' not in request.session:
-		return HttpResponseRedirect('/majors/')
-	else:
-		return HttpResponseRedirect(request.session['next'])
+	request.session['_auth_user_backend'] = 'prosperime.accounts.backends.LinkedinBackend'
+	
+	user = authenticate(acct_id=linkedin_user_info['id'])
+	
+	if user is not None:
+	
+		auth_login(request,user)
+
+		if 'next' not in request.session:
+			return HttpResponseRedirect('/majors/')
+		else:
+			return HttpResponseRedirect(request.session['next'])
 	
 
 def finish_login(request):
