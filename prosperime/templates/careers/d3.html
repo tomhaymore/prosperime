@@ -150,23 +150,21 @@
 			positions = shuffle({{positions|safe}})
 			majors = {{majors|safe}}
 			// render viz
-			t()// renderViz()
+			renderViz()
 		} else {
 			$.get("/careers/getMajorsData/", function(response) {
 				if (response["result"] == "success") {
 					console.log("Missed Cache, AJAX to DB")
 					// set dst's
-					people = shuffle(people)
-					positions = shuffle(positions)
-					majors = majors
+					people = shuffle($.parseJSON(response["people"]))
+					positions = shuffle($.parseJSON(response["positions"]))
+					majors = $.parseJSON(response["majors"])
 					// render viz
-					t()// renderViz()
+					renderViz()
 				}
 			}, "json");
 		}
 	});
-
-
 
 
 	// Main fxn, takes care of all SVG drawing
