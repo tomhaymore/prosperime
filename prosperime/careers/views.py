@@ -28,6 +28,19 @@ import social.feedlib as feedlib
 import utilities.helpers as helpers
 
 
+def single_major(request, major_id):
+
+	positions = Position.objects.filter(field="Mechanical Engineering")
+
+
+	people = [{'name':p.person.profile.full_name(), 'profile_pic':p.person.profile.default_profile_pic()} for p in positions]
+	data = {
+		"people":json.dumps(people)
+	}
+
+	return render_to_response("careers/major_viz.html", data, context_instance=RequestContext(request))
+
+
 ######################################################
 ################## CORE VIEWS ########################
 ######################################################
