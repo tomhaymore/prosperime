@@ -946,10 +946,10 @@ class CareerPathBase(CareerBase):
 			base_positions = Position.objects.filter(type="education",entity__in=schools).exclude(ideal_position=None).values('ideal_position__major','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
 		else:
 			# base_positions = Position.objects.filter(type="education",ideal_position__level=1).exclude(ideal_position=None,person__profile__status="crunchbase").select_related("person")
-			print "getting positions..."
+			# print "getting positions..."
 			# base_positions = Position.objects.filter(type="education",ideal_position__level=1).exclude(ideal_position=None,person__profile__status="crunchbase").exclude(ideal_position=None).values('ideal_position__major','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
 			base_positions = Position.objects.filter(type="education",ideal_position__level=1).values('person__profile__status','ideal_position__major','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
-		print "looping through positions..."
+		# print "looping through positions..."
 		for p in base_positions:
 			if p['person__profile__status'] == 'crunchbase':
 				continue
@@ -963,7 +963,7 @@ class CareerPathBase(CareerBase):
 				first_ideal = IdealPosition.objects.get(position__id=first_ideals[p['person__id']])
 			else:
 				first_ideal = None
-			print first_ideal
+			# print first_ideal
 			# first_ideal = first_ideals[p['person__id']]
 			
 			# get full name
@@ -976,7 +976,7 @@ class CareerPathBase(CareerBase):
 					# print p.ideal_position, p.ideal_position.id
 				if p['ideal_position__major'] not in majors_set:
 					majors_set.add(p['ideal_position__major'])
-					majors[p['ideal_position__major']] = {"id":[p['person__id']],"people":[p['person__id']], "positions":[first_ideal.id], "index":len(majors_set)}
+					majors[p['ideal_position__major']] = {"id":[p['ideal_position__id']],"people":[p['person__id']], "positions":[first_ideal.id], "index":len(majors_set)}
 				# if p.field not in majors_set:
 				# 	majors_set.add(p.field)
 				# 	majors[p.field] = {"people":[p.person.id], "positions":[first_ideal.id], "index":len(majors_set)}
