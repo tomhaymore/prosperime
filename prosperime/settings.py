@@ -17,6 +17,7 @@ if os.environ.get("PROSPR_ENV",None) == "staging":
     DEBUG = True
 else:
     DEBUG = False
+
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -222,7 +223,7 @@ LOGGING = {
         'log_file':{
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'logs/django.log',
+            'filename': os.path.join(SITE_ROOT, 'logs/django.log'),
             'maxBytes': '16777216', # 16megabytes
             'formatter': 'verbose'
         },
