@@ -2,6 +2,7 @@
 import datetime
 from datetime import timedelta
 import json
+import logging
 
 # Django
 from django.http import HttpResponseRedirect, HttpResponse
@@ -27,6 +28,7 @@ import social.feedlib as feedlib
 
 import utilities.helpers as helpers
 
+logger = logging.getLogger(__name__)
 
 def single_major(request, major_id):
 
@@ -2011,6 +2013,7 @@ def save_build_path(request):
 
 # For Majors D3 viz -- AJAX
 def get_majors_data(request):
+	# logger.info("getting majors data")
 	path = careerlib.CareerPathBase()
 	data = path.get_majors_data()
 
