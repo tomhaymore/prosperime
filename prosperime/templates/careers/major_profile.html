@@ -12,9 +12,15 @@
 
 <div id="content-container" class="main-container">
 	{% if major.long_title %}
-		<p class="feature-page-header">{{major.long_title}}</p>
+		<p class="v2-feature-page-header">
+			<span class="black">Major: </span>
+			{{major.long_title}}
+		</p>
 	{% else %}
-		<p class="feature-page-header">{{major.title}}</p>
+		<p class="v2-feature-page-header">
+			<span class="black">Major: </span>
+			{{major.title}}
+		</p>
 	{% endif %}
 	{% if major.description %}
 		<p class="main-sub-header">{{major.description}}</p>
@@ -144,19 +150,39 @@
 		</div>
 			 -->
 
+		<div class="placeholder"> </div>
+		<div class="section-header black">People: </div>
+
 		{% for p in paths %}
-		<div class="row-fluid path-row">
+		<div class="row-fluid path-row" data-p_id="{{p.id}}">
 			<div class="span2 center">
 				<img class="major-profile-pic" src="{{p.profile_pic}}" />
 				<div class="path-person-title">{{p.full_name}}</div>
 			</div>
-			<div class="span4 path-position">
-				{{p.first_title}} at {{p.first_entity}}
-			</div>
+
+			<!-- For spacing -->
+			{% if p.first|length > 48 %}
+				<div class="span4 path-position">
+					{{p.first}}
+				</div>
+			{% else %}
+				<div class="span4 path-position pad-down">
+					{{p.first}}
+				</div>
+			{% endif %}
+
 			<div class="span2 spacer"> </div>
-			<div class="span4 path-position">
-				{{p.latest_title}} at {{p.latest_entity}}
-			</div>
+
+			<!-- For spacing -->
+			{% if p.latest|length > 48 %}
+				<div class="span4 path-position">
+					{{p.latest}}
+				</div>
+			{% else %}
+				<div class="span4 path-position pad-down">
+					{{p.latest}}
+				</div>
+			{% endif %}
 		</div>
 		{% endfor %}
 
@@ -182,7 +208,9 @@ $(function() {
 		$(this).addClass("path-row-hover")
 	}).on("mouseleave", function(ev) {
 		$(this).removeClass("path-row-hover")
-	});
+	}).click(function() {
+		window.location = "/profile/" + $(this).data("p_id")
+	})
 
 
 

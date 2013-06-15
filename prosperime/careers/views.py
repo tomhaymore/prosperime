@@ -28,6 +28,7 @@ import social.feedlib as feedlib
 import utilities.helpers as helpers
 
 
+## Clayton - DEV
 # def single_major(request, major_id):
 
 # 	positions = Position.objects.filter(field="Mechanical Engineering")
@@ -112,11 +113,11 @@ def major(request,major_id):
 
 	paths  = []
 	positions = Position.objects.filter(ideal_position=major).select_related("person")
-	for p in positions:
+	for p in positions[:10]:
 		# this returns an array --> [first_positions, last_position]
 		first_and_last_positions = p.person.profile.first_and_last_positions() 
 		if first_and_last_positions is not None:
-			paths.append({"full_name":p.person.profile.full_name(), "profile_pic":p.person.profile.default_profile_pic(), "first_title":first_and_last_positions[0].title, "first_entity":first_and_last_positions[0].entity.name, "latest_title":first_and_last_positions[1].title, "latest_entity":first_and_last_positions[1].entity.name})
+			paths.append({"id":p.person.id, "full_name":p.person.profile.full_name(), "profile_pic":p.person.profile.default_profile_pic(), "first":first_and_last_positions[0].title + " at " + first_and_last_positions[0].entity.name, "latest":first_and_last_positions[1].title + " at " + first_and_last_positions[1].entity.name})
 
 
 	data = {
