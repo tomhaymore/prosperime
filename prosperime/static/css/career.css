@@ -145,17 +145,86 @@ div.section-header {
 
 div.path-row {
 	padding:10px 5px 10px 5px;
-	border-top:1px solid rgba(51,51,51,0.1);
+	margin-bottom:5px;
+	/*border-top:1px solid rgba(51,51,51,0.1);*/
 	color: rgba(51,51,51,0.9);
 	font-size:1.1em;
 }
 
-img.major-profile-pic {
-	border-radius:80px;
-	width:80px;
-	height:80px;
-	border:2px solid rgba(51,51,51,0.7);
+div.path-person-title {
+	visibility: hidden;
+	transition:visibility 0.1s;
+	margin-bottom:5px;
 }
+
+div.path-row:hover div div.path-person-title {
+	visibility:visible;
+}
+
+div.path-row:hover div img.major-profile-pic {
+	filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 1 0\'/></filter></svg>#grayscale");
+    -webkit-filter: grayscale(0%);
+}	
+
+div.major-profile-pic-holder {
+	margin-right:25px;
+	width:150px;
+}
+
+div.first-position-holder {
+	width:200px;
+	margin-right:15px;
+	position:relative;
+	display:inline-block;
+	height:75px;
+}
+
+div.first-position-inner {
+	font-size:0.85em;
+	text-align:center;
+	position:absolute;
+	top:50%;
+}
+
+div.path-holder {
+	width:250px;
+	margin-right:15px;
+	position:relative;
+	display:inline-block;
+	height:75px;
+}
+
+div.path-holder-inner {
+	position:absolute;
+	top:50%;
+}
+
+div.current-position-holder {
+	width:200px;
+	position:relative;
+	display:inline-block;
+	height:75px;
+}
+
+div.current-position-inner {
+	text-align:center;
+	font-size:0.85em;
+	position:absolute;
+	top:50%;
+}
+
+img.major-profile-pic {
+	border-radius:60px;
+	width:60px;
+	height:60px;
+	/*border:2px solid rgba(51,51,51,0.7);*/
+	filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale"); /* Firefox 10+, Firefox on Android */
+    filter: gray; /* IE6-9 */
+    -webkit-filter: grayscale(100%);
+    transition: all 0.1s;
+}
+
+
 
 div.path-position {
 	text-align:center;

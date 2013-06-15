@@ -157,42 +157,59 @@
 		</div>
 			 -->
 
-		<div class="placeholder"> </div>
+		<!-- <div class="placeholder"> </div> -->
 		<div class="section-header black">People: </div>
+		{% if paths %}
+			{% for p in paths %}
+			<div class="path-row" data-p_id="{{p.id}}">
+				<div class="major-profile-pic-holder center pull-left">
+					<div class="path-person-title">{{p.full_name}}</div>
+					<img class="major-profile-pic" src="{{p.profile_pic}}" />
+				</div>
+				<div class="first-position-holder pull-left">
+					<div class="first-position-inner">
+					{{p.first}}
+					</div>
+				</div>
+				<div class="path-holder pull-left">
+					<div class="path-holder-inner">
+						<img src="{{STATIC_URL}}img/connector.png" />
+					</div>
+				</div>
+				<div class="current-position-holder pull-left">
+					<div class="current-position-inner">
+					{{p.latest}}
+					</div>
+				</div>
+				<div class="clear"></div>
+				<!-- For spacing -->
+		<!-- 		{% if p.first|length > 48 %}
+					<div class="span4 path-position">
+						{{p.first}}
+					</div>
+				{% else %}
+					<div class="span4 path-position pad-down">
+						{{p.first}}
+					</div>
+				{% endif %}
 
-		{% for p in paths %}
-		<div class="row-fluid path-row" data-p_id="{{p.id}}">
-			<div class="span2 center">
-				<img class="major-profile-pic" src="{{p.profile_pic}}" />
-				<div class="path-person-title">{{p.full_name}}</div>
+				<div class="span2 spacer"> </div> -->
+
+				<!-- For spacing -->
+			<!-- 	{% if p.latest|length > 48 %}
+					<div class="span4 path-position">
+						{{p.latest}}
+					</div>
+				{% else %}
+					<div class="span4 path-position pad-down">
+						{{p.latest}}
+					</div>
+				{% endif %} -->
 			</div>
-
-			<!-- For spacing -->
-			{% if p.first|length > 48 %}
-				<div class="span4 path-position">
-					{{p.first}}
-				</div>
-			{% else %}
-				<div class="span4 path-position pad-down">
-					{{p.first}}
-				</div>
-			{% endif %}
-
-			<div class="span2 spacer"> </div>
-
-			<!-- For spacing -->
-			{% if p.latest|length > 48 %}
-				<div class="span4 path-position">
-					{{p.latest}}
-				</div>
-			{% else %}
-				<div class="span4 path-position pad-down">
-					{{p.latest}}
-				</div>
-			{% endif %}
-		</div>
 		{% endfor %}
-
+		{% else %}
+		<p>Sorry, no people with this degree.</p>
+		{% endif %}
 	</div>
 </div>
 
@@ -210,14 +227,14 @@ $(function() {
 	});
 
 
-	// Hover for path rows
-	$(".path-row").on("mouseenter", function(ev) {
-		$(this).addClass("path-row-hover")
-	}).on("mouseleave", function(ev) {
-		$(this).removeClass("path-row-hover")
-	}).click(function() {
-		window.location = "/profile/" + $(this).data("p_id")
-	})
+	// // Hover for path rows
+	// $(".path-row").on("mouseenter", function(ev) {
+	// 	$(this).addClass("path-row-hover")
+	// }).on("mouseleave", function(ev) {
+	// 	$(this).removeClass("path-row-hover")
+	// }).click(function() {
+	// 	window.location = "/profile/" + $(this).data("p_id")
+	// })
 
 
 
