@@ -29,7 +29,8 @@ urlpatterns = patterns('',
     url(r'^schools/$', 'careers.views.schools'),
     url(r'^majors/$', 'careers.views.majors'),
     url(r'^majors/(\d+)/$','careers.views.major'),
-    url(r'^majors/v/(\d+)/$', 'careers.views.single_major'),
+    url(r'^newMajors/$','careers.views.new_majors'),
+    # url(r'^majors/v/(\d+)/$', 'careers.views.single_major'),
 
     url(r'^progress/$', 'careers.views.progress'), # Am I on Track?
     
@@ -102,6 +103,7 @@ urlpatterns = patterns('',
     url(r'^careers/getSchoolFragment/$', 'careers.views.get_school_fragment'),
     url(r'^careers/getFeedFragment/$', 'careers.views.get_feed_fragment'),
     url(r'^careers/getMajorsData/$', 'careers.views.get_majors_data'),
+    url(r'^careers/getMajorsFilters/$','careers.views.get_majors_filters'),
 
 
     ## Accounts - AJAX calls
@@ -147,7 +149,7 @@ urlpatterns = patterns('',
     url(r'^rand/$', 'accounts.views.random_profile'),
     url(r'^home2/$', 'careers.views.home_proto'),
 
-    url(r'^proto/$', 'careers.views.proto'),
+    # url(r'^proto/$', 'careers.views.proto'),
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     # url(r'^prosperime/', include('prosperime.foo.urls')),
 

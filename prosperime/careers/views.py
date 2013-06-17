@@ -63,6 +63,20 @@ def majors(request):
 
 	return render_to_response("careers/d3.html",data,context_instance=RequestContext(request))
 
+def new_majors(request):
+	# try to get from cache
+	# data = cache.get("majors_viz_"+str(request.user.id))
+	data = cache.get("majors_viz")
+
+	# test if cache worked
+	if data is not None:
+		data["cache"] = "hit"
+		return render_to_response("careers/majors.html",data,context_instance=RequestContext(request))
+	else:
+		data = {"cache":"miss"}
+
+	return render_to_response("careers/majors.html",data,context_instance=RequestContext(request))
+
 
 def home(request):
 	if not request.user.is_authenticated():
@@ -817,7 +831,7 @@ def viewCareerDecisions(request):
 @login_required
 def discover(request):
 
-	# initiate CarerSimBase
+	# initiate CareerSimBase
 	career_path = careerlib.CareerPathBase()
 	career_sim = careerlib.CareerSimBase()
 
@@ -938,7 +952,7 @@ def career_profile(request,career_id):
 @login_required
 def discover_career(request,career_id):
 
-	# initiate CarerSimBase
+	# initiate CareerSimBase
 	# career_path = careerlib.CareerPathBase()
 
 	# get career object
@@ -974,7 +988,7 @@ def discover_career(request,career_id):
 @login_required
 def discover_career_orgs(request, career_id):
 
-	# initiate CarerSimBase
+	# initiate CareerSimBase
 	career_path = careerlib.CareerPathBase()
 
 	career = Career.objects.get(pk=career_id)
@@ -1007,7 +1021,7 @@ def discover_career_orgs(request, career_id):
 @login_required
 def discover_career_positions(request, career_id):
 
-	# initiate CarerSimBase
+	# initiate CareerSimBase
 	career_path = careerlib.CareerPathBase()
 
 	career = Career.objects.get(pk=career_id)
@@ -1237,6 +1251,21 @@ def viewCareerDecisions(request):
 ##########################
 ###### AJAX Methods ######
 ##########################
+
+def get_majors_filters(request):
+	# make sure it's a get request
+	if request.GET:
+
+		params = request.GET['term']
+
+		majors = [{'label_short':m['major'],'label':m['major'] + " (major)",'value':m['id'],'type':'majors'} for m in IdealPosition.objects.filter(cat="ed",major__icontains=params).values('major','id')]
+		schools = [{'label_short':s['name'],'label':s['name'] + " (school)",'value':s['id'],'type':'schools'} for s in Entity.objects.filter(Q(li_type="school")|Q(type="school")).filter(name__icontains=params).values('name','id')]
+		jobs = [{'label_short':p['title'],'label':p['title'] + " (job)",'value':p['id'],'type':'jobs'} for p in IdealPosition.objects.filter(title__icontains=params).values('title','id')]
+
+		results = majors + schools + jobs
+
+		return HttpResponse(json.dumps(results))
+
 
 
 ## returns JSON-ready array of saved careers
@@ -2034,9 +2063,22 @@ def save_build_path(request):
 
 # For Majors D3 viz -- AJAX
 def get_majors_data(request):
+
 	# logger.info("getting majors data")
+	params = {}
+	# print request.GET
+	if request.GET.getlist('majors[]'):
+		params['majors'] = request.GET.getlist('majors[]')
+		# print params['majors']
+		# print request.GET.getlist('majors[]')
+	if request.GET.getlist('schools[]'):
+		params['schools'] = request.GET.getlist('schools[]')
+	if request.GET.getlist('jobs[]'):
+		params['jobs'] = request.GET.getlist('jobs[]')
+	
 	path = careerlib.CareerPathBase()
-	data = path.get_majors_data()
+	# print params
+	data = path.get_majors_data_new(**params)
 
 	# people = []
 	# positions = []
@@ -2134,9 +2176,10 @@ def get_majors_data(request):
 	# 		"people":json.dumps(people),
 	# 		"result":"success"
 	# 	}
+	if not params:
 		
-	cache.set("majors_viz_"+str(request.user.id),data,1500)
-	cache.set("majors_viz",data,1500)
+		cache.set("majors_viz_"+str(request.user.id),data,2400)
+		cache.set("majors_viz",data,2400)
 
 
 	return HttpResponse(json.dumps(data))

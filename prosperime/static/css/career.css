@@ -136,13 +136,6 @@ div.placeholder {
 	width:100%;
 }
 
-
-div.section-header {
-	font-size:1.4em;
-	line-height:30px;
-
-}
-
 div.path-row {
 	padding:10px 5px 10px 5px;
 	margin-bottom:5px;
@@ -248,6 +241,3 @@ div.spacer {
 }
 
 .center { text-align:center; }
-
-
-
