@@ -104,6 +104,7 @@ urlpatterns = patterns('',
     url(r'^careers/getFeedFragment/$', 'careers.views.get_feed_fragment'),
     url(r'^careers/getMajorsData/$', 'careers.views.get_majors_data'),
     url(r'^careers/getMajorsFilters/$','careers.views.get_majors_filters'),
+    url(r'^careers/getSingleMajorData/(\d+)/$','careers.views.get_major_data'),
 
 
     ## Accounts - AJAX calls

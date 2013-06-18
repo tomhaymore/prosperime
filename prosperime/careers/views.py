@@ -2061,6 +2061,17 @@ def save_build_path(request):
 
 	return HttpResponse(json.dumps(response))
 
+# for single major d3 viz -- AJAX
+def get_major_data(request,major_id):
+	
+	data = cache.get("major_viz_"+str(request.user.id)+"_"+str(major_id))
+	if not data:
+		path = careerlib.CareerPathBase()
+		data = path.get_major_data(major_id)
+		cache.set("major_viz_"+str(request.user.id)+"_"+str(major_id),data,2400)
+
+	return HttpResponse(json.dumps(data))
+
 # For Majors D3 viz -- AJAX
 def get_majors_data(request):
 
@@ -2068,7 +2079,7 @@ def get_majors_data(request):
 	params = {}
 	# print request.GET
 	if request.GET.getlist('majors[]'):
-		params['majors'] = request.GET.getlist('majors[]')
+		params['majors'] = [int(m) for m in request.GET.getlist('majors[]')]
 		# print params['majors']
 		# print request.GET.getlist('majors[]')
 	if request.GET.getlist('schools[]'):
@@ -2177,7 +2188,7 @@ def get_majors_data(request):
 	# 		"result":"success"
 	# 	}
 	if not params:
-		
+
 		cache.set("majors_viz_"+str(request.user.id),data,2400)
 		cache.set("majors_viz",data,2400)
 

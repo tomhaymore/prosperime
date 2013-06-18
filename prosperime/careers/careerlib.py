@@ -1010,13 +1010,88 @@ class CareerPathBase(CareerBase):
 
 		return data
 
+	def get_major_data(self,major,user=None,**opts):
+		"""
+		returns on a specific major, including users, first jobs, and current jobs
+		"""
+		from accounts.models import Profile
+		
+		# init arrays and sets
+		people = []
+		first_jobs = {}
+		current_jobs = {}
+
+		people_set = set()
+		first_jobs_set = set()
+		current_jobs_set = set()
+
+		# get schools from user
+		if user:
+			schools = Entity.objects.filter(li_type="school",positions__person=user,positions__type="education").distinct()
+		else:
+			schools = None
+
+		users = User.objects.filter(positions__ideal_position__id=major)
+		# add schools filter if present
+		if schools:
+			users = users.filter(positions__entity__in=schools)
+
+		first_ideals = dict((u.id,u.profile.first_ideal_job) for u in users)
+
+		current_ideals = dict((u.id,u.profile.current_ideal_position()) for u in users)
+
+		base_positions = Position.objects.filter(type="education",ideal_position__id=major).values('person__profile__status','ideal_position__major','ideal_position__title','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
+		if schools:
+			base_positions = base_positions.filter(entity__in=schools)
+
+
+		for p in base_positions:
+			# get first and current ideals 
+			first_ideal = first_ideals[p['person__id']]
+			current_ideal = current_ideals[p['person__id']]
+			# skip this relationship if they don't have ideal position on either end
+			if first_ideal is None or current_ideal is None:
+				continue
+
+			if p['person__id'] not in people_set:
+				pic = Profile.objects.get(user__id=p['person__id']).default_profile_pic()
+				fullname = p['person__profile__first_name'] + " " + p['person__profile__last_name']
+				people_set.add(p['person__id'])
+				people.append({"id":p['person__id'],"fullname":fullname,"first_job":first_ideal.id, "current_job":current_ideal.id,"pic":pic})
+				
+			if first_ideal.id not in first_jobs_set:
+				first_jobs_set.add(first_ideal.id)
+				first_jobs[first_ideal.id] = {"id":first_ideal.id,"title":first_ideal.title,"people":[p['person__id']],'current_jobs':[current_ideal.id]}
+			else:
+				first_jobs[first_ideal.id]['people'].append(p['person__id'])
+				first_jobs[first_ideal.id]['current_jobs'].append(current_ideal.id)
+
+			if current_ideal.id not in current_jobs_set:
+				current_jobs_set.add(current_ideal.id)
+				current_jobs[current_ideal.id] = {'id':current_ideal.id,"title":current_ideal.title,"people":[p['person__id']],"first_jobs":[first_ideal.id]}
+			else:
+				current_jobs[current_ideal.id]['people'].append(p['person__id'])
+				current_jobs[current_ideal.id]['first_jobs'].append(first_ideal.id)
+
+		first_jobs_list = [{"id":v['id'],"title":v['title'],"people":v['people'],'current_jobs':v['current_jobs']} for k,v in first_jobs.iteritems()]
+		current_jobs_list = [{"id":v['id'],"title":v['title'],"people":v['people'],'first_jobs':v['first_jobs']} for k,v in current_jobs.iteritems()]
+
+		data = {
+			"current_jobs":current_jobs_list,
+			"first_jobs":first_jobs_list,
+			"people":people,
+			"result":"success"
+		}
+
+		return data
+
+
 	def get_majors_data_new(self,user=None,**opts):
 		"""
 		returns data on majors, first jobs and users
 		"""
 		from accounts.models import Profile
 		# get optional params
-		print opts
 
 		schools = opts.get('schools',None)
 		majors_query = opts.get('majors',None)
@@ -1050,12 +1125,16 @@ class CareerPathBase(CareerBase):
 
 		# assemble all the positions
 		base_positions = Position.objects.filter(type="education",ideal_position__level=1).values('person__profile__status','ideal_position__major','ideal_position__title','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
+		# base_positions.filter(ideal_position__id=2029)
 		if schools:
 			# base_positions = Position.objects.filter(type="education",entity__in=schools).exclude(ideal_position=None).select_related("person")
-			base_positions.filter(entity__in=schools)
+			base_positions = base_positions.filter(entity__in=schools)
 		if majors_query:
-			base_positions.filter(ideal_position__major__icontains=majors_query)	
+			print majors_query
+			base_positions = base_positions.filter(ideal_position__id__in=majors_query)	
 
+		# base_positions.values('person__profile__status','ideal_position__major','ideal_position__title','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
+		print base_positions.query
 		# print "looping through positions..."
 		for p in base_positions:
 			if p['person__profile__status'] == 'crunchbase':
@@ -1084,7 +1163,7 @@ class CareerPathBase(CareerBase):
 					# print p.ideal_position, p.ideal_position.id
 				if p['ideal_position__major'] not in majors_set:
 					majors_set.add(p['ideal_position__major'])
-					majors[p['ideal_position__major']] = {"id":[p['ideal_position__id']],"people":[p['person__id']], "positions":[first_ideal.id], "index":len(majors_set), "abbr":p['ideal_position__title'][:5]}
+					majors[p['ideal_position__major']] = {"id":p['ideal_position__id'],"people":[p['person__id']], "positions":[first_ideal.id], "index":len(majors_set), "abbr":p['ideal_position__title'][:5]}
 				# if p.field not in majors_set:
 				# 	majors_set.add(p.field)
 				# 	majors[p.field] = {"people":[p.person.id], "positions":[first_ideal.id], "index":len(majors_set)}
@@ -1099,7 +1178,7 @@ class CareerPathBase(CareerBase):
 
 					people_set.add(p['person__id'])
 					pic = Profile.objects.get(user__id=p['person__id']).default_profile_pic()
-					people.append({'name':full_name, 'id':p['person__id'], "major_index":majors[p['ideal_position__major']]["index"], "major":p['ideal_position__major'],"pic":pic})
+					people.append({'name':full_name, 'id':p['person__id'], 'major_id':p['ideal_position__id'],"major_index":majors[p['ideal_position__major']]["index"], "major":p['ideal_position__major'],"pic":pic})
 
 
 					counter += 1	
@@ -1109,7 +1188,7 @@ class CareerPathBase(CareerBase):
 
 				if first_ideal.id not in positions_set:
 					positions_set.add(first_ideal.id)
-					positions.append({'title':first_ideal.title, 'id':first_ideal.id, "major_index":majors[p['ideal_position__major']]["index"], "major":p['ideal_position__major']})
+					positions.append({'title':first_ideal.title, 'id':first_ideal.id,'major_id':p['ideal_position__id'], "major_index":majors[p['ideal_position__major']]["index"], "major":p['ideal_position__major']})
 
 		data = {
 			"majors":json.dumps(majors),

@@ -153,7 +153,7 @@
 		
 	</div>
 	<div>
-			<div class="section-header block pull-left">Your Network</div>
+			<div class="section-header block pull-left">People</div>
 			<div class="section-header-middle block pull-left">College Majors</div>
 			<div class="section-header-right block pull-left">First Jobs</div>
 			<div class="clear"></div>
@@ -204,8 +204,8 @@
 			positions = shuffle({{positions|safe}})
 			majors = {{majors|safe}}
 			// logging
-			// console.log(people)
-			console.log(majors)
+			console.log(people)
+			// console.log(majors)
 			// render viz
 			renderViz()
 		} else {
@@ -217,8 +217,8 @@
 					positions = shuffle($.parseJSON(response["positions"]))
 					majors = $.parseJSON(response["majors"])
 					// logging
-					// console.log(people)
-					console.log(majors)
+					console.log(people)
+					// console.log(majors)
 					// render viz
 					renderViz()
 				}
@@ -239,6 +239,7 @@
 					updatePeople();
 					updatePositions();
 					drawLines();
+					console.log('lines drawn')
 				}
 				
 			},"json");
@@ -354,7 +355,8 @@
 			})
 
 			.attr("class", "box")
-			.attr("id", function(d) { return "major-" + majors[d]["index"]})
+			// .attr("id", function(d) { return "major-" + majors[d]["index"]})
+			.attr("id",function(d) { return "major-" + majors[d].id})
 			.attr("data-index", function(d, i) { return i })
 
 			// Major mouseover
@@ -403,7 +405,7 @@
 			})
 
 			.on("click", function(d) {
-				window.location = "/majors/" + majors[d]["id"][0] + "/"
+				window.location = "/majors/" + majors[d]["id"] + "/"
 			});
 
 		center.exit().remove();
@@ -431,7 +433,30 @@
 	function updatePeople() {
 	// function updatePeople(svg_left, y_offset) {
 		// Add user nodes to left svg
-		var svg = svg_left.selectAll("image").data(people);
+		var svg = svg_left.selectAll("image")
+			.data(people,function(d){return d.id;});
+		
+		svg.exit()
+			// .transition()
+			// 	.duration(500)
+			// 	.attr("x",0)
+			// 	.attr("y",0)
+			.remove();
+
+		svg.transition()
+			.duration(500)
+			.attr("x", function(d, i) { // staggers nodes x-value
+				if (i % 4 == 0) return img_width
+				else if (i % 4 == 1) return img_width * 2
+				else if (i % 4 == 2) return img_width * 3
+				else return img_width * 4
+			})
+			.attr("y", function(d, i) {
+				return Math.floor(i / 4) * img_height;
+				
+			});
+		
+		// g = svg.enter().append("g");
 
 		svg.enter().append("image")
 			// .attr("x",0)
@@ -457,7 +482,6 @@
 			.attr("id", function(d) { return "person-"+d.id })
 			.attr("data-name", function(d) { return d.name });
 
-
 		svg.on("mouseover", function(d) {
 				var d3_this = d3.select(this);
 				this.parentNode.appendChild(this);
@@ -469,13 +493,19 @@
 				// d3.select(this).attr("width",img_width+15)
 				// d3.select(this).attr("x",)
 				// Get major div
-				var major_node = d3.select("#major-"+d.major_index)
+				// var major_node = d3.select("#major-"+d.major_index)
+				
+				var major_node = d3.select("#major-"+d.major_id)
+				
 				// Add hover to it
 				major_node.attr("class", "box major-hover")
+				
 				// Make lines blue
 				var line_selector = major_node.attr("id").split("-")[1]
-				lineMouseover(d3.selectAll(".line-"+line_selector))
+				// var line_selector = major_node.attr("id")
 				
+				lineMouseover(d3.selectAll(".line-"+d.major_index))
+				console.log(".line-"+d.major_index)
 				// Trigger hover on user dots
 				for (p in majors[d.major]["people"]) {
 					var user_node = d3.select("#person-"+majors[d.major]["people"][p])
@@ -496,7 +526,8 @@
 				d3.select(this).attr("width",img_width)
 				d3.select(this).attr("filter","url(#grayscale)")
 				// get major node
-				var major_node = d3.select("#major-"+d.major_index)
+				// var major_node = d3.select("#major-"+d.major_index)
+				var major_node = d3.select("#major-"+d.major_id)
 				// normalize class
 				major_node.attr("class", "box")
 
@@ -516,12 +547,32 @@
 				}
 			});
 		
-		svg.exit().remove();
+		
 	};
 
 	// function updatePositions(svg_right, y_offset) {
 	function updatePositions() {
 		var svg = svg_right.selectAll("circle").data(positions);
+
+		svg.exit()
+			// .transition()
+			// 	.duration(500)
+			// 	.attr("cx",250)
+			// 	.attr("cy",0)
+			.remove()
+
+		svg.transition()
+			.duration(500)
+			.attr("cx", function(d, i) { // staggers nodes x-value
+				if (i % 4 == 0) return 200
+				else if (i % 4 == 1) return 250
+				else if (i % 4 == 2) return 160
+				else return 220
+			})
+			.attr("cy", function(d, i) {
+				if ((i + 1) % 2 == 0) return i * y_offset
+				else return (i + 1) * y_offset
+			});
 
 		svg.enter().append("circle")
 			.attr("cx", function(d, i) { // staggers nodes x-value
@@ -540,15 +591,15 @@
 			.attr("stroke-width", 2)
 			.attr("id", function(d) { return "position-"+d.id })
 			.attr("data-title", function(d) { return d.title })
-
 			.on("mouseover", function(d) {
 				// Get major div
-				var major_node = d3.select("#major-"+d.major_index)
+				// var major_node = d3.select("#major-"+d.major_index)
+				var major_node = d3.select("#major-"+d.major_id)
 				// Add hover to it
 				major_node.attr("class", "box major-hover")
 				// Make lines blue
 				var line_selector = major_node.attr("id").split("-")[1]
-				lineMouseover(d3.selectAll(".line-"+line_selector))
+				lineMouseover(d3.selectAll(".line-"+d.major_index))
 				
 				// Trigger hover on user dots
 				for (p in majors[d.major]["people"]) {
@@ -564,13 +615,15 @@
 			})
 			.on("mouseout", function(d) {
 				// get major node
-				var major_node = d3.select("#major-"+d.major_index)
+				var major_node = d3.select("#major-"+d.major_id)
 				// normalize class
 				major_node.attr("class", "box")
 
 				// Make lines grey again
+				// var major_node = d3.select("#major-"+d.major_index)
+				var major_node = d3.select("#major"+d.major_id)
 				lineMouseout(d3.selectAll(".line-"+d.major_index))
-
+				
 				// Remove user hover
 				for (p in majors[d.major]["people"]) {
 					var user_node = d3.select("#person-"+majors[d.major]["people"][p])
@@ -584,25 +637,36 @@
 				}
 			});
 
-		svg.exit().remove()
+		
 	};
 
 	// Iterates through each major, gets ids of positions, people
 	//  draws lines to each
 	// function drawLines(svg_left, svg_right) {
 	function drawLines() {
-
+		// var lines_left = svg_left.selectAll("path").remove()
+		// var lines_right = svg_right.selectAll("path").remove()
+		$("path").remove()
 		// Add all connecting lines
+
 		for (key in majors) {
-
-			var left_y; var left_x; var right_y; var right_x; 
-			var index = d3.select("#major-"+majors[key]["index"]).attr("data-index")
-
+			// console.log(majors[key])
+			var left_y,
+				left_x,
+				right_y,
+				right_x; 
+			// console.log("#major-"+majors[key]["id"])
+			var index = d3.select("#major-"+majors[key]["id"]).attr("data-index")
+			// console.log(index)
 			// people <--> majors
 			var people = majors[key]["people"]
+			// console.log(people)
 			for (var j = 0; j < people.length; j++) {
+				
 				left_y = parseInt($("#person-"+people[j]).attr("y")) + img_height
+				console.log("#person-"+people[j])
 				left_x = parseInt($("#person-"+people[j]).attr("x")) + 3
+
 				right_y = 16 + (27 * index)
 				right_x = 360
 				d3_drawLines(svg_left, left_x, left_y, right_x, right_y, majors[key]["index"])
@@ -614,7 +678,9 @@
 				left_y = 13 + (27 * index)
 				left_x = 0
 				right_y = $("#position-"+positions[l]).attr("cy")
+
 				right_x = parseInt($("#position-"+positions[l]).attr("cx")) - 6	
+
 				d3_drawLines(svg_right, right_x, right_y, left_x, left_y, majors[key]["index"])
 			};
 		};

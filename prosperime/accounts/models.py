@@ -211,6 +211,12 @@ class Profile(models.Model):
         else:
             return None
 
+    def current_ideal_position(self):
+        positions = self.user.positions.exclude(ideal_position=None).order_by('-start_date')
+        if positions.exists():
+            return positions[0]
+        else:
+            return None
 
     def prof_longevity(self):
         return careerlib.get_prof_longevity(self.user)
