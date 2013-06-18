@@ -195,10 +195,10 @@ div.main-container {
 	/*-moz-box-shadow: 0 1px 10px rgba(0,0,0,0.1);*/
 	/*box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);*/
 	margin-top:15px;
-	min-height: 250px;
+	min-height: 550px;
 	margin-bottom:15px;
 }
->>>>>>> 374331e94bf3aa7e3020b9688fabfdebc94dea26
+
 
 div#main-container {
 	background-color:#fff;
@@ -2016,4 +2016,6 @@ div.background-container {
 
 }
 
-
+div.inline {
+	display:inline-block;
+}

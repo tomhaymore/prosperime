@@ -142,14 +142,14 @@
 		<p class="feature-page-header">What can you do with your major?</p>
 		<p class="feature-page-subheader">Use the graph below to see which majors lead to what jobs. Click on any major to learn more.</p>
 		
-		<div id="filter-form">
+		<!-- <div id="filter-form">
 			<p>Filter by school, major or job: <input id="majors-filter-input" data-val-id="" class="flat-input" placeholder="Start typing... "/></p>
 		</div>
 		<div class="filters-container">
 			<ul id="filters-list" class="flat-list">
 
 			</ul>
-		</div>
+		</div> -->
 		
 	</div>
 	<div>
@@ -338,8 +338,11 @@
 
 	function updateMajors() {
 		// Add Center divs (Majors)
-		center = d3.select("#center").selectAll("div").data(Object.keys(majors));
+		center = d3.select("#center").selectAll("div")
+			.data(Object.keys(majors),function(d) { return majors[d].id ;});
 
+		center.exit().remove();
+		
 		center.enter().append("div")
 			.html(function(d) { 
 
@@ -367,8 +370,10 @@
 				
 				// Make lines blue
 				// funky code b/c of closure issues in handler
-				var line_selector = d3.select(this).attr("id").split("-")[1]
-				lineMouseover(d3.selectAll(".line-"+line_selector))
+				// var line_selector = d3.select(this).attr("id").split("-")[1]
+				// console.log(".line-"+majors[d].index)
+				// console.log(".line-"+majors[d].id)
+				lineMouseover(d3.selectAll(".line-"+majors[d].index))
 			
 				// Trigger hover on user dots
 				for (p in majors[d]["people"]) {
@@ -408,7 +413,7 @@
 				window.location = "/majors/" + majors[d]["id"] + "/"
 			});
 
-		center.exit().remove();
+		
 	};
 
 	

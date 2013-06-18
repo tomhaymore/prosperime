@@ -192,7 +192,7 @@ def major(request,major_id):
 	# 	'all':data_all
 	# }
 
-	return render_to_response('careers/major_profile.html',data,context_instance=RequestContext(request))
+	return render_to_response('careers/major_profile_old.html',data,context_instance=RequestContext(request))
 
 def get_school_fragment(request,school_id=None):
 	c = careerlib.CareerPathBase()

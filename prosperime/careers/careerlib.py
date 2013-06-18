@@ -1182,7 +1182,7 @@ class CareerPathBase(CareerBase):
 
 
 					counter += 1	
-					if counter == 72:
+					if counter == 84:
 						break;
 
 

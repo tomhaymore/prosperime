@@ -3,6 +3,7 @@
 {% block head %}
 
 <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/career.css" />
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/majors.css" />
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
 {% endblock %}
@@ -31,7 +32,10 @@
 	<div id="career-profile-container">
 
 	
-		<div class="section-header black">People: </div>
+		<div class="single-section-header pull-left">People </div>
+		<div class="single-section-header pull-left">First Job </div>
+		<div class="single-section-header pull-left">Current Job </div>
+		<div class="clear"></div>
 		<!-- {% if paths %}
 			{% for p in paths %}
 			<div class="path-row" data-p_id="{{p.id}}">
@@ -87,7 +91,7 @@ $(function() {
 		current_jobs;
 
 	// 
-	var width = 750,
+	var width = 1000,
 		height = 750,
 		img_x_offset = 25,
 		img_text_offset = 5,
@@ -182,7 +186,8 @@ $(function() {
 		var g = people_container.enter().append("g")
 			.attr("class","image")
 			.attr("first_job", function(d) { return d.first_job; })
-			.attr("current_job", function(d) { return d.current_job; });
+			.attr("current_job", function(d) { return d.current_job; })
+			.attr("id",function(d) { return "person-group-"+d.id;});
 
 		// add image
 		g.append("image")
@@ -205,11 +210,11 @@ $(function() {
 			showLines(d.id);
 			// repaint triggered elements to get back on top
 			this.parentNode.appendChild(this);
-			var el = document.getElementById("first-job-"+d.first_job)
-			console.log(el.previousSibling);
+			var el = document.getElementById("first-job-group-"+d.first_job)
+			// console.log(el.previousSibling);
 			el.parentNode.appendChild(el.previousSibling);
 			el.parentNode.appendChild(el);
-			var el = document.getElementById("current-job-"+d.current_job)
+			var el = document.getElementById("current-job-group-"+d.current_job)
 			el.parentNode.appendChild(el.previousSibling);
 			el.parentNode.appendChild(el);
 			// magnification effect
@@ -220,10 +225,17 @@ $(function() {
 			d3.select(this).select("text")
 				.attr("class","hover-name");
 			// add filter to boxes
-			d3.select("#first-job-"+d.first_job)
-				.attr("filter","url(#glow)")
-			d3.select("#current-job-"+d.current_job)
-				.attr("filter","url(#glow)")
+			console.log("#first-job-rect-"+d.first_job)
+			d3.select("#first-job-rect-"+d.first_job)
+				// .attr("filter","url(#glow)")
+				// .attr("stroke","rgb(48,91,152)")
+				// .attr("stroke-width",1)
+				// .attr("fill","rgb(255,255,255)")
+			d3.select("#current-job-rect-"+d.current_job)
+				// .attr("stroke","rgb(48,91,152)")
+				// .attr("stroke-width",1)
+				// .attr("filter","url(#glow)")
+				// .attr("fill","rgb(255,255,255)")
 		}).on("mouseout",function(d) {
 			d3.select(this).select("image")
 				.attr("height",img_height)
@@ -232,9 +244,9 @@ $(function() {
 			d3.select(this).select("text")
 				.attr("class","hidden-name")
 			// remove filter from boxes
-			d3.select("#first-job-"+d.first_job)
+			d3.select("#first-job-rect-"+d.first_job)
 				.attr("filter","")
-			d3.select("#current-job-"+d.current_job)
+			d3.select("#current-job-rect-"+d.current_job)
 				.attr("filter","")
 			hideLines(d.id);
 		});
@@ -257,25 +269,27 @@ $(function() {
 		// transition old elements
 		first_jobs_container.transition()
 			.duration(250)
-			.attr("x",250)
+			.attr("x",300)
 			.attr("y",function(d,i) {return (i * job_container) + 25;})
 
 		// add enter
 		var g = first_jobs_container.enter().append("g")
-			.attr("class","first-job");
+			.attr("class","first-job")
+			.attr("id",function(d) { return "first-job-group-"+d.id;});
 
 		// append rects
 		g.append("rect")
-			.attr("x",245)
+			.attr("x",300)
 			.attr("y",function(d,i) {return (i * job_container) + 35;})
-			.attr("width",155)
-			.attr("height",25)
+			.attr("width",250)
+			.attr("height",35)
 			.attr("fill","rgb(255,255,255)")
+			.attr("id",function(d) { return "first-job-rect-"+d.id;})
 			.attr("class","first-job-box");
 
 		// append text
 		g.append("text")
-			.attr("x",250)
+			.attr("x",315)
 			.attr("y",function(d,i) {return (i * job_container) + 45;})
 			.attr("class","first-job-title")
 			.attr("people",function(d) { return d.people; })
@@ -288,21 +302,29 @@ $(function() {
 			showLines(d.people);
 			// repaint triggered elements to get back on top
 			this.parentNode.appendChild(this);
-			var el = document.getElementById("current-job-"+d.current_job)
-			el.parentNode.appendChild(el.previousSibling);
+			var el = document.getElementById("current-job-group-"+d.current_job)
+			// el.parentNode.appendChild(el.previousSibling);
+			el.parentNode.appendChild(el);
+			var el = document.getElementById("people-group-"+d.people)
 			el.parentNode.appendChild(el);
 			// magnification effect
 			userMouseOver("#people-"+d.people)
-			d3.select("#first-job-"+d.first_job)
-				.attr("filter","url(#glow)")
-			d3.select("#current-job-"+d.current_job)
+			d3.select("#first-job-rect-"+d.first_job)
+				// .attr("stroke","rgb(48,91,152)")
+				// .attr("stroke-width",1)
+				// .attr("filter","url(#glow)")
+			d3.select("#current-job-rect-"+d.current_job)
 				.attr("filter","url(#glow)")
 		}).on("mouseout",function(d) {
 			userMouseOut("#people-"+d.people)
 			// remove filter from boxes
-			d3.select("#first-job-"+d.first_job)
+			d3.select("#first-job-rect-"+d.first_job)
+				// .attr("stroke","rgb(48,91,152)")
+				// .attr("stroke-width",1)
 				.attr("filter","")
-			d3.select("#current-job-"+d.current_job)
+			d3.select("#current-job-rect-"+d.current_job)
+				// .attr("stroke","rgb(48,91,152)")
+				// .attr("stroke-width",1)
 				.attr("filter","")
 			hideLines(d.people);
 		});
@@ -321,27 +343,29 @@ $(function() {
 		// transition old elements
 		current_jobs_container.transition()
 			.duration(250)
-			.attr("x",550)
+			.attr("x",700)
 			.attr("y",function(d,i) {return (i * job_container) + 25;})
 
 		// enter function
 		var g = current_jobs_container.enter().append("g")
 			.attr("class","current-job")
-			.attr("height",25)
-			.attr("width",150)
+			.attr("height",35)
+			.attr("width",250)
+			.attr("id",function(d) { return "current-job-group-"+d.id});
 
 		// append rects
 		g.append("rect")
-			.attr("x",545)
+			.attr("x",700)
 			.attr("y",function(d,i) {return (i * job_container) + 35;})
 			.attr("width",155)
 			.attr("height",25)
 			.attr("fill","rgb(255,255,255)")
+			.attr("id",function(d) { return "current-job-rect-"+d.id;})
 			.attr("class","current-job-box");
 
 		// append text		
 		g.append("text")
-			.attr("x",550)
+			.attr("x",715)
 			.attr("y",function(d,i) {return (i * job_container) + 45;})
 			.attr("class","current-job")
 			.attr("people",function(d) { return d.people; })
@@ -354,32 +378,23 @@ $(function() {
 			showLines(d.people);
 			// repaint triggered elements to get back on top
 			this.parentNode.appendChild(this);
-			var el = document.getElementById("first-job-"+d.current_job)
-			el.parentNode.appendChild(el.previousSibling);
+			var el = document.getElementById("first-job-group-"+d.current_job)
+			// el.parentNode.appendChild(el.previousSibling);
+			el.parentNode.appendChild(el);
+			var el = document.getElementById("people-group-"+d.people)
 			el.parentNode.appendChild(el);
 			// magnification effect
-			d3.select(this).select("image")
-				.attr("height",img_height+10)
-				.attr("width",img_width+10)
-				.attr("filter","");
-			d3.select(this).select("text")
-				.attr("class","hover-name");
-			// add filter to boxes
-			// d3.select("#first-job-"+d.first_job)
-			// 	.attr("filter","url(#glow)")
-			d3.select("#current-job-"+d.current_job)
+			userMouseOver("#people-"+d.people)
+			d3.select("#first-job-rect-"+d.first_job)
+				.attr("filter","url(#glow)")
+			d3.select("#current-job-rect-"+d.current_job)
 				.attr("filter","url(#glow)")
 		}).on("mouseout",function(d) {
-			d3.select(this).select("image")
-				.attr("height",img_height)
-				.attr("width",img_width)
-				.attr("filter","url(#grayscale)")
-			d3.select(this).select("text")
-				.attr("class","hidden-name")
+			userMouseOut("#people-"+d.people)
 			// remove filter from boxes
-			// d3.select("#first-job-"+d.first_job)
-			// 	.attr("filter","")
-			d3.select("#current-job-"+d.current_job)
+			d3.select("#first-job-rect-"+d.first_job)
+				.attr("filter","")
+			d3.select("#current-job-rect-"+d.current_job)
 				.attr("filter","")
 			hideLines(d.people);
 		});
