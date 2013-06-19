@@ -11,7 +11,7 @@
 	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-	<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+
 
     <style type="text/css">
         .box {
@@ -146,7 +146,7 @@
 			<p>Filter by school, major or job: <input id="majors-filter-input" data-val-id="" class="flat-input" placeholder="Start typing... "/></p>
 		</div>
 		<div class="filters-container">
-			<ul id="filters-list" class="flat-list">
+			<ul id="filters-list" class="flat-list inline">
 
 			</ul>
 		</div>
@@ -230,11 +230,17 @@
 			minLength: 3,
 			source: '/careers/getMajorsFilters/',
 			select: function(event,ui) {
+				console.log(ui)
 				event.preventDefault();
 				$(this).val(ui.item.label_short);
 				$(this).data('val-id',ui.item.value);
 				$(this).data('val-cat',ui.item.type)
-			}
+			},
+			// Makes the display the major instead of id
+			focus: function(event,ui) {
+				event.preventDefault()
+				$(this).val(ui.item.label_short)
+			},
 		})
 		// Filters keypress
 		.keypress(function(e) {
@@ -244,7 +250,7 @@
 				// add to global filter set
 				filters[cat].push(input.data('val-id'));			
 				// add to list
-				$("#filters-list").append("<li class='filters-item'>"+input.val()+" <span data-type='" + cat + "' data-id='" + input.data("val-id") + "' class='remove-filter' onclick='updateFilters(this)'>X</span></li>");
+				$("#filters-list").append("<li class='filters-item'>"+input.val()+" <span data-type='" + cat + "' data-id='" + input.data("val-id") + "' data-name='"+$("#majors-filter-input").val() +"' class='remove-filter' onclick='updateFilters(this)'>X</span></li>");
 				// empty out input bar
 				input.val("")
 				// update data
@@ -255,14 +261,18 @@
 
 	function updateFilters(el) {
 		// Get id, filter type
+		console.log(filters)
 		var type = $(el).data("type")
-		var id = $(el).data("id")
-
+		var id = parseInt($(el).data("id"))
+		console.log($(el).data("name"))
+		console.log("type: " + type + " id: " + id)
 		// Remove filter from list
 		$(el).parent().remove()
 
 		// Get new data
-		filters[type].splice(filters[type][id], 1) 
+		var index = filters[type].indexOf(id)
+		filters[type].splice(index, 1) 
+		console.log(filters)
 		updateData()
 	};
 
@@ -279,7 +289,7 @@
 				updateMajors();
 				updatePeople();
 				updatePositions();
-				drawLines();
+				// drawLines();
 			}				
 		},"json");
 	};
@@ -316,21 +326,19 @@
 		var majors_column_height = parseInt(d3.select("#center").style("height"))
 		magic_number = (majors_column_height + 100 < 560) ? majors_column_height + 100 : 560;
 		y_offset = Math.ceil(magic_number / positions.length)
-		console.log(d3.select("#center").style("height"))
 		// add position nodes
 		// updatePositions(svg_right, y_offset)
 		updatePositions()
 
 		// draw connecting lines
 		// drawLines(svg_left, svg_right)
-		drawLines()
+		// drawLines()
 	};
 
 
 
 	function updateMajors() {
 		// Add Center divs (Majors)
-		console.log(majors)
 		center = d3.select("#center").selectAll("div")
 			.data(Object.keys(majors), function(d) {
 				// Don't know why, but this gets called twice,
@@ -339,7 +347,12 @@
 			}).order()
 
 		// remove old nodes
-		center.exit().remove();
+		center.exit()
+			.transition()
+				.duration(400)
+				.style("opacity", 0)
+				.remove()
+
 
 		// add new nodes
 		center.enter().append("div")
@@ -430,20 +443,8 @@
 			.remove();
 
 		// update existing nodes... why doesn't .update() work??
-		// svg.transition()
-		// 	.duration(100) // Clay -- made this shorter (400)
-		svg.attr("x", function(d, i) { // staggers nodes x-value
-				if (i % 4 == 0) return img_width
-				else if (i % 4 == 1) return img_width * 2
-				else if (i % 4 == 2) return img_width * 3
-				else return img_width * 4
-			})
-			.attr("y", function(d, i) {
-				return Math.floor(i / 4) * img_height;
-			});
-		
-
-		svg.enter().append("image")
+		svg.transition()
+			.duration(400) // Clay -- made this shorter (400)
 			.attr("x", function(d, i) { // staggers nodes x-value
 				if (i % 4 == 0) return img_width
 				else if (i % 4 == 1) return img_width * 2
@@ -453,12 +454,31 @@
 			.attr("y", function(d, i) {
 				return Math.floor(i / 4) * img_height;
 			})
+			.each("end", drawLinesGate)
+
+
+
+		svg.enter().append("image")
+			.attr("x", -50) // start off the canvas, animate on
+			.attr("y", function(d, i) {
+				return Math.floor(i / 4) * img_height;
+			})
 			.attr("height", img_height)
 			.attr("width", img_width)
 			.attr("xlink:href", function(d) { return d.pic })
 			.attr("filter","url(#grayscale)")
 			.attr("id", function(d) { return "person-"+d.id })
-			.attr("data-name", function(d) { return d.name });
+			.attr("data-name", function(d) { return d.name })
+		.transition()
+			.duration(400)
+			.each("end", drawLinesGate)
+			.attr("x", function(d, i) { // staggers nodes x-value
+				if (i % 4 == 0) return img_width
+				else if (i % 4 == 1) return img_width * 2
+				else if (i % 4 == 2) return img_width * 3
+				else return img_width * 4
+			})
+
 
 		svg.on("mouseover", function(d) {
 				// ??
@@ -577,10 +597,19 @@
 			});
 	};
 
+	var transition_counter = 0;
+	/* Tactics... catch each individual transition's end event,
+		increment counter. Once all end events transferred, save to 
+		re-draw lines to new locations */
+	var drawLinesGate = function() {
+		if (transition_counter++ >= people.length - 1) drawLines()
+	};
+
 	// Iterates through each major, gets ids of positions, people
 	//  draws lines to each
 	// function drawLines(svg_left, svg_right) {
 	function drawLines() {
+		transition_counter = 0
 		// Remove existing lines
 		// var lines_left = svg_left.selectAll("path").remove()
 		// var lines_right = svg_right.selectAll("path").remove()
@@ -814,11 +843,9 @@
 
 
 /* TODO 
-: fix filters
 : animate nodes, pictures, divs in 
-: allow filter canceling
 : add a button in case "enter" isn't intuitive
-
+: deal with position changes... doing nothing
 
 
 */
