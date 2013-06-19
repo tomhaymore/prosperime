@@ -17,10 +17,12 @@ if os.environ.get("PROSPR_ENV",None) == "staging":
     DEBUG = True
 else:
     DEBUG = False
+
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     ('Thomas Haymore', 'thomas.haymore@gmail.com'),
+    ('Clayton Holz','ctholz@gmail.com'),
 )
 
 MANAGERS = ADMINS
@@ -170,6 +172,7 @@ INSTALLED_APPS = (
     # 'saved_paths',
     'careers',
     'social',
+    # 'django_extensions',
     # 'debug_toolbar'
     # 'south',
     # 'jsonify',
@@ -194,16 +197,67 @@ AUTHENTICATION_BACKENDS = (
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
     'handlers': {
+        'null': {
+            'level':'DEBUG',
+            'class':'django.utils.log.NullHandler',
+        },
+        'console':{
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'log_file':{
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(SITE_ROOT, 'logs/django.log'),
+            'maxBytes': '16777216', # 16megabytes
+            'formatter': 'verbose'
+        },
         'mail_admins': {
             'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler'
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler',
+            'include_html': True,
         }
     },
     'loggers': {
         'django.request': {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
+            'propagate': True,
+        },
+        'careers': { # I keep all my of apps under 'apps' folder, but you can also add them one by one, and this depends on how your virtualenv/paths are set
+            'handlers': ['console','log_file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'accounts': { # I keep all my of apps under 'apps' folder, but you can also add them one by one, and this depends on how your virtualenv/paths are set
+            'handlers': ['console','log_file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'social': { # I keep all my of apps under 'apps' folder, but you can also add them one by one, and this depends on how your virtualenv/paths are set
+            'handlers': ['console','log_file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'entities': { # I keep all my of apps under 'apps' folder, but you can also add them one by one, and this depends on how your virtualenv/paths are set
+            'handlers': ['console','log_file'],
+            'level': 'INFO',
             'propagate': True,
         },
     }
@@ -213,7 +267,7 @@ EMAIL_HOST_PASSWORD = os.environ.get('MANDRILL_APIKEY',None)
 EMAIL_HOST_USER = os.environ.get('MANDRILL_USERNAME',None)
 EMAIL_HOST = "smtp.mandrillapp.com"
 EMAIL_PORT = 587
-
+SERVER_EMAIL = "admin@prospr.me"
 
 import dj_database_url
 DATABASES['default'] =  dj_database_url.config()

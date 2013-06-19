@@ -2,6 +2,7 @@
 import datetime
 from datetime import timedelta
 import json
+import logging
 
 # Django
 from django.http import HttpResponseRedirect, HttpResponse
@@ -27,6 +28,7 @@ import social.feedlib as feedlib
 
 import utilities.helpers as helpers
 
+logger = logging.getLogger(__name__)
 
 # Clayton - DEV
 def single_major(request, major_id):
@@ -45,10 +47,12 @@ def single_major(request, major_id):
 ######################################################
 ################## CORE VIEWS ########################
 ######################################################
+@login_required
 def majors(request):
 
 	# try to get from cache
-	data = cache.get("majors_viz_"+str(request.user.id))
+	# data = cache.get("majors_viz_"+str(request.user.id))
+	data = cache.get("majors_viz")
 
 	# test if cache worked
 	if data is not None:
@@ -59,11 +63,26 @@ def majors(request):
 
 	return render_to_response("careers/d3.html",data,context_instance=RequestContext(request))
 
+def new_majors(request):
+	# try to get from cache
+	# data = cache.get("majors_viz_"+str(request.user.id))
+	data = cache.get("majors_viz")
+
+	# test if cache worked
+	if data is not None:
+		data["cache"] = "hit"
+		return render_to_response("careers/majors.html",data,context_instance=RequestContext(request))
+	else:
+		data = {"cache":"miss"}
+
+	return render_to_response("careers/majors.html",data,context_instance=RequestContext(request))
+
 
 def home(request):
 	if not request.user.is_authenticated():
 		return HttpResponseRedirect('/welcome/')
-
+	else:
+		return HttpResponseRedirect('/majors/')
 	# data = {}
 	# user = request.user
 
@@ -102,6 +121,7 @@ def home(request):
 
 	return render_to_response('home_v5.html',context_instance=RequestContext(request))
 
+@login_required
 def major(request,major_id):
 	"""
 	view for detailed information on a particular major
@@ -118,7 +138,6 @@ def major(request,major_id):
 		first_and_last_positions = p.person.profile.first_and_last_positions() 
 		if first_and_last_positions is not None:
 			paths.append({"id":p.person.id, "full_name":p.person.profile.full_name(), "profile_pic":p.person.profile.default_profile_pic(), "first":first_and_last_positions[0].title + " at " + first_and_last_positions[0].entity.name, "latest":first_and_last_positions[1].title + " at " + first_and_last_positions[1].entity.name})
-
 
 	data = {
 		"paths": paths,
@@ -173,7 +192,7 @@ def major(request,major_id):
 	# 	'all':data_all
 	# }
 
-	return render_to_response('careers/major_profile.html',data,context_instance=RequestContext(request))
+	return render_to_response('careers/major_profile_old.html',data,context_instance=RequestContext(request))
 
 def get_school_fragment(request,school_id=None):
 	c = careerlib.CareerPathBase()
@@ -812,7 +831,7 @@ def viewCareerDecisions(request):
 @login_required
 def discover(request):
 
-	# initiate CarerSimBase
+	# initiate CareerSimBase
 	career_path = careerlib.CareerPathBase()
 	career_sim = careerlib.CareerSimBase()
 
@@ -933,7 +952,7 @@ def career_profile(request,career_id):
 @login_required
 def discover_career(request,career_id):
 
-	# initiate CarerSimBase
+	# initiate CareerSimBase
 	# career_path = careerlib.CareerPathBase()
 
 	# get career object
@@ -969,7 +988,7 @@ def discover_career(request,career_id):
 @login_required
 def discover_career_orgs(request, career_id):
 
-	# initiate CarerSimBase
+	# initiate CareerSimBase
 	career_path = careerlib.CareerPathBase()
 
 	career = Career.objects.get(pk=career_id)
@@ -1002,7 +1021,7 @@ def discover_career_orgs(request, career_id):
 @login_required
 def discover_career_positions(request, career_id):
 
-	# initiate CarerSimBase
+	# initiate CareerSimBase
 	career_path = careerlib.CareerPathBase()
 
 	career = Career.objects.get(pk=career_id)
@@ -1232,6 +1251,21 @@ def viewCareerDecisions(request):
 ##########################
 ###### AJAX Methods ######
 ##########################
+
+def get_majors_filters(request):
+	# make sure it's a get request
+	if request.GET:
+
+		params = request.GET['term']
+
+		majors = [{'label_short':m['major'],'label':m['major'] + " (major)",'value':m['id'],'type':'majors'} for m in IdealPosition.objects.filter(cat="ed",major__icontains=params).values('major','id')]
+		schools = [{'label_short':s['name'],'label':s['name'] + " (school)",'value':s['id'],'type':'schools'} for s in Entity.objects.filter(Q(li_type="school")|Q(type="school")).filter(name__icontains=params).values('name','id')]
+		jobs = [{'label_short':p['title'],'label':p['title'] + " (job)",'value':p['id'],'type':'jobs'} for p in IdealPosition.objects.filter(title__icontains=params).values('title','id')]
+
+		results = majors + schools + jobs
+
+		return HttpResponse(json.dumps(results))
+
 
 
 ## returns JSON-ready array of saved careers
@@ -2027,106 +2061,136 @@ def save_build_path(request):
 
 	return HttpResponse(json.dumps(response))
 
+# for single major d3 viz -- AJAX
+def get_major_data(request,major_id):
+	
+	data = cache.get("major_viz_"+str(request.user.id)+"_"+str(major_id))
+	if not data:
+		path = careerlib.CareerPathBase()
+		data = path.get_major_data(major_id)
+		cache.set("major_viz_"+str(request.user.id)+"_"+str(major_id),data,2400)
+
+	return HttpResponse(json.dumps(data))
+
 # For Majors D3 viz -- AJAX
 def get_majors_data(request):
 
-	people = []
-	positions = []
-	majors = {}
-
-	majors_set = set()
-	people_set = set()
-	positions_set = set()
-
-	counter = 0
-
-	# get schools from user
-	schools = Entity.objects.filter(li_type="school",positions__person=request.user,positions__type="education").distinct()
-
-	acceptable_majors = ["Science, Technology, and Society", "English", "Psychology", "Management Science & Engineering", "Computer Science", "International Relations", "Political Science", "Economics", "Human Biology", "Product Design", "History", "Civil Engineering", "Electrical Engineering", "Physics", "Symbolic Systems", "Mechanical Engineering", "Spanish", "Public Policy", "Materials Science & Engineering", "Biomechanical Engineering", "Mathematics", "Classics", "Feminist Studies", "Mathematical and Computational Sciences", "Atmosphere and Energy Engineering", "Urban Studies", "Chemistry", "Chemical Engineering", "Religious Studies", "Earth Systems"]
-	# base_positions = Position.objects.filter(type="education", field__in=acceptable_majors).exclude(ideal_position=None).select_related("person")
+	# logger.info("getting majors data")
+	params = {}
+	# print request.GET
+	if request.GET.getlist('majors[]'):
+		params['majors'] = [int(m) for m in request.GET.getlist('majors[]')]
+		# print params['majors']
+		# print request.GET.getlist('majors[]')
+	if request.GET.getlist('schools[]'):
+		params['schools'] = request.GET.getlist('schools[]')
+	if request.GET.getlist('jobs[]'):
+		params['jobs'] = request.GET.getlist('jobs[]')
 	
-	# assemble all the positions
-	# base_positions = Position.objects.filter(type="education",entity__in=schools).exclude(ideal_position=None).select_related("person")
-	base_positions = Position.objects.filter(type="education",ideal_position__level=1).exclude(ideal_position=None,person__profile__status="crunchbase").select_related("person")
+	path = careerlib.CareerPathBase()
+	# print params
+	data = path.get_majors_data_new(**params)
 
-	for p in base_positions:
-		first_ideal = p.person.profile.first_ideal()
+	# people = []
+	# positions = []
+	# majors = {}
 
-		# Majors
-		if first_ideal:
-			if p.ideal_position.major is None:
-				continue
-				print p.title, p.degree, p.field
-				print p.ideal_position, p.ideal_position.id
-			if p.ideal_position.major not in majors_set:
-				majors_set.add(p.ideal_position.major)
-				majors[p.ideal_position.major] = {"id":[p.ideal_position.id],"people":[p.person.id], "positions":[first_ideal.id], "index":len(majors_set)}
-			# if p.field not in majors_set:
-			# 	majors_set.add(p.field)
-			# 	majors[p.field] = {"people":[p.person.id], "positions":[first_ideal.id], "index":len(majors_set)}
-			else:
-				# majors[p.field]["people"].append(p.person.id)
-				# majors[p.field]["positions"].append(first_ideal.id)
-				majors[p.ideal_position.major]["people"].append(p.person.id)
-				majors[p.ideal_position.major]["positions"].append(first_ideal.id)
+	# majors_set = set()
+	# people_set = set()
+	# positions_set = set()
 
-			# People
-			if p.person.id not in people_set:
+	# counter = 0
 
-				people_set.add(p.person.id)
-				people.append({'name':p.person.profile.full_name(), 'id':p.person.id, "major_index":majors[p.ideal_position.major]["index"], "major":p.ideal_position.major})
+	# # get schools from user
+	# schools = Entity.objects.filter(li_type="school",positions__person=request.user,positions__type="education").distinct()
 
-				counter += 1	
-				if counter == 72:
-					break;
+	# acceptable_majors = ["Science, Technology, and Society", "English", "Psychology", "Management Science & Engineering", "Computer Science", "International Relations", "Political Science", "Economics", "Human Biology", "Product Design", "History", "Civil Engineering", "Electrical Engineering", "Physics", "Symbolic Systems", "Mechanical Engineering", "Spanish", "Public Policy", "Materials Science & Engineering", "Biomechanical Engineering", "Mathematics", "Classics", "Feminist Studies", "Mathematical and Computational Sciences", "Atmosphere and Energy Engineering", "Urban Studies", "Chemistry", "Chemical Engineering", "Religious Studies", "Earth Systems"]
+	# # base_positions = Position.objects.filter(type="education", field__in=acceptable_majors).exclude(ideal_position=None).select_related("person")
+	
+	# # assemble all the positions
+	# # base_positions = Position.objects.filter(type="education",entity__in=schools).exclude(ideal_position=None).select_related("person")
+	# base_positions = Position.objects.filter(type="education",ideal_position__level=1).exclude(ideal_position=None,person__profile__status="crunchbase").select_related("person")
+
+	# for p in base_positions:
+	# 	# first_ideal = p.person.profile.first_ideal()
+	# 	first_ideal = p.person.profile.first_ideal_job()
+
+	# 	# Majors
+	# 	if first_ideal:
+	# 		if p.ideal_position.major is None:
+	# 			continue
+	# 			print p.title, p.degree, p.field
+	# 			print p.ideal_position, p.ideal_position.id
+	# 		if p.ideal_position.major not in majors_set:
+	# 			majors_set.add(p.ideal_position.major)
+	# 			majors[p.ideal_position.major] = {"id":[p.ideal_position.id],"people":[p.person.id], "positions":[first_ideal['ideal_position__id']], "index":len(majors_set)}
+	# 		# if p.field not in majors_set:
+	# 		# 	majors_set.add(p.field)
+	# 		# 	majors[p.field] = {"people":[p.person.id], "positions":[first_ideal.id], "index":len(majors_set)}
+	# 		else:
+	# 			# majors[p.field]["people"].append(p.person.id)
+	# 			# majors[p.field]["positions"].append(first_ideal.id)
+	# 			majors[p.ideal_position.major]["people"].append(p.person.id)
+	# 			majors[p.ideal_position.major]["positions"].append(first_ideal['ideal_position__id'])
+
+	# 		# People
+	# 		if p.person.id not in people_set:
+
+	# 			people_set.add(p.person.id)
+	# 			people.append({'name':p.person.profile.full_name(), 'id':p.person.id, "major_index":majors[p.ideal_position.major]["index"], "major":p.ideal_position.major})
+
+	# 			counter += 1	
+	# 			if counter == 72:
+	# 				break;
 
 
-			if first_ideal.id not in positions_set:
-				positions_set.add(first_ideal.id)
-				positions.append({'title':first_ideal.title, 'id':first_ideal.id, "major_index":majors[p.ideal_position.major]["index"], "major":p.ideal_position.major})
+	# 		if first_ideal['ideal_position__id'] not in positions_set:
+	# 			positions_set.add(first_ideal['ideal_position__id'])
+	# 			positions.append({'title':first_ideal['ideal_position__title'], 'id':first_ideal['ideal_position__id'], "major_index":majors[p.ideal_position.major]["index"], "major":p.ideal_position.major})
 
 
 	
-		# ideal_positions_set = set()
-		# majors_dict = {}
+	# 	# ideal_positions_set = set()
+	# 	# majors_dict = {}
 
-		# all_people = Profile.objects.all()
-		# for p in all_people:
-		# 	first_ideal = p.first_ideal()
+	# 	# all_people = Profile.objects.all()
+	# 	# for p in all_people:
+	# 	# 	first_ideal = p.first_ideal()
 
-		# 	# Make sure they have a first position
-		# 	if first_ideal:
-		# 		# Add to people list
-		# 		people.append({'name':p.full_name(), 'id':p.id})
-		# 		# Add to position list
-		# 		if first_ideal.id not in ideal_positions_set:
-		# 			ideal_positions_set.add(first_ideal)
-		# 			positions.append({'title':first_ideal.title, 'id':first_ideal.id})
+	# 	# 	# Make sure they have a first position
+	# 	# 	if first_ideal:
+	# 	# 		# Add to people list
+	# 	# 		people.append({'name':p.full_name(), 'id':p.id})
+	# 	# 		# Add to position list
+	# 	# 		if first_ideal.id not in ideal_positions_set:
+	# 	# 			ideal_positions_set.add(first_ideal)
+	# 	# 			positions.append({'title':first_ideal.title, 'id':first_ideal.id})
 
-		# majored_positions = Position.objects.filter(type="education").exclude(field=None)
-		# for m in majored_positions:
-		# 	if m.field not in majors_dict:
-		# 		majors_dict[m.field] = 1
-		# 		majors.append({'major':m.field, 'id':m.id})
-		# 	else:
-		# 		majors_dict[m.field] = majors_dict[m.field] + 1
+	# 	# majored_positions = Position.objects.filter(type="education").exclude(field=None)
+	# 	# for m in majored_positions:
+	# 	# 	if m.field not in majors_dict:
+	# 	# 		majors_dict[m.field] = 1
+	# 	# 		majors.append({'major':m.field, 'id':m.id})
+	# 	# 	else:
+	# 	# 		majors_dict[m.field] = majors_dict[m.field] + 1
 
-		# print majors
-		# print "###################"
-		# print people
-		# print "###################"
-		# print positions
+	# 	# print majors
+	# 	# print "###################"
+	# 	# print people
+	# 	# print "###################"
+	# 	# print positions
 
-		# majors["Human Basket-weaving and other Anthropological Endeavors"] = {"id":1,"people":[],"positions":[],"index":len(majors_set)}
-		data = {
-			"majors":json.dumps(majors),
-			"positions":json.dumps(positions),
-			"people":json.dumps(people),
-			"result":"success"
-		}
-		
-		cache.set("majors_viz_"+str(request.user.id),data,1500)
+	# 	# majors["Human Basket-weaving and other Anthropological Endeavors"] = {"id":1,"people":[],"positions":[],"index":len(majors_set)}
+	# 	data = {
+	# 		"majors":json.dumps(majors),
+	# 		"positions":json.dumps(positions),
+	# 		"people":json.dumps(people),
+	# 		"result":"success"
+	# 	}
+	if not params:
+
+		cache.set("majors_viz_"+str(request.user.id),data,2400)
+		cache.set("majors_viz",data,2400)
 
 
 	return HttpResponse(json.dumps(data))

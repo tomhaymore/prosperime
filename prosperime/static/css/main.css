@@ -163,8 +163,8 @@ body {
 div.background-container {
 	/*background-color:whitesmoke;*/
 	background-color:#fff;
-	min-height:100%;
-	height: auto !important;
+	/*min-height:100%;*/
+	/*height: auto !important;*/
 	/*margin:0 auto -60px;*/
 
 }
@@ -195,10 +195,10 @@ div.main-container {
 	/*-moz-box-shadow: 0 1px 10px rgba(0,0,0,0.1);*/
 	/*box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);*/
 	margin-top:15px;
-	min-height: 250px;
+	min-height: 550px;
 	margin-bottom:15px;
 }
->>>>>>> 374331e94bf3aa7e3020b9688fabfdebc94dea26
+
 
 div#main-container {
 	background-color:#fff;
@@ -367,9 +367,9 @@ div.splash-module {
 }
 
 #splash-img-1 {
-	width:515px;
-	opacity: 1;
-	/*transition:opacity 0.2s;*/
+	width:460px;
+	opacity: 0.8;
+	transition:opacity 0.2s;
 	margin-left:25px;
 }
 
@@ -396,7 +396,7 @@ div.splash-module {
 }
 
 #splash-img-1:hover, #splash-img-alumni:hover, #splash-img-plan:hover, #splash-img-advice:hover {
-	/*opacity:1;*/
+	opacity:1;
 }
 
 div.splash-inner-container {
@@ -438,15 +438,19 @@ a.splash-message, p.splash-message {
 	vertical-align: middle;
 }
 
-p.splash-submessage a {
-	color:#e6e6e6;
+.splash-submessage a {
+	color:#fffffe;
 	/*color:rgb(43, 46, 48);*/
-	font-size: 1.0em;
+	font-size: 0.9em;
 	line-height: 1.2em;
-	vertical-align: middle;
+	/*vertical-align: middle;*/
+	display:block;
+	width:42%;
+	text-align:center;
+	font-weight:normal;
 }
 
-p.splash-submessage a:hover {
+.splash-submessage a:hover {
 	color:#fff;
 	text-decoration: underline;
 } 
@@ -2006,10 +2010,12 @@ body {
 div.background-container {
 	/*background-color:whitesmoke;*/
 	background-color:#fff;
-	min-height:100%;
-	height: auto !important;
+	/*min-height:100%;*/
+	/*height: auto !important;*/
 	/*margin:0 auto -60px;*/
 
 }
 
-
+div.inline {
+	display:inline-block;
+}

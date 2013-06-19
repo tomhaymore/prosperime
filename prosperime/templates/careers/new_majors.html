@@ -111,11 +111,39 @@
 			<div class="section-header block pull-left">First Jobs</div>
 			<div class="clear"></div>
 	</div>
-
-	<!-- These divs have to be written this way with no linebreak between them for the SVG to run flush against the main container. Thank you StackOverflow. -->
-	<div id="left" class="block"></div><div id="center" class="block"></div><div id="right" class="block"></div>
-
-	<div id="loading-message">Loading...<img src="{{STATIC_URL}}img/spinner.gif" /></div>
+	<div>
+		{% if people %}
+			<ul>
+				<li>
+				{% for p in people %}
+					{% if forloop.counter0|divisibleby:4 %}
+						</li><li>
+					{% else %}
+						<img src="{{p.profile.default_profile_pic}}" />
+					{% endif %}
+				{% endfor %}
+				</li>
+			</ul>
+		{% endif %}
+	</div>
+	<div>
+		{% if degrees %}
+		<ul>
+			{% for d in degrees %}
+				<li>{{d.title}}</li>
+			{% endfor %}
+		</ul>
+		{% endif %}
+	</div>	
+	<div>
+		{% if first_ideals %}
+		<ul>
+			{% for i in first_ideals %}
+				<li>{{i.title}}</li>
+			{% endfor %}
+		</ul>
+		{% endif %}
+	</div>	
 	
 </div>
 {% endblock %}

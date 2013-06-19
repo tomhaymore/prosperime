@@ -3,6 +3,17 @@ from celery import task
 # from prosperme
 import careers.careerlib as careerlib
 from careers.models import Position
+from django.contrib.auth.models import User
+
+@task()
+def set_first_ideal_jobs():
+	"""
+	goes through all users and sets their first ideal job
+	"""
+	path = careerlib.CareerPathBase()
+	users = User.objects.all()
+	for u in users:
+		u.profile.set_first_ideal_job()
 
 @task()
 def match_unmatched_positions():

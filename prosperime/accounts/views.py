@@ -6,9 +6,7 @@ import urlparse
 import math
 import json
 import os
-
-# import datetime
-
+import logging
 import random
 
 # from django.contrib.auth.decorators import  _required
@@ -34,6 +32,7 @@ from accounts.tasks import process_li_profile, process_li_connections
 from accounts.forms import FinishAuthForm, AuthForm, RegisterForm
 import utilities.helpers as helpers
 
+logger = logging.getLogger(__name__)
 
 def login(request):
 	# from django.contrib.auth.forms import AuthenticationForm
@@ -74,14 +73,14 @@ def use(request):
 
 	return render_to_response('use.html',context_instance=RequestContext(request))
 
-def register(request):
+def register_slim(request):
 
 	if request.user.is_authenticated():
 		return HttpResponseRedirect('/majors/')
 
 	return render_to_response('accounts/register_li_only.html',context_instance=RequestContext(request))
 
-def register_old(request):
+def register(request):
 
 	if request.user.is_authenticated():
 		return HttpResponseRedirect('/majors/')
@@ -181,6 +180,94 @@ def linkedin_authenticate(request):
 		# if not logged in, ask to finish user registration process
 		return HttpResponseRedirect('/account/finish')
 
+def finish_registration(request):
+	import accounts.emaillib as emaillib
+	# get linkedin info from session
+	linkedin_user_info = request.session['linkedin_user_info']
+	access_token = request.session['access_token']
+
+	# check for dormant user
+	try: 
+		user = User.objects.get(profile__status="dormant",account__uniq_id=linkedin_user_info['id'])
+		user.email=linkedin_user_info['emailAddress']
+		logger.info("activated dormant user "+linkedin_user_info['emailAddress'])
+		existing = True
+	except:
+		# create user
+		user = User.objects.create_user(linkedin_user_info['emailAddress'],linkedin_user_info['emailAddress'])
+		logger.info("created new user "+linkedin_user_info['emailAddress'])
+		user.save()
+		existing = False
+		
+	# set user properties
+	password = User.objects.make_random_password()
+	user.set_password(password)
+	user.save()	
+	# set profile status
+	user.profile.status = "active"
+	user.profile.first_name = linkedin_user_info['firstName']
+	user.profile.last_name = linkedin_user_info['lastName']
+	user.profile.save()
+	user.username = linkedin_user_info['emailAddress']
+	user.is_active = True
+	user.save()	
+	
+	# send welcome email
+	welcome = emaillib.WelcomeEmail(user)
+	welcome.send_email()
+	logger.info("sent welcome email to user: "+linkedin_user_info['emailAddress'])
+	
+	# check to see if user provided a headline
+	if 'headline' in linkedin_user_info:
+		user.profile.headline = linkedin_user_info['headline']
+		user.profile.save()
+	# check to see if user has a linkedin picture
+	if 'pictureUrls' in linkedin_user_info:
+		li_parser = LIProfile()
+		li_parser.add_profile_pic(user,linkedin_user_info['pictureUrls']['values'][0])
+
+	# update LI account
+	if existing:
+		# get existing LI account
+		acct = Account.objects.get(owner=user,service="linkedin")
+	else:
+		# create LinkedIn account
+		acct = Account()
+	
+	acct.owner = user
+	acct.access_token = access_token['oauth_token']
+	acct.token_secret = access_token['oauth_token_secret']
+	acct.service = 'linkedin'
+	acct.expires_on = datetime.now() + timedelta(seconds=int(access_token['oauth_authorization_expires_in']))
+	acct.uniq_id = linkedin_user_info['id']
+	acct.status = "active"
+	acct.save()
+		
+	# finish processing LI profile
+	profile_task = process_li_profile.delay(user.id,acct.id)
+
+	# start processing connections
+	connections_task = process_li_connections.delay(user.id,acct.id)
+
+	# save task ids to session
+	request.session['tasks'] = {
+		'profile': profile_task.id,
+		'connections': connections_task.id
+	}
+
+	request.session['_auth_user_backend'] = 'prosperime.accounts.backends.LinkedinBackend'
+	
+	user = authenticate(acct_id=linkedin_user_info['id'])
+	
+	if user is not None:
+	
+		auth_login(request,user)
+
+		if 'next' not in request.session:
+			return HttpResponseRedirect('/majors/')
+		else:
+			return HttpResponseRedirect(request.session['next'])
+	
 
 def finish_login(request):
 	# TODO: redirect if not not authenticated through LinkedIn already
@@ -311,7 +398,7 @@ def finish_login(request):
 
 			#return HttpResponseRedirect('/account/success')
 			if 'next' not in request.session:
-				return HttpResponseRedirect('/majorss/')
+				return HttpResponseRedirect('/majors/')
 			else:
 				return HttpResponseRedirect(request.session['next'])
 	else:

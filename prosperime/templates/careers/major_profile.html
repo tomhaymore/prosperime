@@ -3,6 +3,8 @@
 {% block head %}
 
 <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/career.css" />
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/majors.css" />
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
 {% endblock %}
 
@@ -28,164 +30,42 @@
 	<!-- <p>Prosper.me gets better the more people that use it. Tell your friends!</p> -->
 
 	<div id="career-profile-container">
-	<!-- <div class="career-profile-nav-container">
-			
-			<a class="career-profile-nav pull-left selected" data-view="network">Your Network</a> 
-			<a class="career-profile-nav pull-left unselected" data-view="all">Prosper.me Community</a>
-			<div class="clear"></div>
-			
-		</div> -->
-		<!-- <div class="career-perspective" data-view="network" style="display:none;">
-			<div id="career-left-pane" class="pull-left">
-				<div class="career-module">
-					{% if network.schools %}
-					<p class="feature-page-subheader">School Overview</p>
-					<ul class="career-list">
-						{% for s in network.schools %}
-							<li>{{s.name}} <span class="info-badge">{{s.pos}}</span></li>
-						{% endfor %}
-					</ul>
-					{% endif %}
-				</div>
-				<div class="career-module">
-					{% if network.first_jobs %}
-					<p class="feature-page-subheader">Popular First Jobs</p>
-					<ul class="career-list">
-						{% for j in network.first_jobs %}
-							<li>{{j.1.title}} <span class="info-badge">{{j.1.count}}</span></li>
-						{% endfor %}
-					</ul>
-					{% endif %}
-				</div>
-				<div class="career-module">
-					{% if network.careers %}
-					<p class="feature-page-subheader">Popular Careers</p>
-					<ul class="career-list">
-						{% for c in network.careers %}
-							<li>{{c.name}}</li>
-						{% endfor %}
-					</ul>
-					{% endif %}
-				</div>
-			</div>
-			<div id="career-right-pane" class="pull-left">
-				<div class="career-module">
-					{% if network.paths %}
-						<p class="feature-page-subheader">Where are they now?</p>
-						<ul class="career-list">
-						{% for p in network.paths|slice:"5" %}
-							<li>
-								<div class="pull-left">
-									<img class="thumbnail" src="{{p.profile.default_profile_pic}}" />
-								</div>
-								<div class="pull-left user-info-stub">
-									<p>{{p.profile.full_name}}</p>
-									<p>{{p.profile.current_position}}</p>
-										
-								</div>
-								<div class="clear"></div>
-							</li>
-						{% endfor %}
-						</ul>
-					{% endif %}
-				</div>
-			</div>
-			<div class="clear"></div>
-		</div>
-		<div class="career-perspective" data-view="all">
-			<div id="career-left-pane" class="pull-left">
-				<div class="career-module">
-					{% if all.schools %}
-					<p class="feature-page-subheader">School Overview</p>
-					<ul class="career-list">
-						{% for s in all.schools %}
-							<li>{{s.name}} <span class="info-badge">{{s.pos}}</span></li>
-						{% endfor %}
-					</ul>
-					{% endif %}
-				</div>
-				<div class="career-module">
-					{% if all.first_jobs %}
-					<p class="feature-page-subheader">Popular First Jobs</p>
-					<ul class="career-list">
-						{% for j in all.first_jobs %}
-							<li>{{j.1.title}} <span class="info-badge">{{j.1.count}}</span></li>
-						{% endfor %}
-					</ul>
-					{% endif %}
-				</div>
-				<div class="career-module">
-					{% if all.careers %}
-					<p class="feature-page-subheader">Popular Careers</p>
-					<ul class="career-list">
-						{% for c in all.careers %}
-							<li>{{c.name}}</li>
-						{% endfor %}
-					</ul>
-					{% endif %}
-				</div>
-			</div>
-			<div id="career-right-pane" class="pull-left">
-				<div class="career-module">
-					{% if all.paths %}
-						<p class="feature-page-subheader">Where are they now?</p>
-						<ul class="career-list">
-						{% for p in all.paths|slice:"5" %}
-							<li>
-								<div class="pull-left">
-									<img class="thumbnail" src="{{p.profile.default_profile_pic}}" />
-								</div>
-								<div class="pull-left user-info-stub">
-									<p>{{p.profile.full_name}}</p>
-									<p>{{p.profile.current_position}}</p>
-								</div>
-								<div class="clear"></div>
-							</li>
-						{% endfor %}
-						</ul>
-					{% endif %}
-				</div>
-			</div>
-			<div class="clear"></div>
-		</div>
-			 -->
 
-		<div class="placeholder"> </div>
-		<div class="section-header black">People: </div>
-
-		{% for p in paths %}
-		<div class="row-fluid path-row" data-p_id="{{p.id}}">
-			<div class="span2 center">
-				<img class="major-profile-pic" src="{{p.profile_pic}}" />
-				<div class="path-person-title">{{p.full_name}}</div>
-			</div>
-
-			<!-- For spacing -->
-			{% if p.first|length > 48 %}
-				<div class="span4 path-position">
+	
+		<div class="single-section-header pull-left">People </div>
+		<div class="single-section-header pull-left">First Job </div>
+		<div class="single-section-header pull-left">Current Job </div>
+		<div class="clear"></div>
+		<!-- {% if paths %}
+			{% for p in paths %}
+			<div class="path-row" data-p_id="{{p.id}}">
+				<div class="major-profile-pic-holder center pull-left">
+					<div class="path-person-title">{{p.full_name}}</div>
+					<img class="major-profile-pic" src="{{p.profile_pic}}" />
+				</div>
+				<div class="first-position-holder pull-left">
+					<div class="first-position-inner">
 					{{p.first}}
+					</div>
 				</div>
-			{% else %}
-				<div class="span4 path-position pad-down">
-					{{p.first}}
+				<div class="path-holder pull-left">
+					<div class="path-holder-inner">
+						<img src="{{STATIC_URL}}img/connector.png" />
+					</div>
 				</div>
-			{% endif %}
-
-			<div class="span2 spacer"> </div>
-
-			<!-- For spacing -->
-			{% if p.latest|length > 48 %}
-				<div class="span4 path-position">
+				<div class="current-position-holder pull-left">
+					<div class="current-position-inner">
 					{{p.latest}}
+					</div>
 				</div>
-			{% else %}
-				<div class="span4 path-position pad-down">
-					{{p.latest}}
-				</div>
-			{% endif %}
-		</div>
+				<div class="clear"></div>
+
+
+			</div>
 		{% endfor %}
-
+		{% else %}
+		<p>Sorry, no people with this major.</p>
+		{% endif %} -->
 	</div>
 </div>
 
@@ -194,6 +74,7 @@
 {% block templates %}
 <script type="text/javascript">
 $(function() {
+	// nav for in - network / all
 	$("a.career-profile-nav").click(function() {
 		var view = $(this).data('view');
 		$("a.career-profile-nav").removeClass("selected").addClass("unselected");
@@ -202,18 +83,423 @@ $(function() {
 		$("div.career-perspective[data-view='"+view+"']").show();
 	});
 
+	// d3 functions
 
-	// Hover for path rows
-	$(".path-row").on("mouseenter", function(ev) {
-		$(this).addClass("path-row-hover")
-	}).on("mouseleave", function(ev) {
-		$(this).removeClass("path-row-hover")
-	}).click(function() {
-		window.location = "/profile/" + $(this).data("p_id")
-	})
+	// data vars
+	window.people;
+	var first_jobs, 
+		current_jobs;
+
+	// 
+	var width = 1000,
+		height = 750,
+		img_x_offset = 25,
+		img_text_offset = 5,
+		img_height = 55,
+		img_width = 55,
+		img_container = 90,
+		job_container = 90;
+
+	// init svg container
+	svg = d3.select("#career-profile-container").append("svg")
+		.attr("width",width)
+		.attr("height",width);
+
+	// add grayscale filters
+	var filter = svg.append("svg:defs")
+		.append("svg:filter")
+			.attr("id","grayscale")
+		.append("svg:feColorMatrix")
+			.attr("type","matrix")
+			.attr("values","0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0");
+
+	var glow_filter = svg.append("svg:defs")
+		.append("svg:filter")
+			.attr("id","glow")
+			.attr("width","3.5")
+			.attr("height","3.5")
+			.attr("x","-.25")
+			.attr("y","-.25")
+		.append("svg:feGaussianBlur")
+			.attr("in","SourceAlpha")
+			.attr("stdDeviation",15.000000)
+			.attr("result","blur")
+		.append("svg:feColorMatrix")
+			.attr("result","bluralpha")
+			.attr("type","matrix")
+			.attr("values","-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 0.800000 0")
+		.append("svg:feOffset")
+			.attr("in","bluralpha")
+			.attr("dx","0.000000")
+			.attr("dy","0.000000")
+			.attr("result","offsetBlur");
+
+	var feMerge = glow_filter.append("feMerge");
+
+	feMerge.append("feMergeNode")
+		.attr("in","offsetBlur")
+	feMerge.append("feMergeNode")
+		.attr("in","SourceGraphic")	
 
 
+	// get data
+	var updateData = function() {
+		$.get("/careers/getSingleMajorData/"+{{major.id|safe}}, function(response) {
+				if (response["result"] == "success") {
+					// breakdown data
+					people = response["people"]
+					first_jobs = response["first_jobs"]
+					current_jobs = response["current_jobs"]
+					// update wrapper
+					updateGraph();
+				}
+			}, "json");
+	};
 
+	// wrapper function for updating separate elements, in case of future complexity
+	var updateGraph = function() {
+		updatePeople()
+		updateFirstJobs()
+		updateCurrentJobs()
+		updateLines()
+	};
+
+	// update people
+	var updatePeople = function() {
+		// logging
+		// console.log("updating people...")
+		// console.log(people)
+		// bind data
+		var people_container = svg.selectAll("g.image")
+			.data(people,function(d) { return d.id;});
+
+		// simple remove function
+		people_container.exit()
+			.remove();
+
+		// transition old elements
+		people_container.transition()
+			.duration(250)
+			.attr("x",0)
+			.attr("y",function(d,i) {return (i * img_container) + 25;})
+
+		var g = people_container.enter().append("g")
+			.attr("class","image")
+			.attr("first_job", function(d) { return d.first_job; })
+			.attr("current_job", function(d) { return d.current_job; })
+			.attr("id",function(d) { return "person-group-"+d.id;});
+
+		// add image
+		g.append("image")
+			.attr("x",img_x_offset)
+			.attr("y",function(d,i) {return (i * img_container) + 25;})
+			.attr("height", img_height)
+			.attr("width", img_width)
+			.attr("xlink:href", function(d) { return d.pic })
+			.attr("filter","url(#grayscale)")
+			.attr("id", function(d) { return "person-"+d.id });
+		
+		// add name
+		g.append("text")
+			.attr("x",img_text_offset)
+			.attr("y",function(d,i) {return (i * img_container) + 18;})
+			.attr("class","hidden-name")
+			.text(function(d) {return d.fullname;});
+
+		g.on("mouseover",function(d) {
+			showLines(d.id);
+			// repaint triggered elements to get back on top
+			this.parentNode.appendChild(this);
+			var el = document.getElementById("first-job-group-"+d.first_job)
+			// console.log(el.previousSibling);
+			el.parentNode.appendChild(el.previousSibling);
+			el.parentNode.appendChild(el);
+			var el = document.getElementById("current-job-group-"+d.current_job)
+			el.parentNode.appendChild(el.previousSibling);
+			el.parentNode.appendChild(el);
+			// magnification effect
+			d3.select(this).select("image")
+				.attr("height",img_height+10)
+				.attr("width",img_width+10)
+				.attr("filter","");
+			d3.select(this).select("text")
+				.attr("class","hover-name");
+			// add filter to boxes
+			console.log("#first-job-rect-"+d.first_job)
+			d3.select("#first-job-rect-"+d.first_job)
+				// .attr("filter","url(#glow)")
+				// .attr("stroke","rgb(48,91,152)")
+				// .attr("stroke-width",1)
+				// .attr("fill","rgb(255,255,255)")
+			d3.select("#current-job-rect-"+d.current_job)
+				// .attr("stroke","rgb(48,91,152)")
+				// .attr("stroke-width",1)
+				// .attr("filter","url(#glow)")
+				// .attr("fill","rgb(255,255,255)")
+		}).on("mouseout",function(d) {
+			d3.select(this).select("image")
+				.attr("height",img_height)
+				.attr("width",img_width)
+				.attr("filter","url(#grayscale)")
+			d3.select(this).select("text")
+				.attr("class","hidden-name")
+			// remove filter from boxes
+			d3.select("#first-job-rect-"+d.first_job)
+				.attr("filter","")
+			d3.select("#current-job-rect-"+d.current_job)
+				.attr("filter","")
+			hideLines(d.id);
+		});
+
+	};
+
+	var updateFirstJobs = function () {
+		// logging
+		// console.log("updating first jobs");
+		// console.log(first_jobs);
+
+		// bind data
+		var first_jobs_container = svg.selectAll("g.first-job")
+			.data(first_jobs,function(d) { return d.id;});
+
+		// simple remove function
+		first_jobs_container.exit()
+			.remove();
+
+		// transition old elements
+		first_jobs_container.transition()
+			.duration(250)
+			.attr("x",300)
+			.attr("y",function(d,i) {return (i * job_container) + 25;})
+
+		// add enter
+		var g = first_jobs_container.enter().append("g")
+			.attr("class","first-job")
+			.attr("id",function(d) { return "first-job-group-"+d.id;});
+
+		// append rects
+		g.append("rect")
+			.attr("x",300)
+			.attr("y",function(d,i) {return (i * job_container) + 35;})
+			.attr("width",250)
+			.attr("height",35)
+			.attr("fill","rgb(255,255,255)")
+			.attr("id",function(d) { return "first-job-rect-"+d.id;})
+			.attr("class","first-job-box");
+
+		// append text
+		g.append("text")
+			.attr("x",315)
+			.attr("y",function(d,i) {return (i * job_container) + 45;})
+			.attr("class","first-job-title")
+			.attr("people",function(d) { return d.people; })
+			.attr("current_jobs",function(d) { return d.current_jobs; })
+			.attr("id",function(d) {return "first-job-"+d.id})
+			.text(function(d) {return d.title;});
+
+		// add actions
+		g.on("mouseover",function(d) {
+			showLines(d.people);
+			// repaint triggered elements to get back on top
+			this.parentNode.appendChild(this);
+			var el = document.getElementById("current-job-group-"+d.current_job)
+			// el.parentNode.appendChild(el.previousSibling);
+			el.parentNode.appendChild(el);
+			var el = document.getElementById("people-group-"+d.people)
+			el.parentNode.appendChild(el);
+			// magnification effect
+			userMouseOver("#people-"+d.people)
+			d3.select("#first-job-rect-"+d.first_job)
+				// .attr("stroke","rgb(48,91,152)")
+				// .attr("stroke-width",1)
+				// .attr("filter","url(#glow)")
+			d3.select("#current-job-rect-"+d.current_job)
+				.attr("filter","url(#glow)")
+		}).on("mouseout",function(d) {
+			userMouseOut("#people-"+d.people)
+			// remove filter from boxes
+			d3.select("#first-job-rect-"+d.first_job)
+				// .attr("stroke","rgb(48,91,152)")
+				// .attr("stroke-width",1)
+				.attr("filter","")
+			d3.select("#current-job-rect-"+d.current_job)
+				// .attr("stroke","rgb(48,91,152)")
+				// .attr("stroke-width",1)
+				.attr("filter","")
+			hideLines(d.people);
+		});
+	};
+	
+	var updateCurrentJobs = function () {
+
+		// bind data
+		var current_jobs_container = svg.selectAll("g.current-job")
+			.data(current_jobs,function(d) { return d.id;});
+
+		// simple remove function
+		current_jobs_container.exit()
+			.remove();
+
+		// transition old elements
+		current_jobs_container.transition()
+			.duration(250)
+			.attr("x",700)
+			.attr("y",function(d,i) {return (i * job_container) + 25;})
+
+		// enter function
+		var g = current_jobs_container.enter().append("g")
+			.attr("class","current-job")
+			.attr("height",35)
+			.attr("width",250)
+			.attr("id",function(d) { return "current-job-group-"+d.id});
+
+		// append rects
+		g.append("rect")
+			.attr("x",700)
+			.attr("y",function(d,i) {return (i * job_container) + 35;})
+			.attr("width",155)
+			.attr("height",25)
+			.attr("fill","rgb(255,255,255)")
+			.attr("id",function(d) { return "current-job-rect-"+d.id;})
+			.attr("class","current-job-box");
+
+		// append text		
+		g.append("text")
+			.attr("x",715)
+			.attr("y",function(d,i) {return (i * job_container) + 45;})
+			.attr("class","current-job")
+			.attr("people",function(d) { return d.people; })
+			.attr("first_jobs",function(d) { return d.first_jobs; })
+			.attr("id",function(d) {return "current-job-"+d.id})
+			.text(function(d) {return d.title;});
+
+		// add actions
+		g.on("mouseover",function(d) {
+			showLines(d.people);
+			// repaint triggered elements to get back on top
+			this.parentNode.appendChild(this);
+			var el = document.getElementById("first-job-group-"+d.current_job)
+			// el.parentNode.appendChild(el.previousSibling);
+			el.parentNode.appendChild(el);
+			var el = document.getElementById("people-group-"+d.people)
+			el.parentNode.appendChild(el);
+			// magnification effect
+			userMouseOver("#people-"+d.people)
+			d3.select("#first-job-rect-"+d.first_job)
+				.attr("filter","url(#glow)")
+			d3.select("#current-job-rect-"+d.current_job)
+				.attr("filter","url(#glow)")
+		}).on("mouseout",function(d) {
+			userMouseOut("#people-"+d.people)
+			// remove filter from boxes
+			d3.select("#first-job-rect-"+d.first_job)
+				.attr("filter","")
+			d3.select("#current-job-rect-"+d.current_job)
+				.attr("filter","")
+			hideLines(d.people);
+		});
+	};
+
+	var updateLines = function () {
+		console.log("adding lines...")
+		// add lines
+		var lines_container = svg.selectAll("path")
+			.data(people,function(d) { return d.id;});
+
+		// simple remove function
+		lines_container.exit()
+			.remove()
+
+		// line generator
+		var lineGen = d3.svg.line()
+			.x(function(d) { return d.x })
+			.y(function(d) { return d.y })
+			.interpolate("monotone");
+
+		// transition old elements
+		lines_container.transition()
+			.duration(250)
+			.attr("d", function(d,i) { return lineGen([
+					{'x':75,'y':(i*img_container) + 45	},
+					{'x':d3.select("#first-job-"+d.first_job).attr("x"),'y':d3.select("#first-job-"+d.first_job).attr("y")},
+					{'x':d3.select("#current-job-"+d.current_job).attr("x"),'y':d3.select("#current-job-"+d.current_job).attr("y")}
+					]);}
+			)
+			.attr("fill","none")
+			// .attr("stroke","")
+			.attr("stroke-width",1);
+
+		// enter function
+		lines_container.enter().append("path")
+			.attr("id",function(d) { return "line-"+d.id})
+			.attr("d", function(d,i) { return lineGen([
+					{'x':75,'y':(i*img_container) + 45},
+					{'x':d3.select("#first-job-"+d.first_job).attr("x"),'y':d3.select("#first-job-"+d.first_job).attr("y")},
+					{'x':d3.select("#current-job-"+d.current_job).attr("x"),'y':d3.select("#current-job-"+d.current_job).attr("y")}
+					]);}
+			)
+			.attr("fill","none")
+			// .attr("stroke","")
+			.attr("stroke-width",1);
+
+	};
+
+	var userMouseOver = function(selector) {
+		$(selector).parentNode.appendChild($(selector))
+		d3.select(selector).select("image")
+			.attr("height",img_height+10)
+			.attr("width",img_width+10)
+			.attr("filter","");
+		d3.select(selector).select("text")
+			.attr("class","hover-name");
+	};
+
+	var userMouseOut = function(selector) {
+		d3.select(selector).select("image")
+			.attr("height",img_height)
+			.attr("width",img_width)
+			.attr("filter","url(#grayscale)")
+		d3.select(selector).select("text")
+			.attr("class","hidden-name")
+	};
+
+	var showLines = function(id) {
+		console.log("#line-"+id);
+		d3.select("#line-"+id)
+			.attr("stroke","rgba(41,128,185,0.7)")
+			.attr("stroke-width");
+	};
+
+	var hideLines = function(id) {
+		d3.select("#line-"+id)
+			.attr("stroke","none")
+			.attr("stroke-width",1);
+	}
+
+	// var getLinePath = function(origin_x,origin_y,data) {
+		
+	// 	var coords = [{'x':origin_x,'y':origin_y}]
+	// 	console.log("#first-job-"+data.first_job)
+	// 	var first_job_node = d3.select("#first-job-"+data.first_job)
+	// 	// var first_job_node = $("#first-job-"+data.first_job)
+	// 	coords.push({'x':first_job_node.attr("x"),'y':first_job_node.attr("y")})
+	// 	var current_job_node = $("current-job-"+data.current_job)
+	// 	coords.push({'x':current_job_node.x,'y':current_job_node.y})
+	// 	// console.log(coords)
+		
+	// 	console.log(result)
+	// };
+
+	// var getFirstJobHTML = function(data) {
+	// 	var html = "<span class='first-job-title'>"+data.title+"</span>"
+	// 	return html
+	// }
+
+	// var getCurrentJobHTML = function(data) {
+	// 	var html = "<span class='current-job-title'>"+data.title+"</span>"
+	// }
+
+	updateData();
 
 })
 </script>
