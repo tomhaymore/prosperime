@@ -537,7 +537,7 @@ div.input-container {
 
 
 
-
+/* NEW MAJORS */
 
 
 
@@ -555,10 +555,11 @@ span.degree-abbr {
 	visibility: hidden;
 	/*width: 35px;*/
 	line-height: 32px;
-	background-color: rgb(48,91,152);
+	background-color: rgba(48,91,152,0.9);
 	color: #fff;
 	padding: 0 5px;
 	margin-right: 5px;
+	border-radius:2px;
 	font-weight: 200;
 	/*height:75%;*/
 	transition:all 5s;
@@ -607,5 +608,28 @@ border-radius: 20px;*/
 
 .current-job {
 	background-color:#fff;
-	
 }
+
+#filters-list {
+	margin-bottom:10px;
+}
+
+.remove-filter {
+	font-size:1.0em;
+	margin-left:8px;
+	opacity:0.5;
+}
+
+
+.remove-filter:hover {
+	opacity:1;
+	cursor:pointer;
+}
+
+
+
+
+
+
+
+
