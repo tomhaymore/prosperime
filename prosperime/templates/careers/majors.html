@@ -151,7 +151,7 @@
 		<p class="feature-page-header">What can you do with your major?</p>
 		<p class="feature-page-subheader">Use the graph below to see which majors lead to what jobs. Click on any major to learn more.</p>
 		
-
+		{% if user.is_authenticated %}
 		<div id="filter-form">
 			<p>Filter by school, major or job: <input id="majors-filter-input" data-val-id="" class="flat-input" placeholder="Start typing... "/></p>
 		</div>
@@ -160,6 +160,7 @@
 
 			</ul>
 		</div>
+		{% endif %}
 		
 	</div>
 	<div>
@@ -850,7 +851,7 @@
 
 			// append tooltip
 			var parent_container = d3.select("#left")
-			d3_drawTooltip(parent_container, x, y, user_name, "person-hover-"+id, "left")
+			// d3_drawTooltip(parent_container, x, y, user_name, "person-hover-"+id, "left")
 		};
 	};
 

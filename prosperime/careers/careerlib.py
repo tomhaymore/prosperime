@@ -8,6 +8,7 @@ import csv
 import re
 import os
 import types
+import logging
 
 # from Django
 from django.contrib.auth.models import User
@@ -19,6 +20,8 @@ from django.db.models import Count, Q
 from entities.models import Industry, Entity
 from careers.models import Career, Position, IdealPosition
 from careers.positionlib import IdealPositionBase
+
+logger = logging.getLogger(__name__)
 
 def safe_int(data):
 	if data is not None:
@@ -1093,10 +1096,14 @@ class CareerPathBase(CareerBase):
 		from accounts.models import Profile
 		# get optional params
 
-		schools = opts.get('schools',None)
+		school_ids = opts.get('schools',None)
+		if school_ids:
+			school_ids = [int(s) for s in school_ids]
 		majors_query = opts.get('majors',None)
 		job = opts.get('jobs',None)
-		
+
+		# logger.info('schools in query: ' + str(school_ids))
+
 		people = []
 		positions = []
 		majors = {}
@@ -1108,12 +1115,12 @@ class CareerPathBase(CareerBase):
 		counter = 0
 
 		# get schools from user
-		if user and schools:
-			schools = Entity.objects.filter(Q(li_type="school",positions__person=user,positions__type="education")|Q(id__in=schools)).distinct()
+		if user and school_idss:
+			schools = Entity.objects.filter(Q(li_type="school",positions__person=user,positions__type="education")|Q(id__in=school_ids)).distinct()
 		elif user:
 			schools = Entity.objects.filter(li_type="school",positions__person=user,positions__type="education").distinct()
-		elif schools:
-			schools = Entity.objects.filter(id__in=schools).distinct()
+		elif school_ids:
+			schools = Entity.objects.filter(id__in=school_ids).distinct()
 		else:
 			schools = None
 
@@ -1124,11 +1131,12 @@ class CareerPathBase(CareerBase):
 		first_ideals = dict((u['id'],u['profile__first_ideal_job']) for u in User.objects.values('id','profile__first_ideal_job'))
 
 		# assemble all the positions
-		base_positions = Position.objects.filter(type="education",ideal_position__level=1).values('person__profile__status','ideal_position__major','ideal_position__title','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
+		# base_positions = Position.objects.filter(type="education",ideal_position__level=1).values('person__profile__status','ideal_position__major','ideal_position__title','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
+		base_positions = Position.objects.filter(ideal_position__cat="ed",ideal_position__level=1).values('person__profile__status','ideal_position__major','ideal_position__title','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
 
 		if schools:
 			# base_positions = Position.objects.filter(type="education",entity__in=schools).exclude(ideal_position=None).select_related("person")
-			base_positions = base_positions.filter(entity__in=schools)
+			base_positions = base_positions.filter(entity_id__in=schools)
 		if majors_query:
 			# print majors_query
 			base_positions = base_positions.filter(ideal_position__id__in=majors_query)	

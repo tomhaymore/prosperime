@@ -1296,15 +1296,18 @@ def viewCareerDecisions(request):
 
 def get_majors_filters(request):
 	# make sure it's a get request
+	from operator import itemgetter
 	if request.GET:
 
 		params = request.GET['term']
 
-		majors = [{'label_short':m['major'],'label':m['major'] + " (major)",'value':m['id'],'type':'majors'} for m in IdealPosition.objects.filter(cat="ed",major__icontains=params).values('major','id')]
-		schools = [{'label_short':s['name'],'label':s['name'] + " (school)",'value':s['id'],'type':'schools'} for s in Entity.objects.filter(Q(li_type="school")|Q(type="school")).filter(name__icontains=params).values('name','id')]
+		majors = [{'label_short':m['major'],'label':m['major'] + " (major)",'value':m['id'],'type':'majors'} for m in IdealPosition.objects.filter(cat="ed",major__icontains=params).values('major','id').distinct()]
+		schools = [{'label_short':s['name'],'label':s['name'] + " (school)",'value':s['id'],'type':'schools'} for s in Entity.objects.filter(Q(li_type="school")|Q(type="school")|Q(li_type="educational")).filter(name__icontains=params).exclude(li_uniq_id=None,li_univ_name=None).values('name','id')]
 		jobs = [{'label_short':p['title'],'label':p['title'] + " (job)",'value':p['id'],'type':'jobs'} for p in IdealPosition.objects.filter(title__icontains=params).values('title','id')]
 
 		results = majors + schools + jobs
+
+		results = sorted(results, key=itemgetter('label_short'))
 
 		return HttpResponse(json.dumps(results))
 

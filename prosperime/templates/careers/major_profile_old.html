@@ -184,6 +184,26 @@
 			<!-- <div class="placeholder"> </div> -->
 			
 			{% if paths %}
+				<div style="margin-top:25px;">
+					<div class="major-profile-pic-holder pull-left">
+						<div class="major-column-header">People</div>
+					</div>
+					<div class="first-position-holder pull-left" style="height:35px;">
+						<div class="major-column-header">
+							First Position
+						</div>
+					</div>
+					<div class="path-holder pull-left" style="height:20px;">
+						<div class="major-column-header">
+						</div>
+					</div>
+					<div class="current-position-holder pull-left" style="height:35px;">
+						<div class="major-column-header">
+							Current Position
+						</div>
+					</div>
+					<div class="clear"></div>
+				</div>
 				{% for p in paths %}
 				<div class="path-row" data-p_id="{{p.id}}">
 					<div class="major-profile-pic-holder center pull-left">

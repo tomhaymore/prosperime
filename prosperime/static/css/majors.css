@@ -620,7 +620,7 @@ border-radius: 20px;*/
 	width:1000px;
 	margin-left:auto;
 	margin-right:auto;
-	text-align:center;
+	/*text-align:center;*/
 	font-size:1.3em;
 	/*background-color: rgba(48,91,152,0.2);
 	border:1px solid rgb(48,91,152);*/
@@ -658,4 +658,10 @@ border-radius: 20px;*/
 .remove-filter:hover {
 	opacity:1;
 	cursor:pointer;
+}
+
+.major-column-header {
+	text-align: center;
+	font-size:18px;
+	font-weight: bold;
 }
