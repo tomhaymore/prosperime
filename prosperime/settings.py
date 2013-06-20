@@ -228,7 +228,9 @@ LOGGING = {
             'formatter': 'verbose'
         },
         'mail_admins': {
+
             'level': 'INFO',
+
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler',
             'include_html': True,
@@ -245,25 +247,32 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
+
         'accounts': { 
             'handlers': ['console','log_file'],
             'level': 'INFO',
             'propagate': True,
         },
+
         'social': { 
+
             'handlers': ['console','log_file'],
             'level': 'INFO',
             'propagate': True,
         },
+
         'entities': { 
+
             'handlers': ['console','log_file'],
             'level': 'INFO',
             'propagate': True,
         },
+
         'benchmarks': {
             'handlers':['mail_admins'],
             'level':'INFO'
         }
+
     }
 }
 

@@ -39,7 +39,9 @@ class RegisterForm(forms.Form):
 	required_css_class = 'form_required'
 
 	full_name = forms.CharField(label="Full name")
+
 	username = forms.CharField(label="Username",required=False)
+
 	email = forms.EmailField(label="Email")
 	location = forms.CharField(label="Location",required=False)
 	headline = forms.CharField(label="Headline",required=False)
@@ -75,8 +77,8 @@ class RegisterForm(forms.Form):
 class FinishAuthForm(forms.Form):
 	error_css_class = 'form_error'
 	required_css_class = 'form_required'
-
 	username = forms.CharField(label="Username",required=False)
+
 	email = forms.EmailField(label="Email")
 	location = forms.CharField(label="Location",required=False)
 	headline = forms.CharField(label="Headline",required=False)

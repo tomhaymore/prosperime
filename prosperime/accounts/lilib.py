@@ -1004,6 +1004,7 @@ class LIConnections(LIBase):
 							careerlib.match_position_to_ideals(p)
 						# process first_ideal_position
 						user.profile.set_first_ideal_job()
+
 				
 				# Either way, create the connection object
 				# if user is not None:

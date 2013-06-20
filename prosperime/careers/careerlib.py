@@ -1125,7 +1125,7 @@ class CareerPathBase(CareerBase):
 
 		# assemble all the positions
 		base_positions = Position.objects.filter(type="education",ideal_position__level=1).values('person__profile__status','ideal_position__major','ideal_position__title','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
-		# base_positions.filter(ideal_position__id=2029)
+
 		if schools:
 			# base_positions = Position.objects.filter(type="education",entity__in=schools).exclude(ideal_position=None).select_related("person")
 			base_positions = base_positions.filter(entity__in=schools)
@@ -1135,6 +1135,7 @@ class CareerPathBase(CareerBase):
 
 		# base_positions.values('person__profile__status','ideal_position__major','ideal_position__title','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
 		# print base_positions.query
+
 		# print "looping through positions..."
 		for p in base_positions:
 			if p['person__profile__status'] == 'crunchbase':
@@ -1182,13 +1183,15 @@ class CareerPathBase(CareerBase):
 
 
 					counter += 1	
-					if counter == 100	:
+					if counter == 100:
 						break;
 
 
 				if first_ideal.id not in positions_set:
 					positions_set.add(first_ideal.id)
+
 					positions.append({'title':first_ideal.title, 'id':first_ideal.id,'major_id':p['ideal_position__id'], "major_index":majors[p['ideal_position__major']]["index"], "major":p['ideal_position__major']})
+
 
 		data = {
 			"majors":json.dumps(majors),

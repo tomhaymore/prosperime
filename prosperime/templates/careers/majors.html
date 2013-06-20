@@ -11,7 +11,6 @@
 	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-	<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
 
     <style type="text/css">
         .box {
@@ -61,6 +60,7 @@
 
      	.person-box {
     		background-color:rgba(41,128,185,0.8);
+    		/*background-color:rgba(41,91,152,0.8);*/
      		color:#ECF0F1;
 			font-size:0.9em;
 			-moz-box-sizing: border-box;
@@ -132,7 +132,6 @@
 
 {% endblock %}
 
-
 {% block extramessage %}
 	{% if not user.is_authenticated %}
 		<div id="cta-container">
@@ -143,22 +142,24 @@
 	{% endif %}
 {% endblock %}
 
+
 {% block content %}
 
 <div id="wide-content-container" class="main-container">
-	
+
 	<div id="header-container">
 		<p class="feature-page-header">What can you do with your major?</p>
 		<p class="feature-page-subheader">Use the graph below to see which majors lead to what jobs. Click on any major to learn more.</p>
 		
-		<!-- <div id="filter-form">
+
+		<div id="filter-form">
 			<p>Filter by school, major or job: <input id="majors-filter-input" data-val-id="" class="flat-input" placeholder="Start typing... "/></p>
 		</div>
 		<div class="filters-container">
-			<ul id="filters-list" class="flat-list">
+			<ul id="filters-list" class="flat-list inline">
 
 			</ul>
-		</div> -->
+		</div>
 		
 	</div>
 	<div>
@@ -191,6 +192,7 @@
 		'schools':[],
 		'jobs':[]
 	}
+
 	// Constants
 	var svg_width = 350; var svg_height = 1100; 
 	var magic_number = 575; 
@@ -198,6 +200,9 @@
 
 	var img_height = 35;
 	var img_width = 35;
+
+	var main_blue = "rgba(48,91,152,0.7)"
+	var main_blue_fuller = "rgba(48,91,152,0.9)"
 
 
 	/************/
@@ -220,6 +225,7 @@
 			// logging
 			console.log(people)
 			// console.log(majors)
+
 			// render viz
 			renderViz()
 		} else {
@@ -231,82 +237,105 @@
 					positions = shuffle($.parseJSON(response["positions"]))
 					majors = $.parseJSON(response["majors"])
 					// logging
-					console.log(people)
-					// console.log(majors)
 					// render viz
 					renderViz()
 				}
 			}, "json");
 		};
 
-		function updateData() {
-			// make ajax call
-			$.get("/careers/getMajorsData/", {'majors':filters['majors'],'jobs':filters['jobs'],'schools':filters['schools']},function(response) {
-				if (response["result"] == "success") {
-					console.log("updating data...")
-					// deconstruct data
-					people = $.parseJSON(response["people"])
-					positions = $.parseJSON(response["positions"])
-					majors = $.parseJSON(response["majors"])
-					// update data in d3 objects
-					updateMajors();
-					updatePeople();
-					updatePositions();
-					drawLines();
-					console.log('lines drawn')
-				}
+		// function updateData() {
+		// 	// make ajax call
+		// 	$.get("/careers/getMajorsData/", {'majors':filters['majors'],'jobs':filters['jobs'],'schools':filters['schools']},function(response) {
+		// 		if (response["result"] == "success") {
+		// 			console.log("updating data...")
+		// 			// deconstruct data
+		// 			people = $.parseJSON(response["people"])
+		// 			positions = $.parseJSON(response["positions"])
+		// 			majors = $.parseJSON(response["majors"])
+		// 			// update data in d3 objects
+		// 			updateMajors();
+		// 			updatePeople();
+		// 			updatePositions();
+		// 			drawLines();
+		// 			console.log('lines drawn')
+		// 		}
 				
-			},"json");
+		// 	},"json");
 			
 
 		
-		};
+		// };
 
+
+		// Filters Autocomplete
 		$('#majors-filter-input').autocomplete({
 			minLength: 3,
 			source: '/careers/getMajorsFilters/',
 			select: function(event,ui) {
+				console.log(ui)
 				event.preventDefault();
-				console.log(ui.item);
 				$(this).val(ui.item.label_short);
 				$(this).data('val-id',ui.item.value);
 				$(this).data('val-cat',ui.item.type)
-			}
+			},
+			// Makes the display the major instead of id
+			focus: function(event,ui) {
+				event.preventDefault()
+				$(this).val(ui.item.label_short)
+			},
 		})
+		// Filters keypress
 		.keypress(function(e) {
 			if(e.which == 13) {
 				var input = $('#majors-filter-input')
 				var cat = input.data('val-cat')
 				// add to global filter set
-				filters[cat].push(input.data('val-id'));
-				
+
+				filters[cat].push(input.data('val-id'));			
 				// add to list
-				$("#filters-list").append("<li class='filters-item'>"+input.val()+"</li>");
+				$("#filters-list").append("<li class='filters-item'>"+input.val()+" <span data-type='" + cat + "' data-id='" + input.data("val-id") + "' data-name='"+$("#majors-filter-input").val() +"' class='remove-filter' onclick='updateFilters(this)'>X</span></li>");
 				// empty out input bar
 				input.val("")
 				// update data
 				updateData()
 			}
 		});
-
 	});
 
+	function updateFilters(el) {
+		// Get id, filter type
+		console.log(filters)
+		var type = $(el).data("type")
+		var id = parseInt($(el).data("id"))
+		console.log($(el).data("name"))
+		console.log("type: " + type + " id: " + id)
+		// Remove filter from list
+		$(el).parent().remove()
 
-	function userMouseOverAll() {
-		for (p in majors[d]["people"]) {
-			var user_node = d3.select("#person-"+majors[d]["people"][p])
-			userMouseOver(user_node)
-		};
+		// Get new data
+		var index = filters[type].indexOf(id)
+		filters[type].splice(index, 1) 
+		console.log(filters)
+		updateData()
 	};
 
-	function userMouseOutAll() {
-		for (p in majors[d]["people"]) {
-			var user_node = d3.select("#person-"+majors[d]["people"][p])
-			userMouseOut(user_node)
-		};
-
+	// AJAX to DB for new set of data
+	function updateData() {
+		$.get("/careers/getMajorsData/", {'majors':filters['majors'],'jobs':filters['jobs'],'schools':filters['schools']},function(response) {
+			if (response["result"] == "success") {
+				// deconstruct data
+				people = $.parseJSON(response["people"])
+				/* Clay - Bugs in what the API is returning incl. duplicate values... maybe just me? */
+				// positions = $.parseJSON(response["positions"])
+				majors = $.parseJSON(response["majors"])
+				// update data in d3 objects
+				updateMajors();
+				updatePeople();
+				updatePositions();
+				// drawLines();
+			}				
+		},"json");
 	};
-
 
 
 	// Main fxn, takes care of all SVG drawing
@@ -332,20 +361,31 @@
 		svg_right = createSvgContainer("right")
 
 		// get y_offset for scaling dist between dots
-		y_offset = Math.floor(magic_number / (people.length / 4))
+
+		// y_offset = Math.floor(magic_number / (people.length / 4))
+
 		// add people nodes
 		// updatePeople(svg_left, y_offset)
 		updatePeople()
 
 		// get y_offset for scaling dist between dots
-		y_offset = Math.floor(magic_number / positions.length)
+
+		// y_offset = Math.floor(magic_number / positions.length)
+
+		// code roughly scales the positions down so, at most, right col is 100 pixels taller than center col
+		var majors_column_height = parseInt(d3.select("#center").style("height"))
+		magic_number = (majors_column_height + 100 < 560) ? majors_column_height + 100 : 560;
+		y_offset = Math.ceil(magic_number / positions.length)
+
 		// add position nodes
 		// updatePositions(svg_right, y_offset)
 		updatePositions()
 
 		// draw connecting lines
 		// drawLines(svg_left, svg_right)
-		drawLines()
+
+		// drawLines()
+
 	};
 
 
@@ -353,16 +393,26 @@
 	function updateMajors() {
 		// Add Center divs (Majors)
 		center = d3.select("#center").selectAll("div")
-			.data(Object.keys(majors),function(d) { return majors[d].id ;});
+			.data(Object.keys(majors), function(d) {
+				// Don't know why, but this gets called twice,
+				// one with old data, once with new data
+				if (d in majors) return majors[d].id
+			}).order()
 
-		center.exit().remove();
-		
+		// remove old nodes
+		center.exit()
+			.transition()
+				.duration(400)
+				.style("opacity", 0)
+				.remove()
+
+
+		// add new nodes
 		center.enter().append("div")
+			// Set text of Major div
 			.html(function(d) { 
-
-				// Thomas -- just change this # to the max that fit on a line
 				if (d.length >= 36) {
-					// AND this to that number - 3
+
 					var txt = "<span class='degree-magnified'><span class='degree-abbr'>" + majors[d].abbr + "</span>" + d.substring(0,33) + "</span><span class='degree-major'>" + d.substring(0,33) + "...</div>"
 					return txt
 				} else {
@@ -372,9 +422,7 @@
 			})
 
 			.attr("class", "box")
-			// .attr("id", function(d) { return "major-" + majors[d]["index"]})
 			.attr("id",function(d) { return "major-" + majors[d].id})
-			.attr("data-index", function(d, i) { return i })
 
 			// Major mouseover
 			.on("mouseover", function(d) {
@@ -383,23 +431,13 @@
 				d3.select(this).attr("class", "box major-hover")
 				
 				// Make lines blue
-				// funky code b/c of closure issues in handler
-				// var line_selector = d3.select(this).attr("id").split("-")[1]
-				// console.log(".line-"+majors[d].index)
-				// console.log(".line-"+majors[d].id)
-				lineMouseover(d3.selectAll(".line-"+majors[d].index))
-			
-				// Trigger hover on user dots
-				for (p in majors[d]["people"]) {
-					var user_node = d3.select("#person-"+majors[d]["people"][p])
-					userMouseOver(user_node)
-				};
 
-				// Trigger hover on position dots
-				for (p in majors[d]["positions"]) {
-					var position_node = d3.select("#position-"+majors[d]["positions"][p])
-					positionMouseover(position_node)
-				}
+				// ++ lineMouseover(d3.selectAll(".line-"+majors[d].index))
+				lineMouseover(d3.selectAll(".line-"+majors[d]["id"]))
+			
+				// trigger person and position mouseovers
+				triggerUserAndPositionMouseover(d)
+
 			})
 
 			// Major mouseout
@@ -408,26 +446,26 @@
 				d3.select(this).attr("class", "box")
 
 				// Make lines grey again
-				lineMouseout(d3.selectAll(".line-"+majors[d]["index"]))
 
-				// Remove user hover
-				for (p in majors[d]["people"]) {
-					var user_node = d3.select("#person-"+majors[d]["people"][p])
-					userMouseOut(user_node)
-				};
+				// ++ lineMouseout(d3.selectAll(".line-"+majors[d]["index"]))
+				lineMouseout(d3.selectAll(".line-"+majors[d]["id"]))
 
-				// Trigger hover on position dots
-				for (p in majors[d]["positions"]) {
-					var position_node = d3.select("#position-"+majors[d]["positions"][p])
-					positionMouseout(position_node)
-				}
+				// trigger user and position mouseouts
+				triggerUserandPositionMouseout(d)
 			})
-
+			// Click -- go to individual major page
 			.on("click", function(d) {
 				window.location = "/majors/" + majors[d]["id"] + "/"
-			});
+			})
 
-		
+
+		// Reset indices after enter so that existing elements
+		// and newly added ones are effected.
+		// Then re-order them by index
+		center
+			.attr("data-index", function(d, i) { return i  })
+			.order()
+
 	};
 
 	
@@ -444,6 +482,7 @@
 			.append("svg:feColorMatrix")
 				.attr("type","matrix")
 				.attr("values","0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0");
+
 		return container
 	};
 
@@ -453,8 +492,10 @@
 	// function updatePeople(svg_left, y_offset) {
 		// Add user nodes to left svg
 		var svg = svg_left.selectAll("image")
-			.data(people,function(d){return d.id;});
+
+			.data(people,function(d){return d.id;}).order()
 		
+		// remove existing
 		svg.exit()
 			// .transition()
 			// 	.duration(500)
@@ -462,8 +503,10 @@
 			// 	.attr("y",0)
 			.remove();
 
+
+		// update existing nodes... why doesn't .update() work??
 		svg.transition()
-			.duration(500)
+			.duration(400) // Clay -- made this shorter (400)
 			.attr("x", function(d, i) { // staggers nodes x-value
 				if (i % 4 == 0) return img_width
 				else if (i % 4 == 1) return img_width * 2
@@ -472,71 +515,58 @@
 			})
 			.attr("y", function(d, i) {
 				return Math.floor(i / 4) * img_height;
-				
-			});
-		
-		// g = svg.enter().append("g");
+
+			})
+			.each("end", drawLinesGate)
+
+
 
 		svg.enter().append("image")
-			// .attr("x",0)
-			// .attr("y",0)
-			// .transition().duration(50)
-			.attr("x", function(d, i) { // staggers nodes x-value
-				if (i % 4 == 0) return img_width
-				else if (i % 4 == 1) return img_width * 2
-				else if (i % 4 == 2) return img_width * 3
-				else return img_width * 4
-			})
+			.attr("x", -50) // start off the canvas, animate on
 			.attr("y", function(d, i) {
 				return Math.floor(i / 4) * img_height;
-				
 			})
 			.attr("height", img_height)
 			.attr("width", img_width)
 			.attr("xlink:href", function(d) { return d.pic })
 			.attr("filter","url(#grayscale)")
-			// .attr("fill", "#fff")
-			// .attr("stroke","rgba(104,105,107,0.5)")
-			// .attr("stroke-width",2)
 			.attr("id", function(d) { return "person-"+d.id })
-			.attr("data-name", function(d) { return d.name });
+			.attr("data-name", function(d) { return d.name })
+		.transition()
+			.duration(400)
+			.each("end", drawLinesGate)
+			.attr("x", function(d, i) { // staggers nodes x-value
+				if (i % 4 == 0) return img_width
+				else if (i % 4 == 1) return img_width * 2
+				else if (i % 4 == 2) return img_width * 3
+				else return img_width * 4
+			})
+
 
 		svg.on("mouseover", function(d) {
-				var d3_this = d3.select(this);
+				// ??
 				this.parentNode.appendChild(this);
-				d3_this.attr("height",img_height+15)
-				d3_this.attr("width",img_height+15)
+				// Magnify image
+				d3.select(this).attr("height",img_height+15)
+				d3.select(this).attr("width",img_height+15)
 				// d3_this.attr("x",parseInt(this.getAttribute("x")) - 7)
-				d3_this.attr("filter","")
-				// d3.select(this).attr("height",img_height+15)
-				// d3.select(this).attr("width",img_width+15)
-				// d3.select(this).attr("x",)
+				// Remove filter
+				d3.select(this).attr("filter","")
+
 				// Get major div
-				// var major_node = d3.select("#major-"+d.major_index)
-				
 				var major_node = d3.select("#major-"+d.major_id)
-				
 				// Add hover to it
 				major_node.attr("class", "box major-hover")
 				
 				// Make lines blue
-				var line_selector = major_node.attr("id").split("-")[1]
-				// var line_selector = major_node.attr("id")
-				
-				lineMouseover(d3.selectAll(".line-"+d.major_index))
-				console.log(".line-"+d.major_index)
-				// Trigger hover on user dots
-				for (p in majors[d.major]["people"]) {
-					var user_node = d3.select("#person-"+majors[d.major]["people"][p])
-					userMouseOver(user_node)
-				};
+				/* Clay -- why major_index here and not id? (on mouseout too) */
+				// ++ lineMouseover(d3.selectAll(".line-"+d.major_index))
+				lineMouseover(d3.selectAll(".line-"+d.major_id))
 
-				// Trigger hover on position dots
-				for (p in majors[d.major]["positions"]) {
-					var position_node = d3.select("#position-"+majors[d.major]["positions"][p])
-					positionMouseover(position_node)
-				}
+				// Trigger hover on user, position dots
+				triggerUserAndPositionMouseover(d.major)
 			})
+
 			.on("mouseout", function(d) {
 				// resize
 				
@@ -551,22 +581,13 @@
 				major_node.attr("class", "box")
 
 				// Make lines grey again
-				lineMouseout(d3.selectAll(".line-"+d.major_index))
 
+				// ++ lineMouseout(d3.selectAll(".line-"+d.major_index))
+				lineMouseout(d3.selectAll(".line-"+d.major_id))
+				
 				// Remove user hover
-				for (p in majors[d.major]["people"]) {
-					var user_node = d3.select("#person-"+majors[d.major]["people"][p])
-					userMouseOut(user_node)
-				};
-
-				// Trigger hover on position dots
-				for (p in majors[d.major]["positions"]) {
-					var position_node = d3.select("#position-"+majors[d.major]["positions"][p])
-					positionMouseout(position_node)
-				}
+				triggerUserandPositionMouseout(d.major)
 			});
-		
-		
 	};
 
 	// function updatePositions(svg_right, y_offset) {
@@ -579,6 +600,8 @@
 			// 	.attr("cx",250)
 			// 	.attr("cy",0)
 			.remove()
+
+		// Transitions positions to new location
 
 		svg.transition()
 			.duration(500)
@@ -606,32 +629,26 @@
 			})
 			.attr("r", 5)
 			.attr("fill", "none")
-			.attr("stroke","rgba(104,105,107,0.5)")
+
+			.attr("stroke",main_blue)
 			.attr("stroke-width", 2)
 			.attr("id", function(d) { return "position-"+d.id })
 			.attr("data-title", function(d) { return d.title })
 			.on("mouseover", function(d) {
 				// Get major div
-				// var major_node = d3.select("#major-"+d.major_index)
+
 				var major_node = d3.select("#major-"+d.major_id)
 				// Add hover to it
 				major_node.attr("class", "box major-hover")
 				// Make lines blue
-				var line_selector = major_node.attr("id").split("-")[1]
-				lineMouseover(d3.selectAll(".line-"+d.major_index))
-				
-				// Trigger hover on user dots
-				for (p in majors[d.major]["people"]) {
-					var user_node = d3.select("#person-"+majors[d.major]["people"][p])
-					userMouseOver(user_node)
-				};
 
-				// Trigger hover on position dots
-				for (p in majors[d.major]["positions"]) {
-					var position_node = d3.select("#position-"+majors[d.major]["positions"][p])
-					positionMouseover(position_node)
-				}
+				/* Clay -- check this code */
+				// ++ lineMouseover(d3.selectAll(".line-"+d.major_index))
+				lineMouseover(d3.selectAll(".line-"+d.major_id))
+				// Trigger hover on users, position
+				triggerUserAndPositionMouseover(d.major)
 			})
+
 			.on("mouseout", function(d) {
 				// get major node
 				var major_node = d3.select("#major-"+d.major_id)
@@ -639,68 +656,108 @@
 				major_node.attr("class", "box")
 
 				// Make lines grey again
-				// var major_node = d3.select("#major-"+d.major_index)
-				var major_node = d3.select("#major"+d.major_id)
-				lineMouseout(d3.selectAll(".line-"+d.major_index))
-				
-				// Remove user hover
-				for (p in majors[d.major]["people"]) {
-					var user_node = d3.select("#person-"+majors[d.major]["people"][p])
-					userMouseOut(user_node)
-				};
+				/* Clay -- check this */
+				// ++ lineMouseout(d3.selectAll(".line-"+d.major_index))
+				lineMouseout(d3.selectAll(".line-"+d.major_id))
 
-				// Trigger hover on position dots
-				for (p in majors[d.major]["positions"]) {
-					var position_node = d3.select("#position-"+majors[d.major]["positions"][p])
-					positionMouseout(position_node)
-				}
+				// Trigger mouseout on user, position
+				triggerUserandPositionMouseout(d.major)
 			});
+	};
 
-		
+	var transition_counter = 0;
+	/* Tactics... catch each individual transition's end event,
+		increment counter. Once all end events transferred, save to 
+		re-draw lines to new locations */
+	var drawLinesGate = function() {
+		if (transition_counter++ >= people.length - 1) drawLines()
 	};
 
 	// Iterates through each major, gets ids of positions, people
 	//  draws lines to each
 	// function drawLines(svg_left, svg_right) {
 	function drawLines() {
+// <<<<<<< HEAD
+// 		// var lines_left = svg_left.selectAll("path").remove()
+// 		// var lines_right = svg_right.selectAll("path").remove()
+// 		$("path").remove()
+// 		// Add all connecting lines
+
+// 		for (key in majors) {
+// 			// console.log(majors[key])
+// 			var left_y,
+// 				left_x,
+// 				right_y,
+// 				right_x; 
+// 			// console.log("#major-"+majors[key]["id"])
+// 			var index = d3.select("#major-"+majors[key]["id"]).attr("data-index")
+// 			// console.log(index)
+// 			// people <--> majors
+// 			var people = majors[key]["people"]
+// 			// console.log(people)
+// 			for (var j = 0; j < people.length; j++) {
+				
+// 				left_y = parseInt($("#person-"+people[j]).attr("y")) + img_height
+// 				// console.log("#person-"+people[j])
+// 				left_x = parseInt($("#person-"+people[j]).attr("x")) + 3
+
+// 				right_y = 16 + (27 * index)
+// 				right_x = 360
+// 				d3_drawLines(svg_left, left_x, left_y, right_x, right_y, majors[key]["index"])
+// =======
+		transition_counter = 0
+		// Remove existing lines
 		// var lines_left = svg_left.selectAll("path").remove()
 		// var lines_right = svg_right.selectAll("path").remove()
 		$("path").remove()
-		// Add all connecting lines
 
+		// Add all connecting lines
+		var left_y,
+			left_x,
+			right_y,
+			right_x;
 		for (key in majors) {
-			// console.log(majors[key])
-			var left_y,
-				left_x,
-				right_y,
-				right_x; 
-			// console.log("#major-"+majors[key]["id"])
+
 			var index = d3.select("#major-"+majors[key]["id"]).attr("data-index")
-			// console.log(index)
+
 			// people <--> majors
 			var people = majors[key]["people"]
-			// console.log(people)
-			for (var j = 0; j < people.length; j++) {
-				
-				left_y = parseInt($("#person-"+people[j]).attr("y")) + img_height
-				// console.log("#person-"+people[j])
-				left_x = parseInt($("#person-"+people[j]).attr("x")) + 3
 
-				right_y = 16 + (27 * index)
+			for (var j = 0; j < people.length; j++) {
+				// left_y = parseInt($("#person-"+people[j]).attr("y")) + img_height
+				left_y = d3.select("#person-"+people[j]).attr("y")	
+				// left_x = parseInt($("#person-"+people[j]).attr("x")) + 3
+				left_x = d3.select("#person-"+people[j]).attr("x")
+
+				right_y = 22 + (27 * index)
 				right_x = 360
-				d3_drawLines(svg_left, left_x, left_y, right_x, right_y, majors[key]["index"])
+				// ++ d3_drawLines(svg_left, left_x, left_y, right_x, right_y, majors[key]["index"])
+				d3_drawLines(svg_left, left_x, left_y, right_x, right_y, majors[key]["id"])
+// >>>>>>> 50402b2a748ffff16b1fb5d883e323082eeede0f
 			};
 
 			// majors <--> positions
 			var positions = majors[key]["positions"]
-			for (var l = 0; l < positions.length; l++) {
-				left_y = 13 + (27 * index)
-				left_x = 0
-				right_y = $("#position-"+positions[l]).attr("cy")
+// <<<<<<< HEAD
+// 			for (var l = 0; l < positions.length; l++) {
+// 				left_y = 13 + (27 * index)
+// 				left_x = 0
+// 				right_y = $("#position-"+positions[l]).attr("cy")
 
-				right_x = parseInt($("#position-"+positions[l]).attr("cx")) - 6	
+// 				right_x = parseInt($("#position-"+positions[l]).attr("cx")) - 6	
 
-				d3_drawLines(svg_right, right_x, right_y, left_x, left_y, majors[key]["index"])
+// 				d3_drawLines(svg_right, right_x, right_y, left_x, left_y, majors[key]["index"])
+// =======
+			if (key in majors) {
+				for (var l = 0; l < positions.length; l++) {
+					left_y = 13 + (27 * index)
+					left_x = 0
+					right_y = $("#position-"+positions[l]).attr("cy")
+
+					right_x = parseInt($("#position-"+positions[l]).attr("cx")) - 6	
+					// ++ d3_drawLines(svg_right, right_x, right_y, left_x, left_y, majors[key]["index"])
+					d3_drawLines(svg_right, right_x, right_y, left_x, left_y, majors[key]["id"])
+				};
 			};
 		};
 	};
@@ -751,8 +808,6 @@
 	};
 
 
-
-
 	/* HANDLERS */
 	function positionMouseover(position_node) {
 
@@ -764,7 +819,8 @@
 		if ($("#position-hover-"+id == 0)) {
 
 			// make node blue, bigger
-			position_node.attr("fill", "#3498DB").attr("r",8)
+
+			position_node.attr("fill", main_blue_fuller).attr("r",8)
 
 			// get coordinates for tooltip
 			var container_offset = $("#right").offset()
@@ -780,7 +836,8 @@
 	// returns position node to original attr
 	function positionMouseout(position_node) {
 
-		position_node.transition().duration(250).attr("fill","#fff").attr("stroke-width",2).attr("r",5)
+		position_node.transition().duration(250).attr("fill","none").attr("stroke-width",2).attr("r",5)
+
 	};
 
 
@@ -829,97 +886,98 @@
 
 	// Makes lines blue, bigger
 	function lineMouseover(selection) {
-		selection.attr("stroke","rgba(41,128,185,0.7)")
-			.attr("stroke-width",1)
-	};
-	// Makes lines grey, smaller
-	function lineMouseout(selection) {
-		selection
-			// .attr("stroke", "rgba(104,105,107,0.3)")
-			// .attr("stroke","rgb(255,255,255)")
-			.attr("stroke","")
-			.attr("stroke-width",1)
-	};
+// <<<<<<< HEAD
+// 		selection.attr("stroke","rgba(41,128,185,0.7)")
+// 			.attr("stroke-width",1)
+// 	};
+// 	// Makes lines grey, smaller
+// 	function lineMouseout(selection) {
+// 		selection
+// 			// .attr("stroke", "rgba(104,105,107,0.3)")
+// 			// .attr("stroke","rgb(255,255,255)")
+// 			.attr("stroke","")
+// 			.attr("stroke-width",1)
+// 	};
 
 
-	var profile_task_id,
-		connections_task_id;
+// 	var profile_task_id,
+// 		connections_task_id;
 
-	var update_task_status = function(id,status) {
-		// determine what class to add
-		if (status == "success") {
-			var msg_class = "success";
-			var msg_text = "We have completed syncing with your LinkedIn account. Please refresh the page to see more results.";
-		} else if (status == "failure") {
-			var msg_class = "info";
-			var msg_text = "We have encountered an error processing your LinkedIn account.";
-		} else {
-			var msg_class = "info";
-			var msg_text = "We are still syncing your LinkedIn profile...";
-		}
-		// check if messages are present
-		var msg_container = $("div#messages");
-		if (!$.contains(document.documentElement,msg_container)) {
-			// messages div is not present, update
-			var block = "<div id='messages'>\n<ul class='messages'>\n<li class="+msg_class+" data-task-id="+id+">"+msg_text+"</li>\n</ul>\n</div>";
-			$("div.messages-container").append(block);
-		} else {
-			// messages div is present, check to see if this particular message is present
-			var msg = $("li#[data-task-id='"+id+"']");
-			if(!$.contains(document.documentElement,msg)) {
-				// element does not exist, create
-				var message = "<li class='info' data-task-id="+id+">"+msg_text+"</li>";
-				$("ul.messages").append(message);
-			} else {
-				// message is already present
-				msg.removeClass();
-				msg.addClass(msg_class);
-			}
-		}
-	};
+// 	var update_task_status = function(id,status) {
+// 		// determine what class to add
+// 		if (status == "success") {
+// 			var msg_class = "success";
+// 			var msg_text = "We have completed syncing with your LinkedIn account. Please refresh the page to see more results.";
+// 		} else if (status == "failure") {
+// 			var msg_class = "info";
+// 			var msg_text = "We have encountered an error processing your LinkedIn account.";
+// 		} else {
+// 			var msg_class = "info";
+// 			var msg_text = "We are still syncing your LinkedIn profile...";
+// 		}
+// 		// check if messages are present
+// 		var msg_container = $("div#messages");
+// 		if (!$.contains(document.documentElement,msg_container)) {
+// 			// messages div is not present, update
+// 			var block = "<div id='messages'>\n<ul class='messages'>\n<li class="+msg_class+" data-task-id="+id+">"+msg_text+"</li>\n</ul>\n</div>";
+// 			$("div.messages-container").append(block);
+// 		} else {
+// 			// messages div is present, check to see if this particular message is present
+// 			var msg = $("li#[data-task-id='"+id+"']");
+// 			if(!$.contains(document.documentElement,msg)) {
+// 				// element does not exist, create
+// 				var message = "<li class='info' data-task-id="+id+">"+msg_text+"</li>";
+// 				$("ul.messages").append(message);
+// 			} else {
+// 				// message is already present
+// 				msg.removeClass();
+// 				msg.addClass(msg_class);
+// 			}
+// 		}
+// 	};
 	
-	var check_task = function(id) {
-		setTimeout(function() {
-			console.log("checking task again...")
-			var url = "/tasks/" + id + "/status"
-			$.ajax({
-					url:url,
-					success: function(data) {
-						if (data.task.status == "SUCCESS") {
-							// task already completed, updated with success message
-							update_task_status(id,'success');
-						} else if (data.task.status == "FAILURE") {
-							// task failed
-							// update_task_status(id,'failure');
+// 	var check_task = function(id) {
+// 		setTimeout(function() {
+// 			console.log("checking task again...")
+// 			var url = "/tasks/" + id + "/status"
+// 			$.ajax({
+// 					url:url,
+// 					success: function(data) {
+// 						if (data.task.status == "SUCCESS") {
+// 							// task already completed, updated with success message
+// 							update_task_status(id,'success');
+// 						} else if (data.task.status == "FAILURE") {
+// 							// task failed
+// 							// update_task_status(id,'failure');
 
-						} else {
-							// task still pending
-							check_task();
-						}
-					},
-					dataType:"json"})
-		},2500);
+// 						} else {
+// 							// task still pending
+// 							check_task();
+// 						}
+// 					},
+// 					dataType:"json"})
+// 		},2500);
 
-	};
+// 	};
 	
-	var tasks = {% if tasks %} true {% else %} false {% endif %};
-	{% if tasks %}
-	if (tasks == true) {
-		console.log("tasks...")
-		var profile_task_id = {% if profile_task_id %} "{{profile_task_id|safe}}" {% else %} null {% endif %}
-		var connections_task_id = {% if connections_task_id %} "{{connections_task_id|safe}}" {% else %} null {% endif %}
-	};	
-	{% endif %}
-	if (profile_task_id != null) {
-		check_task(profile_task_id);
-	};
-	// if (connections_task_id != null) {
-	// 	check_task(connections_task_id);
-	// };
+// 	var tasks = {% if tasks %} true {% else %} false {% endif %};
+// 	{% if tasks %}
+// 	if (tasks == true) {
+// 		console.log("tasks...")
+// 		var profile_task_id = {% if profile_task_id %} "{{profile_task_id|safe}}" {% else %} null {% endif %}
+// 		var connections_task_id = {% if connections_task_id %} "{{connections_task_id|safe}}" {% else %} null {% endif %}
+// 	};	
+// 	{% endif %}
+// 	if (profile_task_id != null) {
+// 		check_task(profile_task_id);
+// 	};
+// 	// if (connections_task_id != null) {
+// 	// 	check_task(connections_task_id);
+// 	// };
 
 
 	
-	// function personMouseover(d) {
+// 	// function personMouseover(d) {
 
 	// 	// make sure hover hasn't already been triggered
 	// 	if ($("#person-hover-"+d.name.split(" ")[0]).length == 0) {
@@ -973,6 +1031,48 @@
 	// .on("mouseout", function(d) {
 	// 	userMouseOut(d3.select(this))
 	// });
+// =======
+		selection.attr({
+			"stroke":main_blue,
+			"stroke-width":1
+		});
+	};
+
+	// Makes lines grey, smaller
+	function lineMouseout(selection) {
+		selection.attr("stroke","")
+	};
+
+	var triggerUserAndPositionMouseover = function(key) {
+		// Trigger hover on user dots
+		for (p in majors[key]["people"]) {
+			var user_node = d3.select("#person-"+majors[key]["people"][p])
+			userMouseOver(user_node)
+		};
+
+		// Trigger hover on position dots
+		for (p in majors[key]["positions"]) {
+			var position_node = d3.select("#position-"+majors[key]["positions"][p])
+			positionMouseover(position_node)
+		}
+	};
+
+	var triggerUserandPositionMouseout = function(key) {
+		// Remove user hover
+		for (p in majors[key]["people"]) {
+			var user_node = d3.select("#person-"+majors[key]["people"][p])
+			userMouseOut(user_node)
+		};
+
+		// Trigger hover on position dots
+		for (p in majors[key]["positions"]) {
+			var position_node = d3.select("#position-"+majors[key]["positions"][p])
+			positionMouseout(position_node)
+		};
+	};
+
+
+
 
 
 	function shuffle(o) {
@@ -980,6 +1080,31 @@
 	    return o;
 	}
 
+	/* DEPRECATED */
+
+	function userMouseOverAll() {
+		for (p in majors[d]["people"]) {
+			var user_node = d3.select("#person-"+majors[d]["people"][p])
+			userMouseOver(user_node)
+		};
+	};
+
+	function userMouseOutAll() {
+		for (p in majors[d]["people"]) {
+			var user_node = d3.select("#person-"+majors[d]["people"][p])
+			userMouseOut(user_node)
+		};
+
+	};
+
+
+/* TODO 
+: animate nodes, pictures, divs in 
+: add a button in case "enter" isn't intuitive
+: deal with position changes... doing nothing
+
+
+*/
 
 </script>
 {% endblock %}

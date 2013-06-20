@@ -35,6 +35,7 @@ import utilities.helpers as helpers
 logger = logging.getLogger(__name__)
 critical_logger = logging.getLogger("benchmarks")
 
+
 def login(request):
 	# from django.contrib.auth.forms import AuthenticationForm
 	# print request.session['_auth_user_backend']
@@ -181,7 +182,9 @@ def linkedin_authenticate(request):
 		# if not logged in, ask to finish user registration process
 		return HttpResponseRedirect('/account/finish')
 
+
 def finish_registration_old(request):
+
 	import accounts.emaillib as emaillib
 	# get linkedin info from session
 	linkedin_user_info = request.session['linkedin_user_info']

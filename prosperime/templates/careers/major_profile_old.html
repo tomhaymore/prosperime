@@ -18,6 +18,7 @@
 			
 		</div>
 	{% endif %}
+
 {% endblock %}
 
 {% block content %}
@@ -25,6 +26,7 @@
 
 
 <div id="content-container" class="main-container">
+
 	
 		{% if major.long_title %}
 			<p class="v2-feature-page-header">
@@ -232,6 +234,7 @@
 			{% else %}
 			<p>Sorry, no people with this degree.</p>
 			{% endif %}
+
 		{% endif %}
 	</div>
 </div>
@@ -241,11 +244,13 @@
 {% block templates %}
 <script type="text/javascript">
 $(function() {
+
 	if ($("#cta-container")) {
 			setTimeout(function() {
 				$("#cta-container").addClass("show")
 			},2500);
 		};
+
 	$("a.career-profile-nav").click(function() {
 		var view = $(this).data('view');
 		$("a.career-profile-nav").removeClass("selected").addClass("unselected");

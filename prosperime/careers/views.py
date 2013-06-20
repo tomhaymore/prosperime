@@ -30,6 +30,7 @@ import utilities.helpers as helpers
 
 logger = logging.getLogger(__name__)
 
+
 ## Clayton - DEV
 # def single_major(request, major_id):
 
@@ -44,11 +45,14 @@ logger = logging.getLogger(__name__)
 # 	return render_to_response("careers/major_viz.html", data, context_instance=RequestContext(request))
 
 
+
 ######################################################
 ################## CORE VIEWS ########################
 ######################################################
+
 # @login_required
 def old_majors(request):
+
 
 	# try to get from cache
 	# data = cache.get("majors_viz_"+str(request.user.id))
@@ -62,6 +66,7 @@ def old_majors(request):
 		data = {"cache":"miss"}
 
 	return render_to_response("careers/d3.html",data,context_instance=RequestContext(request))
+
 
 def majors(request):
 	# try to get from cache
@@ -95,10 +100,10 @@ def majors(request):
 
 	# test if cache worked
 	if data["majors"]:
+
 		return render_to_response("careers/majors.html",data,context_instance=RequestContext(request))
 	else:
 		data = {"cache":"miss"}
-
 
 
 	return render_to_response("careers/majors.html",data,context_instance=RequestContext(request))
@@ -147,7 +152,9 @@ def home(request):
 
 	return render_to_response('home_v5.html',context_instance=RequestContext(request))
 
+
 # @login_required
+
 def major(request,major_id):
 	"""
 	view for detailed information on a particular major
