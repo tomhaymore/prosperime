@@ -4,7 +4,7 @@ import urllib2
 from datetime import datetime
 from datetime import timedelta
 from datetime import date
-import csv
+
 import re
 import os
 import types
@@ -1833,6 +1833,7 @@ class CareerImportBase():
 				p.save()
 
 	def test_import_census_matching_data(self,path):
+		import csv
 		# initiate career dict
 		career_positions_dict = {}
 		# open file, conver to csv DictReader object
@@ -1870,6 +1871,7 @@ class CareerImportBase():
 		f.close()
 
 	def import_census_matching_data(self,path):
+		import csv
 		# initiate career dict
 		career_positions_dict = {}
 		# open file, conver to csv DictReader object
@@ -1915,7 +1917,7 @@ class CareerImportBase():
 		# print career_positions_dict
 
 	def import_careers_from_file(self,path):
-
+		import csv
 		f = open(path,'rU')
 		c = csv.DictReader(f)
 		for row in c:
@@ -1930,7 +1932,7 @@ class CareerImportBase():
 			career.save()
 
 	def import_careers_from_url(self,path):
-
+		import csv
 		data = urllib2.urlopen(path).read()
 		c = csv.DictReader([data])
 		for row in c:
@@ -2060,7 +2062,7 @@ class CareerExportBase():
 		f.close()
 
 	def export_careers(self):
-
+		import csv
 		file_name = 'careers_' + datetime.now().strftime('%Y%m%d%H%M') + '.csv'
 		fieldnames = {'short_name':'short_name','long_name':'long_name','titles':'titles'}
 		f = open(file_name,'w')
@@ -2076,3 +2078,41 @@ class CareerExportBase():
 		careers = Career.objects.values_list('id','short_name','long_name','soc_code','census_code','description','parent','pos_titles').all()
 
 		stdout.write(list(careers))
+
+class CareerReportBase():
+
+	def report_unmatched_positions(self):
+		# imports
+		from utilities.models import Report
+		import csv
+		from django.core.files import File
+
+		# variables
+		category = "Ideal positions"
+		title = "unmatched_positions_" + str(datetime.date.today())
+		filename = title + ".csv"
+
+		# get all positions
+		positions = Position.objects.filter(ideal_position=None)
+		
+		# prep file
+		f = open('tmp_report_'+title,'w')
+		c = csv.reader(f)
+
+		# write headers
+		c.writerow(['username','user_id','pos_id','pos_title','pos_degree','pos_field'])
+		
+		# add a row for each position
+		for p in positions:
+			c.writerow([p.person.username,p.person.id,p.id,p.title,p.degree,p.field])
+		f.close()
+		
+		# create report
+		rep = Report(title=title,category=category)
+		rep.save
+
+		# upload report
+		with open('tmp_img_'+title,'r') as f:
+			report_file = File(f)
+			rep.report.save(filename,report_file,True)
+
