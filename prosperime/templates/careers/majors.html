@@ -195,7 +195,7 @@
 	}
 
 	// Constants
-	var svg_width = 350; var svg_height = 700; 
+	var svg_width = 350; var svg_height = 1000; 
 	var magic_number = 575; 
 	// 600 is the upper limit of what fits on my laptop
 
@@ -251,7 +251,7 @@
 					console.log("updating data...")
 					// deconstruct data
 					people = $.parseJSON(response["people"])
-					positions = $.parseJSON(response["positions"])
+					// positions = $.parseJSON(response["positions"])
 					majors = $.parseJSON(response["majors"])
 					// update data in d3 objects
 					updateMajors();
