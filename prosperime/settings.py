@@ -228,7 +228,7 @@ LOGGING = {
             'formatter': 'verbose'
         },
         'mail_admins': {
-            'level': 'ERROR',
+            'level': 'INFO',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler',
             'include_html': True,
@@ -240,26 +240,30 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        'careers': { # I keep all my of apps under 'apps' folder, but you can also add them one by one, and this depends on how your virtualenv/paths are set
+        'careers': { 
             'handlers': ['console','log_file'],
             'level': 'INFO',
             'propagate': True,
         },
-        'accounts': { # I keep all my of apps under 'apps' folder, but you can also add them one by one, and this depends on how your virtualenv/paths are set
+        'accounts': { 
             'handlers': ['console','log_file'],
             'level': 'INFO',
             'propagate': True,
         },
-        'social': { # I keep all my of apps under 'apps' folder, but you can also add them one by one, and this depends on how your virtualenv/paths are set
+        'social': { 
             'handlers': ['console','log_file'],
             'level': 'INFO',
             'propagate': True,
         },
-        'entities': { # I keep all my of apps under 'apps' folder, but you can also add them one by one, and this depends on how your virtualenv/paths are set
+        'entities': { 
             'handlers': ['console','log_file'],
             'level': 'INFO',
             'propagate': True,
         },
+        'benchmarks': {
+            'handlers':['mail_admins'],
+            'level':'INFO'
+        }
     }
 }
 
