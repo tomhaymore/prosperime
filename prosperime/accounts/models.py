@@ -150,7 +150,7 @@ class Profile(models.Model):
 
     # Used in /major/id
     def first_and_last_positions(self):
-        positions = self.user.positions.all().order_by("-start_date").exclude(type="education")
+        positions = self.user.positions.all().order_by("start_date").exclude(type="education")
         if positions.exists():
             return [positions[0], positions[len(positions) - 1]]
         else:
