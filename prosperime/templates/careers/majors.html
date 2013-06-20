@@ -194,7 +194,7 @@
 	}
 
 	// Constants
-	var svg_width = 350; var svg_height = 1100; 
+	var svg_width = 350; var svg_height = 700; 
 	var magic_number = 575; 
 	// 600 is the upper limit of what fits on my laptop
 
@@ -223,7 +223,7 @@
 			positions = shuffle({{majors.positions|safe}})
 			majors = {{majors.majors|safe}}
 			// logging
-			console.log(people)
+			// console.log(people)
 			// console.log(majors)
 
 			// render viz
@@ -250,14 +250,13 @@
 					console.log("updating data...")
 					// deconstruct data
 					people = $.parseJSON(response["people"])
-					positions = $.parseJSON(response["positions"])
+					// positions = $.parseJSON(response["positions"])
 					majors = $.parseJSON(response["majors"])
 					// update data in d3 objects
 					updateMajors();
 					updatePeople();
 					updatePositions();
 					drawLines();
-					console.log('lines drawn')
 				}
 				
 			},"json");
@@ -269,7 +268,6 @@
 			minLength: 3,
 			source: '/careers/getMajorsFilters/',
 			select: function(event,ui) {
-				console.log(ui)
 				event.preventDefault();
 				$(this).val(ui.item.label_short);
 				$(this).data('val-id',ui.item.value);
@@ -301,18 +299,14 @@
 
 	function updateFilters(el) {
 		// Get id, filter type
-		console.log(filters)
 		var type = $(el).data("type")
 		var id = parseInt($(el).data("id"))
-		console.log($(el).data("name"))
-		console.log("type: " + type + " id: " + id)
 		// Remove filter from list
 		$(el).parent().remove()
 
 		// Get new data
 		var index = filters[type].indexOf(id)
 		filters[type].splice(index, 1) 
-		console.log(filters)
 		updateData()
 	};
 
@@ -424,7 +418,6 @@
 			// Major mouseover
 			.on("mouseover", function(d) {
 				if (transition_counter != 0) return false;
-				console.log('in')
 
 				// Add hover class
 				d3.select(this).attr("class", "box major-hover")
@@ -442,7 +435,6 @@
 			// Major mouseout
 			.on("mouseleave", function(d) {
 				if (transition_counter != 0) return false;
-				console.log('in')
 				// normalize class
 				d3.select(this).attr("class", "box")
 
@@ -506,7 +498,7 @@
 
 		// update existing nodes... why doesn't .update() work??
 		svg.transition()
-			.duration(750) // **
+			.duration(300) // **
 			.attr("x", function(d, i) { // staggers nodes x-value
 				if (i % 4 == 0) return img_width
 				else if (i % 4 == 1) return img_width * 2
@@ -533,14 +525,15 @@
 			.attr("id", function(d) { return "person-"+d.id })
 			.attr("data-name", function(d) { return d.name })
 		.transition()
-			.duration(750) // **
-			.each("end", drawLinesGate)
+			.duration(300) // **
 			.attr("x", function(d, i) { // staggers nodes x-value
 				if (i % 4 == 0) return img_width
 				else if (i % 4 == 1) return img_width * 2
 				else if (i % 4 == 2) return img_width * 3
 				else return img_width * 4
 			})
+			.each("end", drawLinesGate)
+
 
 
 		svg.on("mouseover", function(d) {
@@ -641,34 +634,43 @@
 			.on("mouseover", function(d) {
 				if (transition_counter != 0) return false;
 
-				// Get major div
-				var major_node = d3.select("#major-"+d.major_id)
-				// Add hover to it
-				major_node.attr("class", "box major-hover")
-				// Make lines blue
+				// need this for the time being b/c positions are not
+				// updated. w/ filtering, you can have vestigial positions that point to majors no longer on the screen
+				if (d.major in majors) {
 
-				/* Clay -- check this code */
-				// ++ lineMouseover(d3.selectAll(".line-"+d.major_index))
-				lineMouseover(d3.selectAll(".line-"+d.major_id))
-				// Trigger hover on users, position
-				triggerUserAndPositionWrapper(d.major, "mouseover")
+					// Get major div
+					var major_node = d3.select("#major-"+d.major_id)
+					// Add hover to it
+					major_node.attr("class", "box major-hover")
+					// Make lines blue
+
+					/* Clay -- check this code */
+					// ++ lineMouseover(d3.selectAll(".line-"+d.major_index))
+					lineMouseover(d3.selectAll(".line-"+d.major_id))
+					// Trigger hover on users, position
+					triggerUserAndPositionWrapper(d.major, "mouseover")
+				}
 			})
 
 			.on("mouseout", function(d) {
 				if (transition_counter != 0) return false;
 
-				// get major node
-				var major_node = d3.select("#major-"+d.major_id)
-				// normalize class
-				major_node.attr("class", "box")
+				// See note above
+				if (d.major in majors) {
 
-				// Make lines grey again
-				/* Clay -- check this */
-				// ++ lineMouseout(d3.selectAll(".line-"+d.major_index))
-				lineMouseout(d3.selectAll(".line-"+d.major_id))
+					// get major node
+					var major_node = d3.select("#major-"+d.major_id)
+					// normalize class
+					major_node.attr("class", "box")
 
-				// Trigger mouseout on user, position
-				triggerUserAndPositionWrapper(d.major, "mouseout")
+					// Make lines grey again
+					/* Clay -- check this */
+					// ++ lineMouseout(d3.selectAll(".line-"+d.major_index))
+					lineMouseout(d3.selectAll(".line-"+d.major_id))
+
+					// Trigger mouseout on user, position
+					triggerUserAndPositionWrapper(d.major, "mouseout")
+				}
 			});
 	};
 
@@ -677,19 +679,16 @@
 		increment counter. Once all end events transferred, save to 
 		re-draw lines to new locations */
 	var drawLinesGate = function() {
-		console.log(transition_counter)
-		if (transition_counter++ >= people.length - 2) drawLines()
+		if (transition_counter == -1) transition_counter = 0
+		if (transition_counter++ >= people.length - 1) drawLines()
 	};
 
 	// Iterates through each major, gets ids of positions, people
 	//  draws lines to each
 	// function drawLines(svg_left, svg_right) {
 	function drawLines() {
-
 		transition_counter = 0
 		// Remove existing lines
-		// var lines_left = svg_left.selectAll("path").remove()
-		// var lines_right = svg_right.selectAll("path").remove()
 		$("path").remove()
 
 		// Add all connecting lines
