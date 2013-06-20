@@ -1,0 +1,219 @@
+{% extends "base_full.html" %}
+{% load cache %}
+{% block head %}
+
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/career.css" />
+
+<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/career.js"></script>
+{% endblock %}
+
+{% block content %}
+
+{% cache 10 content user.id career.id %}
+
+<div id="content-container" class="main-container">
+	<p class="feature-page-header">{{career.name}}</p>
+	{% if career.description %}
+		<p class="main-sub-header">{{career.description}}</p>
+	{% endif %}
+
+	<div id="career-profile-container">
+		<div class="career-profile-nav-container">
+			<!-- <span class="main-sub-header pull-left">View stats for: </span> -->
+			<a class="career-profile-nav pull-left selected" data-view="network">Your Network</a> 
+			<a class="career-profile-nav pull-left unselected" data-view="all">Prospr.me Community</a>
+			<div class="clear"></div>
+			
+		</div>
+		<div class="career-profile-ed-overview pull-left">
+			<p class="main-sub-header">Educational Breakdown</p>
+			<div id="career-profile-graph-label">&nbsp;</div>
+			{% if ed_overview %}
+				<ul class="ed_overview_network_graph_list">
+				{% for k,v in ed_overview.network.items|slice:":5" %}
+					<li class="ed_overview_network_item" data-id="{{k}}" data-count="{{v.count}}" data-name="{{v.name}}">{{v.name}}</li>
+				{% endfor %}
+				</ul>
+				<ul class="ed_overview_all_graph_list">
+				{% for k,v in ed_overview.all.items|slice:":5" %}
+					<li class="ed_overview_all_item" data-id="{{k}}" data-count="{{v.count}}" data-name="{{v.name}}">{{v.name}}</li>
+				{% endfor %}
+				</ul>
+			{% else %}
+				<p> Breakdown not available.</p>
+			{% endif %}
+			<div id="ed-overview-network-chart"></div>
+			<div id="ed-overview-all-chart" style="display:none;"></div>
+		</div>
+		<div class="career-profile-stats-container pull-left">
+			<p class="main-sub-header">General Stats</p>
+			<div class="career-profile-stats pull-left">
+				<div class="career-profile-stats-holder">
+					<span data-view="network" class="career-profile-stats-block stats-highlighted">{{overview.network.num_people}}</span><span data-view="all" class="career-profile-stats-block">{{overview.all.num_people}}</span>
+				</div>
+				<p class="stats-header">People</p>
+			</div>
+			<div class="career-profile-stats pull-left">
+				<div class="career-profile-stats-holder">
+					<span data-view="network" class="career-profile-stats-block stats-highlighted">{{overview.network.num_pos}}</span><span data-view="all" class="career-profile-stats-block">{{overview.all.num_pos}}</span>
+				</div>
+				<p class="stats-header">Positions</p>
+			</div>
+			<div class="career-profile-stats pull-left">
+				<div class="career-profile-stats-holder">
+					<span data-view="network" class="career-profile-stats-block stats-highlighted">{{overview.network.num_cos}}</span><span data-view="all" class="career-profile-stats-block">{{overview.all.num_cos}}</span>
+				</div>
+				<p class="stats-header">Organizations</p>
+			</div>
+			<div class="clear"></div>
+			<div class="career-profile-stats pull-left">
+				<span data-view="network" class="stats-holder">
+					{% if stats.duration.network %}
+						{{stats.duration.network}}
+					{% else %}
+						n/a
+					{% endif %}
+				</span>
+				<span data-view="all" class="stats-holder" style="display:none;">
+					{% if stats.duration.all %}
+						{{stats.duration.all}}
+					{% else %}
+						n/a
+					{% endif %}</span>
+				<p class="stats-header">Avg # of Years</p>
+			</div>
+			<div class="career-profile-stats pull-left">
+				<span data-view='network' class="stats-holder">
+					{% if stats.positions.entry.network %}
+						{% for p in stats.positions.entry.network|slice:":1" %} 
+							{{p.0}}
+						{% endfor %}
+					{% else %}
+						n/a
+					{% endif %}
+				</span>
+				<span data-view='all' class="stats-holder" style="display:none;">
+					{% if stats.positions.entry.all %}
+						{% for p in stats.positions.entry.all|slice:":1" %} 
+							{{p.0}}
+						{% endfor %}
+					{% else %}
+						n/a
+					{% endif %}
+				</span>
+				<p class="stats-header">Most common entry position</p>
+			</div>
+			<div class="career-profile-stats pull-left">
+				<span data-view='network' class="stats-holder">
+					{% if stats.positions.senior.network %}
+						{% for p in stats.positions.senior.network|slice:":1" %} 
+							{{p.0}}
+						{% endfor %}
+					{% else %}
+						n/a
+					{% endif %}
+				</span>
+				<span data-view='all' class="stats-holder" style="display:none;">
+					{% if stats.positions.senior.all %}
+						{% for p in stats.positions.senior.all|slice:":1" %} 
+							{{p.0}}
+						{% endfor %}
+					{% else %}
+						n/a
+					{% endif %}
+				</span>
+				<p class="stats-header">Most common senior position</p>
+			</div>
+			<div class="clear"></div>
+		</div>
+		<div class="clear"></div>
+		<div class="career-profile-people-container">
+			<p class="main-sub-header">People</p><a name="people"></a>
+			<div class="career-profile-paths" data-view="network">
+				<ul class="career-profile-paths-list flat">
+				{% for k,v in paths.network.items|slice:":10" %}
+					<li class="career-profile-paths-item">
+					<!-- 	{% if v.pic %}
+							<img class="career-profile-preview" src="{{ MEDIA_URL }}{{v.pic}}" />
+						{% else %}
+							<img class="career-profile-preview" src="{{ MEDIA_URL }}/pictures/anon.jpg" />
+						{% endif %} -->
+						
+						<p class="career-profile-preview-name"><a href="/profile/{{k}}">{{v.full_name}}</a></p>
+					</li>
+				{% endfor %}
+				</ul>
+			</div>
+			<div class="career-profile-paths" data-view="all" style="display:none;">
+				<ul class="career-profile-paths-list flat">
+				{% for k,v in paths.all.items|slice:":10" %}
+					<li class="career-profile-paths-item">
+						{% if v.pic %}
+							<!-- <img class="career-profile-preview" src="{{ MEDIA_URL }}{{v.pic}}" /> -->
+						{% else %}
+							<!-- <img class="career-profile-preview" src="{{ MEDIA_URL }}/pictures/anon.jpg" /> -->
+						{% endif %}
+						<p class="career-profile-preview-name"><a href="/profile/{{k}}">{{v.full_name}}</a></p>
+					</li>
+				{% endfor %}
+				</ul>
+			</div>
+			<div class="clear"></div>
+		</div>
+	<!-- 	<div class="career-profile-positions-container">
+			<p class="main-sub-header">Positions</p><a name="positions"></a>
+			<div class="career-profile-positions" data-view="network">
+				<p>Coming soon!</p>
+			</div>
+			<div class="career-profile-positions" data-view="all" style="display:none;">
+				{% if positions.all %}
+					<ul>
+					{% for p in positions.all|slice:":10" %}
+						<li>{{p.title}}</li>
+					{% endfor %}
+					</ul>
+				{% else %}
+					n/a
+				{% endif %}
+			</div>
+			<div class="clear"></div>
+		</div> -->
+		<div class="career-profile-orgs-container">
+			<p class="main-sub-header">Organizations</p><a name="organizations"></a>
+			<div class="career-profile-orgs" data-view="network">
+				<p>Coming soon!</p>
+				{% if orgs.network %}
+					<ul>
+					{% for o in orgs.network|slice:":10" %}
+						<!-- <li><a>{{o.name}}</li> -->
+					{% endfor %}
+					</ul>
+				{% else %}
+					n/a
+				{% endif %}
+			</div>
+			<div class="career-profile-orgs" data-view="all" style="display:none;">
+				<p>Coming soon!</p>
+				{% if orgs.all %}
+					<ul>
+					{% for o in orgs.all|slice:":10" %}
+						<!-- <li><a>{{o.name}}</li> -->
+					{% endfor %}
+					</ul>
+				{% else %}
+					n/a
+				{% endif %}
+			</div>
+			<div class="clear"></div>
+		</div>
+		
+
+			
+	</div>
+</div>
+
+
+{% endcache %}
+
+{% endblock %}

@@ -1,0 +1,254 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+<!-- CSS -->
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/discover.css" />
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/home.css" />
+
+<!-- Javascript -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/discover.js"></script>
+{% endblock %}
+
+
+{% block content %}
+
+<div id="content-container" class="main-container">
+
+	<!-- Header Links -->
+	<div class="pull-left dashboard-header">
+		<p class="splash-header">Dashboard</p>
+
+		<ul class="module-list main-sub-header">
+			
+			<li>
+				<a href="/profile/{{user.id}}">Your profile</a>
+			</li>
+			<!-- <li><a href="/discover">Discover careers</a></li> -->
+			<li>
+				<a href="/search/">Search</a>
+			</li>
+			<!-- <li>
+				<a href='/rand'>Random User</a>
+			</li> -->
+			<li>
+				<a href="/next/#?i1={{industry}}">What Do I Do Next?</a>
+			</li>
+
+			{% if not user.profile.li_linked %}
+				<li><a href="/account/authorize" onclick="_gaq.push(['_trackEvent', 'home', 'authorize', '{{user.id}}'])">Authorize</a></li>
+			
+			{% endif %}
+		</ul>
+	</div>
+
+	<div class="clear"></div>
+
+	<!-- Saved Careers --> 
+	<div class="dashboard-module pull-left one-third" data-name="dashboard-saved-careers">
+		<p class="module-header">My Careers</p>
+
+		{% if saved_careers %}
+			<table class="table table-condensed table-bordered" data-name="careers-list">
+			{% for c in saved_careers %}
+				<tr><td>
+					<a href="/career/{{c.id}}">{{c.name}}</a>
+				</td></tr>
+			{% endfor %}					
+			</table>
+		{% endif %}
+		<p>
+			<a href="/personalize/careers/">Add more careers</a>
+		</p>
+	</div>
+
+	<!-- Saved Positions -->
+	<!-- <div class="dashboard-module pull-left" data-name="dashboard-saved-positions">
+		<p class="module-header">My Positions</p>		
+<<<<<<< HEAD
+		<!-- <p>Coming soon</p> -->
+=======
+		<p>Coming soon</p>
+>>>>>>> 87b9f3743d4eafb2b55761881cc079c66294bfb0
+		{% if saved_jobs %}
+			<ul>
+
+			{% for j in saved_jobs %}
+				<li>
+					<a href="/position/{{j.position.id}}">{{j.position.title}}</a>
+				</li>
+			{% endfor %}					
+			</ul>
+		{% endif %}
+<<<<<<< HEAD
+		<p class="sub-header"><a href="/personalize/jobs/">Add more positions</a></p>
+	</div>
+=======
+		<p class="sub-header"><a href="/personalize">Add more positions</a></p>
+	</div> -->
+>>>>>>> 87b9f3743d4eafb2b55761881cc079c66294bfb0
+	
+	<!-- Saved Paths -->
+	<div class="dashboard-module pull-left two-thirds" data-name="dashboard-saved-paths">
+		<p class="module-header" id='saved-paths-module'>Positions of Interest</p>
+		{% if positions_of_interest %} 
+			<table class="table table-condensed table-bordered" data-name="saved-paths-list">
+				
+			{% for p in positions_of_interest %}
+				<tr>
+					<td>
+						{{p.title}} / {{p.entity.name}}
+						<!-- I like these... -->
+						<!-- <span class="badge">
+							{{positions_of_interest|length}}
+						</span> -->
+					</td>
+				</tr>
+			{% endfor %}
+
+			</table>
+
+		{% else %}
+			<p>Let's find some jobs you're interested in! Head over to <a href="#">what's next</a> to start exploring your options!</p>
+		{% endif %}
+	</div>
+
+	<!-- Career Decisions  -->
+	<!-- <div class="dashboard-module pull-left" data-name="dashboard-top-careers">
+		<p class='module-header'>Recent Career Decisions</p>
+		<a href='/careers/decisions/' class='sub-header'>View All</a><br/>
+		{% if career_decisions %}
+			<ul id='career-decisions-list'>
+			{% for decision in career_decisions %}
+				<li class='sub-header'>
+				{% if decision.privacy == 'anonymous' %}
+					Someone 
+				{% else %}
+					<a href='/profile/{{decision.owner.id}}'>
+						{{decision.owner.profile.full_name}}
+					</a>
+				{% endif %}
+
+				chose to be a {{decision.position.title}} at 
+				<a href='/profile/org/{{decision.winner.id}}/'>
+					{{decision.winner.name}} 
+				</a>
+
+			{% endfor %}
+			</ul>
+		{% else %}
+			<p>No recent career decisions in your network. Head to <a href="/profile/{{user.id}}/"> your profile </a>to write about a decision of your own now!
+		{% endif %} -->
+
+
+		<!--<p class="module-header">Top Careers in Network</p>
+		{% if top_careers %} 
+			<ul data-name="top-careers-list">
+			{% for c in top_careers %}
+				<li><a href="/discover/career/{{c.id}}">{{c.name}}</a></li>
+			{% endfor %}
+			</ul>
+		{% else %}
+			<p>Coming soon</p>
+		{% endif %}-->
+	<!-- </div> -->
+
+	<div class="clear"></div>
+</div>
+
+
+<script type="text/javascript">
+
+	var whatsThis = function(origin, elem) {
+
+		_gaq.push(['_trackEvent', 'home', 'whatsThis'])
+		if (origin == "careers") {
+			// If its already there, delete it
+			if ($('#module-info-careers').length > 0) {
+				$('#module-info-careers').remove()
+				return true;
+			}
+			
+			// Else, delete everything else
+			$('.module-info').each(function() {
+				$(this).remove()
+			});
+
+			$(elem).after("<table id='module-info-careers' class='module-info table table-condensed table-bordered table-striped'><tr><td>After analyzing your work and that of the Prosperime Community, we selected the following career paths as those of potential interest for you. We have collected information on jobs, companies, and people in the field, and we hope it will help you on your way to forging a meaningful, lasting career.</td></tr></table>")
+
+		}
+	};
+
+		/* Inelegant but effective way to pulsate the element w/o
+	   external JQuery libraries */
+	var highlight = function(elem) {
+		$(elem).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
+	};
+
+	var newPathAjax = function() {
+		var title = $('#new-path-box').val()
+		if (title.length < 1) {
+			errorCreatingPath('title')
+			return
+		}
+
+		// Attempt POST request via AJAX to create path
+		$.post('/saved_paths/create/', {title: title, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
+				if (response['success']) {
+					console.log(response)
+					// Construct new table element for path
+					var newRow = "<tr><td ondragover='allowDrop(event)' ondrop='dropPosition(event," + title + ", this)'><a href='/saved_paths/#id/?id=" + response['id'] + "'>" + title + "</a></td></tr>"
+
+					// Add to DOM
+					$('#sidebar-path-list > tbody:last').append(newRow)
+					
+					// Clear text field
+					$('#new-path-box-row').remove()
+				} else {
+					errorCreatingPath('db')
+				}
+		}, 'json');
+	};
+
+	var errorCreatingPath = function(reason) {
+		var createBox = $('#new-path-box')
+		if (reason == "db") {
+			console.log("Error in the view creating new path...")
+			createBox.val("Please enter a title")
+		} else if (reason == "title") {
+			createBox.val("Please enter a title")
+		}
+
+		highlight(createBox)
+	};
+
+	var createNewPath = function() {
+
+		// first, make sure there isn't already a new path box out there
+		if ($('#new-path-box-row').length > 0) return
+
+		// If not, then create and add a last row
+		var table = document.getElementsByClassName('path-list')[0]
+		var lastRow = table.getElementsByClassName('saved-path-list-last')[0]
+		var newRow = document.createElement('tr')
+		newRow.id = 'new-path-box-row'
+		var newCol = document.createElement('td')
+
+		var newColText = '<div class="input-prepend">'
+		newColText += '<span class="add-on" onclick="newPathAjax()"><i class="icon-plus"></i></span>'
+		newColText += '<input type="text" maxlength="32" style="width:160px" id="new-path-box" onclick="clearContents(this)" />'
+		newColText += '</div>'
+		newCol.innerHTML = newColText;
+		
+		newRow.appendChild(newCol)
+		table.appendChild(newRow)
+	};
+
+	var createNewPathTable = function () {
+		// need to append entire table
+		console.log('here')
+		$('#saved-path-module').insert(	)
+	}
+
+</script>
+
+{% endblock %}

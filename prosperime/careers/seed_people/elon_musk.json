@@ -1,0 +1,42 @@
+{
+	"name":"Elon Musk",
+	"headline":"Founder, CEO, & CTO of SpaceX and Co-Founder, Head of Product Design of Tesla Motors",
+	"profile_pic":"/static/img/elon_musk.jpg",
+	"path": [
+		{
+		"title":"B.A. in Business",
+		"type":"education",
+		"entity_name":"University of Pennsylvania - The Wharton School"
+		}, {
+		"title":"B.S. in Physics",
+		"type":"education",
+		"entity_name":"University of Pennsylvania",
+		"meta":"highlight"
+		}, {
+		"title":"PhD in Applied Physics and Materials Science -- Unfinished",
+		"type":"education",
+		"entity_name":"Stanford University"
+		},{
+		"entity_name":"Zip2",
+		"title":"Co-Founder",
+		"type":"position",
+		"description":"Acquired by Compaq in 1999."
+		}, {
+		"entity_name":"PayPal, Inc.",
+		"title":"Co-Founder",
+		"type":"position",
+		"description":"Acquired by EBay in 2003.",
+		"meta":"highlight"
+		}, {
+		"entity_name":"SpaceX",
+		"type":"position",
+		"title":"Founder, CEO, & CTO",
+		"meta":"higlight"
+		}, {
+		"entity_name":"Tesla Motors",
+		"type":"position",
+		"title":"Co-Founder & Head of Product Design",
+		"meta":"highlight"
+		}
+	]
+}

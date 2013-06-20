@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+	
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css" />
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" />
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/main.css" />
+	<link href="{{ STATIC_URL }}img/favicon.ico" rel="icon"  />
+	<script type="text/javascript" src="{{ STATIC_URL }}js/json2.js"></script>
+	 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+	<!-- // <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js"></script> -->
+	<link href='http://fonts.googleapis.com/css?family=Lato|Arimo' rel='stylesheet' type='text/css'>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/uri.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
+	 <script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+	{% block head %} {% endblock %}
+<head> <title>{% block title %}ProsprMe: Don't work, prosper {% endblock %}</title> </head>
+
+<body>
+	<!-- <div class="navbar navbar-static-top"> -->
+		<div class="topbar">
+			<!-- <div class="navbar-inner"> -->
+			<div class="topbar-inner">
+				<!-- <div class="row-fluid"> -->
+					<div class="log-container pull-left">
+						<!-- <a class="brand" href="/">Prosperime</a> -->
+						<a href="/"><img class="main-logo" src="{{STATIC_URL}}img/main_logo.png" /></a>
+					</div>
+					<div class="pull-right">
+						<ul class="topbar-nav pull-right">
+							
+                			{% if user.is_authenticated %}
+	                		<li>
+	                			<a href="/profile/{{user.id}}"><!--{{user.profile.full_name}}-->Profile</a>
+	                		</li>
+	                		<li>
+								<a href="/">Home</a>
+							</li>
+	                		<li>
+	                			<a href="/search/">Search</a>
+	                		</li>
+	                		<li>
+	                			<a href="/account/logout/">Logout</a>
+	                		</li>
+	                		{% else %}
+							<li>
+								<a href="/account/login">Login / Register</a>
+							</li>
+							<li>
+								<a href="/about/">About</a>
+							</li>
+	                		<li>
+								<a href="/contact/">Contact</a>
+							</li>
+	                		{% endif %}
+							
+						</ul>
+					</div>
+					<div class="clear"></div>
+				<!-- </div> -->
+			</div>
+		</div>
+		
+    <div class="background-container">
+		 <div class="messages-container">
+			{% block message %} 
+
+				{% if messages %}
+					<div id="messages">
+						<ul class="messages">
+						    {% for message in messages %}
+						    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+						    {% endfor %}
+						</ul>
+					</div>
+				{% endif %}
+			
+			{% endblock %}
+
+			{% block extramessage %}
+
+			{% endblock %}
+		</div>
+
+	   <div class="container-fluid">
+		    <div class="row-fluid">
+			    <div class="span12">
+					<div id="content-container" class="main-container">
+
+				        <div id="main-column" class="pull-left">
+				        	<div id="sidebar-column" class="pull-left max-filters">
+					            {% block sidebar %} {% endblock %} 
+					        </div>
+					        <div id="middle-column" class="pull-left min-results">
+					        	{% block content %} {% endblock %}
+					        </div>
+					        <div class="clear"></div>
+				        </div>
+				            
+				        <div id="right-column" class="pull-left">
+				            {% block rightSidebar %} {% endblock %} 
+				        </div>
+				        <div class="clear"></div>
+			        
+					</div>
+				</div>
+			</div>
+		</div>
+    
+{% block templates %}
+{% endblock %}
+
+{% block footer %}
+	{% include "footer.html" %}
+{% endblock %}
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-37510588-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</body>
+</html>

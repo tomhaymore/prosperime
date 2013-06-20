@@ -1,0 +1,229 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<!-- CSS -->
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/thread.css" />
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
+
+<!-- JS -->
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div id="content-container" class="main-container">
+	<div class="row-fluid">
+		<div class="span12">
+			<div class="thread-main-header">Thread</div>
+			<div class="question-header">
+				<span class="quote">&#147;</span>
+					<input type="text" name="thread_title" placeholder="What is the answer to life, the universe, and everything?" class="input" id="title-input" maxlength="80" style="text-align:center;"/>
+				<div id="title-div"></div>
+				<span class="quote">&#148;</span>
+
+			</div>
+
+			<div class="sub-text"><i class="icon-arrow-up icon-large"></i></div>
+			<div class="sub-text">Enter the title of your thread here. Try to keep it short and succint, like <br/><b>"What can one do with a B.S. in Mechanical Engineering from Stanford?"</b></div>
+		</div>
+	</div>
+
+	<div class="row-fluid question-container move-up">
+		
+		<div class="offset1 span10">
+			<div class="prompt-main block">
+				<div class="sub-text">Enter the main body of your question here. <br/>Remember, <b>the more context you give</b><br/> --  where you want to work, what you want to be, and how you want to get there -- <br/><b>the <b>better and more personalized your answers will be!</b></div>
+				<div class="sub-text"><i class="icon-arrow-down icon-large move-left"></i></div>
+
+				<textarea id="new-question-textarea" placeholder="More specifically, as someone is skilled in wizardy and wants to one day be a ..." style="text-align:center;"></textarea>
+				
+				<div id="form-button" class="input-button">
+					<i class="icon-ok icon-2x"></i>
+				</div>			</div>
+		</div>
+	</div>
+
+	<div class="row-fluid question-container no-border">
+	
+		<div class="offset1 span10 prompt-main">
+			<div class="question-header">Know someone who would be perfect for this thread? <br/> Invite them to join the conversation.</div>
+			<div class="icons-container">
+				<div class="row-fluid">
+					<div class="span3"><div class="icon-wrapper center"><i class="icon-facebook icon-3x"></i></div></div>
+
+					<div class="span3"><div class="icon-wrapper center"><i class="icon-twitter icon-3x"></i></div></div>
+
+					<div class="span3"><div class="icon-wrapper center"><i class="icon-linkedin icon-3x"></i></div></div>
+
+					<div class="span3"><div class="icon-wrapper center"><i class="icon-google-plus icon-3x"></i></div></div>
+				</div>
+
+				<div class="row-fluid">
+					<div class="offset2 span4 center">
+						<div class="call-to-action flat-button">
+							Ask a Friend
+						</div>
+					</div>
+					<div class="span4 center">
+						<div class="call-to-action flat-button">
+							Go to Question
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+</div>
+{% endblock %}
+
+{% block templates %}
+
+<script type="text/javascript">
+
+
+	// Social icon hovers & clicks
+	$(".icons-container .row-fluid i").each(function() {
+		$(this).hover(function(e) {
+			if ($(this).hasClass("icon-google-plus"))
+				$(this).toggleClass("google-plus")
+			else if ($(this).hasClass("icon-facebook"))
+				$(this).toggleClass("facebook")
+			else if ($(this).hasClass("icon-linkedin"))
+				$(this).toggleClass("linkedin")
+			else if ($(this).hasClass("icon-twitter"))
+				$(this).toggleClass("twitter")
+
+
+		})
+	})
+
+
+	// Click listener on textarea
+	$("#new-question-textarea").on("click", function(k) {
+		// If title entered
+		if ($("#title-input").val().length > 0) {
+			// Animate text box away
+			$("#title-input").animate({"opacity":0}, "100", function() {
+				// Turn into div
+				var title = $(this).val()
+				$("#title-div").html(title).css("display", "inline-block")
+				// Hide input 
+				$(this).css("display","none")
+				// Center text
+				$(this).parent().css("text-align","center")
+				// TODO: allow div to be re-clicked
+			})
+
+		}
+	});
+
+	// Textarea listener
+		// TODO: what if delete back to zero?
+	$("#new-question-textarea").on("keypress", function(k) {
+		$(this).off("keypress").css("text-align","left")
+		$("#form-button").animate({"opacity":1}, "250", function() {
+		}).click(function(e) { inputEntered() })
+	});
+
+
+
+
+	var postComment = function(ev) {
+
+		// Animate Button
+		$("#comment-button").html("<i class='icon-ok icon-large'></i>")
+
+		// Post to DB
+		var body = $("#prompt-textarea").val()
+		var thread_id = {{thread_id}}
+		$.post("/social/postComment/", {"body":body, "thread_id": thread_id, "csrfmiddlewaretoken":"{{csrf_token}}"}, function(response) {
+			console.log(response)
+
+			// Create comment via template
+			var template = _.template($("#comment-template").html())
+			$(".prompt-container").before(template({
+				"id":response["data"]["id"],
+				"votes":0,
+				"owner_pic":response["data"]["owner_pic"],
+				"owner_name":response["data"]["owner_name"],
+				"created":response["data"]["created"],
+				"body":body,
+			}));
+			// Animate comment in
+			$(".comment-row-fluid :last").css("opacity", 0).animate({"opacity":1}, "400")
+
+			// Clear textarea
+			$("#prompt-textarea").val("")
+		}, "json");
+	};
+
+	var inputEntered = function(ev) {
+
+		if ($("#title-div").html().length == 0 && $("#title-input").val().length == 0) {
+			// TODO -- messaging for no title
+
+			return false;
+		} else if ($("#new-question-textarea").val().length == 0) {
+			// TODO -- messaging for no text
+
+			return false;
+		}
+
+		// Animate button
+		$("#form-button").css("background-color", "#27AE60")
+
+
+		// Show what it would look like
+		if ($("#title-input").css("display") != "none") {
+			$("#title-input").animate({"opacity":0}, "100", function() {
+				// Turn into div
+				var title = $(this).val()
+				$("#title-div").html(title).css("display", "inline-block")
+				// Hide input 
+				$(this).css("display","none")
+				// Center text
+				$(this).parent().css("text-align","center")
+			})
+		}
+
+		// Hit DB
+		var title = $("#title-div").html()
+		var body = $("#new-question-textarea").val()
+
+		$.post("/social/createThread/", {"title":title, "body":body, "csrfmiddlewaretoken":"{{csrf_token}}"}, function(response) {
+			console.log(response)
+			if (response["result"] == "success") {
+ 				$("html, body").animate({ scrollTop: $(document).height() }, "slow");
+
+			 	$(".call-to-action").each(function() {
+			 		$(this).css("visibility", "visible").hide().show(250)
+				 });
+
+			 	$(".call-to-action :last").click(function() {
+			 		window.location = "/thread/" + response["thread_id"]
+			 	})
+			}
+
+			// TODO: display something if it goes wrong
+		}, "json")
+	};
+
+
+
+
+
+</script>
+
+{% endblock %}
+
+
+
+
+
+

@@ -1,0 +1,69 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+<!-- CSS -->
+<!-- <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/discover.css" /> -->
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/home.css" />
+<link type='text/css' rel='stylesheet' href='{{ STATIC_URL }}css/font-awesome.min.css' />
+
+
+
+<!-- Lato, Source Sans, Varela -->
+<!-- Javascript -->
+
+{% endblock %}
+
+
+{% block content %}
+<div id="content-container" class="main-container">
+
+	<!-- Header Links -->
+
+	<!-- <div id="v5-container"> -->
+
+		<!-- Header -->
+		<div id="v5-header-container">
+			<div class="v5-header">Get Started</div>
+			<div class="v5-text">ProsperMe works best if you tell us more about your goals. Pick an option below to get started: </div>
+		</div>
+
+		<!-- <div class="span12"> -->
+			<!-- Build -->
+			<div class="third-container pull-left">
+				<div class="v5-header"><a href="/build/">Build</a></div>
+				<div class="v5-text">Build your career step-by-step and see what possibilities each new job opens up</div>
+				<div class="flat-button v5-button pull-left"><a href="/build/">Start Building</a></div>
+				<div class="clear"></div>
+			</div>
+
+			<!-- Plan -->
+			<div class="third-container pull-left">
+				<div class="v5-header"><a href="/plan/">Plan</a></div>
+				<div class="v5-text">Pick your ideal job and see how others have achieved it and how you can reach the same goal</div>
+				<div class="flat-button v5-button pull-left"><a href="/plan/">Start Planning</a></div>
+				<div class="clear"></div>
+			</div>
+		
+
+			<!-- Next -->
+			<div class="third-container pull-left">
+				<div class="v5-header"><a href="/next/#?i1={{industry}}/">Next</a></div>
+				<div class="v5-text">See the tried and true options for switching from your current industry to another</div>
+				<div class="flat-button v5-button pull-left"><a href="/next/#?i1={{industry}}">What's Next</a></div>
+				<div class="clear"></div>
+			</div>
+		<!-- </div> -->
+		<div class="clear"></div>
+		<div class="v5-text">Or, you can skip this and go straight to your <a href="/feed/">home view</a></div>
+
+	<!-- </div> -->
+</div>
+
+
+<script type="text/javascript">
+
+	
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,51 @@
+<div class="path-viz-timeline-left pull-left">
+
+{% for k, v in path.items %}
+		{% if forloop.counter0 in odd %}
+		<div class="path-viz-pos viz-row">
+			<span class="path-viz-pos-co">{{k}}</span>
+			<ul>
+				{% for pos in v %}
+					{% if pos.title %}
+				
+					<li> {{pos.title}} {% if pos.start_date %}, {{pos.start_date}} {% if pos.end_date %} - {{pos.end_date}} {% endif %} {% endif %}</li>
+					{% endif %}
+				{% endfor %}
+			</ul>
+			<b class="notch-right"></b>
+		</div>
+		{% endif %}
+{% endfor %}
+</div>
+<div class="path-viz-timeline-center pull-left viz-line-height{{path.items|length}}"></div>
+<div class="path-viz-timeline-right pull-left">
+{% for k, v in path.items %}
+
+		{% if forloop.counter0 in even %}
+		<div class="path-viz-pos viz-row{{forloop.counter0}}">
+			<span class="path-viz-pos-co">{{k}}</span>
+			<ul>
+				
+				{% for pos in v %}
+
+				<ul>
+					<li>Render Position for: ' {{pos.entity.name}}</li>
+						<li>Title: ' + {{pos.title}}</li>
+						<li>Summary: ' + {{pos.summary}}</li>
+						<li>Description: ' + {{pos.descrption}}</li>
+						<li>Current: ' + {{pos.current}}</li>
+						<li>Start Date: ' + {{pos.start_date}}</li>
+						<li>End Date: '+ {{pos.end_date}}</li>
+						<li>Type: ' + {{pos.type}}</li>
+						<li>Degree: ' + {{pos.degree}}</li>
+						<li>Field: ' + {{pos.field}}</li>
+						<li>Status: ' + {{	pos.status}}</li>
+					</ul>
+					<li> {{pos.title}} {% if pos.start_date %} {{pos.start_date}} {% if pos.end_date %} - {{pos.end_date}} {% endif %} {% endif %}</li>
+				{% endfor %}	
+			</ul>
+			<b class="notch-left"></b>
+		</div>
+		{% endif %}
+{% endfor %}
+</div>

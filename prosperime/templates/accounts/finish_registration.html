@@ -1,0 +1,47 @@
+{% extends "base_full.html" %}
+
+{% block sidebar %}
+
+{% endblock %}
+
+{% block content %}
+<div class="main-container" id="content-container">
+<p class="feature-page-header">Almost Finished!</p>
+<p>Pick a username and password and you're all set.</p>
+<form action="" method="post" name="finish_login">
+	{% csrf_token %}
+
+	<ul>
+<!-- 		<li><label for="id_username">Username:</label>
+			{{form.username.errors}}
+			<input class="flat-input" type="text" name="username" id="id_username" /></li> -->
+		<li><label for="id_email">Email:</label>
+			{{form.email.errors}}
+			<input class="flat-input" type="text" name="email" id="id_email" value="{{email_address}}"/></li>
+	<!-- 	<li><label for="id_location">Location:</label>
+			{{form.location.errors}}
+			<input type="text" name="location" id="id_location" /></li> -->
+		<li><label for="id_password">Password:</label>
+			{{form.password.errors}}
+			<input class="flat-input" type="password" name="password" id="id_password" /></li>
+		<li><label for="id_confirm_password">Confirm Password:</label>
+			{{form.confirm_password.errors}}
+			<input class="flat-input" type="password" name="confirm_password" id="id_confirm_password" /></li>
+		<li><input class="adj_checkbox" type="checkbox" name="notification" id="id_notification" checked="checked"/>Keep me informed about ProsperMe updates and news.
+			{{form.notification.errors}} </li>
+		<li class="form_required"><input class="adj_checkbox" type="checkbox" name="terms" id="id_terms" checked="checked"/>I have read and understand the <a href='/terms'>Terms of Service</a> and <a href='/privacy'>Privacy Policy</a>
+			{{form.terms.errors}} </li>
+		
+	</ul>
+	
+	<fieldset>
+		<button type="submit" class="btn">Submit</button>
+	</fieldset>
+</form>
+</div>
+{% endblock %}
+
+{% block rightSidebar %}
+
+
+{% endblock %}

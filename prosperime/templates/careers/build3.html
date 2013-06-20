@@ -1,0 +1,201 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<!-- CSS -->
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/build.css" />
+
+
+<!-- JS -->
+	<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>
+	<script async type="text/javascript" src="{{ STATIC_URL }}js/timeline-viz.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.autocomplete.min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/helpers.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/build3.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div id="build-main-container" class="main-container">
+
+	<!-- Header --> 
+	<div class="pull-right warning-message"></div>
+	<div class="build-header">
+		Build: 
+		{% if title == "Untitled" %}
+			<span class="build-header-name italicize">{{title}}</span>
+		{% else %}
+			<span class="build-header-name">{{title}}</span>
+		{% endif %}
+
+		<!-- Delete Button --> 
+		<!-- <div id="delete-button-container" class="pull-right flat-button">
+			{% if path_id > -1 %}
+				<div id="delete-button" onclick="delete_path()">
+					Delete
+				</div>
+			{% endif %}
+		</div> -->
+
+		<div class="pull-right save-button disabled" disabled style="display:none">Save</div>
+
+	</div>
+
+
+
+	<div class="row">
+		<div class="call-out-text">Select a Starting Position: </div>
+		<div id="current-positions-container">
+			<!-- current positions -->
+			{% for c in current_positions %}
+				{% if c.title|length > 26 %}
+					<div class="position-box current-position low-padding" data-index="{{forloop.counter0}}">{{c.title}}<br/>{{c.entity_name}}</div>
+				{% elif c.entity_name|length > 26 %}
+					<div class="position-box current-position low-padding" data-index="{{forloop.counter0}}">{{c.title}}<br/>{{c.entity_name}}</div>
+				{% else %}
+					<div class="position-box current-position medium-padding" data-index="{{forloop.counter0}}">{{c.title}}<br/>{{c.entity_name}}</div>
+				{% endif %}
+						
+		
+			{% endfor %}
+			<div id="new-position-box" class="position-box new-position high-padding">New Position</div>
+			
+			<select data-placeholder="Select a position..." id="build-new-position-select">
+				{% for pos in alternate_starting_points %}
+					<option data-ideal_id="{{pos.ideal_id}}" data-pos_id="{{pos.pos_id}}" data-title="{{pos.title}}" data-entity_name="{{pos.entity_name}}">{{pos.title}} at {{pos.entity_name}}</option>
+				{% endfor %}
+			</select>	
+
+
+			<div id="path-container-wrapper">
+				<div id="path-container-svg"><!-- SVG --></div>
+			</div>
+		</div>
+
+		<div id="info-box-container">
+			<h3 id="info-box-header"></h3>
+
+			<div class="info-box-sub-header" style="visibility:hidden">		Top People: 
+			</div>
+    		<div id="info-box-people" class="info-box-text"></div>
+    		<br/>
+
+    		<div class="info-box-sub-header" style="visibility:hidden">		Stats: 
+    		</div>
+    		<div id="info-box-stats" class="info-box-text"></div>
+    		<br/>
+
+
+    		<div class="info-box-sub-header" style="visibility:hidden">		Top Companies: 
+    		</div>
+    		<div id="info-box-entities"></div>
+			<br/>
+
+		</div>
+	</div>
+
+
+
+	
+
+	<!-- Bottom Container -->
+	<div class="row">
+		<!-- Comments -->
+		<div id="comments-container" class="pull-right inline span12" style="margin-left:0px; visibility:hidden;">
+			<div class="build-sub-header" id="comments-container-header">Comments</div>
+			{% if comments|length == 0 %}
+				{% if viewer_own_profile == "false" %}
+					Be the first one to leave a comment!
+				{% else %}
+					No comments yet
+				{% endif %}
+			{% else %}
+				{% for c in comments %}
+					<div class="comment-inline">
+						<img width="25" height="25" class="profile-image" src="{{c.profile_pic}}"/>
+						<span class="comment-name"><a href="/profile/{{c.user_id}}/">{{c.user_name}}</a></span>
+						<span class="comment-body">{{c.body}}</span>
+						<span class="comment-date">{{c.date_created}}</span>
+					</div>
+				{% endfor %}
+			{% endif %}
+			</div>
+		</div>	
+	</div>
+
+	<div class="feedback-container">
+		<div class="feedback-prompt">Something broken? Something you'd like to see? <a href="mailto:clayton@prospr.me?subject=Build Feedback">Let us know</a>.</div>
+	</div>
+
+
+</div>
+{% endblock %}
+
+{% block templates %}
+
+<!-- V3 Script -->
+<script type="text/javascript">
+
+	var current_positions_javascript = {{current_positions_json|safe}}
+	var path = {{path_steps|safe}}
+
+	// Title change handlers....
+	var enterPressed = function(ev) {
+		if (ev.which == 13 && $('.build-input').length > 0) {
+			$('.build-header-name').html($('.build-input').val()).removeClass("italicize").click(title_change_handler)
+			$(document).off("keypress")
+		} else if (ev.which == 13 && $('.build-input').length == 0) {
+			$('.build-header-name').html("Untitled").click(title_change_handler)
+		}
+	};
+
+	var title_change_handler = function(ev) {
+		var current_text = $('.build-header-name').html()
+		var new_html = "<input class='build-input' type='text' placeholder='" + current_text + "' name='path-title-input'>"
+		$('.build-header-name').html(new_html).off("click")
+		$(document).keypress(enterPressed)
+	};
+
+
+	$(function() {
+
+		normalizeCurrentPos()
+
+		$(".new-position").each(function() {
+			$(this).hover(function() {
+				$(this).css("background-color", "rgba(149,165,166,1)")
+			}, function() { $(this).css("background-color", "rgba(149,165,166,0.7)") }
+			);
+		});
+
+		$("#new-position-box").click(searchStartingPositions)
+		$('.build-header-name').click(title_change_handler)
+
+		// $('#build-new-position-select').chosen()
+	});
+
+
+
+
+
+
+
+
+
+
+</script>
+
+
+{% endblock %}
+
+
+
+
+
+

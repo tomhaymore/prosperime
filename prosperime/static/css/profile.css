@@ -1,0 +1,544 @@
+
+
+div#timeline-info-container {
+	margin-top:25px;
+	border-radius:4px;
+	padding:10px;
+	width:300px;
+	max-width:300px;
+	height:100px;
+	/*text-align:center;
+	/*border:2px dashed rgba(41,98,152,1);*/
+	/*position:relative;
+	left:33%;
+
+	background-color:rgb(41,98,152);
+	color:#fffffe;*/
+	margin-bottom:25px;
+}
+
+div.container-condensed {
+	height:60px !important;
+	margin-top:10px !important;
+}
+
+div#timeline-description-container {
+	/*display:none;*/
+	line-height:27px;
+}
+
+div#timeline-header-container {
+}
+
+div#goal-careers-container, div#goal-positions-container {
+	float:left;
+	width:60%;
+}
+
+div#goal-careers-header {
+}
+
+div.personalize {
+	display:inline;
+	font-weight:500;
+	float:right;
+	/*margin-right:150px;*/
+	max-height:20px;
+}
+
+div.no-positions {
+	display:block;
+	margin-left:50px;
+	margin-top:10px;
+	font-size:1.1em;
+	line-height:28px;
+}
+
+div#goal-careers-container table {
+	/*margin-top:25px;*/
+	margin-bottom:25px;
+}
+
+div#goal-careers-container table td {
+	padding-left:10px;
+}
+
+div#saved-paths-container .timeline-header {
+	margin-bottom:25px;
+	margin-top:25px;
+}
+
+#saved-careers-table,#goal-position-table {
+	width:100%;
+}
+
+div.profile-header-container {
+/*	border-bottom: solid 1px rgb(41,98,152);
+*/	padding-bottom:10px;
+}
+
+div.profile-header {
+	font-size: 1.4em;
+	color: rgb(41,98,152);
+	font-weight: 500;
+	margin:5px;
+	
+}
+
+span.splash-slug {
+	color:rgb(41,98,152);
+}
+
+p.profile-list {
+	font-family:Helvetica;
+	
+}
+
+div.profile-details-container {
+	margin-left:10px;
+	margin-right:25px;
+	width:400px;
+	height:200px;
+}
+
+div.careers-list {
+	width:250px;
+}
+
+#profile-careers-container {
+	width:92%;
+}
+
+
+ul.profile-careers-list {
+	margin-left: 0;
+	font-size:9pt;
+}
+
+ul.profile-careers-list li {
+	margin-left: 0;
+	margin-right:8px;
+	padding-top:8px;
+}
+
+a.profile-button {
+	font-size:14px;
+	display:inline-block;
+	padding: 2px 4px 2px 4px;
+	background-color: rgb(41,98,152);
+	color:#fff;
+	cursor:pointer;
+	border-radius:1px;
+	font-weight: 300;
+}
+
+a.profile-button:hover {
+	text-decoration: none;
+}
+
+div.profile-nav-container {
+	border-bottom: solid 1px rgb(41,98,152);
+	padding-bottom: 0px;
+}
+
+p.profile-subheader {
+	font-size: 16px;
+}
+
+div.profile-info-top {
+	margin-top:10px;
+}
+
+div.profile-img-holder {
+	margin-left:15px;
+}
+
+img.profile-image {
+	width:75px;
+}
+
+div.profile-brief-info {
+	margin-left: 15px
+}
+
+div.empty-tab {
+	text-align:left;
+	margin-left:25px;
+	font-size:1.1em;
+	line-height:28px;
+}
+
+
+div#career-decision-module {
+
+}
+
+div#career-decision-prompt {
+	color:whitesmoke;
+	background-color: rgb(41,98,152);
+	padding:8px;
+	/*margin-top:50px;*/
+	font-size:14px;
+	line-height:200%;
+	border-radius:4px;
+
+}
+
+
+
+#career-decision-form textarea{
+	resize:none;
+}
+
+div.close {
+	color:whitesmoke;
+}
+
+div.display-none {
+	display:none;
+}
+
+div.career-decision-prompt-btn {
+
+}
+
+.full-width {
+	width:95%;
+}
+
+#worst{
+	display:inline-block;
+	width:55%;
+	text-align:right;
+	font-weight:bold;
+}
+
+#best {
+	display:inline-block;
+	width:40%;
+	font-weight:bold;
+	text-align:right;
+}
+
+.input-label {
+	display:inline-block;
+	width:33%;
+}
+
+
+.callout-text {
+	color: rgb(41,98,152);
+	font-size:1.2em;
+}
+
+.radio {
+	font-size:.9em;
+}
+
+.autocomplete-suggestions {
+	border: 1px solid #999;
+	background: #FFF;
+	overflow: auto;
+	width:350px !important; /* normally, no, but this is a 3rd party library */ 
+}
+
+.autocomplete-suggestion { 
+	padding: 2px 5px; 
+	white-space: nowrap; 
+	overflow: hidden; 
+}
+
+.autocomplete-selected { 
+	background: #F0F0F0;
+}
+
+.autocomplete-suggestions strong { 
+	font-weight: normal; 
+	color: #3399FF; 
+}
+
+
+div.hidden-data-structure {
+	display:none;
+}
+
+
+.bordered {
+/*	border-bottom:4px solid rgba(85,85,85,0.8);
+	border-left:4px solid rgba(85,85,85,0.8);
+	border-right:4px solid rgba(85,85,85,0.8);
+	border-radius:4px 4px 4px 4px;
+	background-image:url('../img/redox_01.png');
+	background-image:url('../img/handmadepaper.png');*/
+}
+
+.info_box_text {
+	font-size:18px;
+}
+
+.background-internship {
+	/*background-color:rgba(255,195,64,.2);
+	border:2px solid rgb(255,195,64);*/
+	border-radius:4px 4px 4px 4px;
+	background-color:#f9f9f9;
+	border:2px solid #ddd;
+	box-shadow:1px 1px 1px 1px;
+
+}
+
+.background-position {
+	/*background-color:rgba(50,121,202,.2);
+	border:2px solid rgb(50,121,202);*/
+	background-color:#f9f9f9;
+	border:2px solid #ddd;
+	border-radius:4px 4px 4px 4px;
+	box-shadow:1px 1px 1px 1px;
+
+}
+
+.background-education {
+	/*background-color:rgba(191,51,48,.2);
+	border:2px solid rgb(191,51,48);*/
+	border-radius:4px 4px 4px 4px;
+	background-color:#f9f9f9;
+	border:2px solid #ddd;
+	box-shadow:1px 1px 1px 1px;
+
+}
+
+.loose-spacing {
+	letter-spacing:.1em;
+}
+
+
+
+
+div.personalize-button {
+	position:relative;
+	top:4px;
+	left:4px;
+}
+
+div.personalize-prompt-container {
+	width:350px;
+}
+
+
+
+div.timeline-date {
+	font-size:1em;
+}
+
+div.timeline-title {
+
+}
+
+div.timeline-entity-name {
+
+}
+
+span.timeline-description {
+	font-size:1em;
+
+}
+
+span.initial-prompt {
+	text-align:left;
+}
+
+
+/* Major Structures */
+div#timeline-float-screen {
+	position:relative;
+	left:10%;
+	width:80%;
+	height:125px;
+	text-align:center;
+	vertical-align:middle;
+}
+
+div#timeline-float-screen-left {
+	float:left;
+	width:32%;
+	margin-right:45px;
+	padding:10px;
+}
+
+div#timeline-float-screen-right {
+	float:right;
+	width:55%;
+	padding:10px;
+	padding-bottom:0px;
+}
+
+div#timeline-float-screen-center {
+	margin-left:auto;
+	margin-right:auto;
+	width:50%;
+	padding:10px;
+	padding-bottom:0px;
+}
+
+div#middle-float-screen {
+	width:380px;
+	position:absolute;
+	top:200px;
+	left:425px;
+	font-size:0.9em;
+	text-align:center;
+}
+
+
+div#career-decision-form {
+	position:relative;
+	z-index:1000;
+	background-color:#fff;
+	padding:15px;
+	border-radius:2px 2px 2px 2px;
+	width:425px;
+	border:1px solid #555;
+	border-radius:4px;
+
+}
+
+div#career-decision-form form {
+	margin:0px;
+}
+
+#profile-right {
+	margin-top:0px;
+	margin-right:25px;
+}
+
+div.timeline-header {
+	color:rgb(41,98,152);
+	/*padding-top:20px;
+	padding-left:40px;
+	font-weight:500;
+	font-size:12pt;
+	text-transform: uppercase;
+	letter-spacing:1px;*/
+	padding-left:20px;
+	font-size:1.6em;
+/*	font-family:"Varela", "Helvetica";
+*/}
+
+div.reposition {
+	position:relative;
+	top:75px;
+	right:15px;
+	padding-left:0px !important;
+}
+
+div#queue {
+
+}
+
+div.item-container {
+	margin-left:0px auto;
+	margin-right:0px auto;
+	text-align:center;
+	width:100%;
+	margin-bottom:50px;
+}
+
+div.queue-position {
+	margin-top:25px;
+	padding:5px;
+	padding-top:15px;
+
+	display:inline-block;
+	border-radius:8px;
+	width:200px;
+	height:75px;
+	vertical-align:middle;
+	margin-left:4px;
+	margin-right:4px;
+	/*color:#fffffe;*/
+	text-align:center;
+	font-size:1.1em;
+	/*border:1px dashed #333;*/
+	border:2px dashed rgba(41,98,152,1);
+}
+
+div.queue-position-hover {
+	border:2px solid rgba(41,98,152,1);
+	cursor:pointer;
+}
+
+div.queue-position-position {
+
+}
+
+div.queue-position-entity {
+	font-weight:600;
+}
+
+.queue-position-title {
+	font-weight:600;
+}
+
+i.profile-chevron {
+	position:relative;
+	top:20px;
+	margin:10px;
+}
+
+div#edit-path-button {
+
+
+}
+
+div#delete-path-button {
+
+}
+
+div.path-button {
+	display:inline-block;
+	float:right;
+	font-size:1.2em;
+	line-height:25px;
+	background-color:rgb(41,98,152);
+	color:#fffffe;
+	width:75px;
+	padding:6px 8px;
+	margin-bottom:0px;
+	margin-right:25px;
+}
+
+div.path-button a {
+	text-decoration: none;
+	color:#fffffe;
+}
+
+
+
+.hide {
+	visibility: hidden;
+}
+
+.anchor {
+	text-decoration: none;
+}
+
+.timeline-header a {
+	text-decoration: none;
+}
+
+.inline {
+	display:inline;
+}
+
+.left-half {
+	width:50%;
+}
+
+.connect-button {
+	position:relative;
+	right:75px;
+	top:15px;
+}
+
+
+
+

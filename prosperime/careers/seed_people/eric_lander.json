@@ -1,0 +1,37 @@
+{
+	"name":"Eric Lander",
+	"headline":"Professor at M.I.T., Founder of the Whitehead Institute Center for Genomic Research",
+	"profile_pic":"/static/img/eric_lander.jpg",
+	"path": [
+		{
+		"title":"B.S. Mathematics",
+		"type":"education",
+		"entity_name":"Princeton University",
+		"description":"Eric graduated as Valedictorian in 1978.",
+		"meta":"highlight"
+		}, {
+		"title":"PhD in Algebraic Coding Theory & Symmetric Block Design",
+		"type":"education",
+		"entity_name":"Oxford University",
+		"description":"Attended as a Rhodes Scholar"
+		}, {
+		"entity_name":"Harvard Business School",
+		"title":"Teacher, Managerial Economics",
+		"type":"position"
+		}, {
+		"entity_name":"The Whitehead Institute (M.I.T.)",
+		"title":"Genetecist",
+		"type":"position",
+		"meta":"pivot"
+		}, {
+		"entity_name":"Whitehead Institute Center for Genomic Research",
+		"type":"position",
+		"title":"Founder"
+		}, {
+		"entity_name":"M.I.T.",
+		"type":"position",
+		"title":"Professor of Biology",
+		"meta":"highlight"
+		}
+	]
+}

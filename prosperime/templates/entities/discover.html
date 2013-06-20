@@ -1,0 +1,117 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/discover.css" />
+<script type="text/javascript" src="{{ STATIC_URL }}js/discover.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div id="content-container" class="main-container">
+	<p class="splash-header">Discover</p>
+	<p class="main-sub-header">Discover career paths from other individuals in <span class="callout-text">your network</span> or browse the whole <span class="callout-text">prosperime</span> community to see career paths of people <span class="callout-text">just like you</span>.</p>
+
+	<div id="careers-container">
+		<div class="discover-nav-container">
+			<div class="pull-left discover-nav-selected" onclick="			_gaq.push(['_trackEvent', 'discover', 'yourNetwork'])
+"><a id="discover-nav-network" href="#network">Your Network</a></div>
+
+			<div class="pull-left discover-nav-unselected" onclick="			_gaq.push(['_trackEvent', 'discover', 'justLikeYou'])
+"><a id="discover-nav-justlikeyou" href="#justlikeyou">Just Like You</a></div>
+			<div class="clear"></div>
+		</div>
+		<div class="discover-careers-container">
+			<div class="discover-careers-network">
+				<!-- header row -->
+				<div class="pull-left careers-header-row"></div>
+				<div class="pull-left careers-stats-container">
+					<ul class="careers-stats">
+						<li>people</li>
+						<li>positions</li>
+						<li>companies</li>
+					</ul>
+				</div>
+				<div class="clear"></div>
+				{% for c in careers.network %}
+					
+					<div class="pull-left careers-name-container">
+						<a href="career/{{c.0}}" class="careers-name" onclick="_gaq.push(['_trackEvent', 'discover', 'careerNameClicked-network', '{{c.0}}'])">
+						{% if c.1.short_name %}
+							{{c.1.short_name}}
+						{% else %}
+							{{c.1.long_name}}
+						{% endif %}
+						</a>
+					</div>
+					<div class="pull-left careers-stats-container">
+						<ul class="careers-stats">
+							<li class="careers-stats-people blue-box-container">
+								<a href="career/{{c.0}}/">
+								<div class="stats">{{c.1.num_people}}</div>
+								</a>
+							</li>
+							<li class="careers-stats-positions blue-box-container">
+
+								<a href="career/{{c.0}}/positions/">
+
+								<div class="stats">{{c.1.num_pos}}</div>
+								</a>
+							</li>
+							<li class="careers-stats-orgs blue-box-container">
+
+								<a href="career/{{c.0}}/orgs/">
+
+								<div class="stats">{{c.1.num_cos}}</div>
+								</a>
+							</li>
+						</ul>
+					</div>
+					<div class="clear"></div>
+				{% endfor %}
+			</div>
+			<div class="discover-careers-justlikeyou" style="display:none;">
+				<!-- header row -->
+				<div class="pull-left careers-header-row"></div>
+				<div class="pull-left careers-stats-container">
+					<ul class="careers-stats">
+						<li>people</li>
+						<li>positions</li>
+						<li>companies</li>
+					</ul>
+				</div>
+				<div class="clear"></div>
+				{% for c in careers.similar %}
+					<div class="pull-left careers-name-container">
+						<a href="career/{{c.id}}" onclick="_gaq.push(['_trackEvent', 'discover', 'careerNameClicked-justLikeYou', '{{c.id}}'])" class="careers-name">{{c.name}}
+						</a>
+					</div>
+					<div class="pull-left careers-stats-container">
+						<ul class="careers-stats">
+							<li class="careers-stats-people blue-box-container">
+								<a href='career/{{c.id}}/' onclick="_gaq.push(['_trackEvent', 'discover', 'blueBoxCompaniesClicked-justLikeYou', '{{c.id}}'])">
+								<div class="stats">{{c.num_people}}</div>
+								</a>
+							</li>
+
+							<li class="careers-stats-positions blue-box-container">
+								<a href='career/{{c.id}}/positions/' onclick="_gaq.push(['_trackEvent', 'discover', 'blueBoxCompaniesClicked-justLikeYou', '{{c.id}}'])">
+								<div class="stats">{{c.num_pos}}</div>
+								</a>
+							</li>
+							
+							<li class="careers-stats-orgs blue-box-container">
+								<a href='career/{{c.id}}/orgs/' onclick="_gaq.push(['_trackEvent', 'discover', 'blueBoxCompaniesClicked-justLikeYou', '{{c.id}}'])">
+								<div class="stats">{{c.num_cos}}</div>
+								</a>
+							</li>
+						</ul>
+					</div>
+					<div class="clear"></div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

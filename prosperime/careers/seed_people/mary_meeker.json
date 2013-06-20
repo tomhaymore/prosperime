@@ -1,0 +1,40 @@
+{
+	"name":"Mary Meeker",
+	"headline":"Partner at Kleiner Perkins Caulfield & Byers",
+	"profile_pic":"/static/img/mary_meeker.jpg",
+	"path": [
+		{
+		"title":"B.A. in Psychology",
+		"type":"education",
+		"entity_name":"DePauw University"
+		}, {
+		"title":"Stockbroker",
+		"entity_name":"Merrill Lynch",
+		"type":"position"
+		}, {
+		"title":"M.B.A. in Finance",
+		"type":"education",
+		"entity_name":"Cornell University",
+		"meta":"highlight"
+		},{
+		"title":"Technology Research Analyst",
+		"entity_name":"Cowen and Salomon Brothers",
+		"type":"position"
+		}, {
+		"title":"PC Software/Hardware and New Media Analyst",
+		"entity_name":"Morgan Stanley",
+		"type":"position",
+		"meta":"highlight",
+		"description":"In 1995, Mary co-authored \"the Internet Report\", a seminal report that became a bedrock of Dot Com Era investing."
+		}, {
+		"title":"Managing Partner",
+		"entity_name":"Morgan Stanley",
+		"type":"position"
+		}, {
+		"title": "Partner",
+		"entity_name": "Kleiner Perkins Caulfield & Byers",
+		"meta":"pivot",
+		"type":"position"
+		}
+	]
+}

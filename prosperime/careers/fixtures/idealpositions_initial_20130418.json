@@ -1,0 +1,9548 @@
+[
+	{
+		"title":"Product Development Intern",
+		"description":"",
+		"level":0,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"product development intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Product Manager Intern",
+		"description":"",
+		"level":0,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"product manager intern",
+					"industries":null
+				},
+				{
+					"title":"product management intern",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"New Product Development Analyst",
+		"description":"",
+		"level":1,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"new product development analyst",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Product Planner",
+		"description":"",
+		"level":2,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"product planner",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Product Manager",
+		"description":"",
+		"level":2,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"product manager",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Senior Product Manager",
+		"description":"",
+		"level":3,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"senior product manager",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Head of Product",
+		"description":"",
+		"level":4,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"head of product",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Global Product Manager",
+		"description":"",
+		"level":3,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"global product manager",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"VP of Product",
+		"description":"",
+		"level":4,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"vp product",
+					"industries":null
+				},
+				{
+					"title":"vice president product",
+					"industries":null
+				},
+				{
+					"title":"vp product management",
+					"industries":null
+				},
+				{
+					"title":"vice president product management",
+					"industries":null
+				},
+				{
+					"title":"vice president of product management",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Senior VP of Product",
+		"description":"",
+		"level":4,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"senior vice president product management",
+					"industries":null
+				},
+				{
+					"title":"senior vice president products marketing and alliances",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Product Marketing Manager Intern",
+		"description":"",
+		"level":0,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"product marketing manager intern",
+					"industries":null
+				},
+				{
+					"title":"intern product marketing",
+					"industries":null
+				},
+				{
+					"type":"wild",
+					"title":"product marketing manager",
+					"token":"intern"
+				}
+			]
+	},
+	{
+		"title":"Product Marketing Manager",
+		"description":"",
+		"level":2,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"product marketing manager",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Senior Product Marketing Manager",
+		"description":"",
+		"level":2,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"senior product marketing manager",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Product Marketing",
+		"description":"",
+		"level":0,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"product marketing",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Director of Product Marketing",
+		"description":"",
+		"level":3,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"director product marketing",
+					"industries":null
+				},
+				{
+					"title":"director of product marketing",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Global Program Lead",
+		"description":"",
+		"level":3,
+		"careers":[564],
+		"matches":
+			[
+				{
+					"title":"global program lead",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Senior Program Manager",
+		"description":"",
+		"level":3,
+		"careers":[564],
+		"matches":
+			[
+				{
+					"title":"senior program manager",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Program Chair",
+		"description":"",
+		"level":4,
+		"careers":[597],
+		"matches":
+			[
+				{
+					"title":"program chair",
+					"industries":null
+				},
+				{
+					"title":"program co-chair",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Vice President of Programming",
+		"description":"",
+		"level":4,
+		"careers":[564],
+		"matches":
+			[
+				{
+					"title":"vice president programming",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Program Assistant",
+		"description":"",
+		"level":1,
+		"careers":[564],
+		"matches":
+			[
+				{
+					"title":"program assistant",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Program Advisor",
+		"description":"",
+		"level":3,
+		"careers":[564],
+		"matches":
+			[
+				{
+					"title":"program advisor",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Program Manager",
+		"description":"",
+		"level":2,
+		"careers":[564],
+		"matches":
+			[
+				{
+					"title":"program manager",
+					"industries":null
+				},
+				{
+					"title":"program management",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"VP Program Management",
+		"description":"",
+		"level":4,
+		"careers":[564],
+		"matches":
+			[
+				{
+					"title":"vp program management",
+					"industries":null
+				},
+				{
+					"title":"vice president program management",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Technical Program Manager",
+		"description":"",
+		"level":2,
+		"careers":[564],
+		"matches":
+			[
+				{
+					"title":"technical program manager",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Project Manager Intern",
+		"description":"",
+		"level":0,
+		"careers":[564],
+		"matches":
+			[
+				{
+					"title":"project manager intern",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Team Leader",
+		"description":"",
+		"level":1,
+		"careers":[564],
+		"matches":
+			[
+				{
+					"title":"team leader",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Project Manager",
+		"description":"",
+		"level":2,
+		"careers":[564],
+		"matches":
+			[
+				{
+					"title":"project manager",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Project Director",
+		"description":"",
+		"level":3,
+		"careers":[564],
+		"matches":
+			[
+				{
+					"title":"project director",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Project Lead",
+		"description":"",
+		"level":2,
+		"careers":[564],
+		"matches":
+			[
+				{
+					"title":"project lead",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Senior Project Manager",
+		"description":"",
+		"level":3,
+		"careers":[564],
+		"matches":
+			[
+				{
+					"title":"senior project manager",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Assistant U.S. Attorney",
+		"description":"",
+		"level":3,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"AUSA",
+					"industries":["Government Administration","Legal Services","Law Practice"]
+				},
+				{
+					"title":"assistant us attorney",
+					"industries":null
+				},
+				{
+					"title":"assistant united states attorney",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"U.S. Attorney",
+		"description":"",
+		"level":4,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"USA",
+					"industries":["Government Administration","Legal Services","Law Practice"]
+				},
+				{
+					"title":"us attorney",
+					"industries":null
+				},
+				{
+					"title":"united states attorney",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Tax Associate",
+		"description":"",
+		"level":1,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"tax associate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Entertainment Associate",
+		"description":"",
+		"level":1,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"entertainment associate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Litigator",
+		"description":"",
+		"level":2,
+		"careers":[129,588],
+		"matches":
+			[
+				{
+					"title":"trial attorney",
+					"industries":null
+				},
+				{
+					"title":"litigator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Attorney Adviser",
+		"description":"",
+		"level":2,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"attorney adviser",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Attorney",
+		"description":"",
+		"level":2,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"attorney",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Judge Advocate",
+		"description":"",
+		"level":3,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"judge advocate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Juvenile Justice Advocate",
+		"description":"",
+		"level":1,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"juvenile justice advocate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Visiting Advocate",
+		"description":"",
+		"level":1,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"visiting advocate",
+					"industries":["Legal Services","Law Practice"]
+				}
+			]	
+	},
+	{
+		"title":"Deputy Chief (U.S. Attorney's Office)",
+		"description":"",
+		"level":2,
+		"careers":[129,599],
+		"matches":
+			[
+				{
+					"title":"deputy chief",
+					"industries":["Government Administration"]
+				}
+			]	
+	},
+	{
+		"title":"Senior Associate (law)",
+		"description":"",
+		"level":3,
+		"careers":[129,569],
+		"matches":
+			[
+				{
+					"title":"senior associate",
+					"industries":["Law Practice","Legal Services"]
+				}
+			]	
+	},
+	{
+		"title":"Corporate Associate",
+		"description":"",
+		"level":2,
+		"careers":[129,569],
+		"matches":
+			[
+				{
+					"title":"corporate associate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Whistleblower/False Claims Act Associate",
+		"description":"",
+		"level":2,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"Whistleblower false claims act associate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Corporate Counsel",
+		"description":"",
+		"level":2,
+		"careers":[129,569],
+		"matches":
+			[
+				{
+					"title":"corporate counsel",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Legal Counsel",
+		"description":"",
+		"level":2,
+		"careers":[129,569],
+		"matches":
+			[
+				{
+					"title":"legal counsel",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Student Attorney",
+		"description":"",
+		"level":0,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"student attorney",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Corporate Counsel - Litigator",
+		"description":"",
+		"level":2,
+		"careers":[129,588],
+		"matches":
+			[
+				{
+					"title":"corporate counsel litigator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Commercial and Product Counsel",
+		"description":"",
+		"level":2,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"commercial and product counsel",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate Product Counsel",
+		"description":"",
+		"level":1,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"associate product counsel",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Counsel",
+		"description":"",
+		"level":3,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"senior counsel",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Partner",
+		"description":"",
+		"level":3,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"partner",
+					"industries":["Legal Services","Law Practice"]
+				}
+			]	
+	},
+	{
+		"title":"IP Lawyer",
+		"description":"",
+		"level":2,
+		"careers":[129,568],
+		"matches":
+			[
+				{
+					"title":"ip associate",
+					"industries":null
+				},
+				{
+					"title":"intellectual property associate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"IP Litigator",
+		"description":"",
+		"level":2,
+		"careers":[129,568],
+		"matches":
+			[
+				{
+					"title":"ip and internet litigator",
+					"industries":null
+				},
+				{
+					"title":"ip litigator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Litigator",
+		"description":"",
+		"level":2,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"litigator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Trial Consultant",
+		"description":"",
+		"level":1,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"trial consultant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate (law)",
+		"description":"",
+		"level":2,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"tax associate",
+					"industries":["Legal Services","Law Practice"]
+				}
+			]	
+	},
+	{
+		"title":"Assistant City Attorney",
+		"description":"",
+		"level":2,
+		"careers":[129,599],
+		"matches":
+			[
+				{
+					"title":"assistant city attorney",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Assistant City Prosecutor",
+		"description":"",
+		"level":3,
+		"careers":[129,599],
+		"matches":
+			[
+				{
+					"title":"assistant city prosecutor",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"City Prosecutor",
+		"description":"",
+		"level":4,
+		"careers":[129,599],
+		"matches":
+			[
+				{
+					"title":"city prosecutor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director (law)",
+		"description":"",
+		"level":3,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"director, legal process",
+					"industries":null
+				},
+				{
+					"title":"director",
+					"industries":["Law Practice","Legal Services"]
+				}
+			]	
+	},
+	{
+		"title":"Law Clerk",
+		"description":"",
+		"level":1,
+		"careers":[129,130],
+		"matches":
+			[
+				{
+					"title":"law clerk",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Judicial Clerk",
+		"description":"",
+		"level":1,
+		"careers":[129,130],
+		"matches":
+			[
+				{
+					"title":"judicial clerk",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Paralegal",
+		"description":"",
+		"level":2,
+		"careers":[132],
+		"matches":
+			[
+				{
+					"title":"paralegal",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Litigation Services Manager",
+		"description":"",
+		"level":3,
+		"careers":[132],
+		"matches":
+			[
+				{
+					"title":"litigation services manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Corporate Assistant",
+		"description":"",
+		"level":1,
+		"careers":[132],
+		"matches":
+			[
+				{
+					"title":"corporate assistant",
+					"industries":["Legal Services","Law Practice"]
+				}
+			]	
+	},
+	{
+		"title":"Research Assistant",
+		"description":"",
+		"careers":[119],
+		"level":0,
+		"matches":
+			[
+				{
+					"title":"research assistant",
+					"industries":null
+				},
+				{
+					"title":"graduate research assistant",
+					"industries":null
+				},
+				{
+					"title":"graduate researcher",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Summer Associate (law)",
+		"description":"",
+		"level":0,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"summer associate",
+					"industries":["Law Practice","Legal Services"]
+				}
+			]	
+	},
+	{
+		"title":"Legal Intern",
+		"description":"",
+		"level":0,
+		"careers":[129,132,133],
+		"matches":
+			[
+				{
+					"title":"intern",
+					"industries":["Law Practice","Legal Services"]
+				},
+				{
+					"title":"legal intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Legal Specialist",
+		"description":"",
+		"level":1,
+		"careers":[129,132,133],
+		"matches":
+			[
+				{
+					"title":"legal specialist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Investigative Intern",
+		"description":"",
+		"level":0,
+		"careers":[129,132,133],
+		"matches":
+			[
+				{
+					"title":"investigative intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"President (publishing)",
+		"description":"",
+		"level":5,
+		"careers":[156],
+		"matches":
+			[
+				{
+					"title":"president",
+					"industries":["Publishing"]
+				}
+			]	
+	},
+	{
+		"title":"Investment Banking Analyst",
+		"description":"",
+		"level":1,
+		"careers":[587],
+		"matches":
+			[
+				{
+					"title":"investment banking analyst",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Investment Banker",
+		"description":"",
+		"level":2,
+		"careers":[587],
+		"matches":
+			[
+				{
+					"title":"investment banker",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Spring Securities Intern",
+		"description":"",
+		"level":0,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"spring securities intern",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				}
+			]	
+	},
+	{
+		"title":"Summer Associate (banking)",
+		"description":"",
+		"level":0,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"summer associate",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				}
+			]	
+	},
+	{
+		"title":"Summer Financial Analyst",
+		"description":"",
+		"level":0,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"summer analyst",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				},
+				{
+					"title":"analyst intern",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				},
+				{
+					"title":"summer financial analyst",
+					"industries":null
+				},
+				{
+					"title":"imd summer analyst",
+					"industries":null
+				}
+				,
+				{
+					"title":"summer analyst imd",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Financial Analyst Intern",
+		"description":"",
+		"level":0,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"financial analyst intern",
+					"industries":null
+				},
+				{
+					"title":"investment support intern",
+					"industries":null
+				},
+				{
+					"title":"finance intern",
+					"industries":null
+				},
+				{
+					"title":"financial representative intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Portfolio Analyst Intern",
+		"description":"",
+		"level":0,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"portfolio analyst intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Transactions & Restructuring Intern",
+		"description":"",
+		"level":0,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"transactions and restructuring intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Wealth Management Intern",
+		"description":"",
+		"level":0,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"wealth management intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Financial Analyst",
+		"description":"",
+		"level":1,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"analyst",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				},
+				{
+					"title":"associate analyst",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				},
+				{
+					"title":"financial analyst",
+					"industries":null
+				},
+				{
+					"title":"finance analyst",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Quantitative Analyst Intern",
+		"description":"",
+		"level":0,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"quantitative analyst Intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Quantitative Analyst",
+		"description":"",
+		"level":1,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"quantitative analyst",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Quantitative Analyst (finance)",
+		"description":"",
+		"level":1,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"quantitative analyst",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				}
+			]	
+	},
+	{
+		"title":"Research Analyst (finance)",
+		"description":"",
+		"level":1,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"research analyst",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				}
+			]	
+	},
+	{
+		"title":"Vice President of Research -- Finance",
+		"description":"",
+		"level":4,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"vp of research",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				},
+				{
+					"title":"vice president of research",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				}
+			]	
+	},
+	{
+		"title":"Senior Financial Specialist",
+		"description":"",
+		"level":2,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"senior financial specialist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate Principal (financial)",
+		"description":"",
+		"level":2,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"principal",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				}
+			]	
+	},
+	{
+		"title":"Principal (financial)",
+		"description":"",
+		"level":3,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"principal",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				}
+			]	
+	},
+	{
+		"title":"Managing Director (financial)",
+		"description":"",
+		"level":3,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"managing director",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				}
+			]	
+	},
+	{
+		"title":"Director, Capital Markets",
+		"description":"",
+		"level":3,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"director capital markets",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				}
+			]	
+	},
+	{
+		"title":"Senior Technology Analyst (financial)",
+		"description":"",
+		"level":2,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"senior technology analyst",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				}
+			]	
+	},
+	{
+		"title":"General Partner (financial)",
+		"description":"General partners are the full, but not necessarily equal, partners in an investment fund. They will participate in most funding and investment decisions, and will often specialize in a certain category or market segment. In some partnerships, partners are compensated equally while in others they 'eat what they kill', that is, they reap most of their compensation from the investments they brought to the fund.",
+		"level":4,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"general partner",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				},
+				{
+					"title":"partner",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				}
+			]	
+	},
+	{
+		"title":"Brand Program Intern",
+		"description":"",
+		"level":0,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"brand program intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Brand Program Coordinator",
+		"description":"",
+		"level":3,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"brand program coordinator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Brand Ambassador",
+		"description":"",
+		"level":3,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"brand ambassador",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director of Corporate Branding & Web Strategy",
+		"description":"",
+		"level":3,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"director of corporate branding web strategy",
+					"industries":null
+				},
+				{
+					"title":"director of corporate branding and web strategy",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Market Development Manager",
+		"description":"",
+		"level":3,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"market development manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"VP of Marketing",
+		"description":"",
+		"level":4,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"vp marketing",
+					"industries":null
+				},
+				{
+					"title":"vp of marketing",
+					"industries":null
+				},
+				{
+					"title":"vice president of marketing",
+					"industries":null
+				},
+				{
+					"title":"vice president marketing",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"CMO",
+		"description":"",
+		"level":5,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"chief marketing officer",
+					"industries":null
+				},
+				{
+					"title":"cmo",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Marketing Project Manager",
+		"description":"",
+		"level":2,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"marketing project manager",
+					"industries":null
+				},
+				{
+					"title":"project manager marketing",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Merchandising Specialist",
+		"description":"",
+		"level":1,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"merchandising specialist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Communications Officer",
+		"description":"",
+		"level":2,
+		"careers":[7,47,538],
+		"matches":
+			[
+				{
+					"title":"communications officer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Marketing Communications Specialist",
+		"description":"",
+		"level":2,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"marketing representative",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Marketing Associate",
+		"description":"",
+		"level":2,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"marketing associate",
+					"industries":null
+				},
+				{
+					"title":"marketing and strategy",
+					"industries":null
+				},
+				{
+					"title":"marketing and sales",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Publicity Manager",
+		"description":"",
+		"level":2,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"publicity manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Social Media and Community Development Associate",
+		"description":"",
+		"level":2,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"social media and community development associate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Social Media Marketing",
+		"description":"",
+		"level":1,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"social media marketing",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Social Media Consultant",
+		"description":"",
+		"level":1,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"social media consultant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Online Marketing Specialist",
+		"description":"",
+		"level":1,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"online marketing specialist",
+					"industries":null
+				}
+			]
+	},
+		
+	{
+		"title":"Online Media Coordinator",
+		"description":"",
+		"level":1,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"online media coordinator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director of Community Outreach",
+		"description":"",
+		"level":4,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"director of community outreach",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Marketing Representative",
+		"description":"",
+		"level":1,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"marketing representative",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Strategy Intern",
+		"description":"",
+		"level":0,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"strategy intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Marketing Strategy Intern",
+		"description":"",
+		"level":0,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"marketing strategy intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Marketing Intern",
+		"description":"",
+		"level":0,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"marketing intern",
+					"industries":null
+				},
+				{
+					"title":"marketing ecommerce intern",
+					"industries":null
+				},
+				{
+					"title":"summer marketing analyst",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Social Media Intern",
+		"description":"",
+		"level":0,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"social media intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Marketing and Business Development Intern",
+		"description":"",
+		"level":0,
+		"careers":[7,47,547,548],
+		"matches":
+			[
+				{
+					"title":"marketing and business development intern",
+					"industries":null
+				},
+				{
+					"title":"marketing and bd intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Internet Marketing Analyst",
+		"description":"",
+		"level":2,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"Internet marketing analyst",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Strategic Marketing Analyst",
+		"description":"",
+		"level":2,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"strategic marketing analyst",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Lead Content Manager",
+		"description":"",
+		"level":2,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"lead content manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Retail Marketing",
+		"description":"",
+		"level":1,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"retail marketing",
+					"industries":null
+				},
+				{
+					"title":"retail strategy",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Manager Channel Marketing",
+		"description":"",
+		"level":3,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"manager channel marketing",
+					"industries":null
+				},
+				{
+					"title":"channel marketing manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Manager Channel Marketing",
+		"description":"",
+		"level":3,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"senior manager channel marketing",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Manager Content Marketing",
+		"description":"",
+		"level":3,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"senior manager content marketing",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director of Marketing",
+		"description":"",
+		"level":3,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"marketing director",
+					"industries":null
+				},
+				{
+					"title":"director of marketing",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Sales and Marketing Analyst",
+		"description":"",
+		"level":1,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"sales and marketing analyst",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Sales Operations and Product Realization",
+		"description":"",
+		"level":2,
+		"careers":[4,7,47,48],
+		"matches":
+			[
+				{
+					"title":"sales operations and product realization",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Marketing Analyst",
+		"description":"",
+		"level":1,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"marketing analyst",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Marketing Coordinator",
+		"description":"",
+		"level":2,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"marketing coordinator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Manager, Online Marketing",
+		"description":"",
+		"level":3,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"manager online marketing",
+					"industries":null
+				},
+				{
+					"title":"online marketing manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Interactive Marketing Manager",
+		"description":"",
+		"level":3,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"interactive marketing manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Studio Marketing Manager",
+		"description":"",
+		"level":3,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"Studio marketing manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Marketing Manager",
+		"description":"",
+		"level":3,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"marketing manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Creative Merchandising & Promotions Manager",
+		"description":"",
+		"level":3,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"creative merchandising and promotions manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Visual Merchandiser",
+		"description":"",
+		"level":3,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"visual merchandiser",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Display Artist",
+		"description":"",
+		"level":3,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"display artist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Marketing Manager",
+		"description":"",
+		"level":3,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"senior marketing manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Campus Marketing Representative",
+		"description":"",
+		"level":1,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"campus marketing representative",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Field Marketer",
+		"description":"",
+		"level":2,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"field marketer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Event Marketing",
+		"description":"",
+		"level":1,
+		"careers":[7,45,47],
+		"matches":
+			[
+				{
+					"title":"event marketing",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Event Organizer",
+		"description":"",
+		"level":2,
+		"careers":[7,45,47],
+		"matches":
+			[
+				{
+					"title":"event organizer",
+					"industries":null
+				},
+				{
+					"title":"event organizing",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Manager, Field Marketing",
+		"description":"",
+		"level":3,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"senior manager field marketing",
+					"industries":null
+				},
+				{
+					"title":"senior field marketing manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Chief Marketer",
+		"description":"",
+		"level":2,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"chief marketer",
+					"industries":null
+				},
+				{
+					"title":"chief marketer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Evangelist",
+		"description":"",
+		"level":1,
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"evangelist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Communications Intern",
+		"description":"",
+		"level":0,
+		"careers":[551,552],
+		"matches":
+			[
+				{
+					"title":"communications intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Communications Associate",
+		"description":"",
+		"level":1,
+		"careers":[551,552],
+		"matches":
+			[
+				{
+					"title":"communications associate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Communications Specialist",
+		"description":"",
+		"level":1,
+		"careers":[551,552],
+		"matches":
+			[
+				{
+					"title":"communications specialist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Community Communications Manager",
+		"description":"",
+		"level":3,
+		"careers":[551,552],
+		"matches":
+			[
+				{
+					"title":"community communications manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate Director of Communications",
+		"description":"",
+		"level":3,
+		"careers":[551,552],
+		"matches":
+			[
+				{
+					"title":"associate director of communications",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Manager of Corporate Communications",
+		"description":"",
+		"level":3,
+		"careers":[551,552],
+		"matches":
+			[
+				{
+					"title":"manager corporate communications",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Public Relations Intern",
+		"description":"",
+		"level":0,
+		"careers":[8,155],
+		"matches":
+			[
+				{
+					"title":"public relations intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"International Public Affairs Advisor",
+		"description":"",
+		"level":2,
+		"careers":[8,155],
+		"matches":
+			[
+				{
+					"title":"international public affairs advisor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Missionary",
+		"description":"",
+		"level":1,
+		"careers":[576],
+		"matches":
+			[
+				{
+					"title":"missionary",
+					"industries":null
+				},
+				{
+					"title":"lds missionary",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Partner (law)",
+		"description":"",
+		"level":3,
+		"careers":[129],
+		"matches":
+			[
+				{
+					"title":"partner",
+					"industries":["Law Practice","Legal Services"]
+				}
+			]	
+	},
+	{
+		"title":"Audit Intern",
+		"description":"",
+		"level":0,
+		"careers":[49],
+		"matches":
+			[
+				{
+					"title":"audit and tax intern",
+					"industries":null
+				},
+				{
+					"title":"audit intern",
+					"industries":null
+				},
+				{
+					"title":"audit and forensic litigation intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Financial Control Intern",
+		"description":"",
+		"level":0,
+		"careers":[49],
+		"matches":
+			[
+				{
+					"title":"financial control intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Tax Preparer",
+		"description":"",
+		"level":1,
+		"careers":[59],
+		"matches":
+			[
+				{
+					"title":"tax preparer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Accountant",
+		"description":"",
+		"level":2,
+		"careers":[49],
+		"matches":
+			[
+				{
+					"title":"accountant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate (accounting)",
+		"description":"",
+		"level":2,
+		"careers":[49],
+		"matches":
+			[
+				{
+					"title":"associate",
+					"industries":["Accounting"]
+				}
+			]	
+	},
+	{
+		"title":"Manager (accounting)",
+		"description":"",
+		"level":3,
+		"careers":[49],
+		"matches":
+			[
+				{
+					"title":"manager",
+					"industries":["Accounting"]
+				}
+			]	
+	},
+	{
+		"title":"Fixed Income Intern",
+		"description":"",
+		"level":0,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"fixed income intern",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Intern (finance)",
+		"description":"",
+		"level":0,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"intern",
+					"industries":["Investment Management","Financial Services","Banking","Venture Capital"]
+				},
+				{
+					"title":"mba intern",
+					"industries":["Investment Management","Financial Services","Banking","Venture Capital"]
+				}
+			]	
+	},
+	{
+		"title":"Fixed Income Analyst",
+		"description":"",
+		"level":1,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"fixed income analyst",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Public Markets Analyst",
+		"description":"",
+		"level":1,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"public markets analyst",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"CFO",
+		"description":"",
+		"level":5,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"cfo",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate (finance)",
+		"description":"",
+		"level":2,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"associate technology investment banking",
+					"industries":["Investment Management","Financial Services","Banking","Venture Capital"]
+				},
+				{
+					"title":"associate",
+					"industries":["Investment Management","Financial Services","Banking","Venture Capital"]
+				}
+			]	
+	},
+	{
+		"title":"Senior Associate (finance)",
+		"description":"",
+		"level":2,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"senior associate technology investment banking",
+					"industries":["Investment Management","Financial Services","Banking","Venture Capital"]
+				},
+				{
+					"title":"senior associate",
+					"industries":["Investment Management","Financial Services","Banking","Venture Capital"]
+				}
+			]	
+	},
+	{
+		"title":"Vice President (finance)",
+		"description":"",
+		"level":4,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"vice president",
+					"industries":["Investment Management","Financial Services","Banking","Venture Capital"]
+				}
+			]	
+	},
+	{
+		"title":"Director of Sales",
+		"level":3,
+		"description":"",
+		"careers":[282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"director of sales",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"VP Sales and Marketing",
+		"description":"",
+		"level":4,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"vp sales and marketing",
+					"industries":null
+				},
+				{
+					"title":"vp sales marketing",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Sales and Marketing Advisor",
+		"level":3,
+		"description":"",
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"sales and marketing advisor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Vice President, Global E-Commerce and CRM",
+		"level":0,
+		"description":"",
+		"careers":[547,560,566],
+		"matches":
+			[
+				{
+					"title":"vice president global ecommerce and crm",
+					"industries":null
+				},
+				{
+					"title":"vp global ecommerce and crm",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Customer Service Representative",
+		"level":1,
+		"description":"",
+		"careers":[299,560],
+		"matches":
+			[
+				{
+					"title":"customer service representative",
+					"industries":null
+				},
+				{
+					"title":"applecare specialist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Member Services Associate",
+		"level":1,
+		"description":"",
+		"careers":[299,560],
+		"matches":
+			[
+				{
+					"title":"member services associate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Sales and Support Intern",
+		"level":0,
+		"description":"",
+		"careers":[7,282,279,566,275,276,299,560],
+		"matches":
+			[
+				{
+					"title":"sales and support intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Sales Intern",
+		"description":"",
+		"level":0,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"sales intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Sales Strategy Analyst",
+		"description":"",
+		"level":1,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"sales strategy analyst",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Sales & Lead Generator",
+		"description":"",
+		"level":1,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"sales lead generator",
+					"industries":null
+				},
+				{
+					"title":"sales and lead generator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Sales Representative",
+		"description":"",
+		"level":2,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"sales representative",
+					"industries":null
+				},
+				{
+					"title":"sales rep",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Sales Associate",
+		"description":"",
+		"level":1,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"sales associate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Outside Sales",
+		"description":"",
+		"level":2,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"outside sales",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Sales Manager",
+		"description":"",
+		"level":3,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"senior sales manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"District Sales Manager",
+		"description":"",
+		"level":3,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"district sales manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Regional Sales Manager",
+		"description":"",
+		"level":3,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"regional sales manager",
+					"industries":null
+				},
+				{
+					"title":"asia sales manager",
+					"industries":null
+				},
+				{
+					"title":"regional sales director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Manager, Strategic Sales",
+		"description":"",
+		"level":3,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"manager strategic sales",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Vice President, Sales",
+		"description":"",
+		"level":4,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"vp sales",
+					"industries":null
+				},
+				{
+					"title":"vice president sales",
+					"industries":null
+				}
+				,
+				{
+					"title":"vice president ad network sales",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Vice President, Sales",
+		"description":"",
+		"level":4,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"svp sales",
+					"industries":null
+				},
+				{
+					"title":"senior vice president sales",
+					"industries":null
+				},
+				{
+					"title":"svp sales",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Sales Executive",
+		"description":"",
+		"level":3,
+		"careers":[7,282,566,275,276],
+		"matches":
+			[
+				{
+					"title":"sales executive",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Internal Sales Representative",
+		"description":"",
+		"level":2,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"internal sales",
+					"industries":null
+				},
+				{
+					"title":"internal sales associate",
+					"industries":null
+				},
+				{
+					"title":"inside sales associate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Enterprise Inside Representative",
+		"description":"",
+		"level":2,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"enterprise inside representative",
+					"industries":null
+				},
+				{
+					"title":"enterprise internal representative",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Inside Sales Executive",
+		"description":"",
+		"level":3,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"inside sales executive",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Help Desk Technician",
+		"description":"",
+		"level":1,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"help desk technician",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Sales Engineer",
+		"description":"",
+		"level":2,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"sales engineer",
+					"industries":null
+				},
+				{
+					"title":"sales service engineer",
+					"industries":null
+				},
+				{
+					"title":"sales and service engineer",
+					"industries":null
+				},
+				{
+					"title":"technical service engineer",
+					"industries":null
+				},
+				{
+					"title":"technical sales engineer",
+					"industries":null
+				},
+				{
+					"title":"senior solution specialist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Sales Engineer",
+		"description":"",
+		"level":3,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"senior sales engineer",
+					"industries":null
+				},
+				{
+					"title":"senior sales service engineer",
+					"industries":null
+				},
+				{
+					"title":"senior technical service engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Enterprise Sales",
+		"description":"",
+		"level":2,
+		"careers":[7,282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"enterprise sales",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Software Engineer Intern",
+		"description":"",
+		"level":0,
+		"careers":[64,65,66],
+		"matches":
+			[
+				{
+					"title":"software engineer intern",
+					"industries":null
+				},
+				{
+					"title":"software engineering intern",
+					"industries":null
+				},
+				{
+					"title":"intern",
+					"industries":["Computer Software","Internet"]
+				},
+				{
+					"title":"SDE",
+					"industries":["Computer Software","Internet"]
+				}
+			]	
+	},
+	{
+		"title":"Software Engineer",
+		"description":"",
+		"level":2,
+		"careers":[64,65,66],
+		"matches":
+			[
+				{
+					"title":"software engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Automation Engineer",
+		"description":"",
+		"level":2,
+		"careers":[593],
+		"matches":
+			[
+				{
+					"title":"automation engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"BP&A Analyst",
+		"description":"",
+		"level":2,
+		"careers":[49,567],
+		"matches":
+			[
+				{
+					"title":"bp&a",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Business Manager",
+		"description":"",
+		"level":3,
+		"careers":[550,567],
+		"matches":
+			[
+				{
+					"title":"business manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Coordinator (finance)",
+		"description":"",
+		"level":3,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"coordinator",
+					"industries":["Financial Services","Venture Capital","Banking","Investment Management"]
+				}
+			]	
+	},
+	{
+		"title":"Assistant Director of Finance",
+		"description":"",
+		"level":3,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"assistant director of finance",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Head of Worldwide Call Center Operations",
+		"description":"",
+		"level":3,
+		"careers":[299,560],
+		"matches":
+			[
+				{
+					"title":"head of worldwide call center operations",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Call Center Director",
+		"description":"",
+		"level":3,
+		"careers":[299,560],
+		"matches":
+			[
+				{
+					"title":"call center director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"National Sales Manager",
+		"description":"",
+		"level":3,
+		"careers":[282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"national sales manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Sales Manager",
+		"description":"",
+		"level":3,
+		"careers":[282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"sales manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Head of Mid-Market Sales",
+		"description":"",
+		"level":3,
+		"careers":[282,279,566,275,276],
+		"matches":
+			[
+				{
+					"title":"head of midmarket sales",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Program Assistant",
+		"description":"",
+		"level":1,
+		"careers":[564],
+		"matches":
+			[
+				{
+					"title":"program assistant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Program Coordinator",
+		"description":"",
+		"level":2,
+		"careers":[564],
+		"matches":
+			[
+				{
+					"title":"program coordinator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Program Director",
+		"description":"",
+		"level":3,
+		"careers":[564],
+		"matches":
+			[
+				{
+					"title":"program director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Post Doc",
+		"description":"",
+		"careers":[],
+		"level":1,
+		"matches":
+			[
+				{
+					"title":"post doc",
+					"industries":null
+				},
+				{
+					"title":"post doctoral",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Research Fellow",
+		"description":"",
+		"level":1,
+		"careers":[119],
+		"matches":
+			[
+				{
+					"title":"graduate research fellow",
+					"industries":null
+				},
+				{
+					"title":"research fellow",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Process Engineering Intern",
+		"description":"",
+		"level":0,
+		"careers":[82,116],
+		"matches":
+			[
+				{
+					"title":"process engineering intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Process Engineer",
+		"description":"",
+		"level":2,
+		"careers":[82,116],
+		"matches":
+			[
+				{
+					"title":"process engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Regulatory Compliance Intern",
+		"description":"",
+		"level":0,
+		"careers":[38,577],
+		"matches":
+			[
+				{
+					"title":"process engineering intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"News Intern",
+		"description":"",
+		"level":0,
+		"careers":[38,577],
+		"matches":
+			[
+				{
+					"title":"news intern",
+					"industries":null
+				},
+				{
+					"title":"metro intern",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Business News Intern",
+		"description":"",
+		"level":0,
+		"careers":[38,577],
+		"matches":
+			[
+				{
+					"title":"business news intern",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Head of Financial Reporting",
+		"description":"",
+		"level":3,
+		"careers":[38,577],
+		"matches":
+			[
+				{
+					"title":"head of financial reporting",
+					"industries":null
+				},
+				{
+					"title":"head of uk financial reporting",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Student, Primary or Secondary School",
+		"description":"",
+		"level":0,
+		"careers":[594],
+		"matches":
+			[
+				{
+					"title":"high school student",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Student, College or beyond",
+		"description":"",
+		"level":1,
+		"careers":[595],
+		"matches":	
+			[
+				{
+					"title":"student",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"PhD Student",
+		"description":"",
+		"level":2,
+		"careers":[595],
+		"matches":	
+			[
+				{
+					"title":"phd student",
+					"industries":null
+				},
+				{
+					"title":"doctoral candidate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"MBA student",
+		"description":"",
+		"level":2,
+		"careers":[595],
+		"matches":	
+			[
+				{
+					"title":"mba student",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Student Teacher",
+		"description":"",
+		"level":0,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"student teacher",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Assistant Teacher",
+		"description":"",
+		"level":1,
+		"careers":[134,578],
+		"matches":
+			[
+				{
+					"title":"assistant teacher",
+					"industries":["Higher Education"]
+				}
+			]	
+	},
+	{
+		"title":"Acting Teacher",
+		"description":"",
+		"level":1,
+		"careers":[134,578],
+		"matches":
+			[
+				{
+					"title":"acting teacher",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate Teacher",
+		"description":"",
+		"level":1,
+		"careers":[135,138,139,136,137],
+		"matches":
+			[
+				{
+					"title":"associate teacher",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Educational Leader",
+		"description":"",
+		"level":1,
+		"careers":[134],
+		"matches":
+			[
+				{
+					"title":"educational leader",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Teacher",
+		"description":"",
+		"level":2,
+		"careers":[134,578],
+		"matches":
+			[
+				{
+					"title":"teacher",
+					"industries":["Higher Education"]
+				}
+			]	
+	},
+	{
+		"title":"Visiting Professor",
+		"description":"",
+		"level":2,
+		"careers":[134,578],
+		"matches":
+			[
+				{
+					"title":"visiting assistant professor",
+					"industries":null
+				},
+				{
+					"title":"visiting professor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Adjunct Professor",
+		"description":"",
+		"level":2,
+		"careers":[134,578],
+		"matches":
+			[
+				{
+					"title":"adjunct professor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Adjunct Instructor",
+		"description":"",
+		"level":2,
+		"careers":[134,578],
+		"matches":
+			[
+				{
+					"title":"adjunct instructor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Visiting Research Professor",
+		"description":"",
+		"level":2,
+		"careers":[134,578],
+		"matches":
+			[
+				{
+					"title":"visiting research professor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Consulting Assistant Professor",
+		"description":"",
+		"level":2,
+		"careers":[134,578],
+		"matches":
+			[
+				{
+					"title":"consulting assistant professor",
+					"industries":null
+				},
+				{
+					"title":"consulting asst professor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Assistant Professor",
+		"description":"",
+		"level":2,
+		"careers":[134,578],
+		"matches":
+			[
+				{
+					"title":"assistant professor",
+					"industries":null
+				},
+				{
+					"title":"asst professor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate Professor",
+		"description":"",
+		"level":3,
+		"careers":[134,578],
+		"matches":
+			[
+				{
+					"title":"assistant professor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Professor",
+		"description":"",
+		"level":3,
+		"careers":[134,578],
+		"matches":
+			[
+				{
+					"title":"professor",
+					"industries":null
+				},
+				{
+					"title":"distinguished professor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Clinical Faculty",
+		"description":"",
+		"level":3,
+		"careers":[134,578],
+		"matches":
+			[
+				{
+					"title":"clinical faculty",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Lecturer",
+		"description":"",
+		"level":2,
+		"careers":[134],
+		"matches":
+			[
+				{
+					"title":"lecturer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Lecturer",
+		"description":"",
+		"level":3,
+		"careers":[134],
+		"matches":
+			[
+				{
+					"title":"senior lecturer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Intern (health)",
+		"description":"",
+		"level":0,
+		"careers":[26,558,559],
+		"matches":
+			[
+				{
+					"title":"intern",
+					"industries":["Health, Wellness & Fitness","Hospital & Health Care"]
+				}
+			]	
+	},
+	{
+		"title":"Global Health Consultant",
+		"description":"",
+		"level":2,
+		"careers":[26,558,559],
+		"matches":
+			[
+				{
+					"title":"global health consultant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Teaching Assistant",
+		"description":"",
+		"level":0,
+		"careers":[143],
+		"matches":
+			[
+				{
+					"title":"teaching assistant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Sign Language Teaching Assistant",
+		"description":"",
+		"level":0,
+		"careers":[143,596],
+		"matches":
+			[
+				{
+					"title":"sign language teaching assistant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Admissions Counselor",
+		"description":"",
+		"level":3,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"admissions counselor",
+					"industries":null
+				},
+				{
+					"title":"admission counselor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Registrar Assistant",
+		"description":"",
+		"level":1,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"registrar assistant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Financial Aid Counselor",
+		"description":"",
+		"level":2,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"financial aid counselor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Orientation Coordinator",
+		"description":"",
+		"level":2,
+		"careers":[20,121],
+		"matches":
+			[
+				{
+					"title":"orientation coordinator",
+					"industries":["Higher Education"]
+				}
+
+			]	
+	},
+	{
+		"title":"Associate Director of College Counseling",
+		"description":"",
+		"level":2,
+		"careers":[20,121],
+		"matches":
+			[
+				{
+					"title":"associate director of college counseling",
+					"industries":null
+				}
+
+			]	
+	},
+	{
+		"title":"College Guidance Counselor",
+		"description":"",
+		"level":1,
+		"careers":[121],
+		"matches":
+			[
+				{
+					"title":"guidance counselor",
+					"industries":null
+				},
+				{
+					"title":"college counselor",
+					"industries":null
+				},
+				{
+					"title":"college guidance counselor",
+					"industries":null
+				}
+
+			]	
+	},
+	{
+		"title":"Resident Assistant",
+		"description":"",
+		"level":1,
+		"careers":[591],
+		"matches":
+			[
+				{
+					"title":"resident assistant",
+					"industries":null
+				}
+
+			]	
+	},
+	{
+		"title":"Academic Advisor",
+		"description":"",
+		"level":2,
+		"careers":[591],
+		"matches":
+			[
+				{
+					"title":"academic advisor",
+					"industries":null
+				}
+
+			]	
+	},
+	{
+		"title":"Junior Career Counselor",
+		"description":"",
+		"level":1,
+		"careers":[121,591],
+		"matches":
+			[
+				{
+					"title":"junior career counselor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Career Counselor",
+		"description":"",
+		"level":3,
+		"careers":[121,591],
+		"matches":
+			[
+				{
+					"title":"career counselor",
+					"industries":null
+				},
+				{
+					"title":"career advisor",
+					"industries":null
+				},
+				{
+					"title":"career coach",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"High School Teacher",
+		"description":"",
+		"level":2,
+		"careers":[137],
+		"matches":
+			[
+				{
+					"title":"high school teacher",
+					"industries":null
+				},
+				{
+					"title":"teacher, high school",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Intern (teaching)",
+		"description":"",
+		"level":0,
+		"careers":[139],
+		"matches":
+			[
+				{
+					"title":"intern",
+					"industries":["Higher Education","Primary & Secondary Education"]
+				}
+			]	
+	},
+	{
+		"title":"Teacher / Instructor",
+		"description":"",
+		"level":2,
+		"careers":[139],
+		"matches":
+			[
+				{
+					"title":"insructor",
+					"industries":null
+				}
+			]	
+	},
+
+	{
+		"title":"Test Prep Instructor / Teacher",
+		"description":"",
+		"level":1,
+		"careers":[139],
+		"matches":
+			[
+				{
+					"title":"lsat course instructor",
+					"industries":null
+				},
+				{
+					"title":"academic coach",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Writing Coach",
+		"description":"",
+		"level":1,
+		"careers":[139],
+		"matches":
+			[
+				{
+					"title":"writing coach",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Tutor",
+		"description":"",
+		"level":1,
+		"careers":[139],
+		"matches":
+			[
+				{
+					"title":"tutor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"French Tutor",
+		"description":"",
+		"level":1,
+		"careers":[139,596],
+		"matches":
+			[
+				{
+					"title":"french tutor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Math Tutor",
+		"description":"",
+		"level":1,
+		"careers":[139],
+		"matches":
+			[
+				{
+					"title":"math tutor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Oral Communication Tutor",
+		"description":"",
+		"level":1,
+		"careers":[139],
+		"matches":
+			[
+				{
+					"title":"oral communication tutor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Speech and Voice Coach",
+		"description":"",
+		"level":1,
+		"careers":[139],
+		"matches":
+			[
+				{
+					"title":"speech and voice coach",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Summer Associate (health)",
+		"description":"",
+		"level":0,
+		"careers":[26],
+		"matches":
+			[
+				{
+					"title":"summer associate",
+					"industries":["Hospital & Health Care"]
+				}
+			]	
+	},
+	{
+		"title":"Clinical Professor",
+		"description":"",
+		"level":3,
+		"careers":[101,169,578],
+		"matches":
+			[
+				{
+					"title":"clinical professor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Clinical Assistant Professor",
+		"description":"",
+		"level":2,
+		"careers":[101,169,578],
+		"matches":
+			[
+				{
+					"title":"clinical assistant professor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Manager (accounting)",
+		"description":"",
+		"level":3,
+		"careers":[49],
+		"matches":
+			[
+				{
+					"title":"manager",
+					"industries":["Accounting"]
+				}
+			]	
+	},
+	{
+		"title":"Product Development Manager",
+		"description":"",
+		"level":3,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"product development manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director, Product Management",
+		"description":"",
+		"level":3,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"director product management",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate Director, Product Management",
+		"description":"",
+		"level":3,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"associate director product management",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director, Product Development",
+		"description":"",
+		"level":3,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"director product development",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate Director, Product Development",
+		"description":"",
+		"level":3,
+		"careers":[545,546],
+		"matches":
+			[
+				{
+					"title":"associate director product development",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Community Engagement Manager",
+		"description":"",
+		"level":3,
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"engagement manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Engagement Manager",
+		"description":"",
+		"level":3,
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"engagement manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Channel Account Manager",
+		"description":"",
+		"level":3,
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"channel account manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Customer Account Manager",
+		"level":2,
+		"description":"",
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"customer account manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"New Business Representative",
+		"level":2,
+		"description":"",
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"new business representative",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Donor Relations Intern",
+		"level":0,
+		"description":"",
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"donor relations intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Donor Relations Manager",
+		"level":3,
+		"description":"",
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"donor relations manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director of Business, Corporate and Donor Relations",
+		"level":3,
+		"description":"",
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"director of business corporate and donor relations",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Sales Manager",
+		"level":3,
+		"description":"",
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"application sales manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Business Planning Associate",
+		"level":1,
+		"description":"",
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"business planning associate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Business Management Associate",
+		"level":1,
+		"description":"",
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"business management associate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Sales Account Coordinator",
+		"description":"",
+		"level":2,
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"sales account executive",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Sales Account Executive",
+		"description":"",
+		"level":3,
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"sales account executive",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Account Executive / Manager",
+		"description":"",
+		"level":2,
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"account executive",
+					"industries":null
+				},
+				{
+					"title":"account manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Account Executive",
+		"description":"",
+		"level":3,
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"senior account executive",
+					"industries":null
+				},
+				{
+					"title":"senior account manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Sales Development Team Lead",
+		"description":"",
+		"level":2,
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"sales development team lead",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Enterprise Sales Development Specialist",
+		"description":"",
+		"level":2,
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"enterprise sales development specialist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"System Design & Integration Engineer",
+		"description":"",
+		"level":2,
+		"careers":[10,65],
+		"matches":
+			[
+				{
+					"title":"system design integration engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"System Engineer Intern",
+		"description":"",
+		"level":0,
+		"careers":[10,62,65],
+		"matches":
+			[
+				{
+					"title":"system engineer intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"System Engineer Intern",
+		"description":"",
+		"level":2,
+		"careers":[10,62,65],
+		"matches":
+			[
+				{
+					"title":"system engineer intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Applications Designer",
+		"description":"",
+		"level":2,
+		"careers":[79,90],
+		"matches":
+			[
+				{
+					"title":"applications designer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Product Design Engineer (turbines)",
+		"description":"",
+		"level":3,
+		"careers":[79,90],
+		"matches":
+			[
+				{
+					"title":"product design engineer fans and compressors",
+					"industries":null
+				},
+				{
+					"title":"product design engineer turbines",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Propulsion Engineer",
+		"description":"",
+		"level":2,
+		"careers":[79,90],
+		"matches":
+			[
+				{
+					"title":"propulsion engineer",
+					"industries":null
+				},
+				{
+					"title":"propulsion lead analyst",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Business Development Intern",
+		"description":"",
+		"level":0,
+		"careers":[547],
+		"matches":
+			[
+				{
+					"title":"intern business development",
+					"industries":null
+				},
+				{
+					"title":"business development intern",
+					"industries":null
+				},
+				{
+					"title":"biz dev intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Enterprise Business Development Intern",
+		"description":"",
+		"level":0,
+		"careers":[547],
+		"matches":
+			[
+				{
+					"title":"enterprise business development intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Strategy & Business Development",
+		"description":"",
+		"level":3,
+		"careers":[4,48,547],
+		"matches":
+			[
+				{
+					"title":"strategy business development",
+					"industries":null
+				},
+				{
+					"title":"strategy and business development",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Head of Strategy & Planning",
+		"description":"",
+		"level":3,
+		"careers":[4,48,547],
+		"matches":
+			[
+				{
+					"title":"strategy business development",
+					"industries":null
+				},
+				{
+					"title":"strategy and business development",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Business Development Lead",
+		"description":"",
+		"level":3,
+		"careers":[547],
+		"matches":
+			[
+				{
+					"title":"business development lead",
+					"industries":null
+				},
+				{
+					"title":"lead business development",
+					"industries":null
+				}
+			]	
+	},
+
+	{
+		"title":"Director, Strategic Partners",
+		"description":"",
+		"level":3,
+		"careers":[547],
+		"matches":
+			[
+				{
+					"title":"director strategic partners",
+					"industries":null
+				},
+				{
+					"title":"director strategic partner operations",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Partner Manager",
+		"description":"",
+		"level":3,
+		"careers":[547],
+		"matches":
+			[
+				{
+					"title":"partner manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director, Strategic Initiatives",
+		"description":"",
+		"level":3,
+		"careers":[547],
+		"matches":
+			[
+				{
+					"title":"director strategic business initiatives",
+					"industries":null
+				},
+				{
+					"title":"manager strategic initiatives",
+					"industries":null
+				},
+				{
+					"title":"director strategic alliances",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Business Development",
+		"description":"",
+		"level":2,
+		"careers":[547],
+		"matches":
+			[
+				{
+					"title":"business development",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director, Business Development",
+		"description":"",
+		"level":3,
+		"careers":[547],
+		"matches":
+			[
+				{
+					"title":"director business development",
+					"industries":null
+				},
+				{
+					"title":"director of business development",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director, Corporate Development",
+		"description":"",
+		"level":3,
+		"careers":[547],
+		"matches":
+			[
+				{
+					"title":"director corporate development",
+					"industries":null
+				},
+				{
+					"title":"head of corporate development",
+					"industries":null
+				},
+				{
+					"title":"head corporate development",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director, Strategic Business Development",
+		"description":"",
+		"level":3,
+		"careers":[547],
+		"matches":
+			[
+				{
+					"title":"director strategic business development",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Regional Business Development Manager",
+		"description":"",
+		"level":3,
+		"careers":[547,548],
+		"matches":
+			[
+				{
+					"title":"regional business development manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director, Merchant Development",
+		"description":"",
+		"level":3,
+		"careers":[547,548],
+		"matches":
+			[
+				{
+					"title":"director, merchant development",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Business Development Manager",
+		"description":"",
+		"level":3,
+		"careers":[547,548],
+		"matches":
+			[
+				{
+					"title":"business development manager",
+					"industries":null
+				},
+				{
+					"title":"business development program manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Business Development Manager",
+		"description":"",
+		"level":3,
+		"careers":[547,548],
+		"matches":
+			[
+				{
+					"title":"senior business development manager",
+					"industries":null
+				},
+				{
+					"title":"senior business development program manager",
+					"industries":null
+				},
+				{
+					"title":"senior manager corporate business development",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Business Development Manager",
+		"description":"",
+		"level":3,
+		"careers":[547,548],
+		"matches":
+			[
+				{
+					"title":"senior business development manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Media Partnerships",
+		"description":"",
+		"level":2,
+		"careers":[7,8,47,155,547,548],
+		"matches":
+			[
+				{
+					"title":"media partnerships",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Director, Acquisitions and Development",
+		"description":"",
+		"level":3,
+		"careers":[547,548],
+		"matches":
+			[
+				{
+					"title":"senior director acquisitions and development",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Vice President, Business Development and Sales",
+		"description":"",
+		"level":4,
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"senior vice president business development and sales",
+					"industries":null
+				},
+				{
+					"title":"svp business development and sales",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Vice President, External Relations",
+		"description":"",
+		"level":4,
+		"careers":[547,548],
+		"matches":
+			[
+				{
+					"title":"vice president external relations",
+					"industries":null
+				},
+				{
+					"title":"vp external relations",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Vice President, Business Development",
+		"description":"",
+		"level":4,
+		"careers":[547,548],
+		"matches":
+			[
+				{
+					"title":"vice president business development",
+					"industries":null
+				},
+				{
+					"title":"vice president, head of bd and strategic partnerships",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Vice President, Strategic Accounts",
+		"description":"",
+		"level":4,
+		"careers":[547,548,566,279],
+		"matches":
+			[
+				{
+					"title":"vice president strategic accounts",
+					"industries":null
+				},
+				{
+					"title":"vp strategic accounts",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Benefits Consultant",
+		"description":"",
+		"level":2,
+		"careers":[13,40,308],
+		"matches":
+			[
+				{
+					"title":"benefits consultant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Intern (government)",
+		"description":"",
+		"level":0,
+		"careers":[579],
+		"matches":
+			[
+				{
+					"title":"intern",
+					"industries":["Government Administration"]
+				}
+			]	
+	},
+	{
+		"title":"Public Policy Intern",
+		"description":"",
+		"level":0,
+		"careers":[579],
+		"matches":
+			[
+				{
+					"title":"intern domestic policy council",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Policy Analyst",
+		"description":"",
+		"level":2,
+		"careers":[579],
+		"matches":
+			[
+				{
+					"title":"policy analyst",
+					"industries":null
+				},
+				{
+					"title":"research and policy analyst",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Mobile Developer",
+		"description":"",
+		"level":2,
+		"careers":[64,65,66,565],
+		"matches":
+			[
+				{
+					"title":"mobile developer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Localization Engineer",
+		"description":"",
+		"level":2,
+		"careers":[64,65,66,565],
+		"matches":
+			[
+				{
+					"title":"localization engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Web Development Intern",
+		"description":"",
+		"level":0,
+		"careers":[66,572],
+		"matches":
+			[
+				{
+					"title":"web developer intern",
+					"industries":null
+				},
+				{
+					"title":"web development intern",
+					"industries":null
+				}
+				
+			]	
+	},
+	{
+		"title":"Software Development Intern",
+		"description":"",
+		"level":0,
+		"careers":[65],
+		"matches":
+			[
+				{
+					"title":"software development intern",
+					"industries":null
+				},
+				{
+					"title":"summer intern",
+					"industries":["Internet","Computer Software"]
+				}
+				
+			]	
+	},
+	{
+		"title":"Software Developer",
+		"description":"",
+		"level":2,
+		"careers":[65],
+		"matches":
+			[
+				{
+					"title":"software developer",
+					"industries":null
+				},
+				{
+					"title":"developer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Web Developer",
+		"description":"",
+		"level":1,
+		"careers":[66,572],
+		"matches":
+			[
+				{
+					"title":"web developer",
+					"industries":null
+				},
+				{
+					"title":"web engineer",
+					"industries":null
+				},
+				{
+					"title":"internet applications consultant",
+					"industries":null
+				},
+				{
+					"title":"web dev ux",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Web Developer",
+		"description":"",
+		"level":2,
+		"careers":[66,572],
+		"matches":
+			[
+				{
+					"title":"senior web developer",
+					"industries":null
+				},
+				{
+					"title":"senior web engineer",
+					"industries":null
+				},
+				{
+					"title":"senior internet applications consultant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Web Developer Manager",
+		"description":"",
+		"level":3,
+		"careers":[66,572],
+		"matches":
+			[
+				{
+					"title":"web developer manager",
+					"industries":null
+				},
+				{
+					"title":"web developer management",
+					"industries":null
+				},
+				{
+					"title":"web development managemer",
+					"industries":null
+				},
+				{
+					"title":"development managemer",
+					"industries":["Computer Software","Internet"]
+				}
+			]	
+	},
+	{
+		"title":"Web Services Developer",
+		"description":"",
+		"level":2,
+		"careers":[66,572],
+		"matches":
+			[
+				{
+					"title":"web services developer",
+					"industries":null
+				},
+				{
+					"title":"web services systems engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Web Developer",
+		"description":"",
+		"level":3,
+		"careers":[66,572],
+		"matches":
+			[
+				{
+					"title":"senior web developer",
+					"industries":null
+				},
+				{
+					"title":"senior web engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Developer",
+		"description":"",
+		"level":2,
+		"careers":[66,572],
+		"matches":
+			[
+				{
+					"title":"web developer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"IT Consultant",
+		"description":"",
+		"level":2,
+		"careers":[65],
+		"matches":
+			[
+				{
+					"title":"it consultant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Front End Web Developer",
+		"description":"",
+		"level":2,
+		"careers":[66,572],
+		"matches":
+			[
+				{
+					"title":"front end web developer",
+					"industries":null
+				},
+				{
+					"title":"front end web engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior UI Engineer",
+		"description":"",
+		"level":3,
+		"careers":[66,572],
+		"matches":
+			[
+				{
+					"title":"senior ui developer",
+					"industries":null
+				},
+				{
+					"title":"senior ui engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Web Developer Intern",
+		"description":"",
+		"level":0,
+		"careers":[66,572],
+		"matches":
+			[
+				{
+					"title":"web developer intern",
+					"industries":null
+				},
+				{
+					"title":"web development intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Webmaster",
+		"description":"",
+		"level":0,
+		"careers":[66,572],
+		"matches":
+			[
+				{
+					"title":"webmaster",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Chief Architect -- Software",
+		"description":"",
+		"level":3,
+		"careers":[64],
+		"matches":
+			[
+				{
+					"title":"chief architect",
+					"industries":["Computer Software"]
+				}
+			]	
+	},
+	{
+		"title":"Architect -- Software",
+		"description":"",
+		"level":3,
+		"careers":[64],
+		"matches":
+			[
+				{
+					"title":"architect",
+					"industries":["Computer Software"]
+				}
+			]	
+	},
+	{
+		"title":"Technical Lead (software)",
+		"description":"",
+		"level":3,
+		"careers":[64],
+		"matches":
+			[
+				{
+					"title":"technical lead",
+					"industries":["Computer Software"]
+				}
+			]	
+	},
+	{
+		"title":"Analyst (software)",
+		"description":"",
+		"level":2,
+		"careers":[64],
+		"matches":
+			[
+				{
+					"title":"analyst",
+					"industries":["Computer Software"]
+				}
+			]	
+	},
+	{
+		"title":"Programmer",
+		"description":"",
+		"level":2,
+		"careers":[64],
+		"matches":
+			[
+				{
+					"title":"programmer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Software Evaluator / Trainer",
+		"description":"",
+		"level":1,
+		"careers":[580],
+		"matches":
+			[
+				{
+					"title":"software trainer",
+					"industries":null
+				},
+				{
+					"title":"software evaluator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Usability Test Engineer",
+		"description":"",
+		"level":1,
+		"careers":[580],
+		"matches":
+			[
+				{
+					"title":"usability test engineer",
+					"industries":null
+				},
+				{
+					"title":"usability testing",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Technical Support Engineer",
+		"description":"",
+		"level":1,
+		"careers":[580],
+		"matches":
+			[
+				{
+					"title":"usability test engineer",
+					"industries":null
+				},
+				{
+					"title":"usability testing",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Test Engineer",
+		"description":"",
+		"level":2,
+		"careers":[580],
+		"matches":
+			[
+				{
+					"title":"test engineer",
+					"industries":null
+				},
+				{
+					"title":"qa engineer",
+					"industries":null
+				},
+				{
+					"title":"quality assurance engineer",
+					"industries":null
+				},
+				{
+					"title":"test developer",
+					"industries":null
+				},
+				{
+					"title":"qa developer",
+					"industries":null
+				},
+				{
+					"title":"developmental engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Lead Test Engineer",
+		"description":"",
+		"level":2,
+		"careers":[580],
+		"matches":
+			[
+				{
+					"title":"lead test engineer",
+					"industries":null
+				},
+				{
+					"title":"lead qa engineer",
+					"industries":null
+				},
+				{
+					"title":"lead test developer",
+					"industries":null
+				},
+				{
+					"title":"lead qa developer",
+					"industries":null
+				},
+				{
+					"title":"lead developmental engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director QA",
+		"description":"",
+		"level":3,
+		"careers":[580],
+		"matches":
+			[
+				{
+					"title":"director qa",
+					"industries":null
+				},
+				{
+					"title":"director quality assurance",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Software QA Tester",
+		"description":"",
+		"level":2,
+		"careers":[580],
+		"matches":
+			[
+				{
+					"title":"software qa tester",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Hardware Intern",
+		"description":"",
+		"level":0,
+		"careers":[84],
+		"matches":
+			[
+				{
+					"title":"hardware intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Intern (education)",
+		"description":"",
+		"level":0,
+		"careers":[20],
+		"matches":
+			[
+				{
+					"title":"education intern",
+					"industries":null
+				},
+				{
+					"title":"intern",
+					"industries":["Education Management"]
+				}
+			]	
+	},
+	{
+		"title":"Director (education)",
+		"description":"",
+		"level":3,
+		"careers":[20],
+		"matches":
+			[
+				{
+					"title":"associate director",
+					"industries":["Education Management"]
+				}
+			]	
+	},
+	{
+		"title":"Associate Director of Undergraduate Academic Affairs",
+		"description":"",
+		"level":3,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"senior associate dean",
+					"industries":null
+				},
+				{
+					"title":"associate dean",
+					"industries":null
+				},
+				{
+					"title":"assistant dean",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate Dean",
+		"description":"",
+		"level":3,
+		"careers":[20],
+		"matches":
+			[
+				{
+					"title":"senior associate dean",
+					"industries":null
+				},
+				{
+					"title":"associate dean",
+					"industries":null
+				},
+				{
+					"title":"assistant dean",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director of Alumni Relations",
+		"description":"",
+		"level":3,
+		"careers":[8,20,46],
+		"matches":
+			[
+				{
+					"title":"director of alumni relations",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Assistant Director of Alumni Relations",
+		"description":"",
+		"level":2,
+		"careers":[8,20,46],
+		"matches":
+			[
+				{
+					"title":"assistant director of alumni relations",
+					"industries":null
+				},
+				{
+					"title":"assistant director institutional advancement alumni relations",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director of Leadership Gifts",
+		"description":"",
+		"level":3,
+		"careers":[8,20,46],
+		"matches":
+			[
+				{
+					"title":"director of leadership gifts",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director, Graduate School Fund",
+		"description":"",
+		"level":3,
+		"careers":[8,20,46],
+		"matches":
+			[
+				{
+					"title":"director graduate school fund",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Assistant Director of Academic and Development Coordination",
+		"description":"",
+		"level":3,
+		"careers":[8,20,46],
+		"matches":
+			[
+				{
+					"title":"assistant director of academic and development coordination",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Admission Seasonal Reader",
+		"description":"",
+		"level":0,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"admission seasonal reader",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Undergraduate Admissions Reader",
+		"description":"",
+		"level":1,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"undergraduate admissions reader",
+					"industries":null
+				},
+				{
+					"title":"external reader",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Admissions Officer",
+		"description":"",
+		"level":2,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"admissions officer",
+					"industries":null
+				},
+				{
+					"title":"admissions officer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Graduate Assistant, Student Affairs",
+		"description":"",
+		"level":0,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"graduate assistant student affairs",
+					"industries":null
+				}
+		
+			]	
+	},
+	{
+		"title":"Graduate Assistant, Office of Student Life",
+		"description":"",
+		"level":0,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"graduate assistant office of student life",
+					"industries":null
+				}
+		
+			]	
+	},
+	{
+		"title":"Residence Area Coordinator",
+		"description":"",
+		"level":1,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"residence area coordinator",
+					"industries":null
+				}
+		
+			]	
+	},
+	{
+		"title":"Senior Assistant Director of Undergraduate Admissions",
+		"description":"",
+		"level":2,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"senior assistant director of undergraduate admissions",
+					"industries":null
+				}
+		
+			]	
+	},
+	{
+		"title":"Assistant Director Graduate Admissions",
+		"description":"",
+		"level":2,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"assistant director of graduate admissions",
+					"industries":null
+				},
+				{
+					"title":"assistant director graduate admissions",
+					"industries":null
+				}
+		
+			]	
+	},
+	{
+		"title":"Associate Director Graduate Admissions",
+		"description":"",
+		"level":2,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"associate director of graduate admissions",
+					"industries":null
+				},
+				{
+					"title":"associate director graduate admissions",
+					"industries":null
+				}
+		
+			]	
+	},
+	{
+		"title":"Associate Director of Admissions",
+		"description":"",
+		"level":2,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"associate director of admissions",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Assistant Director of Admissions",
+		"description":"",
+		"level":2,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"assistant director of admissions",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director of Undergraduate Admissions",
+		"description":"",
+		"level":3,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"director of undergraduate admissions",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director of Graduate Admissions",
+		"description":"",
+		"level":3,
+		"careers":[20,591],
+		"matches":
+			[
+				{
+					"title":"director of graduate admissions",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Faculty Director",
+		"description":"",
+		"level":3,
+		"careers":[20],
+		"matches":
+			[
+				{
+					"title":"faculty director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director, Management Communication Program",
+		"description":"",
+		"level":3,
+		"careers":[20],
+		"matches":
+			[
+				{
+					"title":"director management communication program",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Higher Education Intern",
+		"description":"",
+		"level":0,
+		"careers":[20],
+		"matches":
+			[
+				{
+					"title":"intern of higher education",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Fulfillment Specialist",
+		"description":"Especially prevalent in large e-commerce providers such as Amazon.com, fulfillment specialists are part of the team that packages and ships orders to customers.",
+		"level":1,
+		"careers":[320],
+		"matches":
+			[
+				{
+					"title":"fulfillment team",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Staff Packaging",
+		"description":"",
+		"level":2,
+		"careers":[320],
+		"matches":
+			[
+				{
+					"title":"senior staff packaging",
+					"industries":null
+				},
+				{
+					"title":"sr staff packaging",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Procurement Intern",
+		"description":"",
+		"level":0,
+		"careers":[292,320],
+		"matches":
+			[
+				{
+					"title":"procurement intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Overnight Receiving Associate",
+		"description":"",
+		"level":1,
+		"careers":[320],
+		"matches":
+			[
+				{
+					"title":"overnight receiving associate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Business Associate Intern",
+		"description":"",
+		"level":0,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"business associate intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Operations Research Intern",
+		"description":"",
+		"level":0,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"operations research intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Operations Coordinator",
+		"description":"",
+		"level":3,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"operations coordinator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Strategic Advisor",
+		"description":"",
+		"level":3,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"strategic advisor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Manager Strategy & Operations",
+		"description":"",
+		"level":3,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"manager strategy operations",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Manager Strategy & Operations",
+		"description":"",
+		"level":3,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"senior manager strategy operations",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior, Corporate Strategy",
+		"description":"",
+		"level":3,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"director corporate strategy",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Manager, Global Business Analytics",
+		"description":"",
+		"level":3,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"senior manager global business analytics",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director, Corporate Strategy",
+		"description":"",
+		"level":3,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"director corporate strategy",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director of Operations",
+		"description":"",
+		"level":4,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"director of operations",
+					"industries":null
+				},
+				{
+					"title":"operations director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Manager Financial Planning and Analysis",
+		"description":"",
+		"level":3,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"manager fpa",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Strategist",
+		"description":"",
+		"level":2,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"strategist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Finance & Strategy Analyst",
+		"description":"",
+		"level":2,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"finance strategy analyst",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director of Global Customer Operations",
+		"description":"",
+		"level":4,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"director of global customer operations",
+					"industries":null
+				},
+				{
+					"title":"director global customer operations",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director of International Operations",
+		"description":"",
+		"level":3,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"director of international operations",
+					"industries":null
+				},
+				{
+					"title":"international operations director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"VP International Operations",
+		"description":"",
+		"level":4,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"vp international operations",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"VP of Global Operations",
+		"description":"",
+		"level":4,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"vp of global operations",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"VP of Operations",
+		"description":"",
+		"level":4,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"vp of operations",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Vice President of Business Operations",
+		"description":"",
+		"level":4,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"vp of operations",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Chief Operating Officer",
+		"description":"",
+		"level":5,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"chief operating officer",
+					"industries":null
+				},
+				{
+					"title":"coo",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Business Operations Analyst",
+		"description":"",
+		"level":2,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"business operations analyst",
+					"industries":null
+				},
+				{
+					"title":"business analyst",
+					"industries":null
+				},
+				{
+					"title":"business operations and strategy analyst",
+					"industries":null
+				},
+				{
+					"title":"strategy analyst",
+					"industries":null
+				},
+				{
+					"title":"business systems analyst",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Business Operations Analyst Intern",
+		"description":"",
+		"level":0,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"business operations analyst intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Business Intern",
+		"description":"",
+		"level":0,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"business intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Operations Analyst",
+		"description":"",
+		"level":2,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"operations analyst",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Operations Process Improvement",
+		"description":"",
+		"level":2,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"operations process improvement",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Records Processing Manager",
+		"description":"",
+		"level":3,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"records processing manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Records Processing Team Lead",
+		"description":"",
+		"level":2,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"Records Processing Team Lead",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Vice President Employee Engagement & Change Management",
+		"description":"",
+		"level":4,
+		"careers":[4,13],
+		"matches":
+			[
+				{
+					"title":"senior vice president employee engagement change management",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Board Member",
+		"description":"",
+		"level":4,
+		"careers":[561],
+		"matches":
+			[
+				{
+					"title":"board member",
+					"industries":null
+				},
+				{
+					"title":"board of directors",
+					"industries":null
+				}
+
+			]	
+	},
+	{
+		"title":"President, Board of Directors",
+		"description":"",
+		"level":5,
+		"careers":[561],
+		"matches":
+			[
+				{
+					"title":"president board of directors",
+					"industries":null
+				},
+				{
+					"title":"board president",
+					"industries":null
+				}
+				
+			]	
+	},
+	{
+		"title":"Chairman, Board of Directors",
+		"description":"",
+		"level":5,
+		"careers":[561],
+		"matches":
+			[
+				{
+					"title":"chairman board of directors",
+					"industries":null
+				},
+				{
+					"title":"board chairman",
+					"industries":null
+				}
+				
+			]	
+	},
+	{
+		"title":"Vice-Chairman, Board of Directors",
+		"description":"",
+		"level":4,
+		"careers":[561],
+		"matches":
+			[
+				{
+					"title":"vice-chairman board of directors",
+					"industries":null
+				},
+				{
+					"title":"board vice-chairman",
+					"industries":null
+				},
+				{
+					"title":"vice chairman",
+					"industries":null
+				}
+				
+			]	
+	},
+	{
+		"title":"Investor",
+		"description":"",
+		"level":3,
+		"careers":[570],
+		"matches":
+			[
+				{
+					"title":"investor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Private Equity Investor",
+		"description":"",
+		"level":3,
+		"careers":[570],
+		"matches":
+			[
+				{
+					"title":"private equity investor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Angel Investor",
+		"description":"",
+		"level":3,
+		"careers":[570],
+		"matches":
+			[
+				{
+					"title":"angel investor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director, Strategy, Analytics and Operations",
+		"description":"",
+		"level":3,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"director strategy analytics and operations",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Regional General Manager",
+		"description":"",
+		"level":3,
+		"careers":[4],
+		"matches":
+			[
+				{
+					"title":"general manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"General Manager",
+		"description":"",
+		"level":3,
+		"careers":[4],
+		"matches":
+			[
+				{
+					"title":"general manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Assistant to the CEO",
+		"description":"",
+		"level":3,
+		"careers":[4],
+		"matches":
+			[
+				{
+					"title":"assistant to the CEO",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Vice President and General Manager",
+		"description":"",
+		"level":4,
+		"careers":[4],
+		"matches":
+			[
+				{
+					"title":"svp and general manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Managing Director",
+		"description":"",
+		"level":3,
+		"careers":[4],
+		"matches":
+			[
+				{
+					"title":"managing director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Director",
+		"description":"",
+		"level":4,
+		"careers":[4],
+		"matches":
+			[
+				{
+					"title":"senior director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Executive Director",
+		"description":"",
+		"level":4,
+		"careers":[4],
+		"matches":
+			[
+				{
+					"title":"executive director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Business Unit Manager",
+		"description":"",
+		"level":4,
+		"careers":[4],
+		"matches":
+			[
+				{
+					"title":"business unit manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Manager",
+		"description":"",
+		"level":3,
+		"careers":[4],
+		"matches":
+			[
+				{
+					"title":"senior manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"CEO",
+		"description":"",
+		"level":5,
+		"careers":[4],
+		"matches":
+			[
+				{
+					"title":"ceo",
+					"industries":null
+				},
+				{
+					"title":"chief executive office",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"President and CEO",
+		"description":"",
+		"level":5,
+		"careers":[4],
+		"matches":
+			[
+				{
+					"title":"president ceo",
+					"industries":null
+				},
+				{
+					"title":"president chief executive office",
+					"industries":null
+				},
+				{
+					"title":"president and ceo",
+					"industries":null
+				},
+				{
+					"title":"president and chief executive office",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate Chemist / Chemical Engineer",
+		"description":"",
+		"level":2,
+		"careers":[82,105],
+		"matches":
+			[
+				{
+					"title":"associate chemist",
+					"industries":null
+				},
+				{
+					"title":"associate chemical engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Chemist / Chemical Engineer",
+		"description":"",
+		"level":2,
+		"careers":[82,105],
+		"matches":
+			[
+				{
+					"title":"chemist",
+					"industries":null
+				},
+				{
+					"title":"chemical engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Staff Writer",
+		"description":"",
+		"level":2,
+		"careers":[157],
+		"matches":
+			[
+				{
+					"title":"staff writer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Freelance Writer",
+		"description":"",
+		"level":2,
+		"careers":[157],
+		"matches":
+			[
+				{
+					"title":"freelance writer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Columnist",
+		"description":"",
+		"level":2,
+		"careers":[157],
+		"matches":
+			[
+				{
+					"title":"columnist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Technical Writer",
+		"description":"",
+		"level":2,
+		"careers":[157],
+		"matches":
+			[
+				{
+					"title":"technical writer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Technical Writer",
+		"description":"",
+		"level":3,
+		"careers":[157],
+		"matches":
+			[
+				{
+					"title":"senior technical writer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Speechwriter",
+		"description":"",
+		"level":2,
+		"careers":[156,158],
+		"matches":
+			[
+				{
+					"title":"speechwriter",
+					"industries":null
+				},
+				{
+					"title":"speechwriting editor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate Editor",
+		"description":"",
+		"level":2,
+		"careers":[156],
+		"matches":
+			[
+				{
+					"title":"associate editor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Op-ed Editor",
+		"description":"",
+		"level":2,
+		"careers":[156],
+		"matches":
+			[
+				{
+					"title":"oped editor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Editor",
+		"description":"",
+		"level":2,
+		"careers":[156],
+		"matches":
+			[
+				{
+					"title":"editor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Editor",
+		"description":"",
+		"level":3,
+		"careers":[156],
+		"matches":
+			[
+				{
+					"title":"senior editor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Blogger",
+		"description":"",
+		"level":2,
+		"careers":[563],
+		"matches":
+			[
+				{
+					"title":"blogger",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Personal Health Informatics Researcher",
+		"description":"",
+		"careers":[101],
+		"level":2,
+		"matches":
+			[
+				{
+					"title":"personal health informatics researcher",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Business Designer",
+		"description":"",
+		"level":2,
+		"careers":[44],
+		"matches":
+			[
+				{
+					"title":"business designer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Conference Coordinator",
+		"description":"",
+		"level":2,
+		"careers":[45],
+		"matches":
+			[
+				{
+					"title":"conference coordinator",
+					"industries":null
+				},
+				{
+					"title":"colloquium coordinator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Development Assistant",
+		"description":"",
+		"level":1,
+		"careers":[46,547,548],
+		"matches":
+			[
+				{
+					"title":"development associate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Development Associate",
+		"description":"",
+		"level":2,
+		"careers":[46,547,548],
+		"matches":
+			[
+				{
+					"title":"development associate",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Animator",
+		"description":"",
+		"level":3,
+		"careers":[571,581],
+		"matches":
+			[
+				{
+					"title":"senior animator",
+					"industries":null
+				},
+				{
+					"title":"lead animator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Graphic Artist",
+		"description":"",
+		"level":1,
+		"careers":[571,581],
+		"matches":
+			[
+				{
+					"title":"graphic artist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Design Intern",
+		"description":"",
+		"level":0,
+		"careers":[571,581],
+		"matches":
+			[
+				{
+					"title":"design intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Illustrator",
+		"description":"",
+		"level":1,
+		"careers":[571,581],
+		"matches":
+			[
+				{
+					"title":"illustrator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Design Manager",
+		"description":"",
+		"level":3,
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"senior design manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Art Director",
+		"description":"",
+		"level":3,
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"senior art director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Creative Supervisor",
+		"description":"",
+		"level":3,
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"creative supervisor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Creative Supervisor",
+		"description":"",
+		"level":3,
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"senior creative supervisor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Creative Director",
+		"description":"",
+		"level":3,
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"creative Director",
+					"industries":null
+				},
+				{
+					"title":"group creative Director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Designer in Residence",
+		"level":1,
+		"description":"",
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"designer in residence",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Design Director",
+		"description":"",
+		"level":3,
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"design director",
+					"industries":null
+				},
+				{
+					"title":"director design",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director of Creative Services",
+		"description":"",
+		"level":3,
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"director of creative services",
+					"industries":null
+				},
+				{
+					"title":"creative services director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Vice President, Design",
+		"description":"",
+		"level":4,
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"vice president design",
+					"industries":null
+				},
+				{
+					"title":"vice president creative director",
+					"industries":null
+				},
+				{
+					"title":"vp creative director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"UI/UX Intern",
+		"description":"",
+		"level":0,
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"uiux intern",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"UX Intern",
+		"description":"",
+		"level":0,
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"usability research intern",
+					"industries":null
+				},
+				{
+					"title":"ux intern",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Freelance Interactive Graphics Designer",
+		"description":"",
+		"level":2,
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"freelance interactive graphics",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Freelance / Contract Designer",
+		"description":"",
+		"level":2,
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"freelance designer",
+					"industries":null
+				},
+				{
+					"title":"contract designer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"UX Designer",
+		"description":"",
+		"level":2,
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"ux designer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Web Designer Intern",
+		"description":"",
+		"level":0,
+		"careers":[146,554,555,66,572],
+		"matches":
+			[
+				{
+					"title":"ux designer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Visual Interaction Designer",
+		"description":"",
+		"level":1,
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"visual interaction designer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Interaction Designer",
+		"description":"",
+		"level":2,
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"interaction designer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"User Experience Designer",
+		"description":"",
+		"level":2,
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"user experience designer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"UI Designer",
+		"description":"",
+		"level":2,
+		"careers":[146,554,555],
+		"matches":
+			[
+				{
+					"title":"ui designer",
+					"industries":null
+				},
+				{
+					"title":"user interface designer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Electrical Engineering Intern",
+		"description":"",
+		"level":2,
+		"careers":[571,581],
+		"matches":
+			[
+				{
+					"title":"printed electronics research intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Electronics Engineer",
+		"description":"",
+		"level":3,
+		"careers":[571,581],
+		"matches":
+			[
+				{
+					"title":"senior electronics engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Ranch Manager",
+		"description":"",
+		"level":2,
+		"careers":[18],
+		"matches":
+			[
+				{
+					"title":"ranch manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Administrative Assistant",
+		"description":"",
+		"level":1,
+		"careers":[323],
+		"matches":
+			[
+				{
+					"title":"administrative assistant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Executive Assistant",
+		"description":"",
+		"level":2,
+		"careers":[549],
+		"matches":
+			[
+				{
+					"title":"executive assistant",
+					"industries":null
+				},
+				{
+					"title":"executive administrative assistant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Assistant Office Manager",
+		"description":"",
+		"level":1,
+		"careers":[550],
+		"matches":
+			[
+				{
+					"title":"assistant office manager",
+					"industries":null
+				},
+				{
+					"title":"assistant office administrator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Office Manager",
+		"description":"",
+		"level":2,
+		"careers":[550],
+		"matches":
+			[
+				{
+					"title":"office manager",
+					"industries":null
+				},
+				{
+					"title":"office administrator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate Principal (Consulting)",
+		"description":"",
+		"level":3,
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"associate principal",
+					"industries":["Management Consulting"]
+				}
+			]	
+	},
+	{
+		"title":"Principal (Consulting)",
+		"description":"",
+		"level":3,
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"principal",
+					"industries":["Management Consulting"]
+				}
+			]	
+	},
+	{
+		"title":"Senior Associate (Consulting)",
+		"description":"",
+		"level":2,
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"senior associate",
+					"industries":["Management Consulting"]
+				}
+			]	
+	},
+	{
+		"title":"Manager -- Consulting",
+		"description":"",
+		"level":3,
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"manager",
+					"industries":["Management Consulting"]
+				}
+			]	
+	},
+	{
+		"title":"Senior Consultant",
+		"description":"",
+		"level":3,
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"senior consultant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Leadership Consultant",
+		"description":"",
+		"level":2,
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"consultant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Corporate Development Consultant",
+		"description":"",
+		"level":2,
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"consultant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Anaylst Intern",
+		"description":"",
+		"level":0,
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"analyst intern",
+					"industries":["Management Consulting"]
+				}
+			]	
+	},
+	{
+		"title":"Consulting Intern",
+		"description":"",
+		"level":0,
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"consulting intern",
+					"industries":["Management Consulting"]
+				}
+			]	
+	},
+	{
+		"title":"Strategy Consultant",
+		"description":"",
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"strategy consultant",
+					"industries":null
+				},
+				{
+					"title":"consultant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Project Consultant",
+		"description":"",
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"consultant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Consultant",
+		"description":"",
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"consultant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate (Consulting)",
+		"level":2,
+		"description":"",
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"associate",
+					"industries":["Management Consulting"]
+				}
+			]	
+	},
+	{
+		"title":"Business Analyst (Consulting)",
+		"level":2,
+		"description":"",
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"business analyst",
+					"industries":["Management Consulting"]
+				}
+			]	
+	},
+	{
+		"title":"Senior Business Analyst (Consulting)",
+		"level":2,
+		"description":"",
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"senior business analyst",
+					"industries":["Management Consulting"]
+				}
+			]	
+	},
+	{
+		"title":"Senior Associate Consultant",
+		"level":2,
+		"description":"",
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"senior associate consultant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate Consultant",
+		"level":1,
+		"description":"",
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"associate consultant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate Consultant Intern",
+		"level":1,
+		"description":"",
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"associate consultant intern",
+					"industries":null
+				}
+
+			]	
+	},
+	{
+		"title":"Systems Integration and Technology Analyst Intern",
+		"level":0,
+		"description":"",
+		"careers":[558,559],
+		"matches":
+			[
+				{
+					"title":"systems integration and technology analyst intern",
+					"industries":null
+				}
+
+			]	
+	},
+	{
+		"title":"Computational Linguist",
+		"description":"",
+		"careers":[583],
+		"matches":
+			[
+				{
+					"title":"computational linguist",
+					"industries":null
+				},
+				{
+					"title":"computational lexicographer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Architect",
+		"description":"",
+		"careers":[21,77],
+		"matches":
+			[
+				{
+					"title":"architect",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Cable Broadband Analyst",
+		"description":"",
+		"careers":[44,558,559],
+		"matches":
+			[
+				{
+					"title":"cable broadband analyst",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"US Air Force Officer",
+		"description":"",
+		"careers":[538],
+		"matches":
+			[
+				{
+					"title":"usaf officer",
+					"industries":null
+				},
+				{
+					"title":"us air force officer",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"US Army Platoon Leader",
+		"description":"",
+		"careers":[538],
+		"matches":
+			[
+				{
+					"title":"us army platoon leader",
+					"industries":null
+				},
+				{
+					"title":"platoon leader",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"First Lieutenant",
+		"description":"",
+		"careers":[538],
+		"matches":
+			[
+				{
+					"title":"first lieutennt",
+					"industries":null
+				}
+				
+			]
+	},
+	{
+		"title":"Head of Research (securities)",
+		"description":"",
+		"careers":[584],
+		"matches":
+			[
+				{
+					"title":"head of research",
+					"industries":["Capital Markets","Financial Services"]
+				},
+				{
+					"title":"head of global energy research",
+					"industries":["Capital Markets","Financial Services"]
+				}
+			]
+	},
+	{
+		"title":"Director (marketing)",
+		"description":"",
+		"careers":[7,47],
+		"matches":
+			[
+				{
+					"title":"director",
+					"industries":["Market Research","Marketing & Advertising"]
+				}
+			]
+	},
+	{
+		"title":"Director (securities)",
+		"description":"",
+		"careers":[584],
+		"matches":
+			[
+				{
+					"title":"director",
+					"industries":["Capital Markets","Financial Services"]
+				}
+			]
+	},
+	{
+		"title":"Director (finance)",
+		"description":"",
+		"careers":[584],
+		"matches":
+			[
+				{
+					"title":"director",
+					"industries":["Capital Markets","Financial Services","Venture Capital","Investment Management"]
+				}
+			]
+	},
+	{
+		"title":"Finance Reporter",
+		"description":"",
+		"level":2,
+		"careers":[154],
+		"matches":
+			[
+				{
+					"title":"financial reporter",
+					"industries":null
+				},
+				{
+					"title":"finance reporter",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Reporter",
+		"description":"",
+		"level":2,
+		"careers":[154],
+		"matches":
+			[
+				{
+					"title":"reporter",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Senior Correspondent",
+		"description":"",
+		"careers":[154],
+		"matches":
+			[
+				{
+					"title":"senior correspondent",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Bureau Chief",
+		"description":"",
+		"careers":[154],
+		"matches":
+			[
+				{
+					"title":"bureau chief",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Clinical Research Coordinator",
+		"description":"",
+		"careers":[187],
+		"matches":
+			[
+				{
+					"title":"clinical research coordinator",
+					"industries":null
+				},
+				{
+					"title":"clinical studies coordinator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Research Assistant (health)",
+		"description":"",
+		"level":0,
+		"careers":[585],
+		"matches":
+			[
+				{
+					"title":"research assistant",
+					"industries":["Hospital & Health Care"]
+				}
+			]	
+	},
+	{
+		"title":"Senior Research Intern",
+		"description":"",
+		"level":1,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"senior research intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Research Assistant",
+		"description":"",
+		"level":1,
+		"careers":[585],
+		"matches":
+			[
+				{
+					"title":"senior research assistant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Laboratory Assistant",
+		"description":"",
+		"careers":[187],
+		"matches":
+			[
+				{
+					"title":"laboratory assistant",
+					"industries":["Hospital & Health Care"]
+				},
+				{
+					"title":"lab assistant",
+					"industries":["Hospital & Health Care"]
+				}
+			]	
+	},
+	{
+		"title":"Director of Client Services",
+		"description":"",
+		"careers":[299,560],
+		"matches":
+			[
+				{
+					"title":"director client services",
+					"industries":null
+				},
+				{
+					"title":"director of client services",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Vice President of Client Services",
+		"description":"",
+		"careers":[299,560],
+		"matches":
+			[
+				{
+					"title":"senior vice president client services",
+					"industries":null
+				},
+				{
+					"title":"senior vice president of client services",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"R&D Engineer (life sciences)",
+		"description":"",
+		"careers":[102,120],
+		"matches":
+			[
+				{
+					"title":"rd engineer",
+					"industries":["Medical Devices","Life Sciences","Nanotechnology"]
+				}
+			]	
+	},
+	
+	{
+		"title":"Product Development Engineer",
+		"description":"",
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"product development engineer",
+					"industries":null
+				},
+				{
+					"title":"product development",
+					"industries":["Computer Software","Internet"]
+				}
+			]	
+	},
+	{
+		"title":"Mechanical Engineer Intern",
+		"description":"",
+		"level":0,
+		"careers":[90],
+		"matches":
+			[
+				{
+					"title":"mechanical engineer intern",
+					"industries":null
+				},
+				{
+					"title":"mechanical engineering intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Mechanical Engineer",
+		"description":"",
+		"level":1,
+		"careers":[90],
+		"matches":
+			[
+				{
+					"title":"mechanical engineer",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Design Engineer",
+		"description":"",
+		"level":2,
+		"careers":[146,555],
+		"matches":
+			[
+				{
+					"title":"design engineer",
+					"industries":null
+				},
+				{
+					"title":"mechanical design engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Mechanical Lead",
+		"description":"",
+		"level":3,
+		"careers":[90,586],
+		"matches":
+			[
+				{
+					"title":"mechanical lead",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director of Engineering",
+		"description":"",
+		"level":3,
+		"careers":[586],
+		"matches":
+			[
+				{
+					"title":"director of engineering",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director of Dedicated Servers",
+		"description":"",
+		"level":3,
+		"careers":[69,70,586],
+		"matches":
+			[
+				{
+					"title":"director of dedicated servers",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director of Computing Services",
+		"description":"",
+		"level":3,
+		"careers":[586],
+		"matches":
+			[
+				{
+					"title":"director of computing services",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Engineering Manager",
+		"description":"",
+		"level":3,
+		"careers":[586],
+		"matches":
+			[
+				{
+					"title":"engineering manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Development Manager",
+		"description":"",
+		"level":3,
+		"careers":[586],
+		"matches":
+			[
+				{
+					"title":"development manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"R&D Manager",
+		"description":"",
+		"level":3,
+		"careers":[586],
+		"matches":
+			[
+				{
+					"title":"rd manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"VP of Engineering",
+		"description":"",
+		"level":4,
+		"careers":[586],
+		"matches":
+			[
+				{
+					"title":"vp of engineering",
+					"industries":null
+				},
+				{
+					"title":"vp engineering",
+					"industries":null
+				},
+				{
+					"title":"vice president of engineering",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior VP of Engineering",
+		"description":"",
+		"level":4,
+		"careers":[586],
+		"matches":
+			[
+				{
+					"title":"senior vp of engineering",
+					"industries":null
+				},
+				{
+					"title":"senior vice president of engineering",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"CTO",
+		"description":"",
+		"level":5,
+		"careers":[586],
+		"matches":
+			[
+				{
+					"title":"cto",
+					"industries":null
+				},
+				{
+					"title":"chief technical officer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate (recruiting)",
+		"description":"",
+		"level":2,
+		"careers":[556,557],
+		"matches":
+			[
+				{
+					"title":"associate",
+					"industries":["Staffing & Recruiting"]
+				}
+			]	
+	},
+	{
+		"title":"Human Capital Consulting Analyst Intern",
+		"description":"",
+		"level":0,
+		"careers":[556,557],
+		"matches":
+			[
+				{
+					"title":"human capital consulting analyst intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Talent Consulting Analyst",
+		"description":"",
+		"level":2,
+		"careers":[556,557],
+		"matches":
+			[
+				{
+					"title":"talent consulting analyst",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Talent Acquisition Manager",
+		"description":"",
+		"level":2,
+		"careers":[556,557],
+		"matches":
+			[
+				{
+					"title":"talent acquisition manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Recruiter",
+		"description":"",
+		"level":2,
+		"careers":[556,557],
+		"matches":
+			[
+				{
+					"title":"recruiter",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Staff Recruiter",
+		"description":"",
+		"level":2,
+		"careers":[556,557],
+		"matches":
+			[
+				{
+					"title":"staff recruiter",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Technical Recruiter",
+		"description":"",
+		"level":2,
+		"careers":[556,557],
+		"matches":
+			[
+				{
+					"title":"technical recruiter",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Executive Search and Placement Professional",
+		"description":"",
+		"level":2,
+		"careers":[556,557],
+		"matches":
+			[
+				{
+					"title":"executive search and placement professional",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Entrepreneur in Residence",
+		"description":"",
+		"careers":[574],
+		"matches":
+			[
+				{
+					"title":"entrepreneur in residence",
+					"industries":null
+				},
+				{
+					"title":"EIR",
+					"industries":["Venture Capital"]
+				}
+			]	
+	},
+	{
+		"title":"Founder",
+		"description":"",
+		"careers":[574],
+		"matches":
+			[
+				{
+					"title":"founder",
+					"industries":null
+				},
+				{
+					"title":"cofounder",
+					"industries":null
+				},
+				{
+					"title":"founding team member",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Supervising Technical Director",
+		"description":"",
+		"level":4,
+		"careers":[148,554],
+		"matches":
+			[
+				{
+					"title":"supervising technical director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Associate Technical Director",
+		"description":"",
+		"level":3,
+		"careers":[148,554],
+		"matches":
+			[
+				{
+					"title":"associate technical director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Lighting and Effects Technical Director",
+		"description":"",
+		"level":3,
+		"careers":[148,554],
+		"matches":
+			[
+				{
+					"title":"lighting and effects technical director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Technical Director",
+		"description":"",
+		"level":3,
+		"careers":[148,554],
+		"matches":
+			[
+				{
+					"title":"technical director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Member of Technical Staff",
+		"description":"",
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"senior member of technical staff",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Manufacturing Engineer",
+		"description":"",
+		"careers":[589],
+		"matches":
+			[
+				{
+					"title":"manufacturing engineer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Research Librarian",
+		"description":"",
+		"careers":[141],
+		"matches":
+			[
+				{
+					"title":"research librarian",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Library Director",
+		"description":"",
+		"level":4,
+		"careers":[141],
+		"matches":
+			[
+				{
+					"title":"library director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Claims adjudicator",
+		"description":"",
+		"careers":[37],
+		"matches":
+			[
+				{
+					"title":"claims adjudicator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Claim Benefits Specialist",
+		"description":"",
+		"level":2,
+		"careers":[37],
+		"matches":
+			[
+				{
+					"title":"claim benefits specialist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Court clerk",
+		"description":"",
+		"careers":[297],
+		"matches":
+			[
+				{
+					"title":"court clerk",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Staff Scientist",
+		"description":"",
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"senior staff scientist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Scientist",
+		"description":"",
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"scientist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Life Sciences Scientist",
+		"description":"",
+		"careers":[102],
+		"matches":
+			[
+				{
+					"title":"scientist",
+					"industries":["Life Sciences"]
+				}
+			]	
+	},
+	{
+		"title":"Pharmaceutical Intern",
+		"description":"",
+		"careers":[590],
+		"matches":
+			[
+				{
+					"title":"intern",
+					"industries":["Pharmaceuticals"]
+				},
+				{
+					"title":"pharmaceutical intern",
+					"industries":null
+				},
+				{
+					"title":"drug discovery intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Pharmaceutical Scientist",
+		"description":"",
+		"careers":[590],
+		"matches":
+			[
+				{
+					"title":"scientist",
+					"industries":["Pharmaceuticals"]
+				}
+			]	
+	},
+	{
+		"title":"Research Scientist",
+		"description":"",
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"research scientist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Research Forester",
+		"description":"",
+		"careers":[100],
+		"matches":
+			[
+				{
+					"title":"research forester",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Foreign Exchange Intern",
+		"description":"",
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"foreign exchange intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Commercial Advisory Services Intern",
+		"description":"",
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"commercial advisory services intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Solutions Architect",
+		"description":"",
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"solutions architect",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Community Manager",
+		"description":"",
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"community manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Trip Leader",
+		"description":"",
+		"careers":[259],
+		"matches":
+			[
+				{
+					"title":"trip leader",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Tour Guide",
+		"description":"",
+		"careers":[259],
+		"matches":
+			[
+				{
+					"title":"tour guide",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"National Director of Retail",
+		"description":"",
+		"level":4,
+		"careers":[542],
+		"matches":
+			[
+				{
+					"title":"national director of retail",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Assistant Coach",
+		"description":"",
+		"level":1,
+		"careers":[149],
+		"matches":
+			[
+				{
+					"title":"assistant coach",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Rowing Coach",
+		"description":"",
+		"level":1,
+		"careers":[149],
+		"matches":
+			[
+				{
+					"title":"rowing coach",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Coach",
+		"description":"",
+		"level":2,
+		"careers":[149],
+		"matches":
+			[
+				{
+					"title":"coach",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Soccer Referee",
+		"description":"",
+		"careers":[149],
+		"matches":
+			[
+				{
+					"title":"soccer referee",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Professional Volleyball Player",
+		"description":"",
+		"level":5,
+		"careers":[149],
+		"matches":
+			[
+				{
+					"title":"usa womens volleyball national team member",
+					"industries":null
+				},
+				{
+					"title":"professional athlete outside hitter",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Assistant Coach",
+		"description":"",
+		"careers":[149],
+		"matches":
+			[
+				{
+					"title":"assistant coach",
+					"industries":null
+				},
+				{
+					"title":"asst coach",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Security Guard / Officer",
+		"description":"",
+		"careers":[222],
+		"matches":
+			[
+				{
+					"title":"security",
+					"industries":null
+				},
+				{
+					"title":"security guard",
+					"industries":null
+				},
+				{
+					"title":"security coach",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Media Intern",
+		"description":"",
+		"level":0,
+		"careers":[159,163],
+		"matches":
+			[
+				{
+					"title":"media intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Research Intern (fashion)",
+		"description":"",
+		"level":0,
+		"careers":[592],
+		"matches":
+			[
+				{
+					"title":"research intern",
+					"industries":["Fashion & Apparel"]
+				}
+			]	
+	},
+	{
+		"title":"Bank Manager",
+		"description":"",
+		"level":3,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"bank manager",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Intern (community and social work)",
+		"description":"",
+		"careers":[30,122,125],
+		"matches":
+			[
+				{
+					"title":"director graduate school fund",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Case Worker",
+		"description":"",
+		"level":1,
+		"careers":[30,122,125],
+		"matches":
+			[
+				{
+					"title":"case worker",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Social Services Coordinator",
+		"description":"",
+		"level":2,
+		"careers":[30,122,125],
+		"matches":
+			[
+				{
+					"title":"case worker",
+					"industries":null
+				},
+				{
+					"title":"baby can wait coordinator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"VP of Digital Banking",
+		"description":"",
+		"level":4,
+		"careers":[4],
+		"matches":
+			[
+				{
+					"title":"vp digital banking",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Senior Market Analyst",
+		"description":"",
+		"level":3,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"senior market analyst",
+					"industries":null
+				},
+				{
+					"title":"senior analyst strategic market analytics",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Advisor to the CIO",
+		"description":"",
+		"level":3,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"advisor to the cio",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Translator",
+		"description":"",
+		"level":1,
+		"careers":[544],
+		"matches":
+			[
+				{
+					"title":"Translator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Leasing Consultant",
+		"level":3,
+		"description":"",
+		"careers":[278],
+		"matches":
+			[
+				{
+					"title":"leasing consultant",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Commercial Underwriter",
+		"level":2,
+		"description":"",
+		"careers":[598],
+		"matches":
+			[
+				{
+					"title":"commercial underwriter",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Insurance Analyst",
+		"level":1,
+		"description":"",
+		"careers":[55],
+		"matches":
+			[
+				{
+					"title":"insurance analyst",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Director of Developer Relations",
+		"level":3,
+		"description":"",
+		"careers":[547,548,586],
+		"matches":
+			[
+				{
+					"title":"director of developer relations",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Student Journalist",
+		"level":0,
+		"description":"",
+		"careers":[154],
+		"matches":
+			[
+				{
+					"title":"student journalist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"News Journalist Intern",
+		"level":0,
+		"description":"",
+		"careers":[154],
+		"matches":
+			[
+				{
+					"title":"news intern",
+					"industries":null
+				},
+				{
+					"title":"journalist intern",
+					"industries":null
+				},
+				{
+					"title":"news journalist intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Summer Camp Counselor",
+		"level":0,
+		"description":"",
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"summer counselor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Summer Camp Staff",
+		"level":0,
+		"description":"",
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"camp staff",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Editorial Producer",
+		"level":3,
+		"description":"",
+		"careers":[148],
+		"matches":
+			[
+				{
+					"title":"editorial producer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Videographer",
+		"level":3,
+		"description":"",
+		"careers":[148,162],
+		"matches":
+			[
+				{
+					"title":"videographer",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Biotech Intern",
+		"level":0,
+		"description":"",
+		"careers":[81],
+		"matches":
+			[
+				{
+					"title":"videographer",
+					"industries":["Biotech"]
+				}
+			]	
+	},
+	{
+		"title":"Analytics Intern",
+		"level":0,
+		"description":"",
+		"careers":[75,575],
+		"matches":
+			[
+				{
+					"title":"analytics intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Page Operations Analyst",
+		"level":1,
+		"description":"",
+		"careers":[75,575],
+		"matches":
+			[
+				{
+					"title":"page operations analyst",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Data Scientist",
+		"level":2,
+		"description":"",
+		"careers":[75,575],
+		"matches":
+			[
+				{
+					"title":"data scientist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Data Analyst",
+		"level":1,
+		"description":"",
+		"careers":[75,575],
+		"matches":
+			[
+				{
+					"title":"data analyst",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Medical Doctor",
+		"level":3,
+		"description":"",
+		"careers":[169],
+		"matches":
+			[
+				{
+					"title":"md",
+					"industries":null
+				},
+				{
+					"title":"medical doctor",
+					"industries":null
+				},
+				{
+					"title":"physician",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"HR Training Specialist",
+		"level":1,
+		"description":"",
+		"careers":[13,40],
+		"matches":
+			[
+				{
+					"title":"hr training specialist",
+					"industries":null
+				},
+				{
+					"title":"human resources trainer",
+					"industries":null
+				},
+				{
+					"title":"hr training specialist",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Personnel Director",
+		"level":3,
+		"description":"",
+		"careers":[13,40],
+		"matches":
+			[
+				{
+					"title":"personnel director",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Human Resources Representative",
+		"level":1,
+		"description":"",
+		"careers":[13,40],
+		"matches":
+			[
+				{
+					"title":"hr generalist",
+					"industries":null
+				},
+				{
+					"title":"human resources generalist",
+					"industries":null
+				},
+				{
+					"title":"human resources representative",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Leadership Operations Intern",
+		"level":1,
+		"description":"",
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"leadership operations intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Operations Intern",
+		"level":1,
+		"description":"",
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"operations intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Logistics / Supply Intern",
+		"level":1,
+		"description":"",
+		"careers":[43],
+		"matches":
+			[
+				{
+					"title":"logistics intern",
+					"industries":null
+				},
+				{
+					"title":"supply chain and business enablement intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Supply Chain Specialist",
+		"level":1,
+		"description":"",
+		"careers":[43],
+		"matches":
+			[
+				{
+					"title":"supply chain specialist",
+					"industries":null
+				},
+				{
+					"title":"supply chain",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Logistics Coordinator",
+		"level":1,
+		"description":"",
+		"careers":[43],
+		"matches":
+			[
+				{
+					"title":"logistics coordinator",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Biology Researcher",
+		"level":1,
+		"description":"",
+		"careers":[99],
+		"matches":
+			[
+				{
+					"title":"biology researcher",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Transportation Intern",
+		"level":0,
+		"description":"",
+		"careers":[17,43],
+		"matches":
+			[
+				{
+					"title":"driver",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Driver",
+		"level":1,
+		"description":"",
+		"careers":[508],
+		"matches":
+			[
+				{
+					"title":"driver",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Actor",
+		"level":1,
+		"description":"",
+		"careers":[147],
+		"matches":
+			[
+				{
+					"title":"actor",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Financial Communications Analyst",
+		"level":1,
+		"description":"",
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"financial communications analyst",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Gaming Analyst",
+		"level":1,
+		"description":"",
+		"careers":[24,249],
+		"matches":
+			[
+				{
+					"title":"gaming analyst",
+					"industries":["Casinos"]
+				}
+			]	
+	},
+	{
+		"title":"Broadcaster",
+		"level":2,
+		"description":"",
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"broadcaster",
+					"industries":["Casinos"]
+				}
+			]	
+	},
+	{
+		"title":"Media Relations",
+		"level":2,
+		"description":"",
+		"careers":[8,155],
+		"matches":
+			[
+				{
+					"title":"media relations",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Film Intern",
+		"level":0,
+		"description":"",
+		"careers":[148],
+		"matches":
+			[
+				{
+					"title":"film intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Risk Analysis Intern",
+		"level":0,
+		"description":"",
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"film intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Government Relations Intern",
+		"level":0,
+		"description":"",
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"government relations intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Scientific Affairs Intern",
+		"level":0,
+		"description":"",
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"scientific affairs intern",
+					"industries":null
+				}
+			]	
+	},
+	{
+		"title":"Executive Vice President (Real Estate)",
+		"description":"",
+		"level":4,
+		"careers":[278],
+		"matches":
+			[
+				{
+					"title":"executive vice president",
+					"industries":["Real Estate"]
+				}
+			]	
+	},
+	{
+		"title":"Commercial Real Estate Broker",
+		"description":"",
+		"level":1,
+		"careers":[278],
+		"matches":
+			[
+				{
+					"title":"commercial real estate broker",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Associate Broker",
+		"description":"",
+		"level":1,
+		"careers":[278],
+		"matches":
+			[
+				{
+					"title":"associate broker",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Vice President of Sustainability",
+		"description":"",
+		"level":4,
+		"careers":[278],
+		"matches":
+			[
+				{
+					"title":"vice president of sustainability",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Vice President Development",
+		"description":"",
+		"level":4,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"vice president development",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Senior Vice President Development",
+		"description":"",
+		"level":4,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"senior vice president development",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Patent Engineer",
+		"description":"",
+		"level":2,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"patent engineer",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Principal Engineer",
+		"description":"",
+		"level":2,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"principal engineer",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Division President",
+		"description":"",
+		"level":4,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"division president",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Business Line Vice President",
+		"description":"",
+		"level":4,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"business line vice president",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Hostess",
+		"description":"",
+		"level":1,
+		"careers":[237],
+		"matches":
+			[
+				{
+					"title":"hostess",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Barrista",
+		"description":"",
+		"level":1,
+		"careers":[237],
+		"matches":
+			[
+				{
+					"title":"barrista",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Food server",
+		"description":"",
+		"level":1,
+		"careers":[237],
+		"matches":
+			[
+				{
+					"title":"food server",
+					"industries":null
+				},
+				{
+					"title":"server",
+					"industries":["Restaurants & Food Service"]
+				}
+			]
+	},
+	{
+		"title":"Branch Manager",
+		"description":"",
+		"level":3,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"branch manager",
+					"industries":null
+				}			
+			]
+	},
+	{
+		"title":"Area Manager",
+		"description":"",
+		"level":3,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"area manager",
+					"industries":null
+				}		
+			]
+	},
+	{
+		"title":"Purchasing Assistant",
+		"description":"",
+		"level":1,
+		"careers":[16,35,36],
+		"matches":
+			[
+				{
+					"title":"area manager",
+					"industries":null
+				}		
+			]
+	},
+	{
+		"title":"Purchasing Strategist",
+		"description":"",
+		"level":1,
+		"careers":[16,35,36],
+		"matches":
+			[
+				{
+					"title":"purchasing strategist",
+					"industries":null
+				}		
+			]
+	},
+	{
+		"title":"Subdivision Assistant",
+		"description":"",
+		"level":1,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"subdivision assistant",
+					"industries":null
+				}		
+			]
+	},
+	{
+		"title":"Customer Experience",
+		"description":"",
+		"level":1,
+		"careers":[270],
+		"matches":
+			[
+				{
+					"title":"customer experience",
+					"industries":null
+				}		
+			]
+	},
+	{
+		"title":"Customer Specialist",
+		"description":"",
+		"level":1,
+		"careers":[270],
+		"matches":
+			[
+				{
+					"title":"customer specialist",
+					"industries":null
+				}		
+			]
+	},
+	{
+		"title":"Finance Strategist",
+		"description":"",
+		"level":1,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"finance strategist",
+					"industries":null
+				}		
+			]
+	},
+	{
+		"title":"Programmer",
+		"description":"",
+		"level":1,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"programmer",
+					"industries":null
+				}		
+			]
+	},
+	{
+		"title":"Pricing Strategy Analyst",
+		"description":"",
+		"level":1,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"pricing strategy analyst",
+					"industries":null
+				}		
+			]
+	},
+	{
+		"title":"Senior Hardware Verification Engineer",
+		"description":"",
+		"level":2,
+		"careers":[84],
+		"matches":
+			[
+				{
+					"title":"senior hardware verification engineer",
+					"industries":null
+				}		
+			]
+	},
+	{
+		"title":"Hardware Verification Engineer",
+		"description":"",
+		"level":2,
+		"careers":[84],
+		"matches":
+			[
+				{
+					"title":"hardware verification engineer",
+					"industries":null
+				}		
+			]
+	},
+	{
+		"title":"Engineering Leadership Program Intern",
+		"description":"",
+		"level":0,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"engineering leadership program intern",
+					"industries":null
+				}	
+			]
+	},
+	{
+		"title":"Senior Finance Manager",
+		"description":"",
+		"level":3,
+		"careers":[11,53,60],
+		"matches":
+			[
+				{
+					"title":"senior finance manager",
+					"industries":null
+				}	
+			]
+	},
+	{
+		"title":"Vice President Strategic Development",
+		"description":"",
+		"level":4,
+		"careers":[547,548],
+		"matches":
+			[
+				{
+					"title":"vice president strategic development",
+					"industries":null
+				}	
+			]
+	},
+	{
+		"title":"Strategic Planning Manager",
+		"description":"",
+		"level":3,
+		"careers":[547,548],
+		"matches":
+			[
+				{
+					"title":"strategic planning manager",
+					"industries":null
+				}	
+			]
+	},
+	{
+		"title":"Architect Intern",
+		"description":"",
+		"level":0,
+		"careers":[77],
+		"matches":
+			[
+				{
+					"title":"architect intern",
+					"industries":null
+				}	
+			]
+	},
+	{
+		"title":"Architect",
+		"description":"",
+		"level":2,
+		"careers":[77],
+		"matches":
+			[
+				{
+					"title":"architect",
+					"industries":null
+				}	
+			]
+	},
+	{
+		"title":"Video Game Producer",
+		"description":"",
+		"level":2,
+		"careers":[600],
+		"matches":
+			[
+				{
+					"title":"producer",
+					"industries":["Computer Games","Computer Software"]
+				}	
+			]
+	},
+	{
+		"title":"Strategic Planner",
+		"description":"",
+		"level":2,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"strategic planner",
+					"industries":null
+				}	
+			]
+	},
+	{
+		"title":"Industrial Engineer",
+		"description":"",
+		"level":2,
+		"careers":[601],
+		"matches":
+			[
+				{
+					"title":"industrial engineer",
+					"industries":null
+				}	
+			]
+	},
+	{
+		"title":"Senior Advertising Manager",
+		"description":"",
+		"level":2,
+		"careers":[6],
+		"matches":
+			[
+				{
+					"title":"senior advertising manager",
+					"industries":null
+				}	
+			]
+	},
+	{
+		"title":"Materials Integrator",
+		"description":"",
+		"level":2,
+		"careers":[89],
+		"matches":
+			[
+				{
+					"title":"materials integrator",
+					"industries":null
+				}	
+			]
+	},
+	{
+		"title":"Equipment Engineer -- Photo and Diffusion",
+		"description":"",
+		"level":2,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"equipment engineer",
+					"industries":null
+				}	
+			]
+	},
+	{
+		"title":"Customer Category Manager",
+		"description":"",
+		"level":2,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"customer category manager",
+					"industries":null
+				}	
+			]
+	},
+	{
+		"title":"Senior Manager Consumer Insights",
+		"description":"",
+		"level":2,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"senior manager consumer insights",
+					"industries":null
+				}	
+			]
+	},
+	{
+		"title":"Senior Manager Consumer Insights",
+		"description":"",
+		"level":2,
+		"careers":[],
+		"matches":
+			[
+				{
+					"title":"senior manager consumer insights",
+					"industries":null
+				}	
+			]
+	},
+	{
+		"title":"Foreign Service Officer",
+		"description":"",
+		"level":2,
+		"careers":[602],
+		"matches":
+			[
+				{
+					"title":"foreign service officer",
+					"industries":null
+				}	
+			]
+	},
+	{
+		"title":"Vice President of Business Planning",
+		"description":"",
+		"level":4,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"vice president of business planning",
+					"industries":null
+				},
+				{
+					"title":"vice president business planning",
+					"industries":null
+				}
+			]
+	},
+	{
+		"title":"Vice President of Retail Planning",
+		"description":"",
+		"level":4,
+		"careers":[4,48],
+		"matches":
+			[
+				{
+					"title":"vice president of retail planning",
+					"industries":null
+				},
+				{
+					"title":"vice president retail planning",
+					"industries":null
+				}
+			]
+	}
+
+]

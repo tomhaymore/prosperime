@@ -1,0 +1,181 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+<!-- Head -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/viz.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/drag_and_drop.js"></script>
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/profile.css" />
+{% endblock %}
+
+
+
+<!-- Content -->
+{% block content %}
+
+
+<!-- Header -->
+<div class="main-container content-container">
+	<p class="main-header">Profile: <span class="splash-slug">{{name}} </span></p>
+	<p class="main-sub-header">Size: {{size}} </p>
+
+
+<!-- Center --> 
+	<div class="profile-container"  ondragover='allowDrop(event)'>
+		<div class="profile-nav-container">&nbsp;</div>
+		<div class="profile-info-container">
+			<div class="profile-info-left pull-left span9">
+				<div class="profile-info-top">
+					<div class="pull-left span6">	
+						<div class="profile-img-holder pull-left">
+							<img class="logo-preview" src="/media/{{logo_path}}" />
+						</div>
+							
+
+						<div class="profile-brief-info pull-left">
+							<p class="path-name">{{name}}</p>
+						</div>
+					
+						<div class="clear"></div>
+					
+						<div class="path-viz" ondragover='allowDrop(event)'>
+						<div class="path-viz-short">
+
+							
+							<h5>Positions: </h5>
+							<div>
+								<table class="table table-striped table-condensed table-bordered position-list">
+									{% for pos in jobs %}
+										<tr>
+											<td>
+												<i class="icon-chevron-right icon-large"></i>
+												
+											</td>
+											<td>{{pos.title}}</td>
+											<td>{{pos.owner_name}}</td>
+										</tr>
+									{% endfor %}
+									</table>
+								</div>
+							</div>			
+						</div>
+					</div>
+
+					<!-- Float Screen -->
+					<div id="middle-float-screen" class="pull-left span5" ondragover='allowDrop(event)'>
+						{{description}}
+					</div>	
+					<div class="clear"></div>
+				</div>
+			
+				
+			</div>
+
+			<!-- Right Sidebar -->
+			<div id="profile-right" class="span3 pad-down pull-right">
+				<div class="rounded">
+					{% if user %}
+						<p class="sidebar-header">Want to see improvements?</p>
+						<p>We'd love to hear from you -- <a href="mailto:feedback@prosperime.com">please drop us a line</a></p>
+					{% endif %}
+				</div>
+
+				<!-- Viewer Saved Paths -->
+				<div class="rounded">
+					<p class="sidebar-header">Your Saved Career Paths</p>
+					<p> Like what {{profile.first_name}} has done? Drag any of the positions shown into your desired career path or <a onclick='createNewPath()'>create a new one.</a></p>
+						<table class="table table-striped table-condensed table-bordered path-list" id='sidebar-path-list'>			
+							<tr><td class="timeline-description-header">
+								<a href="/saved_paths/">View All</a>
+							</td></tr>
+						{% for saved_path in saved_paths %}
+							{% if forloop.last %}
+								<tr class="saved-path-list-last">
+							{% else %}
+								<tr>
+							{% endif %}
+								<td ondragover='allowDrop(event)' ondrop='dropPosition(event, "{{saved_path.title|escape}}", this)'><a href="/saved_paths/#id/?id={{saved_path.id}}">{{saved_path.title}}</a></td>
+								</tr>
+						{% endfor %}
+						</table>	
+				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+		
+<script type="text/javascript">
+
+	/* Page-specific drag for GA */
+	function dragPos(ev) {
+  		ev.dataTransfer.setData("pos_id", ev.target.id);
+    	_gaq.push(['_trackEvent', 'profile-org', 'positionDragged'])
+  	};
+
+
+	/* Need JQuery for the AJAX request, so put it here */
+	var dropPosition = function(ev, path_title, elem) {
+		_gaq.push(['_trackEvent', 'profile-org', 'positionDropped'])
+
+		ev.preventDefault();
+		var pos_id = ev.dataTransfer.getData("pos_id");
+
+		$.post('/saved_paths/save/', {title: path_title, pos_id: pos_id, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
+				console.log(response)
+				if (response['success']) {
+					highlight(elem)
+				}
+		}, 'json');
+	};
+
+	/* Inelegant but effective way to pulsate the element w/o
+	   external JQuery libraries */
+	var highlight = function(elem) {
+		$(elem).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
+	};
+
+	var newPathAjax = function() {
+		_gaq.push(['_trackEvent', 'profile-org', 'newPathCreated'])
+
+		var title = $('#new-path-box').val()
+		if (title.length < 1) {
+			errorCreatingPath('title')
+			return
+		}
+
+		// Attempt POST request via AJAX to create path
+		$.post('/saved_paths/create/', {title: title, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
+				if (response['success']) {
+					console.log(response)
+					// Construct new table element for path
+					var newRow = "<tr><td ondragover='allowDrop(event)' ondrop='dropPosition(event," + title + ", this)'><a href='/saved_paths/#id/?id=" + response['id'] + "'>" + title + "</a></td></tr>"
+
+					// Add to DOM
+					$('#sidebar-path-list > tbody:last').append(newRow)
+					
+					// Clear text field
+					$('#new-path-box-row').remove()
+				} else {
+					errorCreatingPath('db')
+				}
+		}, 'json');
+	};
+
+	var errorCreatingPath = function(reason) {
+
+		_gaq.push(['_trackEvent', 'profile-rg', 'errorCreatingPath'])
+
+		var createBox = $('#new-path-box')
+		if (reason == "db") {
+			console.log("Error in the view creating new path...")
+			createBox.val("Please enter a title")
+		} else if (reason == "title") {
+			createBox.val("Please enter a title")
+		}
+
+		highlight(createBox)
+	};
+
+</script>
+
+{% endblock %}
+
+

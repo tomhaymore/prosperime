@@ -1,0 +1,457 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<!-- CSS -->
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/typeahead.min.css" />
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/plan.css" />
+
+
+
+<!-- JS -->
+	
+	<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>
+	<script async type="text/javascript" src="{{ STATIC_URL }}js/timeline-viz.js"></script>
+	
+	<script type="text/javascript" src="{{ STATIC_URL }}js/typeahead.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/plan.js"></script>
+{% endblock %}
+
+
+
+{% block content %}
+
+<div id="content-container" class="main-container">
+
+	<div class="feature-header">
+		Plan:
+		{% if ideal_pos %}
+			<span class="feature-header-name italicize">{{ideal_pos.title}}</span></span>
+		{% else %}
+			<span class="feature-header-name">Get started</span>
+		{% endif %}
+	</div>
+
+	<div class="call-out-text">
+		{% if ideal_pos %}
+			{{ideal_pos.description}}
+		{% else %}
+			Select a position below to see the various paths to reach that point. 
+		{% endif %}
+	</div>
+
+	{% if ideal_pos %}
+		<div id="path-container">
+			<!-- SVG here -->
+		</div>
+		<div id="build-positions-container">
+
+			<!-- <div id="plan-save-button" class="flat-button pull-left button-large save-button" onclick="save()">
+				Save
+			</div> -->
+			<div class="clear"></div>
+
+			<div id="matching-positions-container">
+				<p class="plan-sub-header">Matching Users</p>
+				<div id="">
+					
+					<ul id="plan-matching-users-list">
+					{% for u in matching_users %}
+						<li>
+					{% endfor %}
+					</ul>
+					
+				</div>
+			</div>
+		</div>
+	{% else %}
+		<div>
+			<table id="plan-positions-table" class="table">
+				{% if goal_positions %}
+					{% for pos in goal_positions %}
+						<tr>
+							<td><a href="{{pos.ideal_position.id}}">{{pos.position.title}}</a></td>
+						</tr>
+					{% endfor %}
+				{% else %}
+					<tr>
+						<td>You don't have any saved positions; use the search bar below to find one.</td>
+					</tr>
+				{% endif %}
+			</table>
+			<div class="">
+				<input id="plan-positions-search-box" type="text" class="flat-input" placeholder="Search for a position">
+				<a id="go-plan-position-button" class="flat-button blue-button"> Go </a>
+			</div>
+		</div>
+
+	{% endif %}
+	
+</div>
+{% endblock %}
+
+{% block templates %}
+
+<script type="text/template" id="matched_user_template">
+<li><img src="<%= pic %>" /><a href="/profile/<%= id %>"><%= full_name %></a></li>
+</script>
+
+<script type="text/javascript">
+
+$(function () {
+	var isEmpty = function(obj) {
+	    for (var prop in obj) if (obj.hasOwnProperty(prop)) return false;
+	    return true;
+	};
+
+    /* Raphael Extension giving ID's to sets */
+    Raphael.st.setID = function (id) {
+        this.id = id;
+    };
+
+    Raphael.st.setData = function (name, value) {
+        this.data[name] = value;
+    };
+
+    // Not tested
+    Raphael.st.unbindAll = function () {
+        while (this.events.length) {
+            var e = this.events.pop();
+            e.unbind();
+        }
+    };
+    
+    // set global variables
+    var initial = [];
+    var full_path = [];
+
+    var paper_w = 1000;
+    var paper_h = 450;
+
+    // initialize Raphael object with general properties
+    var paper = new Raphael("path-container", paper_w, paper_h);
+    
+	var chosen_dot_attributes = {
+		'fill':'rgb(41,98,152)',
+		'stroke-width':0,
+		'cursor':'pointer'
+	};
+
+    var option_dot_attributes = {
+		'fill':'#679FD2',
+		'stroke-width':0,
+		'cursor':'pointer'
+	};
+
+    var text_attributes = {
+		"font-size":12,
+		"fill":"#fff"
+        // "stroke":"#ffffff"
+	};
+    
+	var title_text_attributes = {
+		"font-size": 12,
+		// "stroke": "#181818",
+		"font-weight":"normal"
+	}
+
+    var curve_attributes = {
+        "stroke":"#181818",
+        "opacity": "0.5"
+    };
+    
+    // declare variables before loops
+    var midline = 225	;
+    var dot_radius = 15;
+    var x_gap = 175;
+    // var dot = [];
+    var text;
+    var curve_coords;
+    var y_coord;
+    var x_coord;
+    var x_coord_init;
+    var y_coord_init;
+    var curve_init_coords;
+    var count;
+    var y_path;
+    var old_y_path;
+    var radius_path;
+    var path;
+    var step;
+    var x_step;
+    var spacer;
+    var x_init;
+    var x_start;
+    var x_last_init;
+    var x_goal;
+    var y_start;
+
+    // move initial array to client
+    var render_graph = function(ideal_id) {
+    	// data = paths;
+    	// initial = (typeof initial === "undefined") ? null : initial;
+    	// grab data from API
+    	paper.clear();
+    	// console.log(initial.length);
+    	if (initial.length>0) {
+    		// console.log(initial);
+    		data = get_data(ideal_id,initial.slice(-1)[0]['pos_id']);	
+    	} else {
+    		data = get_data(ideal_id);
+    	}
+    	
+		y_start = 50;
+		old_y_path = 75;
+	    
+
+	    
+    	x_init = 100;
+	    x_start = initial.length > 0 ? x_init + x_gap * initial.length : x_gap;
+	    x_last_init = initial.length > 0 ? x_init + (x_gap * (initial.length-1)) : 0;
+	    x_goal = x_start + x_gap;
+    	
+		// get length of paths array
+	    var paths_length = 0;
+	    for (var key in data.paths) {
+	        paths_length ++;
+	    };
+
+	    spacer = 300 / paths_length;
+    	// start loop through paths
+    	var i = 0;
+    	for (var key in data.paths) {
+    		
+    		// set variables for each dot, curve, text
+    		path = data.paths[key];
+    		
+    		count = path.count;
+    		// console.log(path.ideal_id);
+    		
+    		
+    		radius_path = dot_radius * count * 1.15;
+    		x_coord = x_start + 15;
+    		spec_dot_radius = dot_radius * (count * .25 + 1);
+
+
+    		// y_path = y_start + i * spacer;
+    		console.log(paths_length,path.paths);
+    		if (paths_length == 1 && isEmpty(path.paths)) {
+    			y_path = midline;
+    		} else if (i==0) {
+    			y_path = y_start;
+    		} else {
+    			y_path = y_start + spacer + spec_dot_radius;
+    		}
+    		// console.log(y_path, y_start, spacer, spec_dot_radius);
+    		y_start = y_path;
+    		// check where path is in loop, adjust control point on bezier curve
+    		if (i / paths_length >= .5) {
+    			y_coord = y_path + 15;
+    			y_coord_init = y_path + 15;
+    		} else {
+    			y_coord = y_path - 15;
+    			y_coord_init = y_path - 15;
+    		}
+
+    		// if starting path, lay down lines first
+    		if (initial.length > 0) {
+    			if (paths_length == 1) {
+    				render_single_init_path();
+    			} else {
+	    			render_init_paths();
+	    		}
+    			
+    		}
+    		// lay down line to goal point
+    		// if (paths_length == 1 || (paths_length == 3 && i == 1) || (paths_length == 5 && i == 2)) {
+    		if (paths_length == 1) {
+    			curve_coords = [["M",x_start, y_path],["L",x_goal,midline]];
+
+    		} else {
+    			curve_coords = [["M",x_start, y_path],["Q",x_coord,y_coord,x_goal,midline]];
+    		}
+	      	// draw line
+	        curve = paper.path(curve_coords).attr(curve_attributes);
+	        // console.log(curve_coords);
+	        // draw circle
+	        
+	        var dot = paper.circle(x_start, y_path, spec_dot_radius).attr(chosen_dot_attributes);
+	        
+	        // set data variables
+	        var pos_id = path.pos_id
+	        var ideal_id = path.ideal_id
+	        // console.log(ideal_id);
+	        dot.data("pos_id", pos_id)
+			dot.data("ideal_id", ideal_id)
+			dot.data("entity_name",path.entity_name)
+			dot.data("title",path.title)
+			
+			// add click behavior
+			if (!isEmpty(path.paths)) {
+				dot.click(function() {
+					// add selected element to initial array
+					// console.log(this.data("ideal_id"));
+					initial.push({'dot_id':dot.id,'pos_id':this.data("pos_id"),'ideal_id':this.data("ideal_id"),'title':this.data("title"),'entity_name':this.data("entity_name")});
+					full_path.push(this.data("ideal_id"));
+					console.log(full_path);
+					// console.log(initial);
+					// redraw the graph
+					render_graph({{ideal_pos.id|safe}});
+					get_matched_users(full_path);
+				});
+
+				count_text = paper.text(x_start, y_path, count).attr(text_attributes);
+			}
+	        // write text for count and title
+	        
+	        title_text = paper.text(x_start, y_path-35, key).attr(title_text_attributes);
+	        textWrap(title_text,35);
+		    // increment counter
+		    i++;
+    	}
+    	// check if there is a start, draw initial path
+        if (initial.length > 0) {
+	    	render_init_points(initial);
+	    }
+
+    	// draw final point and title
+	    end_dot = paper.circle(x_goal,midline,dot_radius).attr(chosen_dot_attributes);
+		goal_text = paper.text(x_goal+75,midline,"{{ideal_pos.title}}").attr(title_text_attributes);
+    };
+
+    var render_single_init_path = function() {
+		// set coordinates for line
+		curve_init_coords = [["M",x_last_init,midline],["L",x_start,y_path]];
+		// console.log(curve_init_coords);
+		// draw curve
+		curve_init = paper.path(curve_init_coords).attr(curve_attributes);
+    }
+
+    var render_init_paths = function() {
+    	x_coord_init = x_start - 15;
+		// set coordinates for curve
+		curve_init_coords = [["M",x_last_init,midline],["Q",x_coord_init,y_coord_init,x_start,y_path]];
+		// console.log(curve_init_coords);
+		// draw curve
+		curve_init = paper.path(curve_init_coords).attr(curve_attributes);
+    }
+
+    var render_init_points = function(data) {
+    	var c = 0;
+		for (key in data) {
+			// save node
+			step = data[key]
+			// get horizontal spacing
+			
+			x_step = x_init + (c*x_gap);
+			// x_step_next = x_step + ((c+1)*x_gap);
+			x_step_next = x_step + x_gap;
+			
+			if (c<data.length-1) {
+				connector_attributes = [["M",x_step,midline],["L",x_step_next,midline]];
+				connector = paper.path(connector_attributes).attr(curve_attributes);
+				
+			}
+			// draw point
+			var init_dot = paper.circle(x_step,midline,dot_radius).attr(chosen_dot_attributes);
+			// draw text
+			init_text = paper.text(x_step,midline-35,step['entity_name']).attr(title_text_attributes)
+			textWrap(init_text,35);
+			// draw connecting line
+
+			c++;
+	    };
+    };
+
+    var get_data = function(ideal_id,initial) {
+
+		/* NOTE: using synchronous AJAX call to hold the chain until
+			returns. Consider changing this to one big callback */
+
+		var data;
+		initial = (typeof initial === "undefined") ? null : initial;
+		jQuery.ajaxSetup({async:false})
+		// console.log(initial);
+		$.get("/careers/getIdealPosPath/", {'ideal_id':ideal_id,'initial':initial}, function(response) {
+			data = response
+		}, "json");
+
+		jQuery.ajaxSetup({async:true})
+		return data
+    };
+
+    var get_matched_users = function(path) {
+    	var user_data;
+    	$("#plan-matching-users-list").html('');
+    	var template = _.template($("#matched_user_template").html());
+    	jQuery.ajaxSetup({async:false})
+    	$.get("/careers/getIdealMatches/", {'path[]':path},function(response) {
+    		console.log('hello')
+    		user_data = response;
+    	},"json");
+		jQuery.ajaxSetup({async:true})
+
+    	for (i=0;i<user_data.length;i++) {
+    		d = user_data[i]
+    		console.log(d)
+    		rendered_content = template(d);
+    		console.log(rendered_content);
+    		$("#plan-matching-users-list").append(rendered_content);
+    	}
+
+
+		// $.get("/careers/getIdealMatches/",{'path[]':path},"json").success(function(data) {
+		// 	console.log(data);
+			
+		// 	for (i=0;i<data.length;i++) {
+	 //    		d = data[i]
+	 //    		console.log(d)
+	 //    		rendered_content = template(d);
+	 //    		$("#plan-matching-users-list").append(rendered_content);
+	 //    	}
+		// }).error(function() {
+		// 	var msg = "<li>No users found</li>";
+  //   		$("#plan-matching-users-list").append(msg);
+		// });
+    };
+
+    var textWrap = function(t,width) {
+    	var content = t.attr("text");
+    	var abc = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    	t.attr({
+    		'text-anchor':'center',
+    		'text':text
+    	});
+    	var letterWidth = t.getBBox().width / abc.length;
+    	t.attr({
+	        "text" : content
+	    });
+
+	    var words = content.split(" ");
+	    var x = 0, s = [];
+	    for ( var i = 0; i < words.length; i++) {
+
+	        var l = words[i].length;
+	        if (x + (l * letterWidth) > width) {
+	            s.push("\n");
+	            x = 0;
+	        }
+	        x += l * letterWidth;
+	        s.push(words[i] + " ");
+	    }
+	    t.attr({
+	        "text" : s.join("")
+	    });
+    }
+
+    render_graph({{ideal_pos.id}});   
+    get_matched_users([{{ideal_pos.id}}]);
+    
+});
+
+</script>
+
+
+{% endblock %}

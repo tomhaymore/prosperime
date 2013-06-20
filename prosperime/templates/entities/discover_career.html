@@ -1,0 +1,252 @@
+{% extends "base_full.html" %}
+{% load cache %}
+{% block head %}
+
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/discover.css" />
+<script type="text/javascript" src="{{ STATIC_URL }}js/discover.js"></script>
+{% endblock %}
+
+{% block content %}
+
+{% cache 10 content user.id career.id request_type %}
+
+<div id="content-container" class="main-container">
+	<p class="main-header">Discover: <span class="splash-slug">{{career.name}}</span></p>
+	{% if career.description %}
+	<p class="main-sub-header">{{career.description}}</p>
+	{% endif %}
+
+	<div id="careers-container">
+			<div class="discover-nav-container">
+				<div class="pull-left discover-nav-selected" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'networkTabClicked', '{{career.id}}'])"><a id="discover-paths-show-network" href="#career-network">Your Network</a></div>
+					
+				<div class="pull-left discover-nav-unselected" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'communityTabClicked', '{{career.id}}'])"><a id="discover-paths-show-all" href="#career-community">Prosperime Community</a></div>
+				<div class="clear"></div>
+			</div>
+
+			<!-- Network -->
+			<div class="discover-paths-network">
+				<div class="discover-paths-network-list pull-left">
+					{% if request_type == 'orgs' %}
+
+					<!-- View: Companies -->
+					<p class="main-header">Related Companies</p>
+					{% for e in entities.network %}
+						<div class="discover-path">
+							<div class="pull-left"><a href="/profile/{{p.id}}">
+							{% if e.logo_path %}
+								<img class="logo-preview" src="/media/{{e.logo_path}}" />
+							{% endif %}
+							</a></div>
+							<div class="pull-left discover-path-name">
+								<p><a class="path-name" href="/profile/org/{{e.id}}/">{{e.name}}</a></p>
+								{% if e.people %}
+									{% for person in e.people %}
+										<a href="/profile/{{person.id}}/"><span class="path-position">
+											{% if forloop.last %}
+												{{person.name}}
+											{% else %}
+												{{person.name}}, 
+											{% endif %}
+										</span></a>
+									{% endfor %}
+
+								{% endif %}
+							</div>
+							<div class="clear"></div>
+						</div>
+						
+					{% endfor %}
+
+					<!-- View: People [DEFAULT] -->
+					{% elif request_type == 'people' %}
+
+					<p class="main-header">Related People</p>
+					{% for k,v in people.network.items %}
+						<div class="discover-path">
+							<div class="pull-left"><a href="/profile/{{p.id}}" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'people-network', 'photoClicked'])">
+								{% if v.pic %}
+									<img class="logo-preview" src="{{ MEDIA_URL }}{{v.pic}}" /></a>
+								{% else %}
+									<img class="logo-preview" src="{{ MEDIA_URL }}/pictures/anon.jpg" /></a>
+								{% endif %}
+							</div>
+							<div class="pull-left discover-path-name">
+								<p><a class="path-name" href="/profile/{{k}}" onclick="_gaq.push(['_trackEvent', 'discoverCareer', 'people-network', 'nameClicked'])">{{v.full_name}}</a></p>
+								{% if v.headline %}
+									<p class="path-position">{{v.headline}}</p>
+								{% endif %}
+							</div>
+							<div class="clear"></div>
+						</div>
+						
+					{% endfor %}
+
+
+					<!-- View: Positions -->
+					{% elif request_type == 'positions' %}
+
+					<p class="main-header">Related Positions</p>
+					{% for p in positions.network %}
+						<div class="discover-path">
+
+							<div class="pull-left"><a href="#"><img class="logo-preview" src="/media/{{p.logo_path}}" /></a></div>
+							<div class="pull-left discover-path-name">
+								<p><a class="path-name" href="/profile/{{p.id}}">{{p.title}} at {{p.co_name}}</a></p>
+								
+								<p class="path-position">
+									<a href="/profile/{{p.owner_id}}">
+
+										{{p.owner}}
+									</a>
+								</p>
+							</div>
+							<div class="clear"></div>
+						</div>
+						
+					{% endfor %}
+					{% endif %}
+				</div>
+				<br/>
+				<div class="discover-paths-network-overview pull-left">
+					<p class="main-header">Overview</p>
+					<ul class="career-overview-stats">
+
+						<li class="career-overview-stats-people blue-box-container"><a href="/discover/career/{{career_id}}/"><span class="stats">{{overview.network.num_people}}</span></a> people</li>
+
+						<li class="career-overview-stats-positions blue-box-container"><a href="/discover/career/{{career_id}}/positions/"><span class="stats">{{overview.network.num_pos}}</span></a> positions</li>
+
+						<li class="career-overview-stats-orgs blue-box-container"><a href="/discover/career/{{career_id}}/orgs"><span class="stats">{{overview.network.num_cos}}</span></a> companies</li>
+					</ul>
+					<p class="main-header">Big Players</p>
+						{% if overview.network.bigplayers %}
+							<ul>
+							{% for b in overview.network.bigplayers %}
+
+								<li><a href="/profile/org/{{b.1.id}}">{{b.0}}</a></li>
+
+							{% endfor %}
+							</ul>
+						{% endif %}
+				</div>
+				<div class="clear"></div>
+			</div>
+
+			<!-- All -->
+			<div class="discover-paths-all" style="display:none;">
+				<div class="discover-paths-all-list pull-left">
+					{% if request_type == 'orgs' %}
+
+					<!-- View: Companies -->
+					<p class="main-header">Related Companies</p>
+					{% for e in entities.all %}
+						<div class="discover-path">
+
+							<div class="pull-left"><a href="/profile/{{p.id}}">
+							{% if e.logo_path %}
+								<img class="logo-preview" src="/media/{{e.1.logo}}" />
+							{% endif %}
+							</a></div>
+							<div class="pull-left discover-path-name">
+								<p><a class="path-name" href="/profile/org/{{p.id}}/">{{e.name}}</a></p>
+
+								{% if e.people %}
+									{% for person in e.people %}
+										<a href="/profile/{{person.id}}/"><span class="path-position">
+											{% if forloop.last %}
+												{{person.name}}
+											{% else %}
+												{{person.name}}, 
+											{% endif %}
+										</span></a>
+									{% endfor %}
+								{% endif %}
+							</div>
+							<div class="clear"></div>
+						</div>
+						
+					{% endfor %}
+
+					<!-- View: People [DEFAULT] -->
+					{% elif request_type == 'people' %}
+
+					<p class="main-header">Related People</p>
+					{% for k,v in people.all.items %}
+						<div class="discover-path">
+
+							<div class="pull-left"><a href="/profile/{{k}}">
+								{% if v.pic %}
+									<img class="logo-preview" src="{{ MEDIA_URL }}{{v.pic}}" /></a>
+								{% else %}
+									<img class="logo-preview" src="{{ MEDIA_URL }}/pictures/anon.jpg" /></a>
+								{% endif %}
+							</a></div>
+							<div class="pull-left discover-path-name">
+								<p><a class="path-name" href="/profile/{{k}}">{{v.full_name}}</a></p>
+								{% if v.headline %}
+									<p class="path-position">{{v.headline}}</p>
+								{% endif %}
+								<!-- {% if p.pos_title %}
+									<p class="path-position">{{p.pos_title}} at {{p.pos_co_name}}</p>
+									<p>{{p.pos_start_date}} to {{p.pos_end_date}}</p>
+								{% endif %} -->
+							</div>
+							<div class="clear"></div>
+						</div>
+						
+					{% endfor %}
+
+					<!-- View: Positions -->
+					{% elif request_type == 'positions' %}
+
+					<p class="main-header">Related Positions</p>
+					{% for p in positions.all %}
+						<div class="discover-path">
+
+							<div class="pull-left"><a href="#"><img class="logo-preview" src="/media/{{p.logo_path}}" /></a></div>
+							<div class="pull-left discover-path-name">
+								<p><a class="path-name" href="/profile/{{p.id}}">{{p.title}} at {{p.co_name}}</a></p>
+								
+								<p class="path-position">
+									<a href="/profile/{{p.owner_id}}">
+
+										{{p.owner}}
+									</a>
+								</p>
+							</div>
+							<div class="clear"></div>
+						</div>
+						
+					{% endfor %}
+					{% endif %}
+				</div>
+				<div class="discover-paths-network-overview pull-left">
+					<p class="main-header">Overview</p>
+					<ul class="career-overview-stats">
+
+						<li class="career-overview-stats-people blue-box-container"><a href="/discover/career/{{career_id}}/"><span class="stats">{{overview.all.num_people}}</span></a>  people</li>
+						<li class="career-overview-stats-positions blue-box-container"><a href="/discover/career/{{career_id}}/positions/"><span class="stats">{{overview.all.num_pos}}</span></a> positions</li>
+						<li class="career-overview-stats-orgs blue-box-container"><a href="/discover/career/{{career_id}}/orgs/"><span class="stats">{{overview.all.num_cos}}</span></a> companies</li>
+
+					</ul>
+					<br/>
+					<p class="main-header">Big Players</p>
+						{% if overview.all.bigplayers %}
+							<ul>
+							{% for b in overview.all.bigplayers %}
+
+								<li><a href="/profile/org/{{b.1.id}}/">{{b.0}}</a></li>
+
+							{% endfor %}
+							</ul>
+						{% endif %}
+				</div>
+				<div class="clear"></div>
+			</div>
+	</div>
+</div>
+
+
+{% endcache %}
+
+{% endblock %}

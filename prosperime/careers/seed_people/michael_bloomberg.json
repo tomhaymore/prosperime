@@ -1,0 +1,33 @@
+{
+	"name":"Michael Bloomberg",
+	"headline":"Mayor of New York City & Business Magnate",
+	"profile_pic":"/static/img/michael_bloomberg.jpg",
+	"path": [
+		{
+			"title":"B.S. in Electrical Engineering",
+			"entity_name":"Johns Hopkins University",
+			"type":"education",
+			"meta":"highlight"
+		}, {
+			"title":"M.B.A.",
+			"entity_name":"Harvard Business School",
+			"type":"education",
+			"meta":"pivot"
+		} , {
+			"title":"General Partner",
+			"entity_name":"Salomon Brothers",
+			"type":"position",
+			"description":"8 years after joining Salomon Brothers, the company was acquired and Michael was fired, but given a $10 million severance package. He used this money to found Innovative Market Systems, now known as Bloomberg, L.P."	
+		} , {
+			"title":"Founder",
+			"entity_name":"Bloomberg L.P.",
+			"type":"position",
+			"meta":"highlight"
+		}, {
+			"title":"Mayor",
+			"entity_name":"City of New York",
+			"type":"position",
+			"meta":"pivot"
+		}
+	]
+}

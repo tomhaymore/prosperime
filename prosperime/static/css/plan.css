@@ -1,0 +1,100 @@
+
+
+div.feature-header {
+	font-size:2.5em;
+	color:rgb(41,98,152);
+	margin-bottom:25px;
+	margin-top:25px;
+	font-family:"Helvetica Neue",Helvetica;
+}
+
+span.feature-header-name {
+	color:#aaa;
+}
+
+div#are-you-sure-prompt {
+	max-width:250px;
+	background-color:#333;
+	position:relative;
+	color:#fffffe;
+	top:50px;
+	left:165px;
+	border-radius:4px;
+	padding:6px 8px;
+
+}
+
+div.call-out-text {
+	font-size:1.4em;
+	margin-bottom:25px;
+	line-height:27px;
+}
+
+div#build-positions-container {
+	margin-left:25px;
+
+}
+
+.plan-sub-header {
+	font-size:1.7em;
+	color:rgb(41,98,152);
+	margin-bottom:25px;
+	margin-top:10px;
+}
+
+div.build-positions-search {
+	margin-top:50px;
+	margin-bottom:50px;
+	margin-left: 15px;
+}
+
+input#build-positions-search-box {
+	width:350px;
+}
+
+
+table#build-positions-table {
+	/*width:50%;*/
+}
+
+table#build-positions-table tr td {
+	/*width:50%;*/
+	cursor: pointer;
+}
+
+span#add-build-position-button {
+	color:#fffffe;
+	background-color:rgb(41,98,152);
+	text-shadow:none;
+}
+
+div.save-button {
+	margin-right:150px;
+	background-color:#339933;
+	color:#fffffe;
+	font-size:1.4em;
+	width:100px;
+	padding:8px 10px;
+}
+
+input.build-input {
+	height:30px;
+	line-height:35px;
+	font-size:.8em;
+}
+
+
+
+
+
+/* Modifiers */
+
+.smaller { font-size:1em !important; }
+
+.selected { background-color:rgb(41,98,152); color:#fffffe;}
+
+
+.italicize {
+	font-style: italic;
+	font-weight:200;
+}

@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+
+<div id="search-container" class="rounded">
+	<div class="search-form-header sidebar-header">
+		Refine Your Search
+	</div>
+	<div class="search-form-module">
+		<p class="form-header">Location</p>
+			{% for l in locations|slice:":5" %}
+				<label class="checkbox">
+					<input type="checkbox" value="{{l}}"> {{l}}</option>
+				</label>
+			{% endfor %}
+	</div>
+
+	<div class="search-form-module">
+		<p class="form-header">Sector</p>
+			{% for s in sectors %}
+				<label class="checkbox">
+					<input type="checkbox" value="{{s}}"> {{s}}</option>
+				</label>
+			{% endfor %}
+	</div>
+
+	<div class="search-form-module">
+		<p class="form-header">Size</p>
+			{% for k,v in sizes.items %}
+				<label class="checkbox">
+					<input type="checkbox" value="{{k}}"> {{v}}</option>
+				</label>
+			{% endfor %}
+			<ul class="form-params">
+
+			</ul> 
+	</div>
+
+	<div class="search-form-module">
+		<p class="form-header">Stage</p>
+			{% for s in stages %}
+				<label class="checkbox">
+					<input type="checkbox" value="{{s}}"> {{s}}</option>
+				</label>
+			{% endfor %}
+			<ul class="form-params">
+
+			</ul> 
+	</div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="search-results-list">
+	<p class="main-header">Search Results</p>
+
+{% if entities %}
+	
+		{% for e in entities|slice:":20" %}
+			<div class="list-preview">
+				
+				<div class="left-list-preview">
+					{% if e.logo %}
+					<div class="img-holder">
+						<img class="logo-preview" src="{{e.logo.url}}" />&nbsp;
+					</div>
+					{% endif %}
+				</div>
+				
+				<div class="right-list-preview"
+					<span class="company-header">{{e.name}}</span><br/>
+					<strong>{{e.domain}}</strong><br/>
+					<p>{{e.summary}}</p>
+					{% if e.office_set.all %}
+						Locations:
+						{% for o in e.office_set.all %}
+							{{o.city}}{% if o.state_code %}, {{o.state_code}} {% endif %}
+						{% endfor %}
+					{% endif %}
+				</div>
+				<div class="clear"></div>
+			</div>
+		{% endfor %}
+	</div>
+{% else %}
+I'm sorry, the Internets ate our database.
+{% endif %}
+
+
+{% endblock %}
+
+{% block rightSidebar %}
+
+<div class="rounded">
+	<p class="sidebar-header">Keep Track</p>
+	<p>Drag and drop any company you'd like to keep track of here.</p>
+</div>
+
+<div class="rounded">
+	<p class="sidebar-header">Save Search</p>
+	<p><a href="#">Save this search</a> to come back and review search results any time.</p>
+</div>
+
+{% endblock %}
+
+{% block templates %}
+<script type="text/template" id="org-single-template">
+	<li class="list-preview">			
+		<div class="left-list-preview">
+			<% if (logo != '') { %>
+			<div class="img-holder">
+				<img class="logo-preview" src="/media/<%= logo %>" />&nbsp;
+			</div>
+			<% } %>
+		</div>
+		
+		<div class="right-list-preview"
+			<span class="company-header"><%= full_name %></span><br/>
+			<p><%= summary %></p>
+		</div>
+		<div class="clear"></div>
+	</li>
+</script>
+
+<script type="text/template" id="org-list-template">
+	<p class="main-header">Search Results</p>
+	<ul class="org-list"></ul>
+</script>
+
+<script type="text/template" id="search-header-template">
+	<div class="search-form-header sidebar-header">
+		Refine Your Search
+	</div>
+</script>
+
+<script type="text/template" id="search-module-template">
+	<div class="search-form-module">
+		<p class="form-header"><%= category %></p>
+		<ul class="filters-list"></ul>
+	</div>
+</script>
+
+<script type="text/template" id="search-filters-template">
+	<label class="checkbox">
+		<input <% if (selected == true) { %> checked=checked <% } %> name="<%= category %>-filters" class="input-search-filter" type="checkbox" value="<%= value %>"><%= name %> <% if (count != null) {%> (<%= count %>) <% }%></option>
+	</label>
+</script>
+{% endblock %}

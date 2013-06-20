@@ -1,0 +1,32 @@
+{% extends "base_full.html" %}
+
+{% block sidebar %}
+
+{% endblock %}
+
+{% block content %}
+<div id="content-container" class="main-container">
+	<p class="feature-page-header">Couldn't stay away?</p>
+	{% if msg %}
+	<p class="message_error">{{ msg }}</p>
+	{% endif %}
+	<!-- <p>Enter the information below to log in.</p> -->
+	<form id="login-form" action="" method="post" name="login">
+		{% csrf_token %}
+		{{ form.non_field_errors }}
+		<ul>
+			<li><label for="id_username">Username or Email:</label> {{form.username.errors}}<input type="text" name="username" id="id_username" /></li>
+			<li><label for="id_password">Password:</label> {{form.password.errors}} <input type="password" name="password" id="id_password" /></li>
+		</ul>
+		<fieldset>
+			<a type="submit" onClick="$('#login-form').submit();" class="flat-button green-button">Submit</a><a class="flat-button blue-button left-spacer" href="/account/authorize">Login with LinkedIn</a>
+		</fieldset>
+	</form>
+</div>
+
+{% endblock %}
+
+{% block rightSidebar %}
+
+
+{% endblock %}

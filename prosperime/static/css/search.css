@@ -1,0 +1,74 @@
+/* Search filters */
+
+#main-column {
+	width:98%;
+}
+
+#sidebar-column {
+
+}
+
+#middle-column {
+	/*width:100%;*/
+}
+
+#right-column {
+	/*width: 25%;*/
+}
+
+div.max-filters{
+	width:25%;
+	overflow: hidden;
+	margin-right:5px;
+}
+
+div.min-filters{
+	width:2%;
+	/*overflow: hidden;*/
+	margin-right:5px;
+}
+
+div.min-results {
+	width:73%;
+}
+
+div.max-results {
+	width:95%;
+}
+
+input.input-search-filter {
+	font-size: 0.8em;
+}
+
+a.search-control-close:hover, a.search-control-open:hover {
+	cursor: pointer;
+}
+
+div.search-careers-container {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+ul.search-careers-list {
+	margin-left: 0;
+	font-size:8pt;
+}
+
+ul.search-careers-list li {
+	margin-left: 0;
+	margin-right:10px;
+	margin-top:2px;
+}
+
+a.search-button {
+	display:inline-block;
+	padding: 2px 4px 2px 4px;
+	background-color: rgb(41,98,152);
+	color:#fff;
+	cursor:pointer;
+}
+
+a.search-button:hover {
+	text-decoration: none;
+}
+

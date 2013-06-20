@@ -1,0 +1,42 @@
+{
+	"name":"Reed Hastings",
+	"headline":"Co-Founder & CEO of Netflix",
+	"profile_pic":"/static/img/reed_hastings.jpg",
+	"path": [
+		{
+			"title":"B.S. in Mathematics",
+			"entity_name":"Bowdoin College",
+			"type":"education",
+			"meta":"highlight"
+		}, {
+			"title":"M.A. in Computer Science",
+			"entity_name":"Stanford University",
+			"type":"education"
+		} , {
+			"title":"OCS Candidate",
+			"entity_name":"U.S. Marine Corps",
+			"type":"position",
+			"meta":"pivot"
+		} , {
+			"title":"High School Math Teacher",
+			"type":"position",
+			"entity_name":"Peace Corps",
+			"description":"Reed taught Math in Swaziland for two years.",
+			"meta":"pivot"
+		}, {
+			"title":"Engineer",
+			"type":"position",
+			"entity_name":"Adaptive Technology",
+			"meta":"pivot"
+		} , {
+			"title":"Founder & CEO",
+			"type":"position",
+			"entity_name":"Pure Software"
+		}, {
+			"title":"Co-Founder & CEO",
+			"type":"position",
+			"entity_name":"Netflix",
+			"meta":"highlight"
+		}
+	]
+}

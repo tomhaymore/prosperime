@@ -1,0 +1,337 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<!-- CSS -->
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/build.css" />
+
+
+<!-- JS -->
+	<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>
+	<script async type="text/javascript" src="{{ STATIC_URL }}js/timeline-viz.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.autocomplete.min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/helpers.js"></script>
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div id="content-container" class="main-container">
+
+	<!-- Header --> 
+	<div class="build-header">
+		Path: <span class="build-header-name">{{title}}</span>
+		<span class="build-header-name inline pull-right"><a href="/profile/{{user_id}}/">{{user_name}}</a></span>
+	</div>
+
+	<!-- MAIN PATH CONTAINER -->
+	<div id="path-container">
+		<!-- SVG here -->
+	</div>
+
+
+	<!-- Bottom Container -->
+	<div class="row">
+		<div id="build-positions-container" class="span12">
+			
+			<div class="pull-left span6 inline main-column" style="margin-left:0px">
+				<div class="build-sub-header pull-left inline">
+					Leave a Comment
+				</div>
+
+				<div id="comment-button" class="flat-button green-button save-button inline pull-right" style="visibility:hidden" onclick="submitComment()">Comment</div>
+
+				<textarea id="comment-textarea" rows="3" cols="400" placeholder="Comment on {{title}}..." onkeypress="checkCommentButton()" maxlength="400"></textarea>
+			</div>
+
+
+			<!-- Comments -->
+			<div id="comments-container" class="pull-right inline span6" style="margin-left:0px; visibility:hidden;">
+				<div class="build-sub-header" id="comments-container-header">Comments</div>
+				{% if comments|length == 0 %}
+					{% if viewer_own_profile == "false" %}
+						Be the first one to leave a comment!
+					{% else %}
+						<div id="no-comments">No comments yet</div>
+					{% endif %}
+				{% else %}
+					{% for c in comments %}
+						<div class="comment-inline">
+							<img width="25" height="25" class="profile-image" src="{{c.profile_pic}}"/>
+							<span class="comment-name"><a href="/profile/{{c.user_id}}/">{{c.user_name}}</a></span>
+							<span class="comment-body">{{c.body}}</span>
+							<span class="comment-date">{{c.date_created}}</span>
+						</div>
+					{% endfor %}
+				{% endif %}
+
+				</div>
+		</div>
+	</div>	
+	
+</div>
+{% endblock %}
+
+{% block templates %}
+
+
+
+
+<script type="text/javascript">
+	/* Event Handlers */
+
+	$(function() {
+
+		// If existing path, render it and comment
+		if ({{path_id}} != -1) {
+			render_existing_path()
+			$('#comments-container').css("visibility", "visible")
+		}
+
+	
+		/* Raphael Extension giving ID's to sets */
+		Raphael.st.setID = function(id) {
+			this.id = id;
+		};
+
+		Raphael.st.setData = function(name, value) {
+			this.data[name] = value
+		};
+
+		// Not tested
+		Raphael.st.unbindAll = function() {
+			while(this.events.length) {
+				var e = this.events.pop()
+				e.unbind()
+			}
+		};
+
+
+	});
+
+    // For Comment Textarea Button show/hide
+    var checkCommentButton = function() {
+    	if ($('#comment-textarea').val().length > 0)
+    		$('#comment-button').css('visibility', 'visible')
+    	else 
+    		$('#comment-button').css('visibility', 'hidden')
+    }
+
+    // To Make Comment (AJAX)
+    var submitComment = function() {
+    	var comment = $('#comment-textarea').val()
+
+    	$.post("/social/saveComment/", {'path_id':{{path_id}}, 'body':comment, 'type':"path", 'csrfmiddlewaretoken':"{{csrf_token}}"},
+		function(response) {
+			if (response["result"] == "success") {
+				console.log("Success")
+
+				// Append new comment to comments
+				var template = _.template($('#inline-comment-template').html())
+
+				// If no previous comments, remove "no comments" text
+				if ($('#no-comments').length > 0) $('#no-comments').remove()
+
+				$('#comments-container-header').after(template({
+					'profile_pic':response["profile_pic"],
+					'user_name':response["user_name"],
+					'date_created':response["date_created"],
+					'body':comment,
+				}))
+
+				// Clear comment box
+				$('#comment-textarea').val("")
+
+				// Highlight comment button
+				$('#comment-button').fadeOut(100).fadeIn(100).fadeIn(100).fadeOut(100).fadeIn(100).css('visibility', 'hidden')
+
+			} else {
+				console.log("Failure: " + response["errors"])
+			}
+		},"json");
+    }
+
+</script>
+
+
+<script type="text/template" id="inline-comment-template">
+
+	<div class="comment-inline">
+		<img width="25" height="25" class="profile-image" src="<%=profile_pic%>"/>
+		<span class="comment-name"><%=user_name%></span>
+		<span class="comment-body"><%=body%></span>
+		<span class="comment-date"><%=date_created%></span>
+	</div>
+
+</script>
+
+
+<script type="text/javascript">
+	/****************/
+	/* SVG for Path */
+	/****************/
+
+	/* Constants & Instance Variables */
+	var options = null //{{options|safe}}
+
+	// Note, if a new path is saved, this will change
+	var path_id = {{path_id}}
+	var options_data = []
+	var chosen_data = []
+	var line_data = []
+	var shuffle_button_id = -1
+
+	var paper_w = 1000
+	var paper_h = 250
+	var midline = 125
+	var dot_radius = 14
+	var y_range = 200
+	var y_max = y_range / 2
+	var y_offset = Math.ceil(y_range/(4)) // assuming 5 options...
+	var x_start = 125
+	var dot_distance = 125
+	var text_offset1 = 45
+	var text_offset2 = 30
+	var text_offset3 = 10
+	var option_text_offset = 50
+	var current_rect_id = -1
+	var current_option_index = 0
+
+	/* Attributes */
+	var chosen_dot_attributes = {
+		'fill':'#2890B9',
+		'stroke-width':0
+	};
+
+	var option_dot_attributes = {
+		'fill':'#3498DB',
+		'stroke-width':0,
+	};
+
+	var saved_dot_attributes = {
+		'fill':'#2980B9',
+		'stroke-width':0,
+	};
+
+	var chosen_line_attributes = {
+		'stroke':'#c0c0c0',
+		'stroke-opacity':0.8,
+		'stroke-linecap':'round',
+	};
+
+	var option_line_attributes = {
+		'stroke-dasharray':'-',
+	};
+
+	var text_attributes = {
+		"font-size":14, // make this smaller if > n steps
+		"font-family": '"Helvetica Neue", "Helvetica"',
+	};
+
+	var option_text_attributes = {
+		"font-size":12,
+		"text-anchor":"start",
+		"font-family":'"Open Sans", "Helvetica"'
+	};
+
+	/* Create Paper */
+	var paper = new Raphael("path-container", paper_w, paper_h)
+
+
+	/* If existing path elements, render those first */
+	var render_existing_path = function() {
+
+		var positions = {{path_steps|safe}}
+		if (positions.length == 0) return false;
+
+		var equal_offset = (paper_w / (positions.length + 1))
+		for (var e = 0; e < positions.length; e++) {
+			
+			var title = positions[e].title
+			var entity_name = positions[e].entity_name
+			var pos_id = positions[e].pos_id
+			var ideal_id = positions[e].ideal_id
+			var x = (1 + chosen_data.length) * equal_offset
+
+			// Alternate location of text
+			if (e % 2 == 0) {
+				var title_y = midline - text_offset1
+				var entity_name_y = midline - text_offset2
+			}
+			else {
+				var title_y = midline + text_offset2
+				var entity_name_y = midline + text_offset1
+			}
+
+			/* Create SVG Elements */
+			var dot = paper.circle(x, midline, dot_radius).attr(saved_dot_attributes)
+			var title_text = paper.text(x, title_y, title).attr(text_attributes)
+			var entity_text = paper.text(x, entity_name_y, entity_name).attr(text_attributes)
+
+			/* Set relevant data on dot element */
+			dot.data("pos_id", pos_id)
+			dot.data("title_text_id", title_text.id)
+			dot.data("entity_text_id", entity_text.id)
+			dot.data("ideal_id", ideal_id)
+
+			/* Update data structure */
+			chosen_data.push({"dot_id":dot.id, "pos_id":pos_id, "ideal_id": ideal_id})
+
+			/* Draw connecting line */
+			if (e > 0) {
+				var line = paper.path("M" + (x - equal_offset + dot_radius + 3) + ', ' + midline + ' L' + (x -dot_radius - 3) + ','  + midline).attr(chosen_line_attributes)
+				line_data.push(line.id)
+			}			
+		}
+
+		/* Add 'back' to last dot */
+		//dot.click(go_back)
+
+		/* Get and render options */
+		//get_and_render_options(ideal_id,pos_id)
+	};
+
+
+
+	/***********/
+	/* Helpers */
+	/***********/
+	var remove_options = function() {
+
+		// Delete option dots, titles, entity names
+		for (var j = 0; j < options_data.length; j++) {
+			paper.getById(options_data[j]["dot_id"]).remove()
+			paper.getById(options_data[j]["title_text_id"]).remove()
+			paper.getById(options_data[j]["entity_text_id"]).remove()
+		}
+		options_data.length = 0
+	}
+
+	var clear_path = function() {
+		// Delete dots, options for most recent dot
+		remove_chosen_dots()
+		remove_options()
+
+		// Delete lines
+		for (var d = 0; d < line_data.length; d++) {
+			paper.getById(line_data[d]).remove()
+		}
+
+		// Clear all data structures
+		line_data.length = 0
+	}
+
+	
+</script>
+
+{% endblock %}
+
+
+
+
+
+

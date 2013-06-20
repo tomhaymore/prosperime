@@ -1,0 +1,89 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/discover.css" />
+<script type="text/javascript" src="{{ STATIC_URL }}js/discover.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div id="content-container" class="main-container">
+	<p class="splash-header">{{user.full_name}}</p>
+	<p class="main-sub-header">{{user.headline}}</p>
+
+
+
+	<div id="profile-container">
+		<div class="profile-module" data-name="profile-careers">
+			<p class="main-header">My Careers</p>
+			<ul>
+			{% for c in careers %}
+				<li><a href="/discover/career/{{c.id}}">c.name</a></li>
+			{% endfor %}
+			</ul>
+		</div>
+		<div class="profile-module" data-name="profile-saved-paths">
+			<p class="main-header">Saved Paths</p>
+			<ul data-name="saved-paths-list">
+			{% for s in saved_paths %}
+				<li><a href="#">{{s.title}}</a> <span class="badge">{{s.positions|length}}</span></li>
+			{% endfor %}
+			</ul>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	
+	/* Inelegant but effective way to pulsate the element w/o
+	   external JQuery libraries */
+	var highlight = function(elem) {
+		$(elem).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
+	};
+
+
+	var newPathAjax = function() {
+		_gaq.push(['_trackEvent', 'profile', 'newPathCreated'])
+
+		var title = $('#new-path-box').val()
+		if (title.length < 1) {
+			errorCreatingPath('title')
+			return
+		}
+
+		// Attempt POST request via AJAX to create path
+		$.post('/saved_paths/create/', {title: title, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
+				if (response['success']) {
+					console.log(response)
+					// Construct new table element for path
+					var newRow = "<tr><td ondragover='allowDrop(event)' ondrop='dropPosition(event," + title + ", this)'><a href='/saved_paths/#id/?id=" + response['id'] + "'>" + title + "</a></td></tr>"
+
+					// Add to DOM
+					$('#sidebar-path-list > tbody:last').append(newRow)
+					
+					// Clear text field
+					$('#new-path-box-row').remove()
+				} else {
+					errorCreatingPath('db')
+				}
+		}, 'json');
+	};
+
+	var errorCreatingPath = function(reason) {
+		_gaq.push(['_trackEvent', 'profile', 'errorCreatingPath'])
+	
+		var createBox = $('#new-path-box')
+		if (reason == "db") {
+			console.log("Error in the view creating new path...")
+			createBox.val("Please enter a title")
+		} else if (reason == "title") {
+			createBox.val("Please enter a title")
+		}
+
+		highlight(createBox)
+	};
+</script>
+
+
+{% endblock %}

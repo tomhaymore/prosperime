@@ -1,0 +1,507 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<!-- CSS -->
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/feed.css" />
+
+
+<!-- JS -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/helpers.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/tooltip_and_popover.js"></script>
+<script type="text/javascript">
+$(function() {
+	$("a#close-spotlight").click(function(e) {
+		$("#carousel-container").hide();
+		e.preventDefault();
+	});
+});
+</script>
+{% endblock %}
+
+
+
+{% block content %}
+
+<div id="content-container" class="main-container">
+	<div id="feed-container">
+
+
+
+		<!-- Body Container -->
+		<div class="" id="feed-body-container">
+
+
+	
+
+			<!-- Left Sidebar -->
+			<div class="feed-left-sidebar pull-left column">
+				
+				<!-- Header -->
+				<div id="header-container">
+					<p class="feature-page-header">Feed</p>
+				</div>
+
+				<div id="user-image-container">
+					<img class="profile-image" src="{{user_profile_pic}}" />
+				</div>
+
+
+				<div>
+					<div class="feed-item feed-menu-item selected">Updates</div>
+					<a href="/profile/{{user_id}}/#goal-positions">
+						<div class="feed-item feed-menu-item">Saved Positions</div>
+					</a>
+					<a href="/profile/{{user_id}}#saved-paths">
+						<div class="feed-item feed-menu-item">Saved Paths</div>
+					</a>
+					<!-- <p class="feed-menu-header">Actions</p> -->
+					<a href="/build">
+						<div class="feed-item feed-menu-item">Build</div>
+					</a>
+					<!-- <a href="/plan">
+						<div class="feed-item feed-menu-item">Plan</div>
+					</a> -->
+					<a href="/progress/">
+						<div class="feed-item feed-menu-item">How do I get there?</div>
+					</a>
+				</div>
+			</div>
+
+			<!-- Feed (Main) Column -->
+			<div class="feed-main-container pull-left column">
+
+				<!-- Carousel -->
+				<div id="popover-container"></div>
+				<div class="" id="carousel-container">
+					<div class="">
+						<p class="spotlight-header pull-left">Spotlight</p>
+						<a id="close-spotlight" href="" class="inline-link pull-right">Close</a>
+						<div class="clear"></div>
+
+						<div id="carousel" class="carousel slide">
+							<ol id="seed-carousel-indicators" class="carousel-indicators">
+								<!-- JS Here -->
+							</ol>
+
+					
+							<!-- Items -->
+							<div id="seed-carousel-inner" class="carousel-inner">
+								<!-- JS Here -->
+							</div>
+
+							<!-- Nav -->
+							<a class="carousel-control left" href="#carousel" data-slide="prev">&lsaquo;</a>
+					 		<a class="carousel-control right" href="#carousel" data-slide="next">&rsaquo;</a>
+						</div>
+					</div>
+					<div id="description-container-wrapper">
+						<div id="description-container"></div>
+					</div>
+				</div>
+
+				<!-- Main Feed -->
+				<div class="feed-main column">
+				{% if feed|length > 0 %}
+					{% for f in feed %}
+						{% autoescape on %}
+						<div class="feed-item" onmouseover="render_thumbnail({{f.stub}}, '{{f.type}}', {{f.body}})"onmouseout="close_thumbnail()">
+						{% endautoescape %}
+							{% if f.type == "savedcareer" %}
+								<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> is interested in <a href="/career/{{f.id}}/">{{f.title}}</a>
+							{% elif f.type == "careerpath" %}
+								<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> created the career path <a href="/path/{{f.id}}">{{f.title}}</a>
+							{% elif f.type == "goalposition" %}
+								<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> is interestered in becoming a <a href="/position/{{f.id}}">{{f.title}}</a>
+							{% elif f.type == "newuser" %}
+								<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> joined Prosperime!
+							{% elif f.type == "comment" %}
+								<a href="/profile/{{f.user_id}}">{{f.user_name}}</a> commented on 
+								
+								{% if user.id == f.target_user_id %}
+									your 
+								{% else %}
+									<a href="/profile/{{f.target_user_id}}">{{f.target_user_name}}'s</a>		
+								{% endif %}
+								
+								{{f.target_type}} <a href="/build/{{f.target_id}}">{{f.target_name}}</a>: 
+								{% if f.body|length > 30 %}
+									{{f.body|slice:":35"}}..."
+								{% else %}
+									{{f.body}}
+								{% endif %}
+							{% endif %}
+
+							</div>
+							<div class="feed-item-timestamp pull-right">
+									{{f.date}}
+							</div>
+						{% endfor %}
+						<!-- <div id="more">More</div> -->
+					{% else %}
+						<h5>Sorry, no updates available right now.</h5>
+					{% endif %}
+				</div>
+			</div>
+
+			<!-- Right Sidebar -->
+			<div id="thumbnail-column" class="pull-left column">
+				<div id="thumbnail-fixed">
+					<div id="thumbnail-container">
+						<!-- Hover gets filled in here -->
+					</div>
+
+					<div id="thumbnail-svg-container">
+						<!-- SVG here -->
+					</div>
+				</div>
+			</div>
+			<div class="clear"></div>
+		</div>	
+		
+	</div>
+</div>
+{% endblock %}
+
+{% block templates %}
+
+
+
+
+<script type="text/javascript">
+
+	$(function() {
+
+		// Create carousel structure from JSON, active carousel
+		create_carousel()
+		$('#carousel').carousel({interval:false})
+
+		// Create universal popover
+		$('#popover-container').popover({
+			'trigger':'manual',
+			'placement':'top',
+			'animation':'ease',
+			'content':"Content would go here"
+		});
+	});
+
+
+
+
+	// Constants
+	var paths = {{seeds|safe}}
+	var paper_w = 550; var paper_h = 160;
+	var dot_radius = 12
+	var start_x = 20
+	var ed_y = 140
+	var pos_y = 100
+	var current_y = pos_y
+	var ed_color = '#E74C3C'
+	var pos_color = '#2890B9'
+	var text_offset2 = 35; var text_offset1 = 20;
+
+
+
+	var render_seed_path = function(path, index) {
+
+			// Loop state keepers
+			var prev_x = 0; var prev_y = 0; var color = null; var current_x = 0; var current_y = 0; var x_offset = 0;
+
+
+			var paper = new Raphael("seed-" + index, paper_w, paper_h)
+			x_offset = ((paper_w - (start_x * 2)) / (path.length + 1))
+			current_x = start_x + x_offset
+			current_y = pos_y
+			var prev_dot = null;
+
+
+			// Iterate thru path
+			for (var j = 0; j < path.length; j++) {
+
+				// Set variables for dot
+				if (path[j]['type'] == "education") {
+					color = ed_color
+					current_y = ed_y
+				} else {
+					color = pos_color
+					if (current_y == ed_y) current_y = pos_y
+
+					else if (path[j]['meta'] == 'pivot')
+						current_y = (current_y == pos_y) ? current_y - 40 : pos_y	
+				}
+
+
+				// Draw dot
+				var dot = paper.circle(current_x,current_y,dot_radius).attr({'fill':color,'stroke-width':0})
+				dot.node.id="dot-" + dot.id // for popover
+				dot.node.setAttribute('pop-title', path[j]['title'] + " at " + path[j]['entity_name'])
+				dot.node.setAttribute('y', current_y)
+				if ("description" in path[j]) 
+					dot.node.setAttribute('description', path[j]['description'])
+				else dot.node.setAttribute('description',null)
+
+				// // Write text on pivots, first and last pos
+				// if (path[j]['meta'] == 'pivot' || path[j]['meta'] == 'highlight') {
+
+				// 	// $('#seed-carousel-inner').append("<div id='popover-"+index+"-"+j+"'></div>")
+
+				// 	// $('#popover-'+index+'-'+j).popover({
+				// 	// 	'trigger':'manual',
+				// 	// 	'placement':'top',
+				// 	// 	'animation':'ease',
+				// 	// 	'content':'content'
+				// 	// }).css("left", current_x + "px").attr("data-original-title", $(dot.node).attr("pop-title")).popover("show")
+
+
+					
+
+			
+				// } else {
+
+				// On generic elements, just use the universal popover
+				$(dot.node).on('mouseenter', function(ev) {
+					var target = $(ev.currentTarget)
+					var offset = target.offset()
+
+
+					if (target.attr('y') < pos_y)
+						$('#popover-container').show().css("left",(offset.left + dot_radius) + "px").css("top",(offset.top) + "px").attr("data-original-title", target.attr('pop-title')).attr("data-content", target.attr('pop-content')).popover("show").attr("placement", "bottom")
+
+				
+					else
+						$('#popover-container').show().css("left",(offset.left + dot_radius) + "px").css("top",(offset.top) + "px").attr("data-original-title", target.attr('pop-title')).attr("data-content", target.attr('pop-content')).popover("show")
+
+					if (target.attr("description") != "null")
+						$('#description-container').css("display", "inline-block").append(target.attr("description"))
+
+
+				}).on('mouseleave', function(ev) {
+					$('#popover-container').css("display", "none").popover("hide")
+					$('#description-container').hide().empty()
+				})
+				// }
+
+				
+
+				// Draw connecting line
+				if (j > 0) {
+					var line = paper.path("M"+prev_x+","+prev_y+"L"+current_x+","+current_y).attr({'stroke':'#c0c0c0', 'stroke-linecap':'round', 'stroke-opacity':0.8})
+				}
+
+				// Thomas witchcraft
+				dot.toFront();
+				prev_y = current_y; prev_x = current_x; 
+				current_x += x_offset
+				if (prev_dot != null) {
+					prev_dot.toFront();
+				}
+				prev_dot = dot;
+			};
+				
+
+	};
+	var paper = null;
+	var render_thumbnail = function(stub, type, body) {
+
+		// First empty
+		$('#thumbnail-container').empty()
+		if (paper != null) {
+			clearPaper(paper)
+			paper = null
+		}
+
+		var template = _.template($('#feed-item-thumbnail-template').html());
+
+		var data = {
+			'are_connected':stub["connected"],
+			'profile_pic':stub["user_pic"],
+			'num_saved_paths':stub["saved_paths"],
+			'num_saved_positions':stub["saved_positions"],
+			'user_name':stub["user_name"],
+			'user_id':stub["user_id"]
+		}
+
+		$('#thumbnail-container').append(template(data))
+
+		var secondary_template = null;
+
+		switch(type) {
+			case "savedcareer":
+				secondary_template = _.template($('#saved-career-thumbnail-template').html());
+				data = {
+					"career_id":stub["career"]["id"],
+					"career_title":stub["career"]["title"],
+				}
+				break;
+
+			case "goalposition":
+				secondary_template = _.template($('#goal-position-thumbnail-template').html());
+				data = {
+					"position_id":stub["id"],
+					"position_title":stub["position"],
+				}
+				break;
+
+			case "comment":
+				secondary_template = _.template($('#comment-thumbnail-template').html());
+
+				data = {
+					'body':body,
+				}
+
+				break;
+
+			case "careerpath":
+				secondary_template = _.template($('#career-path-thumbnail-template').html());
+
+				// If this is first career path, create paper
+				if (!paper) 
+					paper = new Raphael("thumbnail-svg-container", 300, 400)
+
+				data["paper"] = paper
+				data["path"] = stub["path"]
+
+				break;
+
+			case "newuser":
+				console.log("newuser")
+				break;
+		};
+		if (secondary_template) {
+			$('#thumbnail-secondary-container').append(secondary_template(data))
+		}
+	};
+
+	var close_thumbnail = function() {
+		// $("#thumbnail-container").empty()
+	};
+
+	var create_carousel = function() {
+		var seeds = {{seeds|safe}}
+		
+		// Iterate through each seed person
+		for (var i = 0; i < seeds.length; i++) {
+
+			// // Append unique popovers to container per highlight/pivot/person
+			// for (var j = 0; j < seeds[i]['path'].length; j++) {
+			// 	if ('meta' in seeds[i]['path'][j]) {
+			// 		console.log(seeds[i]['path'][j])
+			// 		$()
+
+			// 	}
+			// }
+
+
+
+			// if (seeds[i]['path'].length > num_popovers_created) {
+			// 	var difference = seeds[i]['path'].length - num_popovers_created
+
+			// 	for (var j = 0; j < difference; j++) {
+			// 		$('#carousel-container').append("<div class='popover-container' id='popover-" + (++num_popovers_created) + "'></div>")
+			// 	}
+			// }
+
+			// First (active) pane
+			if (i == 0) {
+				// Add indicators
+				$("#seed-carousel-indicators").append(
+					"<li data-target='#carousel' data-slide-to='" + i + "' class='active'></li>"
+				)
+
+				// Add pic, headline, name
+				$("#seed-carousel-inner").append("<div class='active item'><div class='pull-left inline'> <img class='carousel-profile-image inline' width='75' src='" + seeds[i]['profile_pic'] + "' /></div> <div class='carousel-person-name inline'>" + seeds[i]['name'] + "</div><div class='carousel-person-current'>" + seeds[i]['headline'] + "</div><div id='seed-" + i + "' class='svg-container'></div></div>")
+
+			// Background panes
+			} else {
+
+				// Add indicators
+				$("#seed-carousel-indicators").append(
+					"<li data-target='#carousel' data-slide-to='" + i + "'></li>"
+				)
+
+				// Add pic, headline, name
+				$("#seed-carousel-inner").append("<div class='item'><div class='pull-left inline'> <img class='carousel-profile-image inline' width='75' height='75' src='" + seeds[i]['profile_pic'] + "' /></div> <div class='carousel-person-name inline'>" + seeds[i]['name'] + "</div><div class='carousel-person-current'>" + seeds[i]['headline'] + "</div><div id='seed-" + i + "' class='svg-container'></div></div>")			
+			}
+
+			// Now, add SVG
+			render_seed_path(seeds[i]['path'], i)
+			
+		}
+	}
+
+
+</script>
+
+<script type="text/template" id="feed-item-thumbnail-template">
+	<div class="thumbnail-image-container pull-left">
+		<img class="profile-image" src="<%=profile_pic%>" />
+	</div>
+
+	<% if (are_connected) {
+		%><div class="flat-button blue-button connect-button pull-left">Connected</div><%
+	} else {
+		%><div class="flat-button green-button connect-button pull-left">Connect</div><%
+	} %>
+	<div class="clear"></div>
+	<div class="thumbnail-info-header"><a href="/profile/<%=user_id%>"><%= user_name%></a></div>
+	<div class="thumbnail-info"><%= num_saved_paths %> saved paths</div>
+	<div class="thumbnail-info"><%= num_saved_positions %> saved positions</div>
+
+	<div id="thumbnail-secondary-container"></div>
+
+
+</script>
+
+<script type="text/template" id="saved-career-thumbnail-template">
+
+	<p class="thumbnail-info-header">View Career: <a href="/career/<%=career_id%>/"><%=career_title%></a></p>
+
+</script>
+
+<script type="text/template" id="goal-position-thumbnail-template">
+
+	<div class="thumbnail-info-header">View Position: <a href="/position/<%=position_id%>/"><%=position_title%></a></div>
+
+</script>
+
+<script type="text/template" id="comment-thumbnail-template">
+	
+	<div class="thumbnail-info">"<%=body%>"</div>
+
+</script>
+
+<script type="text/template" id="career-path-thumbnail-template">
+
+	<%
+		for (var n = 0; n < path.length; n++) {
+			paper.circle(50, 12 + (36*n), 12).attr({
+				'fill':'rgb(52,152,219)',
+				'stroke-width':0,
+			})
+
+			// Make sure text will fit
+			if (path[n].title.length > 30) {
+				// Find nearest word
+				var split_index = path[n].title.substring(0,30).lastIndexOf(" ")
+
+				path[n].title = path[n].title.substring(0,split_index) + "\n" + path[n].title.substring(split_index)
+			}
+
+			paper.text(75, 12 + (36*n), path[n].title).attr({
+				'font-size':12,
+				'text-anchor':'start'
+			})
+
+			if (n > 0) {
+				var prev_y = 12 + (36*(n-1)) + 12
+				paper.path("M50,"+prev_y+" L50,"+(36*n)).attr({
+					'stroke':'#777'
+				})
+			}
+		}
+	%>
+
+</script>
+
+{% endblock %}

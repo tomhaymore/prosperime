@@ -1,0 +1,1349 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+<!-- CSS -->
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/profile.css" />
+<link type='text/css' rel='stylesheet' href='{{ STATIC_URL }}css/font-awesome.min.css' />
+
+
+<!-- Javascripts --> 
+<script type="text/javascript" src="{{ STATIC_URL }}js/viz.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/drag_and_drop.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+<!-- <script type="text/javascript" src="http://github.com/DmitryBaranovskiy/raphael/raw/master/raphael-min.js"></script> -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.autocomplete.min.js"></script>
+
+<script type="text/javascript">
+	var backbone_careers_init_data = {{goal_careers|safe}}
+	var backbone_goal_positions_init_data = {{goal_positions|safe}}
+	var backbone_positions_of_interest_init_data = {{queue|safe}}
+	var backbone_own_profile = {{own_profile_javascript}}
+
+	var saved_paths = {{viewer_saved_paths|safe}}
+	var positions = {{positions|safe}}
+	var total_start_date = "{{start_date|safe}}"
+	var total_end_date = "{{end_date|safe}}"
+	var total_time = "{{total_time}}"
+</script>
+
+<script type='text/javascript' src='{{ STATIC_URL }}js/backbone.js'></script>
+<script type='text/javascript' src='{{ STATIC_URL }}js/profile.js'></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/timeline-viz.js"></script>
+<!-- For CSRF in Backbone -->
+<script async type="text/javascript">
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    crossDomain: false, // obviates need for sameOrigin test
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type)) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+</script>
+
+
+
+{% endblock %}
+
+
+
+<!-- Content -->
+{% block content %}
+
+<!-- Header -->
+<div class="main-container content-container">
+	<div class="profile-header-container">
+
+
+		<!-- <p class="feature-page-header">Profile</p> -->
+		<p class="feature-page-header">{{profile.full_name}}
+			{% if request.user.id == user.id %}
+				<a class="flat-button green-button">Edit</a>
+			{% endif %}
+		</p>
+		
+
+		<div class="profile-image-container pull-left">
+			<img class="profile-image" src="{{profile.default_profile_pic}}" />
+		</div>
+		<div class="profile-details-container pull-left">
+			{% if profile.headline %}
+				<p class="profile-subheader">{{profile.headline}}</p>
+			{% else %}
+				<p class="profile-subheader">{{profile.latest_position.safe_title}}</p>
+			{% endif %}
+			{% if profile.educations %}
+			<ul>
+				{% for e in profile.educations %}
+				<li>{{e.entity.name}}, {{e.degree}}</li>
+				{% endfor %}
+				
+			</ul>
+			{% endif %}
+		</div>
+		<div class="profile-careers-container pull-left">
+			<div class="pull-left careers-list">
+				<p class="feature-page-subheader" style="display:inline-block;width:200px;">Career Breakdown</p>
+				{% if top_careers %}
+					<ul>
+					{% for c in top_careers|slice:"5" %}
+						<p id="profile-career-list-{{c.1.id}}" class="profile-list">{{c.1.name}}</p>
+					{% endfor %}
+					</ul>
+				{% endif %}
+			</div>
+			<div class="pull-left">
+				
+			<div id="profile-careers-chart" width="150" height="150"></div>
+				<div class="profile-careers" id="career-chart-data">
+					{% if top_careers %}
+					<ul class="profile-career-chart-list">
+					{% for c in top_careers|slice:"5" %}
+						<li class="profile-career-chart-item" data-id="{{c.0}}" data-score="{{c.1.score}}" data-name="{{c.1.name}}">{{c.1.name}}</li>
+					{% endfor %}
+					</ul>
+					<!-- <ul class="profile-careers-list flat">
+						{% for c in top_careers %}
+							<li class="profile-career"><a class="profile-button" href="/career/{{c.id}}">{{c.short_name}}</a></li>
+						{% endfor %}
+					</ul> -->
+					{% endif %}
+				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+		<div class="clear"></div>
+
+		<!-- {% if not is_connected %}
+		<div class="pull-right">
+			<span class="flat-button blue-button button-large connect-button" onclick="connect(this, {{profile.id}})">Connect</span>
+		</div>
+		{% endif %} -->
+
+
+		<!-- <p class="main-sub-header">{{profile.headline}}</p> -->
+		
+		<!-- <span class="pull-right" id='profile-careers-container'>
+			{% if careers %}
+			<ul class="profile-careers-list flat">
+				{% for k,v in careers.items %}
+					<li class="profile-career"><a class="profile-button" href="/career/{{k.id}}">{{k.long_name}}</a></li>
+				{% endfor %}
+			</ul>
+			{% endif %}
+		</span> -->
+
+	</div>
+
+	<div class="clear"></div>
+	
+	<!-- TIMELINE -->
+	{% if positions|length > 0 %}
+		<div class="h-header-container">
+			<div class="h-header">
+				Timeline
+			</div>
+		</div>
+
+		<div id="timeline-container">
+			<!-- Fill in with JS -->
+		</div>
+
+		<!-- Position Information Here -->
+		<div id="timeline-info-container">
+			<div id="timeline-header-container">
+				
+			</div>
+
+			<div id="timeline-description-container">
+				<!-- currently unused -->
+			</div>
+		</div>
+	{% endif %}
+
+
+	<!-- Career Decision Prompt -->
+	<div class="pull-left span12" style='margin-left:0px'>	
+			<div id="middle-float-screen"ondragover='allowDrop(event)'>
+				<!-- Template here -->
+			</div>	
+	</div>
+
+
+	<!-- Personal Data - Saved Careers, Positions of Interest, and Saved Paths -->
+	{% if own_profile %}
+
+		<!-- Tabs -->
+		<ul class="nav nav-tabs" id="profile-tabs">
+			<li><a href="#goal-careers" data-toggle="tab">Your Careers</a></li>
+			<li><a href="#goal-positions" data-toggle="tab">Goal Positions</a></li>
+			<li><a href="#positions-of-interest" data-toggle="tab">Interested Positions</a></li>
+		</ul>
+
+		<!-- Tab Content -->
+		<div class="tab-content">
+
+			<!-- Goal Careers -->
+			<div class="tab-pane active" id="goal-careers">
+
+				<!-- Header -->
+				<!-- <a name="goal-careers-anchor">
+					<div id="goal-careers-header" class="timeline-header anchor inline"></div>
+				</a> -->
+				
+				
+
+				<!-- Careers container -->
+				<div id="goal-careers-container" class="item-container">
+					<!-- Backbone here -->
+				</div>
+
+				<!-- Not what you're looking for? -->
+				<div class="pull-left personalize-prompt-container">
+					<!-- <div id="personalize-goal-careers-prompt" class="personalize">Interested in something else? Explore your options <a onclick="revealPersonalization('goalCareer')">here.</a> -->
+					<div id="personalize-goal-careers-prompt">Add other careers:</a>
+					</div>
+					<!-- <div id="personalize-goal-careers" class="personalize">
+						<div class="input-append inline">
+							<input id="personalize-goal-careers-box" type="text">
+							<span id="personalize-goal-careers-add" class="add-on"> Add </span>
+						</div>
+						<div class="flat-button inline personalize-button" onclick="hidePersonalization('goalCareer')"> Back </div>
+					</div> -->
+					<div id="personalize-goal-careers" class="">
+						<div class="">
+							<input id="personalize-goal-careers-box" class="flat-input-med" type="text" />
+							<span id="personalize-goal-careers-add" class="flat-button inline-button blue-button"> Add </span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Goal Positions -->
+			<div class="tab-pane" id="goal-positions">
+
+				<!-- Header -->
+				<!-- <a name="goal-positions-anchor">
+					<div id="goal-positions-header" class="timeline-header anchor inline"></div>
+				</a> -->
+
+
+				<!-- Positions Container -->
+				<div id="goal-positions-container" class="item-container">
+					<!-- Backbone here -->
+				</div> 
+				<!-- Not what you're looking for? -->
+				<div class="pull-left personalize-prompt-container">
+					<div id="personalize-goal-positions-prompt personalize-prompt">Add other positions:</div>
+					<div id="personalize-goal-positions">
+						<div>
+							<input id="personalize-goal-positions-box" class="flat-input-med" type="text">
+							<span id="personalize-goal-positions-add" class="flat-button inline-button blue-button">Add</span>
+						</div>
+					</div>
+					
+				<!-- <div id="personalize-goal-positions-prompt" class="personalize">
+					Interested in something else? Explore your options <a onclick="revealPersonalization('goalPosition')">here.</a>
+				</div>
+				<div id="personalize-goal-positions" class="personalize" style="display:none">
+					<div class="input-append inline">
+						<input id="personalize-goal-positions-box" type="text">
+						<span id="personalize-goal-positions-add" class="add-on"> Add </span>
+					</div>
+					<div class="flat-button inline personalize-button" onclick="hidePersonalization('goalPosition')"> Back </div>
+
+				</div> -->
+				</div>
+			</div>
+
+			<!-- Interested Positions -->
+			<div class="tab-pane" id="positions-of-interest">
+
+				<!-- Header -->
+				<a name="positions-of-interest-anchor">
+					<div id="queue-header" class='timeline-header anchor'></div>
+				</a>
+
+				<!-- Container -->
+				<div id='queue' class="item-container">
+					<!-- Backbone Here -->
+				</div>
+			</div>
+		</div>
+
+		<br/><br/>
+
+	{% endif %}
+
+	{% if viewer_saved_paths %}
+		<!-- Tabs -->
+		<ul class="nav nav-tabs" id="saved-path-tabs">
+			{% if viewer_saved_paths %}
+				{% for tuple in saved_path_ids %}
+					<li id="path-tab-{{tuple.0}}"><a href="#{{tuple.0}}" data-toggle="tab">{{tuple.1}}</a></li>
+				{% endfor %}
+			{% endif %}
+		</ul>
+
+		<a href="#saved-paths"> </a>
+		<div class="tab-content" id="saved-paths-container">
+			
+			{% if viewer_saved_paths %}
+				{% for tuple in saved_path_ids %}
+					{% if forloop.first %}
+						<div class="tab-pane active" id="{{tuple.0}}"data-index={{forloop.counter0}}>
+					{% else %}
+						<div class="tab-pane" id="{{tuple.0}}" data-index={{forloop.counter0}}>
+					{% endif %}
+
+							<div id='path-{{tuple.0}}' class='saved-path-timeline'>	</div>
+	
+					</div>
+				{% endfor %} 
+			{% endif %}
+
+		</div>
+
+		
+	{% endif %}
+
+</div>
+
+<script type="text/javascript">
+
+
+</script>
+
+<!-- These fxns won't be needed immediately, so async them -->
+<script async type="text/javascript">
+
+	var selected_ideal_position_id = null
+	var selected_career_id = null
+
+
+	$(function() {
+		 $('#personalize-goal-positions-box').autocomplete({
+	    	serviceUrl: '/careers/idealPositionAutocomplete/',
+	    	onSelect: function(suggestion) {
+				selected_ideal_position_id = suggestion.data
+		    }
+	    });
+
+	    $('#personalize-goal-careers-box').autocomplete({
+	    	serviceUrl: '/careers/careerAutocomplete/',
+	    	onSelect: function(suggestion) {
+	    		selected_career_id = suggestion.data
+	    	}
+	    });
+
+	    $('#personalize-goal-positions #personalize-goal-positions-add').click(function(ev) {
+
+	    	// First, make sure not alread a goal pos
+	    	for (var g = 0; g < backbone_goal_positions_init_data.length; g++) {
+	    		if (backbone_goal_positions_init_data[g]['id'] == selected_ideal_position_id) {
+
+	    			// light up that box?
+
+	    			return false;
+	    		}
+	    	}
+
+	    	$.post('/careers/addGoalPosition/', {'id':selected_ideal_position_id, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
+	    		if (response["result"] == "success") {
+	    			console.log("success")
+	    			$('#personalize-goal-positions-box').fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)
+	    			$('#personalize-goal-positions-add').fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)
+	    			update_profile("goalPositions")
+	    		} else 
+	    			console.log("Error: " + response["errors"])
+	    		
+	    	}, "json");
+	    })
+
+	    $('#personalize-goal-careers #personalize-goal-careers-add').click(function(ev) {
+
+	    	// First, make sure not already saved
+	    	for (var h = 0; h < backbone_careers_init_data.length; h++) {
+	    		if (backbone_careers_init_data[h]['id'] == selected_career_id) {
+	    			console.log("goal career already saved")
+	    			// light up that box?
+	    			return false;
+	    		}
+	    	}
+
+	    	$.post('/careers/addSavedCareer/', {'id':selected_career_id, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
+	    		if (response["result"] == "success") {
+	    			console.log("success")
+	    			$('#personalize-goal-careers-box').fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)
+	    			$('#personalize-goal-careers-add').fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100)
+	    			update_profile('savedCareers')
+	    		} else 
+	    			console.log("Error: " + response["errors"])
+	    	}, "json");
+	    })
+
+	});
+
+	/* Connect users that aren't already connected */
+	var connect = function(elem, connectee_id) {
+
+		$.post("/accounts/connect/", {'id':connectee_id}, function(response) {
+				if (response["result"] == "success") {
+					console.log("success")
+					$(elem).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100)
+				} else {
+					console.log("Failure: " + response["errors"])
+				}
+		}, "json");
+
+	};
+
+	/* Send AJAX request to re-fill instance variable that backbone pulls from. Essentially, manually doing what should be done in Backbone */
+	var update_profile = function(type) {
+		console.log("update profile called")
+		$.get('/accounts/updateProfile/?query=' + type, function(response) {
+			console.log(response)
+	    		if (response["result"] == "success") {
+	    			console.log("success")
+	    			console.log(response["data"])
+
+	    			if (type == "goalPositions") {
+	    				backbone_goal_positions_init_data = response['data']
+	    				window.goalPositions.reset(backbone_goal_positions_init_data)
+
+	    			} else {
+	    				backbone_careers_init_data = response['data']
+	    				window.goalCareers.reset(backbone_careers_init_data)
+	    			}
+	    		} else 
+	    			console.log("Error: " + response["errors"])
+	    			// freak out
+	    	}, "json");
+	}
+
+	var revealPersonalization = function(type) {
+		if (type == "goalPosition") {
+
+			$('#personalize-goal-positions-prompt').hide()
+			$('#personalize-goal-positions').show()
+
+
+		} else if (type == "goalCareer") {
+
+			$('#personalize-goal-careers-prompt').hide()
+			$('#personalize-goal-careers').show()
+
+		}
+	};
+
+	var hidePersonalization = function(type) {
+
+		if (type == "goalPosition") {
+
+			$('#personalize-goal-positions-prompt').show()
+			$('#personalize-goal-positions').hide()
+
+		} else if (type == "goalCareer") {
+
+			$('#personalize-goal-careers-prompt').show()
+			$('#personalize-goal-careers').hide()
+
+		}
+	}
+
+	var delete_path = function(ev) {
+
+		var path_id = $(ev.currentTarget).data("id")
+		$.post("/careers/deleteSavedPath/", {'id':path_id}, function(response) {
+			if (response["result"] == "success") {
+				console.log("Success")
+
+				// Remove from view & re-render first tab
+				$('#path-' + path_id).remove()
+				$('#path-tab-' + path_id).remove()
+
+				if ($("#saved-path-tabs a").length > 0)
+					$("#saved-path-tabs a:first").tab("show")
+
+			} else {
+				console.log("Failure: " + response["errors"])
+			}
+		}, "json");
+	}
+
+</script>
+			
+
+<script type="text/javascript">
+	$(function() {
+		/*  Following code taken from http://stackoverflow.com/questions/4771517/raphael-js-path-line-with-gradient to add linear gradients to paths (no native suppport from Raphael) */
+		if (Raphael.vml) {
+        	Raphael.el.strokeLinearGradient = function() {
+            	// not supporting VML yet
+            	return this; // maintain chainability
+        	};
+   		} else {
+        	var setAttr = function(el, attr) {
+            	var key;
+            	if (attr) {
+                	for (key in attr) {
+                   		if (attr.hasOwnProperty(key)) 
+                        	el.setAttribute(key, attr[key]);
+                	}
+            	} else 
+                	return document.createElementNS("http://www.w3.org/2000/svg", el);
+      
+            	return null;
+        	};
+
+	        var defLinearGrad = function(defId, stops) {
+	            var def = setAttr("linearGradient");
+	            var i, l;
+	            def.id = defId;
+
+	            for (i = 0, l = stops.length; i < l; i += 1) {
+	                var stopEle = setAttr("stop");
+	                var stop = stops[i];
+	                setAttr(stopEle, stop);
+
+	                def.appendChild(stopEle);
+	            }
+
+	            return def;
+	        };
+
+	        Raphael.el.strokeLinearGradient = function(defId, width, stops) {
+	        	console.log(this)
+	            if (stops) {
+	                this.paper.defs.appendChild(defLinearGrad(defId, stops));
+	            }
+	            setAttr(this.node, {
+	                "stroke": "url(#" + defId + ")",
+	                "stroke-width": width,
+	                "fill": "url(#" + defId + ")"
+	            });
+	            return this; // maintain chainability
+	        };
+
+	        Raphael.st.strokeLinearGradient = function(defId, width, stops) {
+	            return this.forEach(function(el) {
+	                el.strokeLinearGradient(defId, width, stops);
+	            });
+	        };
+
+	        Raphael.fn.defineLinearGradient = function(defId, stops) {
+	            this.defs.appendChild(defLinearGrad(defId, stops));
+	            console.log(this.defs)
+	        };
+	    }
+	}());
+
+	/********/
+	/* MAIN */
+	/********/
+	$(function() {
+
+		/* Activate tabs */
+		$("#profile-tabs a:first").tab("show")
+		$("#saved-path-tabs a:first").tab("show")
+
+		/* B/c of Bootstrap bug, must render timeline tabs dynamically
+			Keep track of index of rendered timelines and catch 'show' events here */
+		var timelines_shown = [0]
+		$('a[data-toggle="tab"]').on('shown', function (e) {
+			var index = $("#saved-paths-container .active").data("index")
+			if (timelines_shown.indexOf(index) == -1) {saved_path_timeline(index)
+				timelines_shown.push(index)
+			}
+		 });
+
+		/* Display Career Decision prompt if applicable */
+		if ({{career_decision_prompt}}) {
+			var template = _.template($('#career-decision-template').html())
+			$('#middle-float-screen').html(template)
+		}
+
+		/* Adds autocomplete to 'Alternates' textbox */
+		$('#alternatesTextBox').autocomplete({
+	    	serviceUrl: '/careers/entityAutocomplete/',
+	    	delimiter: ', ',
+	    });
+
+	   
+	    /* Condense the info container if own profile */
+	    if ({{own_profile_javascript}} && positions.length > 0) {
+	    	$('#timeline-info-container').addClass("container-condensed")
+	    	$('#timeline-header-container').html("<br/>Hover over one of your positions to see more")
+	    } else if (positions.length > 0) {
+	    	$('#timeline-header-container').html("<br/><br/>Hover over a position to learn more")
+	    } else {
+	    	$('#timeline-header-container').html("No positions available.")
+	    }
+
+
+		/* Prevents submitting the form when 'Enter' is pressed */
+	    $('#career-decision-form').bind("keyup", function(e) {
+	  		var code = e.keyCode || e.which; 
+	  		if (code  == 13) {     
+	    		e.preventDefault();
+	    		return false;
+	  		}
+		});
+
+	    /* Add main timeline */
+		if (positions.length > 0)
+			horizontal_timeline()
+
+		/* Add saved paths */
+		if (saved_paths.length > 0)
+			// saved_path_timelines()
+			saved_path_timeline(0)
+	});
+
+	/**********************/
+	/* Timeline Constants */
+	/**********************/
+	var constants = {
+		'paper_width':1000,
+		'paper_height':200,
+
+		'education_color': '#bf3330',
+		'internship_color': '#ffc340',
+		'position_color': 'rgb(50,121,202)',
+
+		'inner_dot_radius':2,
+		'outer_dot_radius':12,
+
+		'timeline_y':100,
+		'timeline_start':100,
+		'timeline_color':'#c0c0c0',
+		'timeline_end':875,
+
+		'bootstrap_fonts':'"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
+
+		'lvl1_offset':45,
+		'lvl2_offset':75,
+
+
+		/* Offsets for Title Boxes */
+		'line_height':30,
+		'info_font_size':12,
+	}
+
+
+	/************************/
+	/* SAVED PATH TIMELINES */
+	/************************/
+
+
+	var saved_path_timeline = function(index) {
+
+		var title = saved_paths[index].title
+		var positions = saved_paths[index].positions
+		var id = saved_paths[index].id
+		var n_positions = positions.length
+
+		var saved_path_constants = {
+			'paper_w':constants.paper_width,
+			'paper_h':150,
+			'start_offset':100,
+			'midline':75,
+			'box_style':1,
+			'top_text_offset':38,
+			'bottom_text_offset':25,
+		}
+
+		monospaced_timeline(saved_path_constants, positions, 'path-' + id)
+
+		if ({{own_profile_javascript}}) {
+			// need to add 'delete' and 'edit' buttons
+			var prepend_html = "<div class='edit-path-button flat-button path-button'><a href='/build/"+ id + "'>Edit</a></div> <div class='delete-path-button flat-button path-button' data-id='"+ id + "'>Delete</div>"
+
+			$('#path-'+id).prepend(prepend_html)
+			$('#path-' + id + ' .delete-path-button').click(delete_path)
+		} else {
+			var prepend_html = "<a href='/path/"+id+"'><div class='flat-button path-button' data-id='"+id+"'>View</div></a>"
+			$('#path-'+id).prepend(prepend_html)
+		}
+	};
+
+
+
+	/* DEPCRECATED */
+	var saved_path_timelines = function() {
+
+		for (var z = saved_paths.length - 1; z >= 0; z--) {
+
+			var title = saved_paths[z].title
+			var positions = saved_paths[z].positions
+			var id = saved_paths[z].id
+			var n_positions = positions.length
+
+			var saved_path_constants = {
+				'paper_w':constants.paper_width,
+				'paper_h':150,
+				'start_offset':100,
+				'midline':75,
+				'box_style':1,
+				'top_text_offset':38,
+				'bottom_text_offset':25,
+			}
+			monospaced_timeline(saved_path_constants, positions, 'path-' + id)
+			// need to add 'delete' and 'edit' buttons
+			var prepend_html = "<div id='edit-path-button' class='flat-button path-button'><a href='/build/"+ id + "'>Edit</a></div> <div id='delete-path-button' class='flat-button path-button'>Delete</div>"
+		}
+	}
+
+	/* Timeline Instance Variables */
+	var internship_dot_ids = []; var position_dot_ids = []; var education_dot_ids = [];
+
+	/***********************/
+	/* HORIZONTAL TIMELINE */
+	/***********************/
+	var horizontal_timeline = function() {
+		
+		// Create paper and timeline structure
+		var paper = new Raphael('timeline-container', constants.paper_width, constants.paper_height)
+		
+
+		var num_positions = positions.length
+		if (total_time != "None")
+			var offset = Math.floor(775/parseInt(total_time))
+		else
+			var offset = 0
+
+		// // Convenience Print-outs
+		// start date: ' + total_start_date)
+		// console.log('offset in pixels: ' + offset)
+		// console.log('###########################')
+
+		// Beginning and End Text Display Dates for Timeline
+		var start_date_text = paper.text(70,constants.timeline_y, total_start_date).attr({'font-size':'12px', 'stroke':'#c0c0c0', 'text-anchor':'end', 'font-family':constants.bootstrap_fonts})
+
+		var end_date_text = paper.text(900,constants.timeline_y, 'Current').attr({'font-size':'12px', 'stroke':'#c0c0c0', 'text-anchor':'start','font-family':constants.bootstrap_fonts})
+
+		add_selector_circles(paper);
+
+
+		/* MAIN LOOP */
+		var previous_offsets = {} // so we can avoid overlapping
+		var previous_width = 0;
+		var previous_text_offset = 70
+		var previous_end = 84
+
+		for (var i = 0; i < num_positions; i++) {
+			var overlap = false
+
+			var title = positions[i].title
+			var entity_name = positions[i].co_name
+			var id = positions[i].id
+			var description = positions[i].description
+			var start_date = positions[i].start_date
+			var end_date = positions[i].end_date
+			var duration = positions[i].duration
+			var type = positions[i].type
+
+			var start_offset = offset * (months_difference_js(total_start_date, start_date))
+
+			// Still need to check if they put in a future date
+			if (end_date == 'Current' || end_date.length <= 1) {
+				var end_offset = constants.timeline_end
+			} else {
+				var end_offset = start_offset + (offset * months_difference_js(start_date, end_date) + 100)
+
+				if (end_offset > constants.timeline_end) end_offset = constants.timeline_end
+			}
+
+			// Move dots that collide
+			if (start_offset in previous_offsets) {
+				console.log('duplicate, moving dot')
+				overlap = true
+				start_offset += constants.outer_dot_radius // calculate this so they don't mash
+				// This is could still clash if original+12 in set
+			}
+
+			previous_offsets[start_offset] = true
+		
+			// Set dot color based on type
+			var color = get_color(type)
+			
+			// Outer Dot
+			var outer_dot = paper.circle(constants.timeline_start + start_offset, constants.timeline_y, constants.outer_dot_radius).attr({
+				'stroke-width':'0',
+				'stroke':color,
+				'fill':color,
+				'fill-opacity':'.8',
+			});
+
+			switch(type) {
+				case 'education':
+					education_dot_ids.push(outer_dot.id)
+					break;
+				case 'internship':
+					internship_dot_ids.push(outer_dot.id)
+					break;
+				default:
+					position_dot_ids.push(outer_dot.id)
+					break;
+			};
+
+
+			// Inner Dot
+			var dot = paper.circle(constants.timeline_start + start_offset, constants.timeline_y, constants.inner_dot_radius).attr({
+				'stroke-width':1,
+				'stroke':color,
+				'fill':color,
+			})
+
+			// var position_title = construct_title_box(paper, Math.abs(num_positions - i - 1), entity_name, start_offset, dot.id)
+			var position_title = construct_timeline_title(paper, entity_name, start_offset, dot.id)
+
+
+			// Set Data
+			position_title.data('dot_id', dot.id)
+			outer_dot.data('dot_id', dot.id)
+
+			if (title) dot.data('title',title)
+			else dot.data('title', 'None')
+			dot.data('entity_name', entity_name)
+			dot.data('id', id)
+			dot.data('description', description)
+			dot.data('start_date', start_date)
+			dot.data('end_date', end_date)
+			dot.data('start_offset', start_offset + constants.timeline_start)
+			dot.data('end_offset', end_offset)
+			dot.data('color', color)
+			dot.data('type', type)
+			dot.data('duration', duration)
+
+
+			// Note... this doesn't really work
+			// Add timeline chunk
+			if (start_offset > constants.outer_dot_radius && start_offset < (775 - constants.outer_dot_radius) && !overlap && (previous_end + 16 < start_offset + 100)) {
+				
+				var start_line = previous_end + 32
+				var end_line = start_offset - 16 + 100
+				var path_size = "M" + start_line + ",100 L" + end_line + ",100" 
+
+				var path = paper.path(path_size).attr({
+					stroke: constants.timeline_color,
+					"stroke-width":1,
+					'stroke-linecap':'round',
+					'opacity':'0.8',
+					'stroke-dasharray':'2'
+				});
+				previous_end = end_line
+			}
+
+		
+			/* HOVERS */
+			// Outer Dot
+			outer_dot.hover(function() {
+				var dot = paper.getById(this.data('dot_id'))
+				horizontal_hover_in(dot, paper)
+			}, function() {
+				var dot = paper.getById(this.data('dot_id'))
+				horizontal_hover_out(dot, paper)
+			})
+
+			// Inner Dot
+			dot.hover(function() {
+				horizontal_hover_in(this, paper)
+			}, function() {
+				horizontal_hover_out(this, paper)
+			});
+
+			// Title Blurb
+			position_title.hover(function() {
+				var dot = paper.getById(this.data('dot_id'))
+				horizontal_hover_in(dot, paper)
+			},
+			function() {
+				var dot = paper.getById(this.data('dot_id'))
+				horizontal_hover_out(dot, paper)
+			});
+		}
+
+		// Now, reposition titles
+		reposition_titles(paper)
+
+		//Fencepost
+		var start_line = previous_end + 32 
+		var path_size = "M" + start_line + "," + constants.timeline_y + " L875," + constants.timeline_y 
+		var path = paper.path(path_size)
+		path.attr({
+			stroke:'#c0c0c0',
+			"stroke-width":1,
+			'stroke-linecap':'round',
+			'opacity':'0.8'
+		});
+	}
+	// Hover utility
+	var horizontal_hover_in = function(dot, paper) {
+			
+			/* Get Data... more efficient w/o variables? */
+			var data = dot.data
+			var start_date = dot.data('start_date')
+			var end_date = dot.data('end_date')
+			var title = dot.data('title')
+			var id = dot.data('id')
+			var entity_name = dot.data('entity_name')
+			var start_offset = parseInt(dot.data('start_offset'))
+			var end_offset = parseInt(dot.data('end_offset'))
+			var description = dot.data('description')
+			var color = dot.data('color')
+			var duration = dot.data('duration')
+
+			/* Remove old elements */
+			if ($('#duration_rect').length > 0) $('#duration_rect').remove()
+			$('#timeline-info-container').css('visibility', 'visible')
+
+			/* Duration Rectangle */
+			var x = end_offset - start_offset
+			var duration_rect = paper.rect(start_offset + 12 + 6, 98, x, 4, 2).attr({
+				'stroke': color,
+				'stroke-width':12,
+				'stroke-opacity':.8,
+				'fill': color,
+			})
+			duration_rect.node.id = 'duration_rect'
+
+			/* Construct HTML Text */
+			var headerString = ""
+			if (title != 'None') 
+				headerString += '<div class="timeline-title">' +
+				title + '</div>'
+
+			headerString += '<div class="timeline-entity-name">' +
+				entity_name + '</div>'
+
+			headerString += '<div class="timeline-date">' + 
+				start_date + '-' + end_date + ' (' + duration + ' months)</div>'
+			if (title.length < 50) headerString += '<br/>' // just formatting
+				
+
+			// Can't 'like' your own positions
+			if (!{{own_profile_javascript}})
+				headerString += '<div class="timeline-interested-in"><i class="icon-ok-circle icon-large" onclick="addInterestedPosition(this, ' + id + ')"></i> <span class="timeline-interested-text">I\'m interested in this position</span></div>'
+			
+
+			// A). Title & Description
+			/* Currently, not displaying descriptions */
+			if (description != 'None') {
+
+				descriptionString = '<span class="timeline-description">' + description + '</span>'
+				descriptionString = "<i class='icon-share-alt pull-right' onclick='flipInfoBox(\"description\")'></i>" + descriptionString
+				
+				/* Add 'flip' icon if description */
+				// headerString = "<i class='icon-share-alt pull-right' onclick='flipInfoBox(\"header\")'></i>" + headerString
+
+				$('#timeline-header-container').html(headerString)
+				// $('#timeline-description-container').html(descriptionString)
+
+			// B). Title only
+			} else {
+				$('#timeline-header-container').html(headerString)
+			}	
+		}
+		
+	var horizontal_hover_out = function(dot, paper) {
+		// do nothing
+	}
+
+	
+
+	var alterDotOpacities = function(paper, type, opacity, stroke, stroke_width) {
+			var dst; var color;
+
+			if (type.indexOf("position") !== -1) {
+				dst = position_dot_ids
+				color = get_color("position")
+				
+			} else if (type.indexOf("internship") !== -1) {
+				dst = internship_dot_ids
+				color = get_color("internship")
+
+			} else {
+				dst = education_dot_ids
+				color = get_color("education")
+			}
+
+			_.each(dst, function(id) {
+				var dot = paper.getById(id)
+				dot.attr({
+					'fill':color,
+					'stroke-width':stroke_width,
+					'fill-opacity':opacity,
+					'stroke':stroke,
+				})
+			});
+	}
+
+	var flipInfoBox = function(currentSide) {
+		if (currentSide == "header") {
+			$('#timeline-header-container').hide()
+			$('#timeline-description-container').show()
+		} else {
+			$('#timeline-header-container').show()
+			$('#timeline-description-container').hide()
+		}
+	}
+
+	/* Page-specific drag for GA */
+	function dragPos(ev) {
+  		ev.dataTransfer.setData("pos_id", ev.target.id);
+    	_gaq.push(['_trackEvent', 'profile', 'positionDragged'])
+  	};
+
+
+	/* Need JQuery for the AJAX request, so put it here */
+	var dropPosition = function(ev, path_title, elem) {
+		_gaq.push(['_trackEvent', 'profile', 'positionDropped'])
+		ev.preventDefault();
+		var pos_id = ev.dataTransfer.getData("pos_id");
+
+		$.post('/saved_paths/save/', {title: path_title, pos_id: pos_id, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
+				console.log(response)
+				if (response['success']) {
+					highlight(elem)
+				}
+		}, 'json');
+	};
+
+	/* Inelegant but effective way to pulsate the element w/o
+	   external JQuery libraries */
+	var highlight = function(elem) {
+		$(elem).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
+	};
+
+	var newPathAjax = function() {
+		_gaq.push(['_trackEvent', 'profile', 'newPathCreated'])
+
+		var title = $('#new-path-box').val()
+		if (title.length < 1) {
+			errorCreatingPath('title')
+			return
+		}
+
+		// Attempt POST request via AJAX to create path
+		$.post('/saved_paths/create/', {title: title, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
+				if (response['success']) {
+					console.log(response)
+					// Construct new table element for path
+					var newRow = "<tr><td ondragover='allowDrop(event)' ondrop='dropPosition(event," + title + ", this)'><a href='/saved_paths/#id/?id=" + response['id'] + "'>" + title + "</a></td></tr>"
+
+					// Add to DOM
+					$('#sidebar-path-list > tbody:last').append(newRow)
+					
+					// Clear text field
+					$('#new-path-box-row').remove()
+				} else {
+					errorCreatingPath('db')
+				}
+		}, 'json');
+	};
+
+	var errorCreatingPath = function(reason) {
+		_gaq.push(['_trackEvent', 'profile', 'errorCreatingPath'])
+	
+		var createBox = $('#new-path-box')
+		if (reason == "db") {
+			console.log("Error in the view creating new path...")
+			createBox.val("Please enter a title")
+		} else if (reason == "title") {
+			createBox.val("Please enter a title")
+		}
+
+		highlight(createBox)
+	};
+
+	
+
+
+	var revealPrompt = function() {
+		$('#career-decision-prompt').hide()
+		$('#career-decision-form').toggleClass('display-none')
+		$('#profile-left').css('opacity','.4')
+		$('#profile-right').css('opacity','.4')
+		$('#timeline').css('opacity', '.4')
+	}
+
+	var exitPrompt = function(success) {
+
+		$('#middle-float-screen').empty()	
+		$('#profile-left').css('opacity','1')
+		$('#profile-right').css('opacity','1')
+		$('#timeline').css('opacity', '1')
+
+		// // If successful, show user something that indicates so
+		// if (success) {
+		// 	$('#middle-float-screen').append('<a>Thanks! ')
+		// } else {
+		// 	$('#middle-float-screen').append('<a>For more information, hover over a position</a>')
+		// }
+
+		
+	}
+
+	var submitCareerDecision = function(pos_id) { 
+
+		var alternates = $('input[name="alternates"]', '#career-decision-form').val()
+		if (alternates === undefined) alternates = null
+		var reason = $('textarea[name="reason"]', '#career-decision-form').val()
+		if (reason === undefined) reason = null
+		var mentorship = $('input[name="mentorship-radio"]:checked').val()	
+		if (mentorship === undefined) mentorship = 0
+		var skills = $('input[name="skills-radio"]:checked').val()
+		if (skills === undefined) skills = 0
+		var social = $('input[name="social-radio"]:checked').val()
+		if (social === undefined) social = 0
+		var overall = $('input[name="overall-radio"]:checked').val()
+		if (overall === undefined) overall = 0
+
+
+		var comments = $('textarea[name="comments"]','#career-decision-form').val()
+		if (comments === undefined) comments=null
+		var privacy = $('input[name="privacy-radio"]:checked').val()
+
+		$.post('/careers/addDecision/', {pos_id: pos_id, alternates: alternates, reason: reason, mentorship: mentorship, skills: skills, social:social, overall: overall, comments: comments, privacy: privacy, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
+				console.log(response)
+		}, 'json');
+
+		exitPrompt(true);
+	}
+
+
+
+
+    // Responds to click on checkmark 'I'm interested in this position'
+	var addInterestedPosition = function(elem, pos_id) {
+		console.log('add position:' + pos_id)
+		console.log($(elem).next())
+
+		// First, modify and highlight icon accordingly
+		highlight($(elem).next())
+		$(elem).removeClass('icon-ok-circle').addClass('icon-ok-sign')
+
+		$.post('/saved_paths/add_to_queue/', {pos_id: pos_id,csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
+				console.log(response)
+		}, 'json');
+	}
+
+
+	// Compares two dates of format "MM/YY"
+	var months_difference_js = function(start, end) {
+		var diff = 12 * (parseInt(end.substring(3), 10) - parseInt(start.substring(3), 10))
+		// console.log(diff)
+		diff += (parseInt(end.substring(0,2), 10) - parseInt(start.substring(0,2), 10))
+		// console.log(diff)
+		return Math.ceil(diff)
+	}
+
+
+
+	/* DEPRECATED */
+	var upper_timeline_limit = 200;
+	var months_difference = function(mo1, yr1, mo2, yr2, compress, round) {
+
+		var diff = 12 * (yr2 - yr1);
+		diff += (mo2 - mo1);
+
+		if(compress) {
+			diff = diff / 2
+			if (round == "upper") diff = Math.ceil(diff)
+			if (round == "lower") diff = Math.floor(diff)
+		}
+		return diff;
+	};
+
+	
+	/* DEPCRECATED */
+	/* Takes a date of format MM/YYYY and returns MM.YY */
+	var format_date = function(date) {
+		if (date.length == 1) return 'Current'
+		var split_date = date.split('/')
+		return split_date[0] + '.' + split_date[1].substring(2)
+	};
+
+	
+	
+
+
+</script>
+
+
+<!-- Template for rendering Career Decision Prompt -->
+<script type="text/template" id="career-decision-template">
+
+	<div id='career-decision-module'>
+		<div id="career-decision-prompt">
+		<button class="close" onclick='exitPrompt(false)'>&times;</button>
+		<span class='initial-prompt'>
+		Would you provide a bit of information on your decision to 
+		{% if career_decision_prompt.type == 'education' %}
+			attend 
+		{% else %}
+			work as a {{career_decision_prompt.title}} at 
+		{% endif %}
+		{{career_decision_prompt.co_name}}? This information will go directly to others who are making the same important career decisions. 
+		</span> 
+		<div class='btn career-decision-prompt-btn' onclick='revealPrompt()'>Sure</div>
+		</div>
+		<div id="career-decision-form" class="display-none">
+		<button class="close" onclick='exitPrompt(false)'>&times;</button>
+		<div class='callout-text'>Thanks you for sharing, this information will be invaluable to others just like you.</div>
+		<br/>
+		<form class='form'>
+			<input type='text' class='full-width' placeholder='Where else did you considering working?' name='alternates' id='alternatesTextBox'/><br/>
+			{% if career_decision_prompt.type == 'education' %}
+			<textarea rows='2' class="full-width" name='reason' placeholder='Why did you decide to attend {{career_decision_prompt.co_name}}'></textarea>
+			{% else %}
+			<textarea rows='2' class='full-width' name='reason' placeholder='Why did you decide to work at {{career_decision_prompt.co_name}}?'></textarea>
+			{% endif %}
+			<label>On a scale from 1-5, please rate the following elements of your experience at {{career_decision_prompt.co_name}}.</label>
+		<div id="mentorshipCheckboxes">
+			<div id='control-headers'>
+				<span id='worst'>Poor</span>
+				<span id='best'>Excellent</span>
+			</div>
+			<div id='radio-set-mentorship'>
+			<span class='input-label'>Mentorship:</span>
+			<label class="radio inline">
+					<input type="radio" id="mentorshipNA" name='mentorship-radio' value="0"> n/a
+			</label>
+			<label class="radio inline">
+					<input type="radio" id="mentorship1" name='mentorship-radio' value="1"> 1
+			</label>
+			<label class="radio inline">
+					<input type="radio" id="mentorship2" name='mentorship-radio' value="2"> 2
+			</label>
+			<label class="radio inline">
+					<input type="radio" id="mentorship3" name='mentorship-radio' value="3"> 3
+			</label>
+			<label class="radio inline">
+					<input type="radio" id="mentorship4" name='mentorship-radio' value="4"> 4
+			</label>
+			<label class="radio inline">
+					<input type="radio" id="mentorship5" name='mentorship-radio' value="5"> 5
+			</label>
+			
+			</div>
+
+			<div id='radio-set-skills'>
+			<span class='input-label'>Skills Gained:</span>
+			<label class="radio inline">
+					<input type="radio" name='skills-radio' id="skillsNA" value="0"> n/a
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='skills-radio' id="skills1" value="1"> 1
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='skills-radio' id="skills2" value="2"> 2
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='skills-radio' id="skills3" value="3"> 3
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='skills-radio' id="skills4" value="4"> 4
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='skills-radio' id="skills5" value="5"> 5
+			</label>
+			</div>
+
+			<div id='radio-set-social'>
+			<span class='input-label'>
+			Social/Environment:</span>
+			<label class="radio inline">
+					<input type="radio" name='social-radio' id="socialNA" value="0"> n/a
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='social-radio' id="social1" value="1"> 1
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='social-radio' id="social2" value="2"> 2
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='social-radio' id="social3" value="3"> 3
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='social-radio' id="social4" value="4"> 4
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='social-radio' id="social5" value="5"> 5
+			</label>
+			</div>
+
+			<div id='radio-set-overall'>	
+			<span class='input-label'>Overall:</span>
+			<label class="radio inline">
+					<input type="radio" name='overall-radio' id="overallNA" value="0"> n/a
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='overall-radio' id="overall1" value="1"> 1
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='overall-radio' id="overall2" value="2"> 2
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='overall-radio' id="overall3" value="3"> 3
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='overall-radio' id="overall4" value="4"> 4
+			</label>
+			<label class="radio inline">
+					<input type="radio" name='overall-radio' id="overall5" value="5"> 5
+			</label>
+			</div>
+		</div>
+		<br/>
+		{% if career_decision_prompt.type == 'education' %}
+		<textarea rows='2' class='full-width' name='comments' placeholder='Any additional comments for people considering attending {{career_decision_prompt.co_name}}?'</textarea>
+		{% else %}
+		<textarea rows='2' class='full-width' name='comments' placeholder='Any additional comments for people considering working at {{career_decision_prompt.co_name}}?'></textarea>
+		{% endif %}
+		<br/>
+		<div>Select how you want this information to be displayed:</div>
+		<div id='privacy-radio'>
+		<label class="radio inline">
+				<input type="radio" name='privacy-radio' value="anonymous"/ > Anonymous
+		</label>
+		<label class='radio inline'>
+			<input type='radio' name='privacy-radio' value='public' />Public
+		</label>
+		</div>
+		<br/>
+		<div class='btn submitBtn' onclick='submitCareerDecision({{career_decision_prompt.id}})'>Done</div>
+
+		</form>
+		</div>
+	</div>
+</script>
+
+{% endblock %}
+
+

@@ -1,0 +1,313 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<!-- CSS --> 
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/next.css" />
+<link type='text/css' rel='stylesheet' href='{{ STATIC_URL }}css/font-awesome.min.css'/>
+
+
+<!-- JS -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/timeline-viz.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
+<script type='text/javascript' src="{{ STATIC_URL }}js/next.js"></script>
+<script type='text/javascript' src="{{ STATIC_URL }}js/backbone.js"></script>
+<!-- Autocomplete comes from here!:
+		https://github.com/devbridge/jQuery-Autocomplete -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.autocomplete.min.js"></script>
+<!-- <script type="text/javascript" src="{{ STATIC_URL }}js/Chart.min.js"></script> -->
+
+<!-- For CSRF in Backbone -->
+<script type="text/javascript">
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    crossDomain: false, // obviates need for sameOrigin test
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type)) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+</script>
+
+{% endblock %}
+
+<!-- Messages -->
+{% block message %}
+
+{% endblock %}
+
+
+<!-- Content (center pane) -->
+{% block content %}
+<div class="main-container content-container">
+
+	<div class='container-header'>
+		<h3>
+			<span class='sub-header'>What Next?  </span>
+			<span id='industry-header'></span>
+		</h3>
+	</div>
+
+	<!-- currently unused -->
+	<div id="chart-container">
+		<!-- <canvas id="pie" width="400" height="400"></canvas> -->
+		<!-- chart here -->
+	</div>
+
+
+	<div id='search-filters-container'>
+		<!-- Backbone here -->
+	</div>
+
+
+	<div id="search-results-container">
+		<!-- Backbone here -->
+	</div>
+
+	<div id="header-container">
+		<!-- Backbone here -->
+	</div>
+
+</div>
+{% endblock %}
+
+
+
+
+{% block templates %}
+
+<script type="text/template" id="search-filters-template">
+	<!-- /* <div class="main-sub-header">Search Filters</div> */ -->
+
+	<!-- /* Add Search Filters, make first one pre-selected (Most Common) */ -->
+	<% 
+		var counter = 0
+		_.each(filters, function(f) {
+
+			%><label class="radio inline"><%
+
+			if (counter == 0) {
+				%> 
+					<input class="search-filters" type="radio" name="search-filters" id="<%=f%>" checked><%=f%>
+				<%
+			} else {
+				%>
+					<input class="search-filters" type="radio" name="search-filters" id="<%=f%>" ><%=f%>	
+				<%
+			}
+			%></label><%
+			counter++;
+		});
+	%>
+
+</script>
+
+<script type='text/template' id='lvl1-template'>
+
+	<div id="lvl1-header-container">
+		<h3 class="inline-block pull-up">Job Moves from the <%=start_name%> industry: </h3>
+	</div>
+
+	<!-- /* Only first 15 results */ -->
+	<table id='search-results-table-lvl1' class='table table-hover search-results-table'>
+		<thead>
+			<tr>
+				<th><div class="people-box"><%=total_people%> Total People</div></th>
+				<th><div class="content-box"><%=start_name%></div></th>
+			<tr>
+		</thead>
+
+		<tbody>
+			<%
+				if (ordering == 'decreasing') {
+					transitions = _.sortBy(transitions, function(value) {
+						return -value[1]
+					});
+				} else {
+					transitions = _.sortBy(transitions, function(value) {
+						return value[1]
+					});
+				}
+			
+				var end = (transitions.length > 15) ? 15 : transitions.length;
+				for (var i = 0; i < end; i++) {
+				// for (var i = end; i > 0; i--) {
+					var value = transitions[i]
+					var end_name = value[0]
+					var num_people = value[1]
+					var end_id = value[3]
+					%><tr id="<%=start_id%>-<%=end_id%>">
+						<td><div class="people-box"><%=num_people%>
+							<%if (num_people == 1) { %>
+								Person
+							<% } else { %>
+								People
+							<% } %>
+						 </div></td>
+						<td>
+							<div class="content-box">
+								<%=start_name%>  
+									<i class="icon-arrow-right"></i>  
+								<%=end_name%>
+							</div>
+						</td>
+					</tr><%
+				};
+			%>
+		</tbody>
+	</table>
+
+</script>
+
+<script type='text/template' id='lvl2-template'>
+
+	<h3 class="inline">Search Results: </h3>
+		<span class="previous-search pull-right inline">Back</span>
+
+		<h5>"show me people who went from the <i><%=start_name%></i> Industry to the <i><%=end_name%></i> Industry"</h5>
+
+	<table id='search-results-table-lvl2' class='table table-hover search-results-table'>
+		<thead>
+			<tr>
+				<th><div class="people-box"><%=total_people%> Total People</div></th>
+				<th>
+					<div class="content-box">
+						<%=start_name%>
+							<i class="icon-arrow-right"></i>
+						<%=end_name%>
+					</div>
+				</th>
+			<tr>
+		</thead>
+
+		<tbody>
+			<%
+				_.each(people, function(value, key) {
+					var person = value[0]
+					var person_id = key
+					
+					%>
+					<tr id="<%=person_id%>">
+						<td class="first-col">
+							<div class="people-box">
+								<%=person%>
+							</div>
+
+							<div class="flat-button hide">
+								View Full Timeline
+							</div>
+						</td>
+
+
+						<td class="second-col">
+							<div class="content-box" id="content-<%=person_id%>">
+								
+							</div>
+						</td>
+					</tr>
+					<%
+				});
+			%>
+		</tbody>
+	</table>
+
+</script>
+
+<script type="text/template" id="header-template">
+	
+	<div>
+		<% if (industries.length > 1) {
+			%><p class="call-out-text">
+				Don&rsquo;t see what you&rsquo;re looking for? We think the following might also interest you, or you can start typing below and to check out others.
+			</p><%
+		} else {
+			%><p class="call-out-text">
+				Want to explore other industries? Start typing and see what you find!
+			<p><%
+		} %>
+	</div>
+
+	<span>
+		<% if (industries) {
+			%><ul class="industry-options-container inline"><%
+				for (var i = 0; i < industries.length; i++) {
+					if (industries[i][1] != current) {
+						%><li>
+							<a class="industry-button" href="/next/#?i1=<%=industries[i][0]%>">
+								<%=industries[i][1]%>
+							</a>
+						</li><%
+					}	
+				}
+			%></ul><%
+		 } %>
+	</span>
+
+	<div class="search-box">
+		<div class="input-append">
+			<input type="text" id="alternateIndustryBox">
+			<span class="add-on" id="blue-btn"> Search! </span>
+		</div>
+	</div>
+
+
+</script>
+
+<script type="text/javascript">
+	
+	$(function() {
+
+	});
+
+
+
+
+	var id_selected = null
+
+
+	<!-- /* Have to use 'on' b/c elem is dynamically added to DOM */ -->
+	$('#header-container').on("click", function() {
+		$('#alternateIndustryBox').autocomplete({
+			serviceUrl: '/careers/industryAutocomplete/',
+			onSelect: function(suggestion) {
+				console.log("setting ID to: " + suggestion.data)
+				id_selected = suggestion.data
+			},
+		});
+
+		$('#blue-btn').on("click", function() {
+			window.scrollTo(0,0)
+			window.location = ('/next/#?i1=' + id_selected)
+		});
+	})
+
+
+
+</script>
+
+{% endblock %}
+

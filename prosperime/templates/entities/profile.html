@@ -1,0 +1,291 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+<!-- Head -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/viz.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/drag_and_drop.js"></script>
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/profile.css" />
+{% endblock %}
+
+
+
+<!-- Content -->
+{% block content %}
+
+
+<!-- Header -->
+<div class="main-container content-container">
+	<p class="main-header">Profile: <span class="splash-slug">{{profile.first_name}} {{profile.last_name}}</span></p>
+	<p class="main-sub-header">{{profile.headline}} (careers info will go here)</p>
+
+
+<!-- Center --> 
+	<div class="profile-container">
+		<div class="profile-nav-container">&nbsp;</div>
+		<div class="profile-info-container">
+			<div class="profile-info-left pull-left span9">
+				<div class="profile-info-top">
+					<div class="pull-left span6">	
+						<div class="profile-img-holder pull-left">
+							<img class="logo-preview" src="/media/{{profile.default_profile_pic}}" />
+						</div>
+							
+
+						<div class="profile-brief-info pull-left">
+							<p class="path-name">
+								{{profile.first_name}} {{profile.last_name}}</p>
+							<p class="path-current-position">
+								{% if current %}
+									{{current.title}}
+								{% else %}
+									{{profile.headline}}
+								{% endif %}
+							</p>
+						</div>
+					
+						<div class="clear"></div>
+					
+						<div class="path-viz" ondragover='allowDrop(event)'>
+						<div class="path-viz-short">
+
+							<!-- Education  -->
+							{% if ed|length > 0 %}
+								<h5>Education: </h5>
+								<div class='ed_list'>
+									<table class="table table-striped table-condensed table-bordered position-list">
+									{% for pos in ed %}
+									<!-- <div class="indent timeline-ed"> -->
+										<tr>
+											{% if pos.title %}
+												<td>{{pos.title}}</td>
+											{% endif %}
+											
+											<td>{{pos.co_name}}</td>			
+										</tr>
+									<!-- </div> 			 -->
+									{% endfor %}
+									</table>
+								</div>
+							{% endif %}
+
+							<!-- Experience -->
+							{% if orgs|length > 0 %}
+								<h5>Experience: </h5>
+								<div class='org_list'>
+								<table class="table table-striped table-condensed table-bordered position-list">
+								{% for pos in orgs %}
+									<!-- <div class="{{profile.id}}-list indent"> -->
+									<tr onmouseover="showDescription({{forloop.counter0}}, '{{pos.title}}', '{{pos.co_name}}', '{{pos.start_date}}', '{{pos.end_date}}')" draggable='true' ondragstart='drag(event)' id="{{pos.id}}">	
+										{% if pos.title %}
+											<td>{{pos.title}}</td>
+										{% endif %}	
+
+										<td>{{pos.co_name}}</td>
+												
+										
+											<span class="timeline-description timeline-description-float {{pos.id}}-description" style="display:none">
+												<span class="timeline-description-text">
+												{% if pos.description %}				
+													{{pos.description}}
+												{% endif %}
+												</span>
+											</span>
+									
+										</tr>
+									<!-- </div> -->
+								{% endfor %}
+								</table>
+								</div>
+							{% endif %}
+							</div>			
+						</div>
+					</div>
+
+					<!-- Float Screen -->
+					<div id="middle-float-screen" class="pull-left span6" ondragover='allowDrop(event)'>
+						<h1>{{career_decision_prompt}}</h1>
+						{% if career_decision_prompt %}
+						<div id='career-decision-module'>
+							<div id="career-decision-prompt">
+								Would you provide a bit of information on your decision to 
+								{% if career_decision_prompt.type == 'education' %}
+									attend 
+								{% else %}
+									work at 
+								{% endif %}
+								{{career_decision_prompt.co_name}}? This information will go directly to others who are making the same import career decisions!
+							</div>
+							<div id="career-decision-form"
+
+
+						</div>
+						{% else %}
+						<a>Hover over a position for more information!</a>
+						{% endif %}
+					</div>	
+					<div class="clear"></div>
+				</div>
+			
+				<div class="profile-viz-container">
+					<!-- TIMELINE. DON'T. TOUCH. IT. -->
+					{% if orgs|length > 0 %}
+					<div class="timeline-container span12">
+						<table class="timeline">
+							<!-- Row per Position -->
+							{% for p in orgs %}
+								<tr class="timeline-row">
+									{% load months_difference rangify subtract divide %}
+
+									{% if compress %}
+										{% for i in start_date|months_difference:start_date|divide:2|rangify %}
+											<td class="timeline-col"></td>
+										{% endfor %}
+									{% else %}
+										{% for i in p.start_date|months_difference:start_date|rangify %}
+											<td class="timeline-col"></td>
+										{% endfor %}
+									{% endif %}
+
+									<!-- Highlighted Segment -->
+									<td class="timeline-col-highlighted" colspan="{{p.duration}}">{{p.co_name}}</td>
+
+									{% if compress %}
+										{% for i in end_date|months_difference:p.end_date|divide:2|rangify %}
+											<td class="timeline-col"></td>
+										{% endfor %}
+									{% else %}
+										{% for i in end_date|months_difference:p.end_date|rangify %}
+											<td class="timeline-col"></td>
+										{% endfor %}
+									{% endif %}
+								</tr>
+							{% endfor %}
+
+							<!-- Bottom Row -->
+							<tr class="timeline-row-bottom">
+								<td class="timeline-col-start" colspan="{% widthratio total_time 2 1 %}">
+									{{start_date.month}}/{{start_date.year}}
+								</td>
+								<td class="timeline-col-end" colspan="{% widthratio total_time 2 1 %}">
+									Present
+								</td>
+							</tr>
+						</table>	
+					</div>
+					{% endif %}
+				</div>
+			</div>
+
+			<!-- Right Sidebar -->
+			<div id="profile-right" class="span3 pad-down pull-right">
+				<div class="rounded">
+					{% if user %}
+						<p class="sidebar-header">Want to see improvements?</p>
+						<p>We'd love to hear from you -- <a href="mailto:feedback@prosperime.com">please drop us a line</a></p>
+					{% endif %}
+				</div>
+
+				<!-- Profile Saved Paths -->
+				<!-- <div class="rounded">
+					<p class="sidebar-header">{{profile.first_name}}'s Saved Career Paths</p>
+
+					{% if saved_paths %}
+						<table class="table table-striped table-condensed table-bordered position-list">		
+						{% for path in saved_paths %}
+							<tr>
+								<td><a href="/saved_paths/#title/?t={{path.title}}"> {{path.title}} </a></td>
+							</tr>
+						{%endfor%}
+						</table>
+					{% else %}
+						<p>{{profile.first_name}} hasn't saved any career paths yet.</p>
+					{% endif %}
+				</div> -->
+
+				<!-- Viewer Saved Paths -->
+				<div class="rounded">
+					<p class="sidebar-header">Your Saved Career Paths</p>
+					<p> Like what {{profile.first_name}} has done? Drag any of the positions shown into your desired career path or <a onclick='createNewPath()'>create a new one.</a></p>
+						<table class="table table-striped table-condensed table-bordered path-list" id='sidebar-path-list'>			
+							<tr><td class="timeline-description-header">
+								<a href="/saved_paths/">View All</a>
+							</td></tr>
+						{% for saved_path in viewer_saved_paths %}
+							{% if forloop.last %}
+								<tr class="saved-path-list-last">
+							{% else %}
+								<tr>
+							{% endif %}
+								<td ondragover='allowDrop(event)' ondrop='dropPosition(event, "{{saved_path.title|escape}}", this)'><a href="/saved_paths/#id/?id={{saved_path.id}}">{{saved_path.title}}</a></td>
+								</tr>
+						{% endfor %}
+						</table>	
+				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+		
+<script type="text/javascript">
+
+
+	/* Need JQuery for the AJAX request, so put it here */
+	var dropPosition = function(ev, path_title, elem) {
+		ev.preventDefault();
+		var pos_id = ev.dataTransfer.getData("pos_id");
+
+		$.post('/saved_paths/save/', {title: path_title, pos_id: pos_id, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
+				console.log(response)
+				if (response['success']) {
+					highlight(elem)
+				}
+		}, 'json');
+	};
+
+	/* Inelegant but effective way to pulsate the element w/o
+	   external JQuery libraries */
+	var highlight = function(elem) {
+		$(elem).fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
+	};
+
+	var newPathAjax = function() {
+		var title = $('#new-path-box').val()
+		if (title.length < 1) {
+			errorCreatingPath('title')
+			return
+		}
+
+		// Attempt POST request via AJAX to create path
+		$.post('/saved_paths/create/', {title: title, csrfmiddlewaretoken: '{{csrf_token}}'}, function(response) {
+				if (response['success']) {
+					console.log(response)
+					// Construct new table element for path
+					var newRow = "<tr><td ondragover='allowDrop(event)' ondrop='dropPosition(event," + title + ", this)'><a href='/saved_paths/#id/?id=" + response['id'] + "'>" + title + "</a></td></tr>"
+
+					// Add to DOM
+					$('#sidebar-path-list > tbody:last').append(newRow)
+					
+					// Clear text field
+					$('#new-path-box-row').remove()
+				} else {
+					errorCreatingPath('db')
+				}
+		}, 'json');
+	};
+
+	var errorCreatingPath = function(reason) {
+		var createBox = $('#new-path-box')
+		if (reason == "db") {
+			console.log("Error in the view creating new path...")
+			createBox.val("Please enter a title")
+		} else if (reason == "title") {
+			createBox.val("Please enter a title")
+		}
+
+		highlight(createBox)
+	};
+
+</script>
+
+{% endblock %}
+
+

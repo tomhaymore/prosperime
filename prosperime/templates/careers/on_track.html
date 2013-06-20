@@ -1,0 +1,1062 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<!-- CSS -->
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/on_track.css" />
+	<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Lato">
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
+
+<!-- JS -->
+	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div id="content-container" class="main-container">
+
+	<!-- Main Header -->
+	<div id="on-track-header" class="h1 center">
+		How do I get to...?
+	</div>
+	
+	
+
+	<!-- Search Box Wrapper --> 
+	<div id="search-box-wrapper" class="center">
+		<div class="input-prepend">
+  			<span id="enlarge" class="add-on">I want to be: </span>
+  			<select id="goal-position-box">
+  				<option value="" disabled selected>&nbsp;&nbsp;&nbsp;&nbsp;Select your goal position...</option>
+				{% for o in options %}
+					<option value="{{o.ideal_id}}">{{o.title}}</option>
+				{% endfor %}
+				<option value="build">I'm not sure!</option>
+  			</select>
+		</div>
+
+		<div class="call-out-text">Don't see what you're looking for? <a href="mailto:feedback@prospr.me?subject=You're missing my dream job!">Let us know.</a></div>
+  			
+		<div id="show-results-button" class="prompt-button flat-button not-shown" onclick="getAndRenderResults()">	See Your Results
+		</div>
+	</div>
+
+	<div id="loading-wrapper" class="center not-shown">
+		<h1>Loading...</h1>
+	</div>
+
+	<!-- Call to Build Wrapper -->
+	<div id='call-to-build-wrapper' class='call-out-text not-shown'>	Unsure of what your options are? 
+
+		{% if authenticated %}
+			<br/><br/>
+			<a href="/build">
+				<div class='flat-button turquoise-button prompt-button'>Find out.</div>
+			</a>
+		{% else %}
+			<br/><br/>
+			That's the question we specialize in answering. 
+			<br/><br/> 
+			ProsperMe analyzes your existing academic and professional career so that you can discover options that are relevant and personalized for you. 
+			<br/><br/> 
+			<a href='/account/register/'>Sound good?</a>
+			It is, and it's free. <br/><br/>
+			<a href='/account/register/'>
+				<div id='register-button' class='flat-button prompt-button'>Explore Your Future</div>
+			</a>
+		{% endif %}
+	</div>
+
+	<!-- Get Info Wrapper -->
+	<div id="get-info-wrapper" class="not-shown">
+		<div class="call-out-text center offset2 span8">
+			Before we can analyze whether you're on track, we need to know more about you! Keep in mind that the more information you give us, the more thorough analysis we can do, and the more personalized the results will be. <br/> You can either...
+		</div>
+
+		<div id="button-wrapper" class="center">
+
+			<div id="tell-us-more-button" class="flat-button large-button prompt-button left-button turquoise" onclick="renderTellUsMoreForm()">
+				Tell us about yourself!
+			</div>
+
+			<span class="call-out-text"> or </span>
+
+			<a href="/account/authorize/?next=/progress">
+			<div id="linkedin-button" class="flat-button large-button prompt-button right-button dark-blue">
+				Login with LinkedIn
+			</div>
+			</a>
+		</div>
+	</div>
+
+
+	<!-- Preview Wrapper -->
+	<div id="preview-wrapper" class="center">
+		<div class="preview-section-full">
+			<div class="section-header">What is this?</div>
+			<p>This is a new tool from Prospr.me that helps you plan your future. Using our one-of-a-kind database of hundreds of thousands of actual career histories, we can show you possible paths to reach your goals.</p>
+		</div>
+		<!-- <div class="preview-section">
+			<div class="section-header">We can show you: </div>
+			<ul>
+				<li>The dominant career paths that lead to your goals</li>
+				<li>Related professionals in your desired career</li>
+				<li>Important statistics, like how long it takes to get there</li>
+			</ul>
+		</div> -->
+
+		<!-- <div class="preview-section">
+			<div class="section-header">What can we show you?</div>
+			<ul>
+				<li>The dominant career paths that lead to your goals</li>
+				<li>Related professionals in your desired career</li>
+				<li>Important statistics, like how long it takes to get there</li>
+			</ul>
+		</div> -->
+
+<!-- <<<<<<< HEAD
+		<div class="preview-section">
+			<div id="img-placeholder"><img src="/static/img/progress_3.png"/></div>
+======= -->
+		<div class="preview-section-full">
+			<div id="img-placeholder"><img src="/static/img/progress_3.png"/></div>
+		</div>
+	</div>
+
+	
+
+	<!-- Results Wrapper--> 
+	<div id="results-wrapper" class="center not-shown">
+		<div id="v2-bar-entity-wrapper"></div>
+		<div class="call-out-text">Here are the top paths to becoming <span id="goal-position-call-out"></span>.</div>	
+	</div>
+
+	<div id="results-wrapper-buttons" class="not-shown">
+		<div class="pull-right">
+			<div id="shuffle-button" class="flat-button prompt-button turquoise-button smaller-button" onclick="renderNextPath()">Show another path</div>
+			<div id="search-again-button" class="flat-button turquoise-button prompt-button smaller-button float-right" onclick="backToSearch()">Search again</div>
+		</div>
+		<div class="clear"></div>
+	</div>
+	
+
+	<!-- Progress Wrapper (Your path) -->
+	<div id="progress-wrapper" class="center not-shown">
+		
+		<!-- Form Wrapper -->
+		<div id="form-wrapper" class="center not-shown"> 
+			<div class="section-header">Tell us more about yourself by clicking on the categories below...</div>
+
+			<div class="tell-us-more-header" data-section_type="education">
+				<i class="icon-chevron-sign-right"></i>
+				<span class="cursor">Education</span>
+			</div>
+
+			<div class="tell-us-more-header" data-section_type="experience">
+				<i class="icon-chevron-sign-right"></i>
+				<span class="cursor">Experience</span>
+			</div>
+
+			<div class="tell-us-more-header" data-section_type="skills">
+				<i class="icon-chevron-sign-right"></i>
+				<span class="cursor">Skills</span>
+			</div>
+
+			<div id="inline-form-container"></div>
+
+		</div>
+
+		<div class="section-header">Your Path</div>
+
+		<div style="display:none;" id="tell-us-more-results-button" class="green-button prompt-button" onclick="getAndRenderResults('tell-us-more')">See your results</div>
+	</div>
+
+	<div id="call-to-action-wrapper" class="center not-shown">
+		<div class='call-out-text'>Want to see even more options?</div>
+
+	<!-- 	<div class='flat-button prompt-button turquoise-button left-button' onclick='resultsToTellUsMore()'>Tell us more about yourself</div> -->
+
+		{% if authenticated %}
+		<a href="/build/">
+		{% else %}
+		<a href='/account/register/'>
+			{% endif %}
+			<div class='flat-button prompt-button turquoise-button right-button'>Take the next step</div>
+		</a>
+	</div>
+
+
+{% csrf_token %}
+</div>
+{% endblock %}
+
+{% block templates %}
+
+<!-- V3 Script -->
+<script type="text/javascript">
+
+
+	// = #2980B9 (belize hole)
+	var color_map = [
+		"rgba(41,128,185,0.4)",
+		"rgba(41,128,185,0.5)",
+		"rgba(41,128,185,0.6)",
+		"rgba(41,128,185,0.7)",
+		"rgba(41,128,185,0.8)",
+		"rgba(41,128,185,0.9)",
+		"rgba(41,128,185,1)",
+		"rgba(41,128,185,0.4)",
+		"rgba(41,128,185,0.5)",
+		"rgba(41,128,185,0.6)",
+		"rgba(41,128,185,0.7)",
+		"rgba(41,128,185,0.8)",
+		"rgba(41,128,185,0.9)",
+		"rgba(41,128,185,1)",
+	]
+
+
+	/* Main */	
+	$(function() {
+
+		// setup CSRF token
+		$.ajaxSetup({
+	        beforeSend: function(xhr, settings) {
+	            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+	                // Only send the token to relative URLs i.e. locally.
+	                xhr.setRequestHeader("X-CSRFToken",
+	                                     $("input[name='csrfmiddlewaretoken']").val());
+	            }
+	        }
+	    });
+	    jQuery.ajaxSetup({async:true})
+
+		// Change handler on the main select box
+		$("#goal-position-box").change(function() {
+
+			// Remove previous end goal from progress bar
+			$(".end-item").remove()
+
+			// Hide Preview
+			// TODO: add analytics to this, because it's the first step
+			if (!$("#preview-wrapper").hasClass("not-shown")) {
+				$("#preview-wrapper").fadeOut(250, function() {
+					$(this).toggleClass("not-shown")
+					selectItemChanged()
+				});
+			} else selectItemChanged()
+		});
+
+		// Make each form header clickable
+		$(".tell-us-more-header").each(function() {
+			$(this).click(function(ev) {
+				formSectionClicked(ev, this)
+			})
+		})
+
+		// // Draw squiggle ahead of time
+		// var mini_paper = new Raphael("progress-bar-svg-container",30,100)
+		// mini_paper.path("M15,10 L15,40 L30,47 L0,54 L15,61 L15,90").attr({
+		// 	"stroke-width":2, "stroke":"#68696b"
+		// })
+
+	});
+
+	
+	var path = {{positions|safe}}
+
+
+/******************/
+/*  Main Methods  */
+/******************/
+	var getAndRenderResults = function(origin) {
+		if (origin == "tell-us-more") {
+			// hide form wrapper
+			$("#form-wrapper").fadeOut(250, function() { $(this).addClass("not-shown")})
+			$("#tell-us-more-results-button").fadeOut(100).fadeIn(100).fadeOut(250)
+			$("#call-to-action-wrapper").removeClass("not-shown").hide().delay(500).fadeIn(250)
+		}
+
+		// Hide show results button
+		$("#show-results-button").fadeOut(500, function() { $(this).addClass("not-shown") });
+
+		// Render existing path (if applicable)
+		// console.log("Existing Path: ")
+		// console.log(path)
+
+		// show loading
+		$("#loading-wrapper").removeClass("not-shown").hide().fadeIn(100)
+
+		// AJAX for ideal paths
+		var ideal_id = parseInt($("#goal-position-box :selected").val())
+		$.get("/careers/getIdealPaths", {"ideal_id":ideal_id}, function(response) {
+
+			// hide loading
+			$("#loading-wrapper").addClass("not-shown")
+
+			renderResults(response)
+			// Show users's existing positions
+			if ($("#progress-wrapper").hasClass("not-shown") && path.length > 0) {
+				// If already rendered, show them
+				if ($("#progress-wrapper .v2-bar").length > 0) {
+					$("#progress-wrapper").removeClass("not-shown").hide().fadeIn(250)
+					$("#call-to-action-wrapper").removeClass("not-shown").hide().fadeIn(500)
+
+				} else {
+					// Else, make them
+
+					// Create containers
+					$("#progress-wrapper").append("<div class='v2-bar'></div>").append("<div class='v2-duration-bar'></div>")
+
+					// Append them
+					$container = $("#progress-wrapper .v2-bar :last")
+					$d_container = $("#progress-wrapper .v2-duration-bar :last")
+
+					// Make path and resize it
+					renderV2Path($container, $d_container, path)
+
+					// Show containers
+					$("#progress-wrapper").removeClass("not-shown")
+					$("#call-to-action-wrapper").removeClass("not-shown").hide().fadeIn(500)
+
+					// Segment this call to give more time...
+					//	 TODO: fix this problem
+					$(".v2-item", $container).each( function() {
+						resizeText(this)
+					});
+				};
+				// Add '+' box
+				addTellUsMoreEndPosition()
+			} 	
+		}, "json")
+
+		// Add '+' box
+		addTellUsMoreEndPosition()	
+
+		// Slide search wrapper out of the way
+		$("#search-box-wrapper").slideUp(300)
+	}
+
+	/* INSTANCE VARIABLE */
+	var response_data = []
+
+	// Handles rendering all ideal paths returned from server
+	var renderResults = function(paths) {
+		// Set instance variable for easy access
+		response_data = []
+		var first_shown = false
+		var length = Object.keys(paths).length
+
+		// Show/hide shuffle button
+		if (length > 1) $("#shuffle-button").show()
+		else $("#shuffle-button").hide()
+
+		$("#results-wrapper .call-out-text").show()
+
+		for (var key in paths) {
+
+			// Get path
+			var $path = paths[key]
+			response_data.push($path)
+
+			// V2, only show first path
+			if (!first_shown) {
+				$("#results-wrapper").append("<div class='v2-bar' data-path_index='0'></div>").append("<div class='v2-duration-bar'></div>").removeClass("not-shown").hide().fadeIn(250)
+
+				$("#goal-position-call-out").html($("#goal-position-box :selected").html())
+
+				var $bar = $("#results-wrapper .v2-bar :last")
+				var $d_bar = $("#results-wrapper .v2-duration-bar :last")
+
+				renderV2Path($bar, $d_bar, $path)
+				$(".v2-item", $bar).each(function() {
+					resizeText(this)
+				})
+				first_shown = true
+			} 
+		};
+		$("#results-wrapper-buttons").removeClass("not-shown").hide().fadeIn(250)
+	};
+
+
+	// Renders a single path inside of $container
+	var renderPath = function($container, path) {
+
+		var width = Math.floor(100/path.length) + "%"
+		for (var j = 0; j < path.length; j++) {
+
+			// b/c of API idiosyncrasies
+			if ("display_text" in path[j])
+				$container.append("<div class='path-item' style='width:"+width+";background-color:"+color_map[j]+";'>"+path[j]["display_text"]+"</div>")
+
+			if ("pos_title" in path[j] && path[j]["pos_title"] != null)
+				$container.append("<div class='path-item' style='width:"+width+";background-color:"+color_map[j]+";'>"+path[j]["pos_title"]+"</div>")
+			else
+				$container.append("<div class='path-item' style='width:"+width+";background-color:"+color_map[j]+";'>"+path[j]["title"]+"</div>")
+		}
+
+		// make full width, then resize items
+		$container.animate({"width":"80%"}, "500", function() {
+			// text-resizing black magic
+			$(".path-item", $container).each(function() {
+				resizeText(this)
+			})
+		})	
+	};
+
+	var resultsToTellUsMore = function() {
+		// Hide results... need to pipe positions to path
+		// $("#results-wrapper").fadeOut(250, function() { $(this).addClass("not-shown") });
+
+		// Hide call to action buttons
+		$("#call-to-action-wrapper").fadeOut(250, function() { $(this).addClass("not-shown") });	
+
+		// Hide '+' button
+		removeTellUsMoreEndPosition()
+
+		// Hide entity dropdown
+		$("#v2-bar-entity-wrapper").css("left","-500px")
+
+		// Show form
+		$("#form-wrapper").removeClass("not-shown").hide().fadeIn(500)
+	};
+
+
+
+/******************/
+/*    Handlers    */
+/******************/
+
+	/* handler for "shuffling" paths */
+	var renderNextPath = function() {
+		// make sure entity list is hidden
+		$("#v2-bar-entity-wrapper").css("left","-500px")
+
+		// get index of last
+		var next_index = parseInt($("#results-wrapper .v2-bar").data("path_index")) + 1
+
+		// reset index
+		next_index = (next_index >= response_data.length) ? 0 : next_index;
+		$("#results-wrapper .v2-bar").data("path_index", next_index)
+
+		// get path & container
+		var path = response_data[next_index]
+		var $container = $("#results-wrapper .v2-bar")
+		var $d_container = $("#results-wrapper .v2-duration-bar")
+
+		// empty of previous belongings
+		// $($container).fadeOut(250, function() { $(this). empty() });
+		$($container).empty()
+		$($d_container).empty()
+
+		// render new path w/ new index
+		renderV2Path($container, $d_container, path)
+		$(".v2-item", $container).each(function() {
+			resizeText(this)
+		})
+	};
+
+
+	// Responds to main select box change event
+	var selectItemChanged = function() {
+
+		// If !authenticated, ask for more info
+		if (path.length == 0) {
+			renderGetMoreInfo()
+
+		// Else, check if "build" selected
+		} else {
+			if ($("#goal-position-box :selected").val() == "build") {
+				if ($("#call-to-build-wrapper").hasClass("not-shown"))
+					$("#call-to-build-wrapper").removeClass("not-shown").hide().fadeIn(250)
+				if (!$("#show-results-button").hasClass("not-shown"))
+					$("#show-results-button").fadeOut(250, function() {
+						$(this).addClass("not-shown")
+					})
+				
+			// Else, allow show select button
+			} else {
+				if (!$("#call-to-build-wrapper").hasClass("not-shown"))
+					$("#call-to-build-wrapper").hide(function() {
+						$(this).addClass("not-shown")
+					}); 
+				renderSelectButton() 
+			}
+		}
+	}
+
+
+	// Goes back to the search box, erases current results
+	var backToSearch = function() {
+
+		// Show search box
+		$("#search-box-wrapper").removeClass("not-shown").hide().slideDown(250)
+
+		// Hide Results
+		$("#results-wrapper").fadeOut(250, function() { $(this).addClass("not-shown") });
+
+		// Hide Call to Action
+		$("#call-to-action-wrapper").fadeOut(250, function() { $(this).addClass("not-shown") });
+
+		// If form, hide that too
+		$("#form-wrapper").fadeOut(250, function() { $(this).addClass("not-shown") });
+
+		// Erase previous path bars
+		$("#results-wrapper .v2-bar").each(function() {
+			$(this).remove()
+		})
+		$("#results-wrapper .v2-duration-bar").each(function() {
+			$(this).remove()
+		})
+
+		// Hide You bar
+		$("#progress-wrapper").addClass("not-shown")
+
+		// Hide Results buttons
+		$("#results-wrapper-buttons").fadeOut(250)
+
+		// Hide entity div
+		$("#v2-bar-entity-wrapper").css("left","-500px")
+
+		// Show '+' box
+		addTellUsMoreEndPosition()
+	};
+
+
+	// Renders the basic blurb/info and screenshot
+	var renderGetMoreInfo = function() {
+		$("#get-info-wrapper").removeClass("not-shown").hide().fadeIn(500)
+	};
+
+	// Renders a single path/progress bar
+	var renderProgressBar = function(data) {
+		var width = Math.floor(100/data.length)
+		for (var j = 0; j < data.length; j++) {
+
+			$(".progress-bar").append("<div class='progress-item' style='background-color:" + color_map[j] + ";width:"+width+"%'>"+data[j]["title"]+"</div>")
+		}
+		$("#results-wrapper").toggleClass("not-shown")
+	};
+
+	// Changes the input prepend text to "Select" and activates it
+	var renderSelectButton = function() {
+		$("#show-results-button").removeClass("not-shown").hide().fadeIn(250)
+	};
+
+	// Essentially a constant, makes the check mark and x icons
+	var control_button_html = "<i class='icon-remove icon-large red inline-icon' onclick='closeInlineForm(this.parentNode)'></i> <i class='icon-ok icon-large green inline-icon' onclick='addPositionToProgressBar(this.parentNode)'></i>"
+
+
+	// If user elects to enter data manually, show form headers
+	var renderTellUsMoreForm = function() {
+		$("#get-info-wrapper").fadeOut(500, function() {
+			$(this).addClass("not-shown")
+			$("#form-wrapper").removeClass("not-shown").hide().fadeIn(250)
+		});
+		$("#results-wrapper").removeClass("not-shown").hide().fadeIn(250)
+		$("#results-wrapper .call-out-text").hide()
+		$("#results-wrapper #shuffle-button").hide()
+
+		$("#progress-wrapper").removeClass("not-shown").hide().fadeIn(250)
+		if (path.length == 0) $("#progress-wrapper .section-header :last").css("visibility", "hidden")
+
+		// hide '+' box
+		removeTellUsMoreEndPosition()
+	};
+
+	// Renders input for new experience
+	var renderExperienceInput = function(el) {
+		$(el).empty().append("<div class='input-container'><input type='text' placeholder='Title' class='input-medium'/> at <input type='text' placeholder='Company' class='input-medium'/> From: <input type='text' placeholder='mm/yyy' class='input-medium' /> To: <input type='text' placeholder='mm/yyyy' class='input-medium' />" + control_button_html + "</div>").animate({"opacity":1}, "250")
+	};
+
+	// Renders input for new education
+	var renderEducationInput = function(el) {
+		$(el).empty().append("<div class='input-container'><input type='text' placeholder='Degree' class='input-small'/> in <input type='text' placeholder='Field' class='input-medium'/> at <input type='text' placeholder='School' class='input-medium'/> &nbsp;Graduated In: " + year_select() + control_button_html +  "</div>").animate({"opacity":1}, "250")
+	};
+
+	// Renders input for new skills
+	var renderSkillsInput = function(el) {
+		$(el).empty().append("<div class='input-container'><input type='text' placeholder='Skills' class='input-xlarge'/>" + control_button_html + "</div>").animate({"opacity":1}, "250")
+	};
+
+	// Opens and closes pieces of the form when respective headers clicked
+	var formSectionClicked = function(ev, el) {
+		var $icon = $(el).children().first()
+
+		// check if other sections are open
+		$(".section-opened").each(function() {
+			// must compare DOM node, not JQuery el
+			if (this != el.children[0]) {
+				// this means a different section currently open
+				$(this).removeClass("icon-chevron-sign-down").addClass("icon-chevron-sign-right").fadeIn(250).removeClass("section-opened")
+			}
+		});
+
+		// If this section is open, close it
+		if ($icon.hasClass("section-opened")) {
+
+			// Only close if click on icon or header
+			if (ev.target.tagName == "I" || ev.target.tagName == "SPAN") {
+				$icon.removeClass("icon-chevron-sign-down").addClass("icon-chevron-sign-right").fadeIn(250).removeClass("section-opened")
+
+				$("#inline-form-container").animate({'opacity':0}, '250', function() { $(this).empty() })
+
+			}
+
+		// If this section is closed, open and show form
+		} else {
+			$icon.fadeOut(250, function() {
+				$(this).removeClass("icon-chevron-sign-right").addClass("icon-chevron-sign-down").fadeIn(250).addClass("section-opened") 
+
+				var type = $(this).parent().data("section_type")
+				var $container = $("#inline-form-container")
+				if (type=="education") {
+					renderEducationInput($container) // $(this).next()
+				} else if (type=="experience") {
+					renderExperienceInput($container)
+				} else if (type=="skills") {
+					renderSkillsInput($container)
+				}
+			});
+		}
+	};
+
+
+
+	// Adds recently added position to progress bar
+	var addPositionToProgressBar = function(el) {
+
+		// Animate checkmark
+		$(el).children().last().fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(250)
+
+		// Don't dismiss the bar... yet
+		// event.stopPropagation()
+
+		// Calculate num items and width
+		var num_items = path.length
+
+		// Get type
+		var type = $(".section-opened").parent().data("section_type")
+		var inputs = $("#inline-form-container input")
+
+		// Education
+		if (type == "education") {
+			var degree = inputs[0].value
+			var field = inputs[1].value
+			var school = inputs[2].value
+			var grad_year = $("#inline-form-container :selected").val()
+
+			// get form data
+			post_data = {
+				"type":"education",
+				"degree":degree,
+				"field":field,
+				"entity":school,
+				"end_date":grad_year
+			}
+
+			// Validate form data via API
+			$.post('/careers/addProgressDetails/',post_data,function(data) {
+				console.log(data);
+				if (data["result"] == "success") {
+					console.log('success');
+
+					// Add to DST
+					path.push({
+						"type":"education",
+						"degree":data.data.degree,
+						"field":data.data.field,
+						"school":data.data.entity,
+						"grad_year":data.data.end_date,
+						"display_text":data.data.degree + ", " + data.data.field + " at " + data.data.entity
+						});
+					//console.log(path);
+					// rerenderProgressBar(path)
+					if (path.length == 1) createUserPathBar(path)
+					addPositionToExistingPath(path)
+				} else {
+					console.log('failure');
+					console.log(data.errors);
+				}
+			},'json');
+
+		} else if (type == "experience") {
+
+			// Get form data
+			var title = inputs[0].value
+			var entity = inputs[1].value
+			var selects = $('#inline-form-container select')
+			var start_date = inputs[2].value
+			var end_date = inputs[3].value
+
+			post_data = {
+				"type":"position",
+				"title":title,
+				"entity":entity,
+				"start_date":start_date,
+				"end_date":end_date
+			}
+
+			// Validate form data via API
+			$.post('/careers/addProgressDetails/',post_data,function(data) {
+				console.log(data);
+				if (data["result"] == "success") {
+					console.log('success');
+
+					// Add to DST
+					path.push({
+						"type":"position",
+						"title":data.data.title,
+						"entity":data.data.entity,
+						"start_date":data.data.start_date,
+						"end_date":data.data.end_date,
+						"display_text":data.data.title + " at " + data.data.entity
+					});
+					// console.log(path);
+					// rerenderProgressBar(path)
+					if (path.length == 1) createUserPathBar(path)
+					addPositionToExistingPath(path)
+				} else {
+					// display error
+					console.log('failure');
+					console.log(data.errors);
+				}
+			},'json');
+
+		} else if (type == "skills") {
+			console.log("skills entered... what to do with?")
+		}
+
+		// Clear Form Fields
+		$("#inline-form-container input").each(function() {
+			$(this).val("")
+		})
+	}
+
+
+	// Render the progress bar with newly entered data
+		// Currently, re-rendering entire bar to adjust widths
+	// var rerenderProgressBar = function(path) {
+
+	// 	 else // empty existing
+	// 		$("#progress-wrapper .v2-bar").empty()
+	
+
+	// 	// Get new width
+
+	// 	var $container = $("#progress-wrapper .v2-bar")
+	// 	var $d_container = $("#progress-wrapper .v2-duration-bar")
+
+	// 	renderV2Path($container, $d_container, path)
+	// 	$(".v2-item", $container).each(function() {
+	// 		resizeText(this)
+	// 	});
+
+	// }
+
+
+	/**************/
+	/* Viz V2 API */
+	/**************/
+
+	var renderV2Path = function($container, $d_container, path) {
+		// Set relative width
+		var width = (path.length == 1) ? 30 : Math.floor(100/path.length)
+		// console.log(path)
+		var is_user = ("pos_title" in path[0]) ? false : true;
+		if (is_user && path.length > 1) width = Math.floor(100/(path.length + 1))
+		// Iterate through and create boxes
+		for (var j = 0; j < path.length; j++) {
+
+			if (is_user) addV2UserItem(path[j], $container, width, j)
+			else addV2Item(path[j],$container, width, j)
+
+			addV2Duration(path[j],$d_container, width)
+
+			// If not the last element, create link to next
+			if (j < path.length - 1) {// then add link box
+				$($container).append("<div class='v2-bar-link'></div>") 
+				$($d_container).append("<div class='v2-duration-bar-link'></div>")
+			};
+		};
+		// Have to do this after b/c widths have to be set
+		if (!is_user) addStacking(path, $container, width)
+		$($container).hide().fadeIn(250)
+	};
+
+
+	// Creates a V2 bar inside the progress wrapper for the first time
+	//	should only be called once!
+	var createUserPathBar = function(path) {
+
+		// Create progress bar
+		$("#progress-wrapper .section-header :last").after("<div class='v2-duration-bar'></div>").after("<div class='v2-bar'></div>").css("visibility", "visible").fadeIn(250)
+
+		// allow "show results" button to be clicked
+		$("#tell-us-more-results-button").css("visibility", "visible").hide().fadeIn(250)
+	};
+
+	var addPositionToExistingPath = function(path) {
+
+		// get container, d_container, newest position
+		var $container = $("#progress-wrapper .v2-bar")
+		var $d_container = $("#progress-wrapper .v2-duration-bar")
+		var new_position = path[path.length -1]
+		var new_width = Math.floor(100/(path.length+1)) - 2
+
+		// resize existing path items
+		$(".v2-item", $container).each(function() {
+			$(this).animate({"width":new_width+"%"}, "250", function() {
+				resizeText(this)
+			});
+		});
+
+		// add links to newest pos
+		$($container).append("<div class='v2-bar-link'></div>") 
+		$($d_container).append("<div class='v2-duration-bar-link'></div>")
+
+		// add newest position
+		addV2UserItem(new_position, $container, new_width, path.length-1)
+		addV2Duration(new_position, $d_container, new_width)
+
+		$(".v2-item :last", $container).hide().fadeIn(250, function() {
+			resizeText(this)
+		});
+	};
+
+
+	var addV2Item = function(pos, $container, width, index) {
+
+		// Uniqify entities
+		pos["entities"] = _.uniq(pos["entities"], false, function(entity) { return entity["name"] });
+
+		// Need to check for null position titles from API
+		if (pos["pos_title"] != null)
+			$($container).append("<div class='v2-item' data-position_index='"+index+"' data-entity_index='0' style='width:"+(width-2)+"%'>"+pos["pos_title"]+" <span class='v2-item-entity'>"+pos["entities"][0]["name"]+"</span></div>")
+		else
+			$($container).append("<div class='v2-item' data-position_index='"+index+"' data-entity_index='0' style='width:"+(width-2)+"%'><span class='v2-item-entity'>"+pos["entities"][0]["name"]+"</span></div>")
+	};
+
+	var addV2UserItem = function(pos, $container, width, index) {
+		if ("display_text" in pos)
+			$($container).append("<div class='v2-item' data-position_index='"+index+"' data-entity_index='0' style='width:"+(width-2)+"%'>"+pos["display_text"]+"</div>")
+		else
+			$($container).append("<div class='v2-item' data-position_index='"+index+"' data-entity_index='0' style='width:"+(width-2)+"%'>"+pos["title"]+" "+pos["entity_name"]+"</div>")
+	};
+
+
+	var addV2Duration = function(pos, $container, width) {
+		// show nothing for now
+		pos["duration"] = " "
+
+		$($container).append("<div class='v2-duration-item' style='width:"+(width-2)+"%'>"+pos["duration"]+"</div>")
+	};
+
+	// Iterates through data, looks for multiple entities, adds stacked
+	//	viz & hover handler if so
+	var addStacking = function(data, $container, width) {
+		for (var j = 0; j < data.length; j++) {
+			if (data[j]["entities"].length > 1) {
+				var box_to_stack = $(".v2-item :eq("+j+")", $container)
+
+				// Create stacked element, set width
+				$($container).append("<div class='v2-item stacked-item' style='width:"+(width-2)+"%'></div>")
+
+				// Find width, left, top offsets
+				var offset = $(box_to_stack).offset()
+				var d_width = $(box_to_stack).css("width")
+
+				// Place box
+				$(".stacked-item :last", $container).css("left", offset.left-8).css("top",offset.top-6).css("height", "80px").css("width", d_width).css("z-index","5")
+
+				// Path index
+				var path_index = $($container).data("path_index")
+
+				// Add hover
+				$(box_to_stack).hover(function() {
+					// get indices
+					var position_index = $(this).data("position_index")
+					// var entity_index = $(this).data("entity_index") + 1
+					// entity_index = (entity_index >= response_data[path_index][position_index]["entities"].length) ? 0 : entity_index
+
+					// // get new entity
+					// var new_ent = response_data[path_index][position_index]["entities"][entity_index]
+
+					// show entity
+					var entities = response_data[path_index][position_index]["entities"]
+
+					showEntityList(entities, $(this).offset(), this)
+
+				}, function(e) {
+					// $("#v2-bar-entity-wrapper").delay(4000).fadeOut(500, function() {
+					// 	$(this).css("left",-500).fadeIn()
+					// })
+				});
+			};
+		};
+	};
+
+	// Manually add the green '+' box
+	//	Note that this can be called safely if box already exists
+	//	will not create a duplicate
+	var addTellUsMoreEndPosition = function() {
+		if ($("#progress-wrapper .v2-bar .v2-item-prompt").length == 0) {
+
+			var width = $("#progress-wrapper .v2-bar .v2-item :first").css("width")
+			$("#progress-wrapper .v2-bar :last").append("<div class='v2-bar-link'></div><div style='width:"+(width)+";'class='v2-item-prompt'>+</div>")
+			$("#progress-wrapper .v2-item-prompt").click(resultsToTellUsMore)
+		};
+	};
+
+	// Manually remove the green '+' box
+	var removeTellUsMoreEndPosition = function() {
+		$("#progress-wrapper .v2-bar .v2-bar-link :last").fadeOut(250, function() { $(this).remove() });
+		$("#progress-wrapper .v2-bar .v2-item-prompt").fadeOut(250, function() { $(this).remove() });
+	};
+
+	// moves absolutely positioned div to appropriate location and
+	//	renders ul of entities inside it
+	var showEntityList = function(entities, offset, item) {
+		var text = "<ul class='entity-list'><li><i class='icon-caret-right icon-large'></i><b>Related Companies:</b></li>"
+		for (var j = 0; j < entities.length; j++) {
+			text += "<li class='entity-list-item'>" + entities[j]["name"] + "</li>"
+		};
+		text += "</ul>"
+
+		// Place 
+		$("#v2-bar-entity-wrapper").html(text).css("top",offset.top+80).css("left",offset.left-10)
+
+		// Allow each to be clicked
+		$(".entity-list li :not(:first)").each(function() {
+			$(this).click(function() {
+				entityClicked($(this).html(), item)
+			});
+			$(this).hover(function() {
+				$(this).css("background-color", "rgba(41,128,185,0.7)")
+
+			}, function() {
+				$(this).css("background-color","rgba(256,256,255,0.7)")
+			});
+		});
+	};
+
+	// changes the entity of a particular v2 path item
+	var entityClicked = function(clicked, item) {
+		$(".v2-item-entity", item).fadeOut(150, function() {
+			$(this).html(clicked).fadeIn(150, function() {
+				resizeText(item)
+			});
+		});	
+	};
+
+	/***********/
+	/* HELPERS */
+	/***********/
+	var resizeText = function(el) {
+
+		var diff = el.scrollHeight - el.offsetHeight
+		if (diff > (el.offsetHeight * 2)) {
+
+			var current_font_size = parseInt($(el).css("font-size"))
+			$(el).css("font-size", (current_font_size-4) + "px")
+
+			var line_height = parseInt($(el).css("line-height"))
+			$(el).css("line-height", (14) + "px")
+		} else if (diff > el.offsetHeight) {
+			// font-size -= 2
+			var current_font_size = parseInt($(el).css("font-size"))
+			$(el).css("font-size", (current_font_size-2) + "px")
+
+			var line_height = parseInt($(el).css("line-height"))
+			$(el).css("line-height", (18) + "px")
+
+		} else if (diff > 0) {
+			// font-size -= 2
+			// console.log("tier 0")
+			var line_height = parseInt($(el).css("line-height"))
+			$(el).css("line-height", (24) + "px")
+
+		} else if (el.scrollWidth > el.offsetWidth) {
+			var current_font_size = parseInt($(el).css("font-size"))
+			$(el).css("font-size", (current_font_size-2) + "px")
+		}
+
+		// if (el.offsetHeight < el.scrollHeight) { 
+		// 	var current_font_size = parseInt($(el).css("font-size"))
+		// 	if (current_font_size >= 12) 
+		// 		$(el).css("font-size", (current_font_size-2) + "px")
+		// 	// var line_height = parseInt($(el).css("line-height"))
+		// 	// $(el).css("line-height", (line_height / 2) + "px")
+		// };
+	};
+
+
+
+	var closeInlineForm = function(el) {
+
+		// Close opened section
+		$(".section-opened").each(function() {
+			$(this).removeClass("icon-chevron-sign-down").addClass("icon-chevron-sign-right").fadeIn(250).removeClass("section-opened")
+		});
+ 
+		// Empty form container
+		$("#inline-form-container").animate({'opacity':0}, '250', function() { $(this).empty() })
+	};
+
+
+	// Creates select input form for months
+	var month_select = function() {
+		var html = "<select class='input-mini'>"
+		for (var i = 1; i <= 12; i++)
+			html += "<option value='" + i + "'>" + i + "</option>"
+		return html + "</select>"
+	};
+
+	// Creates select input form for years back to 1970
+	var year_select = function() {
+		var html = "<select class='input-small'>"
+		for (var i = 2020; i >= 1980; i--) {
+			if (i == 2013)
+				html += "<option value='" + i + "' selected>" + i + "</option>"
+			else html += "<option value='" + i + "'>" + i + "</option>"
+		}
+		return html + "</select>"
+	};
+
+/*
+	TODO: 
+		: colors?
+
+		: Change link color, header color
+		: Toy w/ Colors!
+		: check date entry HTML5 date input? (tell me more)
+		: need to fail safe if no results returned
+		: proper resizing
+		: render colors backwards from opacity = 1
+		: collapse multiple result paths
+		: need a way to signal current position
+		: need a way to cancel an added position
+		: need to always render positions from same DST ("path")
+
+		: Idea -- iterate through and animate widths to new, then drop in other one somehow.... animate from 0?
+
+
+-- give buttons different colors -- one blue, one green
+
+
+-- make new build work
+-- if time permits, allow entity hover --> description
+*/
+
+</script>
+
+{% endblock %}
+
+
+
+
+
+
