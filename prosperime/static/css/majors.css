@@ -614,6 +614,8 @@ border-radius: 20px;*/
 
 #cta-container {
 	height:0px;
+	-webkit-transition-property:height;
+	-webkit-transition-duration:0.3s;
 	transition:all 0.3s;
 	visibility:hidden;
 	color:#fff;
