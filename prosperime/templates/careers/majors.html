@@ -251,7 +251,7 @@
 					console.log("updating data...")
 					// deconstruct data
 					people = $.parseJSON(response["people"])
-					positions = $.parseJSON(response["positions"])
+					//positions = $.parseJSON(response["positions"])
 					majors = $.parseJSON(response["majors"])
 					// update data in d3 objects
 					updateMajors();
@@ -284,6 +284,8 @@
 		.keypress(function(e) {
 			if(e.which == 13) {
 				var input = $('#majors-filter-input')
+				if ($(input).val().length < 1) return false;
+
 				var cat = input.data('val-cat')
 				// add to global filter set
 
