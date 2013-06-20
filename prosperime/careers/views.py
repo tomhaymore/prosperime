@@ -70,7 +70,7 @@ def old_majors(request):
 
 def majors(request):
 	# try to get from cache
-	# data = cache.get("majors_viz_"+str(request.user.id))
+	# data = cache.get("majors_viz_"`+str(request.user.id))
 	data = {}
 	import accounts.tasks as tasks
 	data['majors'] = cache.get("majors_viz")
@@ -2133,8 +2133,14 @@ def get_majors_data(request):
 		params['jobs'] = request.GET.getlist('jobs[]')
 	
 	path = careerlib.CareerPathBase()
-	# print params
-	data = path.get_majors_data_new(**params)
+
+	# If there are no params, look back at the cache 
+	if not params:
+		data = cache.get("majors_viz")
+		if data is None:
+			data = path.get_majors_data_new(**params)
+	else:
+		data = path.get_majors_data_new(**params)
 
 	# people = []
 	# positions = []
