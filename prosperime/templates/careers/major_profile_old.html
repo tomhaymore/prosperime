@@ -3,7 +3,21 @@
 {% block head %}
 
 <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/career.css" />
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/majors.css" />
+<style type="text/css">
+	
 
+</style>
+{% endblock %}
+
+{% block extramessage %}
+	{% if not user.is_authenticated %}
+		<div id="cta-container">
+			
+				Create an account to see personalized results, filters and more &nbsp;&nbsp; <a class="flat-button green-button button-med" href="/account/authorize">Connect with LinkedIn</a>
+			
+		</div>
+	{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -11,204 +25,213 @@
 
 
 <div id="content-container" class="main-container">
-	{% if major.long_title %}
-		<p class="v2-feature-page-header">
-			<span class="black">Major: </span>
-			{{major.long_title}}
-		</p>
-	{% else %}
-		<p class="v2-feature-page-header">
-			<span class="black">Major: </span>
-			{{major.title}}
-		</p>
-	{% endif %}
-	{% if major.description %}
-		<p class="main-sub-header">{{major.description}}</p>
-	{% endif %}
-	<!-- <p>Prosper.me gets better the more people that use it. Tell your friends!</p> -->
+	
+		{% if major.long_title %}
+			<p class="v2-feature-page-header">
+				<span class="black">Major: </span>
+				{{major.long_title}}
+			</p>
+		{% else %}
+			<p class="v2-feature-page-header">
+				<span class="black">Major: </span>
+				{{major.title}}
+			</p>
+		{% endif %}
 
-	<div id="career-profile-container">
+		{% if major.description %}
+			<p class="main-sub-header">{{major.description}}</p>
+		{% endif %}
+		<!-- <p>Prosper.me gets better the more people that use it. Tell your friends!</p> -->
 
-	<!-- <div class="career-profile-nav-container">
->>>>>>> 2065b6e7a9f9f470ef8c723f6d0b6dc7d21c906a
-			
-			<a class="career-profile-nav pull-left selected" data-view="network">Your Network</a> 
-			<a class="career-profile-nav pull-left unselected" data-view="all">Prosper.me Community</a>
-			<div class="clear"></div>
-			
-<<<<<<< HEAD
+		<div id="career-profile-container">
+		{% if not user.is_authenticated %}
+		<div class="career-descrption">
+			<p>To see details on this major, you need authenticate with your LinkedIn account.</p>
+			<p>Authenticating helps personalize your experience and keeps our user data safe.</p>
+			<p><a href="/account/authorize" class="flat-button green-button">Connect with LinkedIn</a></p>
 		</div>
-		<div class="career-perspective" data-view="network">
-=======
-		</div> -->
-		<!-- <div class="career-perspective" data-view="network" style="display:none;">
->>>>>>> 2065b6e7a9f9f470ef8c723f6d0b6dc7d21c906a
-			<div id="career-left-pane" class="pull-left">
-				<div class="career-module">
-					{% if network.schools %}
-					<p class="feature-page-subheader">School Overview</p>
-					<ul class="career-list">
-						{% for s in network.schools %}
-							<li>{{s.name}} <span class="info-badge">{{s.pos}}</span></li>
-						{% endfor %}
-					</ul>
-					{% endif %}
-				</div>
-				<div class="career-module">
-					{% if network.first_jobs %}
-					<p class="feature-page-subheader">Popular First Jobs</p>
-					<ul class="career-list">
-						{% for j in network.first_jobs %}
-							<li>{{j.1.title}} <span class="info-badge">{{j.1.count}}</span></li>
-						{% endfor %}
-					</ul>
-					{% endif %}
-				</div>
-				<div class="career-module">
-					{% if network.careers %}
-					<p class="feature-page-subheader">Popular Careers</p>
-					<ul class="career-list">
-						{% for c in network.careers %}
-							<li>{{c.name}}</li>
-						{% endfor %}
-					</ul>
-					{% endif %}
-				</div>
+		{% else %}
+		<!-- <div class="career-profile-nav-container">
+	>>>>>>> 2065b6e7a9f9f470ef8c723f6d0b6dc7d21c906a
+				
+				<a class="career-profile-nav pull-left selected" data-view="network">Your Network</a> 
+				<a class="career-profile-nav pull-left unselected" data-view="all">Prosper.me Community</a>
+				<div class="clear"></div>
+				
+	<<<<<<< HEAD
 			</div>
-			<div id="career-right-pane" class="pull-left">
-				<div class="career-module">
-					{% if network.paths %}
-						<p class="feature-page-subheader">Where are they now?</p>
+			<div class="career-perspective" data-view="network">
+	=======
+			</div> -->
+			<!-- <div class="career-perspective" data-view="network" style="display:none;">
+	>>>>>>> 2065b6e7a9f9f470ef8c723f6d0b6dc7d21c906a
+				<div id="career-left-pane" class="pull-left">
+					<div class="career-module">
+						{% if network.schools %}
+						<p class="feature-page-subheader">School Overview</p>
 						<ul class="career-list">
-						{% for p in network.paths|slice:"5" %}
-							<li>
-								<div class="pull-left">
-									<img class="thumbnail" src="{{p.profile.default_profile_pic}}" />
-								</div>
-								<div class="pull-left user-info-stub">
-									<p>{{p.profile.full_name}}</p>
-									<p>{{p.profile.current_position}}</p>
-										
-								</div>
-								<div class="clear"></div>
-							</li>
-						{% endfor %}
+							{% for s in network.schools %}
+								<li>{{s.name}} <span class="info-badge">{{s.pos}}</span></li>
+							{% endfor %}
 						</ul>
-					{% endif %}
-				</div>
-			</div>
-			<div class="clear"></div>
-		</div>
-		<div class="career-perspective" data-view="all"  style="display:none;">
-			<div id="career-left-pane" class="pull-left">
-				<div class="career-module">
-					{% if all.schools %}
-					<p class="feature-page-subheader">School Overview</p>
-					<ul class="career-list">
-						{% for s in all.schools %}
-							<li>{{s.name}} <span class="info-badge">{{s.pos}}</span></li>
-						{% endfor %}
-					</ul>
-					{% endif %}
-				</div>
-				<div class="career-module">
-					{% if all.first_jobs %}
-					<p class="feature-page-subheader">Popular First Jobs</p>
-					<ul class="career-list">
-						{% for j in all.first_jobs %}
-							<li>{{j.1.title}} <span class="info-badge">{{j.1.count}}</span></li>
-						{% endfor %}
-					</ul>
-					{% endif %}
-				</div>
-				<div class="career-module">
-					{% if all.careers %}
-					<p class="feature-page-subheader">Popular Careers</p>
-					<ul class="career-list">
-						{% for c in all.careers %}
-							<li>{{c.name}}</li>
-						{% endfor %}
-					</ul>
-					{% endif %}
-				</div>
-			</div>
-			<div id="career-right-pane" class="pull-left">
-				<div class="career-module">
-					{% if all.paths %}
-						<p class="feature-page-subheader">Where are they now?</p>
+						{% endif %}
+					</div>
+					<div class="career-module">
+						{% if network.first_jobs %}
+						<p class="feature-page-subheader">Popular First Jobs</p>
 						<ul class="career-list">
-						{% for p in all.paths|slice:"5" %}
-							<li>
-								<div class="pull-left">
-									<img class="thumbnail" src="{{p.profile.default_profile_pic}}" />
-								</div>
-								<div class="pull-left user-info-stub">
-									<p>{{p.profile.full_name}}</p>
-									<p>{{p.profile.current_position}}</p>
-								</div>
-								<div class="clear"></div>
-							</li>
-						{% endfor %}
+							{% for j in network.first_jobs %}
+								<li>{{j.1.title}} <span class="info-badge">{{j.1.count}}</span></li>
+							{% endfor %}
 						</ul>
-					{% endif %}
-				</div>
-			</div>
-			<div class="clear"></div>
-		</div>
-			 -->
-
-		<!-- <div class="placeholder"> </div> -->
-		<div class="section-header black">People: </div>
-		{% if paths %}
-			{% for p in paths %}
-			<div class="path-row" data-p_id="{{p.id}}">
-				<div class="major-profile-pic-holder center pull-left">
-					<div class="path-person-title">{{p.full_name}}</div>
-					<img class="major-profile-pic" src="{{p.profile_pic}}" />
-				</div>
-				<div class="first-position-holder pull-left">
-					<div class="first-position-inner">
-					{{p.first}}
+						{% endif %}
+					</div>
+					<div class="career-module">
+						{% if network.careers %}
+						<p class="feature-page-subheader">Popular Careers</p>
+						<ul class="career-list">
+							{% for c in network.careers %}
+								<li>{{c.name}}</li>
+							{% endfor %}
+						</ul>
+						{% endif %}
 					</div>
 				</div>
-				<div class="path-holder pull-left">
-					<div class="path-holder-inner">
-						<img src="{{STATIC_URL}}img/connector.png" />
-					</div>
-				</div>
-				<div class="current-position-holder pull-left">
-					<div class="current-position-inner">
-					{{p.latest}}
+				<div id="career-right-pane" class="pull-left">
+					<div class="career-module">
+						{% if network.paths %}
+							<p class="feature-page-subheader">Where are they now?</p>
+							<ul class="career-list">
+							{% for p in network.paths|slice:"5" %}
+								<li>
+									<div class="pull-left">
+										<img class="thumbnail" src="{{p.profile.default_profile_pic}}" />
+									</div>
+									<div class="pull-left user-info-stub">
+										<p>{{p.profile.full_name}}</p>
+										<p>{{p.profile.current_position}}</p>
+											
+									</div>
+									<div class="clear"></div>
+								</li>
+							{% endfor %}
+							</ul>
+						{% endif %}
 					</div>
 				</div>
 				<div class="clear"></div>
-				<!-- For spacing -->
-		<!-- 		{% if p.first|length > 48 %}
-					<div class="span4 path-position">
-						{{p.first}}
-					</div>
-				{% else %}
-					<div class="span4 path-position pad-down">
-						{{p.first}}
-					</div>
-				{% endif %}
-
-				<div class="span2 spacer"> </div> -->
-
-				<!-- For spacing -->
-			<!-- 	{% if p.latest|length > 48 %}
-					<div class="span4 path-position">
-						{{p.latest}}
-					</div>
-				{% else %}
-					<div class="span4 path-position pad-down">
-						{{p.latest}}
-					</div>
-				{% endif %} -->
 			</div>
-		{% endfor %}
-		{% else %}
-		<p>Sorry, no people with this degree.</p>
+			<div class="career-perspective" data-view="all"  style="display:none;">
+				<div id="career-left-pane" class="pull-left">
+					<div class="career-module">
+						{% if all.schools %}
+						<p class="feature-page-subheader">School Overview</p>
+						<ul class="career-list">
+							{% for s in all.schools %}
+								<li>{{s.name}} <span class="info-badge">{{s.pos}}</span></li>
+							{% endfor %}
+						</ul>
+						{% endif %}
+					</div>
+					<div class="career-module">
+						{% if all.first_jobs %}
+						<p class="feature-page-subheader">Popular First Jobs</p>
+						<ul class="career-list">
+							{% for j in all.first_jobs %}
+								<li>{{j.1.title}} <span class="info-badge">{{j.1.count}}</span></li>
+							{% endfor %}
+						</ul>
+						{% endif %}
+					</div>
+					<div class="career-module">
+						{% if all.careers %}
+						<p class="feature-page-subheader">Popular Careers</p>
+						<ul class="career-list">
+							{% for c in all.careers %}
+								<li>{{c.name}}</li>
+							{% endfor %}
+						</ul>
+						{% endif %}
+					</div>
+				</div>
+				<div id="career-right-pane" class="pull-left">
+					<div class="career-module">
+						{% if all.paths %}
+							<p class="feature-page-subheader">Where are they now?</p>
+							<ul class="career-list">
+							{% for p in all.paths|slice:"5" %}
+								<li>
+									<div class="pull-left">
+										<img class="thumbnail" src="{{p.profile.default_profile_pic}}" />
+									</div>
+									<div class="pull-left user-info-stub">
+										<p>{{p.profile.full_name}}</p>
+										<p>{{p.profile.current_position}}</p>
+									</div>
+									<div class="clear"></div>
+								</li>
+							{% endfor %}
+							</ul>
+						{% endif %}
+					</div>
+				</div>
+				<div class="clear"></div>
+			</div>
+				 -->
+
+			<!-- <div class="placeholder"> </div> -->
+			
+			{% if paths %}
+				{% for p in paths %}
+				<div class="path-row" data-p_id="{{p.id}}">
+					<div class="major-profile-pic-holder center pull-left">
+						<div class="path-person-title">{{p.full_name}}</div>
+						<img class="major-profile-pic" src="{{p.profile_pic}}" />
+					</div>
+					<div class="first-position-holder pull-left">
+						<div class="first-position-inner">
+						{{p.first}}
+						</div>
+					</div>
+					<div class="path-holder pull-left">
+						<div class="path-holder-inner">
+							<img src="{{STATIC_URL}}img/connector.png" />
+						</div>
+					</div>
+					<div class="current-position-holder pull-left">
+						<div class="current-position-inner">
+						{{p.latest}}
+						</div>
+					</div>
+					<div class="clear"></div>
+					<!-- For spacing -->
+			<!-- 		{% if p.first|length > 48 %}
+						<div class="span4 path-position">
+							{{p.first}}
+						</div>
+					{% else %}
+						<div class="span4 path-position pad-down">
+							{{p.first}}
+						</div>
+					{% endif %}
+
+					<div class="span2 spacer"> </div> -->
+
+					<!-- For spacing -->
+				<!-- 	{% if p.latest|length > 48 %}
+						<div class="span4 path-position">
+							{{p.latest}}
+						</div>
+					{% else %}
+						<div class="span4 path-position pad-down">
+							{{p.latest}}
+						</div>
+					{% endif %} -->
+				</div>
+			{% endfor %}
+			{% else %}
+			<p>Sorry, no people with this degree.</p>
+			{% endif %}
 		{% endif %}
 	</div>
 </div>
@@ -218,6 +241,11 @@
 {% block templates %}
 <script type="text/javascript">
 $(function() {
+	if ($("#cta-container")) {
+			setTimeout(function() {
+				$("#cta-container").addClass("show")
+			},2500);
+		};
 	$("a.career-profile-nav").click(function() {
 		var view = $(this).data('view');
 		$("a.career-profile-nav").removeClass("selected").addClass("unselected");

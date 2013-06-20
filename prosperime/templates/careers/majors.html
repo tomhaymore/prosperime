@@ -133,11 +133,20 @@
 {% endblock %}
 
 
+{% block extramessage %}
+	{% if not user.is_authenticated %}
+		<div id="cta-container">
+			
+				See personalized results, filters and more. Connect with one click&nbsp;&nbsp; <a class="flat-button green-button button-med" href="/account/authorize">Connect with LinkedIn</a>
+			
+		</div>
+	{% endif %}
+{% endblock %}
 
 {% block content %}
 
 <div id="wide-content-container" class="main-container">
-
+	
 	<div id="header-container">
 		<p class="feature-page-header">What can you do with your major?</p>
 		<p class="feature-page-subheader">Use the graph below to see which majors lead to what jobs. Click on any major to learn more.</p>
@@ -197,12 +206,17 @@
 
 	// On DOM ready, AJAX to db for d3 data
 	$(function() {
+		if ($("#cta-container")) {
+			setTimeout(function() {
+				$("#cta-container").addClass("show")
+			},2500);
+		};	
 		if ("{{cache}}" == "hit") {
 			console.log("Hit Cache, render immediately")
 			// set dst's
-			people = shuffle({{people|safe}})
-			positions = shuffle({{positions|safe}})
-			majors = {{majors|safe}}
+			people = shuffle({{majors.people|safe}})
+			positions = shuffle({{majors.positions|safe}})
+			majors = {{majors.majors|safe}}
 			// logging
 			console.log(people)
 			// console.log(majors)
@@ -669,7 +683,7 @@
 			for (var j = 0; j < people.length; j++) {
 				
 				left_y = parseInt($("#person-"+people[j]).attr("y")) + img_height
-				console.log("#person-"+people[j])
+				// console.log("#person-"+people[j])
 				left_x = parseInt($("#person-"+people[j]).attr("x")) + 3
 
 				right_y = 16 + (27 * index)
@@ -827,6 +841,81 @@
 			.attr("stroke-width",1)
 	};
 
+
+	var profile_task_id,
+		connections_task_id;
+
+	var update_task_status = function(id,status) {
+		// determine what class to add
+		if (status == "success") {
+			var msg_class = "success";
+			var msg_text = "We have completed syncing with your LinkedIn account. Please refresh the page to see more results.";
+		} else if (status == "failure") {
+			var msg_class = "info";
+			var msg_text = "We have encountered an error processing your LinkedIn account.";
+		} else {
+			var msg_class = "info";
+			var msg_text = "We are still syncing your LinkedIn profile...";
+		}
+		// check if messages are present
+		var msg_container = $("div#messages");
+		if (!$.contains(document.documentElement,msg_container)) {
+			// messages div is not present, update
+			var block = "<div id='messages'>\n<ul class='messages'>\n<li class="+msg_class+" data-task-id="+id+">"+msg_text+"</li>\n</ul>\n</div>";
+			$("div.messages-container").append(block);
+		} else {
+			// messages div is present, check to see if this particular message is present
+			var msg = $("li#[data-task-id='"+id+"']");
+			if(!$.contains(document.documentElement,msg)) {
+				// element does not exist, create
+				var message = "<li class='info' data-task-id="+id+">"+msg_text+"</li>";
+				$("ul.messages").append(message);
+			} else {
+				// message is already present
+				msg.removeClass();
+				msg.addClass(msg_class);
+			}
+		}
+	};
+	
+	var check_task = function(id) {
+		setTimeout(function() {
+			console.log("checking task again...")
+			var url = "/tasks/" + id + "/status"
+			$.ajax({
+					url:url,
+					success: function(data) {
+						if (data.task.status == "SUCCESS") {
+							// task already completed, updated with success message
+							update_task_status(id,'success');
+						} else if (data.task.status == "FAILURE") {
+							// task failed
+							// update_task_status(id,'failure');
+
+						} else {
+							// task still pending
+							check_task();
+						}
+					},
+					dataType:"json"})
+		},2500);
+
+	};
+	
+	var tasks = {% if tasks %} true {% else %} false {% endif %};
+	{% if tasks %}
+	if (tasks == true) {
+		console.log("tasks...")
+		var profile_task_id = {% if profile_task_id %} "{{profile_task_id|safe}}" {% else %} null {% endif %}
+		var connections_task_id = {% if connections_task_id %} "{{connections_task_id|safe}}" {% else %} null {% endif %}
+	};	
+	{% endif %}
+	if (profile_task_id != null) {
+		check_task(profile_task_id);
+	};
+	// if (connections_task_id != null) {
+	// 	check_task(connections_task_id);
+	// };
 
 
 	

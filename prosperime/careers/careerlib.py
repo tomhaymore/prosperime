@@ -1130,11 +1130,11 @@ class CareerPathBase(CareerBase):
 			# base_positions = Position.objects.filter(type="education",entity__in=schools).exclude(ideal_position=None).select_related("person")
 			base_positions = base_positions.filter(entity__in=schools)
 		if majors_query:
-			print majors_query
+			# print majors_query
 			base_positions = base_positions.filter(ideal_position__id__in=majors_query)	
 
 		# base_positions.values('person__profile__status','ideal_position__major','ideal_position__title','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
-		print base_positions.query
+		# print base_positions.query
 		# print "looping through positions..."
 		for p in base_positions:
 			if p['person__profile__status'] == 'crunchbase':
@@ -1182,7 +1182,7 @@ class CareerPathBase(CareerBase):
 
 
 					counter += 1	
-					if counter == 84:
+					if counter == 100	:
 						break;
 
 

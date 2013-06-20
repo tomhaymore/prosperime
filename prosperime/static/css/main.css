@@ -328,7 +328,8 @@ div.footer {
 
 div.messages-container {
 	/*padding-top:5px;*/
-	background-color: #336633;
+	/*background-color: #336633;*/
+	background-color: rgba(61, 124, 204, 0.71);
 }
 
 div#messages {
@@ -338,7 +339,7 @@ div#messages {
 	/*margin-top: 10px;*/
 	/*border: none;
 	border-radius: 5px;*/
-	background-color: #336633;
+	/*background-color: #336633;*/
 	color:#fffffe;
 	padding: 5px;
 }
@@ -1815,7 +1816,7 @@ input.adj_checkbox {
 
 .block {
 	display:inline-block;
-<<<<<<< HEAD
+
 }
 
 div#content-container {
@@ -1823,6 +1824,7 @@ div#content-container {
 	margin-right:auto;
 	margin-left:auto;
 	margin-top:15px;
+	min-height: 500px;
 }
 
 div#wide-content-container {
@@ -1830,6 +1832,7 @@ div#wide-content-container {
 	margin-right: auto;
 	margin-left: auto;
 	margin-top:15px;
+	min-height:500px;
 }
 
 div.main-container {
@@ -1946,6 +1949,12 @@ a.flat-button:hover {
 .flat-button a:hover {
 	text-decoration:none;
 	color:#fffffe;
+}
+
+.button-med {
+	height:16px;
+	line-height:16px;
+	font-size:16px;
 }
 
 .green-button {
