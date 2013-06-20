@@ -250,7 +250,7 @@
 					console.log("updating data...")
 					// deconstruct data
 					people = $.parseJSON(response["people"])
-					// positions = $.parseJSON(response["positions"])
+					positions = $.parseJSON(response["positions"])
 					majors = $.parseJSON(response["majors"])
 					// update data in d3 objects
 					updateMajors();
@@ -312,6 +312,9 @@
 
 	// AJAX to DB for new set of data
 	function updateData() {
+		// reset transition counter to pause events until redrawn
+		transition_counter = -1
+
 		$.get("/careers/getMajorsData/", {'majors':filters['majors'],'jobs':filters['jobs'],'schools':filters['schools']},function(response) {
 			if (response["result"] == "success") {
 				// deconstruct data
@@ -496,9 +499,10 @@
 			.remove();
 
 
-		// update existing nodes... why doesn't .update() work??
+		// // update existing nodes
 		svg.transition()
 			.duration(300) // **
+			.each("end", drawLinesGate)
 			.attr("x", function(d, i) { // staggers nodes x-value
 				if (i % 4 == 0) return img_width
 				else if (i % 4 == 1) return img_width * 2
@@ -509,7 +513,7 @@
 				return Math.floor(i / 4) * img_height;
 
 			})
-			.each("end", drawLinesGate)
+
 
 
 
@@ -679,9 +683,19 @@
 		increment counter. Once all end events transferred, save to 
 		re-draw lines to new locations */
 	var drawLinesGate = function() {
-		if (transition_counter == -1) transition_counter = 0
-		if (transition_counter++ >= people.length - 1) drawLines()
+		if (transition_counter == -1) {
+			console.log("First Knock, reset to 0")
+			transition_counter = 0
+		}
+
+		if (transition_counter++ >= people.length - 1) {
+			console.log("Gate opened: " + transition_counter)
+
+			drawLines()
+		} else console.log("Gate is now: " + transition_counter)
+
 	};
+
 
 	// Iterates through each major, gets ids of positions, people
 	//  draws lines to each
