@@ -292,8 +292,8 @@ div.quick-links {
 div.footer-container {
 	/*width:100%;*/
 	background-color: #333332;
-	border-top: 1px solid #ccc;
-	font-size:1.2em;
+/*	border-top: 1px solid #ccc;
+*/	font-size:1.2em;
 	color:#fffffe;
 }
 
