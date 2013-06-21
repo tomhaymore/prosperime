@@ -355,7 +355,7 @@ class CareerPathBase(CareerBase):
 	def profile_get_majors_data(self):
 		import cProfile
 
-		cProfile.runctx('self.get_majors_data()',globals(),locals())
+		cProfile.runctx('self.get_majors_data_v3()',globals(),locals())
 
 	def entry_positions_stats(self,user,career):
 
@@ -940,7 +940,7 @@ class CareerPathBase(CareerBase):
 		# base_positions = Position.objects.filter(type="education", field__in=acceptable_majors).exclude(ideal_position=None).select_related("person")
 		
 		# get ideals
-		first_ideals = dict((u['id'],u['profile__first_ideal_job']) for u in User.objects.values('id','profile__first_ideal_job'))
+		first_ideals = dict((u['id'],u['profile__first_ideal_job']) for u in User.objects.exclude(profile__status="crunchbase").values('id','profile__first_ideal_job'))
 
 		# assemble all the positions
 		
@@ -1125,7 +1125,7 @@ class CareerPathBase(CareerBase):
 			schools = None
 		
 		# get ideals
-		first_ideals = dict((u['id'],u['profile__first_ideal_job']) for u in User.objects.values('id','profile__first_ideal_job'))
+		first_ideals = dict((u['id'],u['profile__first_ideal_job']) for u in User.objects.filter(Q(profile__status="active")|Q(profile__status="dormant")).values('id','profile__first_ideal_job'))
 
 		# assemble all the positions
 		base_positions = Position.objects.filter(ideal_position__cat="ed",ideal_position__level=1).values('person__profile__status','ideal_position__major','ideal_position__title','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
@@ -1173,7 +1173,6 @@ class CareerPathBase(CareerBase):
 					people.append({'name':full_name, 'id':p['person__id'], 'major_id':p['ideal_position__id'],"major_index":majors[p['ideal_position__id']]["index"], "major":p['ideal_position__major'],"pic":pic})
 
 					counter += 1	
-					print counter
 					if counter == 100:
 						break;
 
