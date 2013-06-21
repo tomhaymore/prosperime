@@ -420,7 +420,7 @@ $(function() {
 			})
 			// Click -- go to individual major page
 			.on("click", function(d) {
-				window.location = "/majors/" + d.major_id + "/"
+				window.location = "/majors/" + d.id + "/"
 			})
 
 
@@ -540,7 +540,7 @@ $(function() {
 		svg.transition()
 			.duration(250)
 			.attr("cx", function(d, i) { // staggers nodes x-value
-				if (i % 4 == 0) return 200
+				if (i % 4 == 0) return 190
 				else if (i % 4 == 1) return 250
 				else if (i % 4 == 2) return 160
 				else return 220
@@ -552,7 +552,7 @@ $(function() {
 
 		svg.enter().append("circle")
 			.attr("cx", function(d, i) { // staggers nodes x-value
-				if (i % 4 == 0) return 200
+				if (i % 4 == 0) return 190
 				else if (i % 4 == 1) return 250
 				else if (i % 4 == 2) return 160
 				else return 220
@@ -616,7 +616,7 @@ $(function() {
 			.remove()
 
 		// transition old lines
-		left_lines.transition()
+		left_lines
 			.attr("d", function(d) { return lineGen(getPathData(d,'people'));} );
 
 		// append new path
@@ -638,7 +638,7 @@ $(function() {
 			.remove()
 
 		// transition old lines
-		right_lines.transition()
+		right_lines
 			.attr("d", function(d) { return lineGen(getPathData(d,'position'));} );
 
 		// append new paths
