@@ -96,6 +96,17 @@
      		font-weight:600;
      	}
 
+     	#filters-loading {
+     		visibility:hidden;
+     		transition:all 0.2s;
+     		-webkit-transition-property:all;
+     		-webkit-transition-duration:0.2s;
+     	}
+
+     	#filters-loading.visible {
+     		visibility:visible;
+     	}
+
     </style>
 
 
@@ -128,6 +139,9 @@
 			<ul id="filters-list" class="flat-list inline">
 
 			</ul>
+		</div>
+		<div id="filters-loading">
+			Updating...
 		</div>
 		{% endif %}
 		
@@ -281,23 +295,35 @@ $(function() {
 	function updateData() {
 		// reset transition counter to pause events until redrawn
 		transition_counter = -1
-
-		$.get("/careers/getMajorsData/v3/", {'majors':filters['majors'],'schools':filters['schools']},function(response) {
-			if (response["result"] == "success") {
-				// deconstruct data
-				people = $.parseJSON(response["people"])
-				positions = $.parseJSON(response["positions"])
-				majors = $.parseJSON(response["majors"])
-				// update data in d3 objects
-				updateMajors();
-				updatePeople();
-				updatePositions();
-					// draw connecting lines
-				setTimeout(function() {
-					drawLines()
-				},1000);
+		$.ajax({
+			type: "GET",
+			url: "/careers/getMajorsData/v3/",
+			data: {'majors':filters['majors'],'schools':filters['schools']},
+			dataType:"json",
+			beforeSend: function() {
+				$("#filters-loading").addClass("visible");
+			},
+			success:function(response) {
+				if (response["result"] == "success") {
+					// deconstruct data
+					people = $.parseJSON(response["people"])
+					positions = $.parseJSON(response["positions"])
+					majors = $.parseJSON(response["majors"])
+					// update data in d3 objects
+					updateMajors();
+					updatePeople();
+					updatePositions();
+						// draw connecting lines
+					setTimeout(function() {
+						drawLines()
+					},1000);
+				}
+			},
+			complete:function() {
+				$("#filters-loading").removeClass("visible");
 			}
-		},"json");
+		})
+
 	};
 
 	// Main fxn, takes care of all SVG drawing
@@ -717,7 +743,7 @@ $(function() {
 			// get major node coords
 			major_node = $("#major-"+d.major_id)
 			// left_x = major_node.offset().right - svg_right_x_offset
-			left_x = 0
+			left_x = 5
 			left_y = major_node.offset().top - svg_right_y_offset + 10
 			// get position node
 			position_node = d3.select("#position-"+d.id)
