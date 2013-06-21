@@ -1,0 +1,900 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<!-- CSS -->
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/majors.css" />
+	<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Lato">
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
+
+<!-- JS -->
+	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+    <style type="text/css">
+        .box {
+			text-align:left;
+			padding:2px;
+			width:250px;
+			font-size:0.9em;
+			height:22px;
+			margin:5px 0 0 5px;
+			-moz-box-sizing: border-box;
+			-webkit-box-sizing: border-box;
+			box-sizing: border-box;
+			cursor:pointer;
+			overflow:hidden;
+      	}
+
+     	.block { 
+     		display:inline-block;
+			vertical-align: top;
+     	}
+
+	    #center {
+	      	text-align:center;
+	      	width:250px;
+	      	margin:0 auto;
+	     }
+
+     	#left {
+			width:350px;
+     	}
+
+     	#right {
+     		width:350px;
+     	}
+
+     	.abs {
+     		position:absolute;
+     	}
+
+     	.person-box {
+    		background-color:rgba(41,128,185,0.8);
+     		color:#ECF0F1;
+			font-size:0.9em;
+			-moz-box-sizing: border-box;
+			-webkit-box-sizing: border-box;
+			box-sizing: border-box;
+			padding:2px;
+			padding-left:4px;
+			padding-right:4px;
+			border-radius:2px;
+			height:22px;
+			line-height:20px;
+     	}
+
+     	.major-hover {
+
+     	}
+
+     	.section-header,.section-header-middle,.section-header-right {
+     		text-align:center;
+     		opacity:0; /* allows animation in */
+     	}
+
+     	.section-header {
+     		width:250px;
+     		margin-right:100px;
+     	}
+
+     	.section-header-right {
+     		width:250px;
+     		margin-left:75px;
+     	}
+
+     	#header-container {
+     		width:100%;
+     	}
+
+     	#loading-message {
+     		position:absolute;
+     		left:500px;
+     		top:225px;
+     		font-size:2.8em;
+     		font-weight:600;
+     	}
+
+    </style>
+
+
+{% endblock %}
+
+{% block extramessage %}
+	{% if not user.is_authenticated %}
+		<div id="cta-container">
+			
+				See personalized results, filters and more. Connect with one click&nbsp;&nbsp; <a class="flat-button green-button button-med" href="/account/authorize">Connect with LinkedIn</a>
+			
+		</div>
+	{% endif %}
+{% endblock %}
+
+
+{% block content %}
+
+<div id="wide-content-container" class="main-container">
+
+	<div id="header-container">
+		<p class="feature-page-header">What can you do with your major?</p>
+		<p class="feature-page-subheader">Use the graph below to see which majors lead to what jobs. Click on any major to learn more.</p>
+		
+		{% if user.is_authenticated %}
+		<div id="filter-form">
+			<p>Filter by school or major: <input id="majors-filter-input" data-val-id="" class="flat-input" placeholder="Start typing... "/></p>
+		</div>
+		<div class="filters-container">
+			<ul id="filters-list" class="flat-list inline">
+
+			</ul>
+		</div>
+		{% endif %}
+		
+	</div>
+	<div>
+			<div class="section-header block pull-left">People</div>
+			<div class="section-header-middle block pull-left">College Majors</div>
+			<div class="section-header-right block pull-left">First Jobs</div>
+			<div class="clear"></div>
+	</div>
+
+	<!-- These divs have to be written this way with no linebreak between them for the SVG to run flush against the main container. Thank you StackOverflow. -->
+	<div id="left" class="block"></div><div id="center" class="block"></div><div id="right" class="block"></div>
+
+	<div id="loading-message">Loading...<img src="{{STATIC_URL}}img/spinner.gif" /></div>
+	
+</div>
+{% endblock %}
+
+{% block templates %}
+
+<!-- V3 Script -->
+<script type="text/javascript">
+
+// Instance Variables (ok they're Globals...)
+var people = null,
+	positions = null,
+	majors = null,
+	svg_left, 
+	center, 
+	svg_right;
+
+var filters = {
+	'majors':[],
+	'schools':[],
+	'jobs':[]
+}
+
+// Constants
+var svg_width = 350; var svg_height = 1000; 
+var magic_number = 575; 
+// 600 is the upper limit of what fits on my laptop
+
+var img_height = 35;
+var img_width = 35;
+	
+// positioning varibles
+var hinge_left = (img_width * 4) + 45,
+	hinge_right = 130,
+	svg_right_x_offset,
+	svg_right_y_offset,
+	svg_left_x_offset,
+	svg_left_y_offset;
+
+var main_blue = "rgba(48,91,152,0.7)"
+var main_blue_fuller = "rgba(48,91,152,0.9)"
+
+
+/************/
+/*** MAIN ***/
+/************/
+
+// On DOM ready, AJAX to db for d3 data
+$(function() {
+		
+	// call to action drop down
+	if ($("#cta-container")) {
+		setTimeout(function() {
+			$("#cta-container").addClass("show")
+		},2500);
+	};	
+
+	// Filters Autocomplete
+	$('#majors-filter-input').autocomplete({
+		minLength: 3,
+		source: '/careers/getMajorsFilters/',
+		select: function(event,ui) {
+			event.preventDefault();
+			$(this).val(ui.item.label_short);
+			$(this).data('val-id',ui.item.value);
+			$(this).data('val-cat',ui.item.type)
+		},
+		// Makes the display the major instead of id
+		focus: function(event,ui) {
+			event.preventDefault()
+			$(this).val(ui.item.label_short)
+		},
+	})
+	// Filters keypress
+	.keypress(function(e) {
+		if(e.which == 13) {
+			var input = $('#majors-filter-input')
+			if ($(input).val().length < 1) return false;
+
+			var cat = input.data('val-cat')
+			// add to global filter set
+
+			filters[cat].push(input.data('val-id'));			
+			// add to list
+			$("#filters-list").append("<li class='filters-item'>"+input.val()+" <span data-type='" + cat + "' data-id='" + input.data("val-id") + "' data-name='"+$("#majors-filter-input").val() +"' class='remove-filter' onclick='updateFilters(this)'>X</span></li>");
+			// empty out input bar
+			input.val("")
+			// update data
+			updateData()
+			}
+		});
+	});
+
+	function updateFilters(el) {
+		// Get id, filter type
+		var type = $(el).data("type")
+		var id = parseInt($(el).data("id"))
+		// Remove filter from list
+		$(el).parent().remove()
+
+		// Get new data
+		var index = filters[type].indexOf(id)
+		filters[type].splice(index, 1) 
+		updateData()
+	};
+
+
+	// D3 functions
+	if ("{{cache}}" == "hit") {
+		console.log("Hit Cache, render immediately")
+		// set dst's
+		people = {% if majors %} {{majors.people|safe}} {% else %} null {% endif %};
+		positions = {% if majors %} {{majors.positions|safe}} {% else %} null {% endif %};
+		majors = {% if majors %} {{majors.majors|safe}} {% else %} null {% endif %};
+
+		// render viz
+		renderViz();	
+	} else {
+		$.get("/careers/getMajorsData/v3/", function(response) {
+			if (response["result"] == "success") {
+				console.log("Missed Cache, AJAX to DB")
+				// set dst's
+				people = $.parseJSON(response["people"])
+				positions = $.parseJSON(response["positions"])
+				majors = $.parseJSON(response["majors"])
+				console.log(majors)
+				window.majors = majors
+				// logging
+				// render viz
+				renderViz()
+			}
+		}, "json");
+	};
+	
+	// AJAX to DB for new set of data
+	function updateData() {
+		// reset transition counter to pause events until redrawn
+		transition_counter = -1
+
+		$.get("/careers/getMajorsData/v3/", {'majors':filters['majors'],'schools':filters['schools']},function(response) {
+			if (response["result"] == "success") {
+				// deconstruct data
+				people = $.parseJSON(response["people"])
+				positions = $.parseJSON(response["positions"])
+				majors = $.parseJSON(response["majors"])
+				// update data in d3 objects
+				updateMajors();
+				updatePeople();
+				updatePositions();
+					// draw connecting lines
+				setTimeout(function() {
+					drawLines()
+				},1000);
+			}
+		},"json");
+	};
+
+	// Main fxn, takes care of all SVG drawing
+	function renderViz() {
+		// print out dst sizes (convenience)
+		console.log("#Majors: " + majors.length)
+		console.log("#People: " + people.length)
+		console.log("#Positons: " + positions.length)
+
+		// hide loading message, fade in column headers
+		$("#loading-message").fadeOut(100, function() {
+			$(".section-header,.section-header-middle,.section-header-right").each(function() {
+				$(this).animate({"opacity":1} , "250")
+			})
+
+		})
+
+		// add majors
+		updateMajors()
+
+		// create each svg container
+		svg_left = createSvgContainer("left")
+		svg_left_x_offset = $("#svg-left").offset().left
+		svg_left_y_offset = $("#svg-left").offset().top
+		svg_right = createSvgContainer("right")
+		svg_right_x_offset = $("#svg-right").offset().left
+		svg_right_y_offset = $("#svg-right").offset().top
+
+		// add people nodes
+		updatePeople()
+
+		// get y_offset for scaling dist between dots
+
+		// code roughly scales the positions down so, at most, right col is 100 pixels taller than center col
+		var majors_column_height = parseInt(d3.select("#center").style("height"))
+		magic_number = (majors_column_height + 100 < 560) ? majors_column_height + 100 : 560;
+		y_offset = Math.ceil(magic_number / positions.length)
+
+		// add position nodes
+		updatePositions()
+
+		// draw connecting lines
+		setTimeout(function() {
+			drawLines()
+		},1000);
+
+	};
+
+	// Creates SVG container, returns d3 handle
+	function createSvgContainer(selector) {
+		container = d3.select("#" + selector).append("svg")
+			.attr("width",svg_width)
+			.attr("height",svg_height)
+			.attr("id","svg-" + selector)
+		var filter = container.append("svg:defs")
+			.append("svg:filter")
+				.attr("id","grayscale")
+			.append("svg:feColorMatrix")
+				.attr("type","matrix")
+				.attr("values","0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0");
+
+		return container
+	};
+
+	// adds majors nodes
+	function updateMajors() {
+		// Add Center divs (Majors)
+		center = d3.select("#center").selectAll("div")
+			.data(majors, function(d) { return d.id;})//.order()
+
+		// remove old nodes
+		center.exit().remove()
+			// .transition()
+			// 	.duration(400)
+			// 	.style("opacity", 0)
+			// 	.remove()
+
+		// add new nodes
+		center.enter().append("div")
+			// Set text of Major div
+			.html(function(d) { 
+				if (d.length >= 30) {
+
+					var txt = "<span class='degree-magnified'><span class='degree-abbr'>" + d.abbr + "</span>" + d.major.substring(0,27) + "...</span><span class='degree-major'>" + d.major.substring(0,24) + "...</div>"
+					return txt
+				} else {
+					var txt = "<span class='degree-magnified'><span class='degree-abbr'>" + d.abbr + "</span>" + d.major + "</span><span class='degree-major'>" + d.major + "</div>"
+					return txt 
+				}
+			})
+			.attr("class", "box")
+			.attr("id",function(d) { return "major-" + d.id})
+			// Major mouseover
+			.on("mouseover", function(d) {
+				if (transition_counter != 0) return false;
+
+				// Add hover class
+				d3.select(this).attr("class", "box major-hover");
+				
+				// Make lines blue
+				lineMouseover(d.id)
+				
+				// trigger person and position mouseovers
+				triggerUserAndPositionWrapper(d.id, "mouseover");
+
+			})
+			// Major mouseout
+			.on("mouseleave", function(d) {
+				if (transition_counter != 0) return false;
+				// normalize class
+				d3.select(this).attr("class", "box")
+
+				// Make lines grey again
+
+				// ++ lineMouseout(d3.selectAll(".line-"+majors[d]["index"]))
+				lineMouseout(d.id)
+
+				// trigger user and position mouseouts
+				triggerUserAndPositionWrapper(d.id, "mouseout")
+			})
+			// Click -- go to individual major page
+			.on("click", function(d) {
+				window.location = "/majors/" + d.major_id + "/"
+			})
+
+
+		// Reset indices after enter so that existing elements
+		// and newly added ones are effected.
+		// Then re-order them by index
+		center
+			.attr("data-index", function(d, i) { return i  })
+			.order()
+
+	};
+
+
+	// Adds people nodes in svg container
+	function updatePeople() {
+		// Add user nodes to left svg
+		var svg = svg_left.selectAll("image")
+			.data(people,function(d){ return d.id;}).order()
+		
+		// remove existing
+		svg.exit()
+			.transition()
+				.duration(500)
+				.attr("x",0)
+				.attr("y", function(d, i) {
+					return Math.floor(i / 4) * img_height;
+
+				})
+			.remove();
+
+
+		// update existing nodes
+		svg.transition()
+			.duration(300) // 
+			.each("end", drawLinesGate)
+			.attr("x", function(d, i) { // staggers nodes x-value
+				if (i % 4 == 0) return img_width
+				else if (i % 4 == 1) return img_width * 2
+				else if (i % 4 == 2) return img_width * 3
+				else return img_width * 4
+			})
+			.attr("y", function(d, i) {
+				return Math.floor(i / 4) * img_height;
+
+			});
+
+		svg.enter().append("image")
+			.attr("x", -50) // start off the canvas, animate on
+			.attr("y", function(d, i) {
+				return Math.floor(i / 4) * img_height;
+			})
+			.attr("height", img_height)
+			.attr("width", img_width)
+			.attr("xlink:href", function(d) { return d.pic })
+			.attr("filter","url(#grayscale)")
+			.attr("id", function(d) { return "person-"+d.id })
+			.attr("data-name", function(d) { return d.name })
+		.transition()
+			.duration(300) // **
+			.attr("x", function(d, i) { // staggers nodes x-value
+				if (i % 4 == 0) return img_width
+				else if (i % 4 == 1) return img_width * 2
+				else if (i % 4 == 2) return img_width * 3
+				else return img_width * 4
+			})
+			.each("end", drawLinesGate)
+
+		svg.on("mouseover", function(d) {
+				if (transition_counter != 0) return false;
+
+				// repaints image node so that it goes on top
+				this.parentNode.appendChild(this);
+				// Magnify image
+				d3.select(this)
+					.attr("height",img_height+15)
+					.attr("width",img_height+15)
+					.attr("filter","")
+				// major animation
+				majorMouseover(d.major_id)
+				// Make lines blue
+				lineMouseover(d.major_id)
+				// Trigger hover on user, position dots
+				triggerUserAndPositionWrapper(d.major_id, "mouseover")
+			})
+
+			.on("mouseout", function(d) {
+				if (transition_counter != 0) return false;
+
+				// resize
+				d3.select(this)
+					.attr("height",img_height)
+					.attr("width",img_width)
+					.attr("filter","url(#grayscale)")
+				
+				// major animation
+				majorMouseout(d.major_id)
+				// Make lines grey again
+				lineMouseout(d.major_id)
+				// Remove user hover
+				triggerUserAndPositionWrapper(d.major_id, "mouseout")
+			});
+	};
+
+	// update positions
+	function updatePositions() {
+		var svg = svg_right.selectAll("circle").data(positions, function(d) { return d.id;})
+			.order();
+
+		svg.exit()
+			// .transition()
+			// 	.duration(500)
+			// 	.attr("cx",250)
+			// 	.attr("cy",0)
+			.remove()
+
+		// Transitions positions to new location
+		svg.transition()
+			.duration(250)
+			.attr("cx", function(d, i) { // staggers nodes x-value
+				if (i % 4 == 0) return 200
+				else if (i % 4 == 1) return 250
+				else if (i % 4 == 2) return 160
+				else return 220
+			})
+			.attr("cy", function(d, i) {
+				if ((i + 1) % 2 == 0) return i * y_offset
+				else return (i + 1) * y_offset
+			});
+
+		svg.enter().append("circle")
+			.attr("cx", function(d, i) { // staggers nodes x-value
+				if (i % 4 == 0) return 200
+				else if (i % 4 == 1) return 250
+				else if (i % 4 == 2) return 160
+				else return 220
+			})
+			.attr("cy", function(d, i) {
+				if ((i + 1) % 2 == 0) return i * y_offset
+				else return (i + 1) * y_offset
+			})
+			.attr("r", 5)
+			.attr("fill", "none")
+			.attr("stroke",main_blue)
+			.attr("stroke-width", 2)
+			.attr("id", function(d) { return "position-"+d.id })
+			.attr("class","positions")
+			.attr("data-title", function(d) { return d.title })
+			// events
+			.on("mouseover", function(d) {
+				if (transition_counter != 0) return false;
+				// d3.select(this)
+				// 	.attr("fill",main_blue_fuller)
+				// 	.attr("r",8)
+				// trigger major animation
+				majorMouseover(d.major_id)
+				// Make lines blue
+				lineMouseover(d.major_id)
+				// Trigger hover on users, position
+				triggerUserAndPositionWrapper(d.major_id, "mouseover")
+			})
+
+			.on("mouseout", function(d) {
+				if (transition_counter != 0) return false;
+				// trigger major animation
+				majorMouseout(d.major_id)
+				// Make lines grey again
+				lineMouseout(d.major_id)
+				// Trigger mouseout on user, position
+				triggerUserAndPositionWrapper(d.major_id, "mouseout")
+			});
+	};
+
+	var transition_counter = -1;
+
+
+	// Iterates through each major, gets ids of positions, people
+	//  draws lines to each
+	function drawLines() {
+		transition_counter = 0
+
+		// d3 line generation function
+		var lineGen = d3.svg.line()
+			.x(function(d) { return d.x })
+			.y(function(d) { return d.y })
+			.interpolate("monotone")
+
+		// People lines
+		// bind data
+		var left_lines = svg_left.selectAll("path").data(people,function(d) { return d.id;});
+
+		// remove old lines
+		left_lines.exit()
+			.remove()
+
+		// transition old lines
+		left_lines.transition()
+			.attr("d", function(d) { return lineGen(getPathData(d,'people'));} );
+
+		// append new path
+		left_lines.enter().append("path")
+			.attr("d", function(d) { return lineGen(getPathData(d,'people'));} )
+			.attr("fill","none")
+			.attr("stroke-width",1)
+			.attr("id",function(d) { return "line-people-"+d.id})
+			.attr("class", function(d) { 
+				return "line-" + d.major_id
+			});
+
+		// Position lines
+		// bind data
+		var right_lines = svg_right.selectAll("path").data(positions,function(d) { return d.id;});
+
+		// remove old lines
+		right_lines.exit()
+			.remove()
+
+		// transition old lines
+		right_lines.transition()
+			.attr("d", function(d) { return lineGen(getPathData(d,'position'));} );
+
+		// append new paths
+		right_lines.enter().append("path")
+			.attr("d", function(d) { return lineGen(getPathData(d,'position'));} )
+			.attr("fill","none")
+			.attr("stroke-width",1)
+			.attr("id",function(d) { return "line-position-"+d.id})
+			.attr("class", function(d) { 
+				return "line-" + d.major_id
+			});
+	};
+
+
+
+	/* HELPERS */
+
+	/* Tactics... catch each individual transition's end event,
+	increment counter. Once all end events transferred, save to 
+	re-draw lines to new locations */
+	var drawLinesGate = function() {
+		if (transition_counter == -1) {
+			transition_counter = 0
+		}
+
+		if (transition_counter++ >= people.length - 1) {
+			drawLines()
+		} 
+
+	};
+
+	function drawTooltip(aspect,node) {
+		if (aspect == "right") {
+			container = $("#right")
+			var x = String(parseInt(node.attr("cx")) + container.offset().left + 10)
+			var y = String(parseInt(node.attr("cy")) + 3 + container.offset().top - 13)
+		}
+
+		var id = "tooltip-" + node.attr("id").split("-")[1]
+		var text = node.attr("data-title")
+
+		d3.select("#right").append("div")
+			.text(text)
+			.attr("class","abs person-box")
+			.style("left",x + "px")
+			.style("top",y + "px")
+			.attr("id",id);
+	}
+
+	function removeTooltip() {
+		d3.selectAll(".abs").remove()
+	}
+
+	function d3_drawTooltip(container, x, y, text, id, direction) {
+		container.append("div")
+			.text(text)
+			.attr("class", "abs person-box")
+			.style("left", x + "px")
+			.style("top", y + "px")
+			.attr("id", id)
+		
+	};
+
+	function getPathData(d,aspect) {
+		if (aspect == "people") {
+			person_node = d3.select("#person-"+d.id)
+			left_x = person_node.attr("x")
+			left_y = person_node.attr("y")
+			// get major node coords
+			major_node = $("#major-"+d.major_id)
+			right_x = major_node.offset().left - svg_left_x_offset
+			right_y = major_node.offset().top - svg_left_y_offset
+			// compile coords
+			data = [{"x":left_x,"y":left_y},{"x":hinge_left,"y":left_y},{"x":right_x,"y":right_y}]
+		} else if (aspect == "position") {
+			// get major node coords
+			major_node = $("#major-"+d.major_id)
+			// left_x = major_node.offset().right - svg_right_x_offset
+			left_x = 0
+			left_y = major_node.offset().top - svg_right_y_offset + 10
+			// get position node
+			position_node = d3.select("#position-"+d.id)
+			right_x = position_node.attr("cx")
+			right_y = position_node.attr("cy") 
+			// compile coords
+			data = [{"x":right_x,"y":right_y},{"x":hinge_right,"y":right_y},{"x":left_x,"y":left_y}]
+		}
+		
+		return data;
+	};
+
+
+	/* HANDLERS */
+
+	function majorMouseover(major_id) {
+		// get major div
+		var major_node = d3.select("#major-"+major_id)
+		// add hover to it
+		major_node.attr("class", "box major-hover")
+	};
+
+	function majorMouseout(major_id) {
+		// get major div
+		var major_node = d3.select("#major-"+major_id)
+		// remove hover
+		major_node.attr("class","box")
+	}
+
+	function positionMouseover(node_id) {
+		var position = d3.select(node_id)
+			.attr("fill",main_blue_fuller)
+			.attr("r",8)
+
+		// draw tooltip
+		drawTooltip("right",position)
+	};
+
+	// returns position node to original attr
+	function positionMouseout(node_id) {
+
+		var position = d3.select(node_id)
+			.transition()
+				.duration(250)
+				.attr("fill","none")
+				.attr("stroke-width",2)
+				.attr("r",5)
+
+		removeTooltip();
+	};
+
+	function positionMouseoutAll(selection) {
+		selection
+			.transition()
+				.duration(250)
+				.attr("fill","none")
+				.attr("stroke-width",2)
+				.attr("r",5)
+	}
+
+
+	function userMouseover(node_id) {
+		// console.log(node_id)
+		// repaint element
+		var el = document.getElementById(node_id.substring(1))
+		el.parentNode.appendChild(el);
+		// expand element
+		var user = d3.select(node_id)
+			.transition().duration(50)
+				.attr("height",img_height+20)
+				.attr("width",img_height+20)
+				.attr("filter","");
+	};
+
+	// Returns user nodes to normal state
+	function userMouseout(node_id) {
+		// animate node to normal size
+
+		var user = d3.select(node_id).transition().duration(50)
+			.attr("height",img_height)
+			.attr("width",img_height)
+			.attr("filter","url(#grayscale)")
+		
+	};
+
+	function userMouseoutAll(selection) {
+		// animate node to normal size
+
+		selection
+			.transition()
+				.duration(50)
+				.attr("height",img_height)
+				.attr("width",img_height)
+				.attr("filter","url(#grayscale)")
+		
+	};
+
+	// Makes lines blue, bigger
+	function lineMouseover(major_id) {
+		lines = d3.selectAll(".line-"+major_id)
+			.attr({
+			"stroke":main_blue,
+			"stroke-width":1
+		});
+	};
+
+	// Makes lines grey, smaller
+	function lineMouseout(major_id) {
+		lines = d3.selectAll(".line-"+major_id)
+			.attr("stroke","")
+	};
+
+
+	// Wrapper allows us to delay calling the trigger  event
+	var triggerUserAndPositionWrapper = function(major_id, type) {
+		if (type == "mouseover") {
+			triggerUserAndPositionMouseover(major_id)
+		} else {
+			triggerUserandPositionMouseout(major_id)
+		}
+		return true;
+	};
+
+	var triggerUserAndPositionMouseover = function(major_id) {
+		// trigger hover on user dots
+		// get major node from data
+
+		for (i=0;i<=majors.length-1;i++) {
+			if (majors[i].id == major_id) {
+				major = majors[i]
+			}
+		}
+		for (var p in major.people) {
+			
+			userMouseover("#person-"+major.people[p])
+		};
+
+		// Trigger hover on position dots
+		for (var p in major.positions) {
+			
+			positionMouseover("#position-"+major.positions[p])
+			
+		}
+	};
+
+	var triggerUserandPositionMouseout = function(major_id) {
+		// trigger hover on user dots
+		// get major node from data
+		
+		for (i=0;i<=majors.length-1;i++) {
+			
+		
+			if (majors[i].id == major_id) {
+				major = majors[i]
+			}
+		}
+
+		for (p in major.people) {
+			userMouseout("#person-"+major.people[p])
+		};
+		d3.selectAll("image").call(userMouseoutAll)
+
+		// Trigger hover on position dots
+		d3.selectAll(".positions").call(positionMouseoutAll);
+		removeTooltip();
+		// positionMouseout("#position-"+major.people[p])
+		
+	};
+
+	function shuffle(o) {
+	    for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+	    return o;
+	}
+
+
+
+</script>
+{% endblock %}
+
+

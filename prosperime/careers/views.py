@@ -67,6 +67,44 @@ def old_majors(request):
 
 	return render_to_response("careers/d3.html",data,context_instance=RequestContext(request))
 
+def majors_v3(request):
+	# try to get from cache
+	# data = cache.get("majors_viz_"`+str(request.user.id))
+	data = {}
+	import accounts.tasks as tasks
+	data['majors'] = cache.get("majors_viz_v3")
+	if data['majors'] is not None:
+		data["cache"] = "hit"
+
+
+	if "tasks" in request.session:
+		logger.info("tasks in session")
+		profile_task = tasks.process_li_profile.AsyncResult(request.session['tasks']['profile'])
+		connections_task = tasks.process_li_connections.AsyncResult(request.session['tasks']['connections'])
+		if profile_task.status != 'SUCCESS' or connections_task.status != 'SUCCESS':
+			data['tasks'] = True
+		if profile_task.status != 'SUCCESS':
+			data['profile_task_id'] = request.session['tasks']['profile']
+		else:
+			data['profile_task_id'] = None
+		if connections_task.status != 'SUCCESS':
+			data['connections_task_id'] = request.session['tasks']['connections']
+		else:
+			data['connections_task_id'] = None
+	else:
+		logger.info('no tasks in session')
+		data['tasks'] = False
+		data['profile_task_id'] = None
+		data['connections_task_id'] = None
+
+	# test if cache worked
+	if data["majors"]:
+		return render_to_response("careers/majors_v3.html",data,context_instance=RequestContext(request))
+	else:
+		data["cache"] = "miss"
+
+		return render_to_response("careers/majors_v3.html",data,context_instance=RequestContext(request))
+
 
 def majors(request):
 	# try to get from cache
@@ -2117,6 +2155,31 @@ def get_major_data(request,major_id):
 
 	return HttpResponse(json.dumps(data))
 
+def get_majors_data_v3(request):
+	params = {}
+	# print request.GET
+	if request.GET.getlist('majors[]'):
+		params['majors'] = [int(m) for m in request.GET.getlist('majors[]')]
+		# print params['majors']
+		# print request.GET.getlist('majors[]')
+	if request.GET.getlist('schools[]'):
+		params['schools'] = request.GET.getlist('schools[]')
+	if request.GET.getlist('jobs[]'):
+		params['jobs'] = request.GET.getlist('jobs[]')
+	
+	path = careerlib.CareerPathBase()
+
+	# If there are no params, look back at the cache 
+	if not params:
+		data = cache.get("majors_viz_v3")
+		if data is None:
+			data = path.get_majors_data_v3(**params)
+			cache.set("majors_viz_v3",data,15)
+	else:
+		data = path.get_majors_data_v3(**params)
+
+	return HttpResponse(json.dumps(data))
+
 # For Majors D3 viz -- AJAX
 def get_majors_data(request):
 
@@ -2138,9 +2201,12 @@ def get_majors_data(request):
 	if not params:
 		data = cache.get("majors_viz")
 		if data is None:
-			data = path.get_majors_data_new(**params)
+			data = path.get_majors_data(**params)
+			cache.set("majors_viz",data,2400)
 	else:
-		data = path.get_majors_data_new(**params)
+		data = path.get_majors_data(**params)
+
+	return HttpResponse(json.dumps(data))
 
 	# people = []
 	# positions = []
