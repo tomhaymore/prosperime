@@ -244,25 +244,30 @@
 			}, "json");
 		};
 
-		function updateData() {
-			// make ajax call
-			$.get("/careers/getMajorsData/", {'majors':filters['majors'],'jobs':filters['jobs'],'schools':filters['schools']},function(response) {
-				if (response["result"] == "success") {
-					console.log("updating data...")
-					// deconstruct data
-					people = $.parseJSON(response["people"])
-					// positions = $.parseJSON(response["positions"])
+		// function updateData() {
+		// 	// make ajax call
+		// 	$.get("/careers/getMajorsData/", {'majors':filters['majors'],'jobs':filters['jobs'],'schools':filters['schools']},function(response) {
+		// 		if (response["result"] == "success") {
+		// 			console.log("updating data...")
+		// 			// deconstruct data
+		// 			people = $.parseJSON(response["people"])
+		// 			// positions = $.parseJSON(response["positions"])
 
-					majors = $.parseJSON(response["majors"])
-					// update data in d3 objects
-					updateMajors();
-					updatePeople();
-					updatePositions();
-					drawLines();
-				}
+		// 			majors = $.parseJSON(response["majors"])
+		// 			// update data in d3 objects
+		// 			updateMajors();
+					
+		// 				updatePeople();
+					
+		// 				updatePositions();
+					
+					
+		// 				drawLines();
+					
+		// 		}
 				
-			},"json");
-		};
+		// 	},"json");
+		// };
 
 
 		// Filters Autocomplete
@@ -329,8 +334,8 @@
 				// update data in d3 objects
 				updateMajors();
 				updatePeople();
-				updatePositions();
-				// drawLines();
+				// draw();
+				drawLines();
 			}				
 		},"json");
 	};
@@ -394,15 +399,18 @@
 			.data(Object.keys(majors), function(d) {
 				// Don't know why, but this gets called twice,
 				// one with old data, once with new data
-				if (d in majors) return majors[d].id
+				if (d == "Communications") console.log(majors[d])
+				if (d in majors) {
+					return majors[d].id
+				}
 			}).order()
 
 		// remove old nodes
-		center.exit()
-			.transition()
-				.duration(400)
-				.style("opacity", 0)
-				.remove()
+		center.exit().remove()
+			// .transition()
+			// 	.duration(400)
+			// 	.style("opacity", 0)
+			// 	.remove()
 
 
 		// add new nodes
@@ -432,8 +440,9 @@
 				// Make lines blue
 
 				// ++ lineMouseover(d3.selectAll(".line-"+majors[d].index))
+
 				lineMouseover(d3.selectAll(".line-"+majors[d]["id"]))
-			
+				// console.log('before linemouseover')
 				// trigger person and position mouseovers
 				triggerUserAndPositionWrapper(d, "mouseover")
 
@@ -462,6 +471,8 @@
 		// Reset indices after enter so that existing elements
 		// and newly added ones are effected.
 		// Then re-order them by index
+
+
 		center
 			.attr("data-index", function(d, i) { return i  })
 			.order()
@@ -654,6 +665,7 @@
 
 					/* Clay -- check this code */
 					// ++ lineMouseover(d3.selectAll(".line-"+d.major_index))
+
 					lineMouseover(d3.selectAll(".line-"+d.major_id))
 					// Trigger hover on users, position
 					triggerUserAndPositionWrapper(d.major, "mouseover")
@@ -694,9 +706,12 @@
 
 		if (transition_counter++ >= people.length - 1) {
 			console.log("Gate opened: " + transition_counter)
-
-			drawLines()
-		} else console.log("Gate is now: " + transition_counter)
+			try {
+				drawLines()
+			} finally {
+				console.log("No dice drawing lines")
+			}
+		} 
 
 	};
 
@@ -715,38 +730,72 @@
 			right_y,
 			right_x;
 		for (key in majors) {
+			try {
+				var index = d3.select("#major-"+majors[key]["id"]).attr("data-index")
 
-			var index = d3.select("#major-"+majors[key]["id"]).attr("data-index")
+				// people <--> majors
+				var people = majors[key]["people"]
 
-			// people <--> majors
-			var people = majors[key]["people"]
+				for (var j = 0; j < people.length; j++) {
+					// left_y = parseInt($("#person-"+people[j]).attr("y")) + img_height
+					left_y = d3.select("#person-"+people[j]).attr("y")	
+					// left_x = parseInt($("#person-"+people[j]).attr("x")) + 3
+					left_x = d3.select("#person-"+people[j]).attr("x")
 
-			for (var j = 0; j < people.length; j++) {
-				// left_y = parseInt($("#person-"+people[j]).attr("y")) + img_height
-				left_y = d3.select("#person-"+people[j]).attr("y")	
-				// left_x = parseInt($("#person-"+people[j]).attr("x")) + 3
-				left_x = d3.select("#person-"+people[j]).attr("x")
-
-				right_y = 22 + (27 * index)
-				right_x = 360
-				// ++ d3_drawLines(svg_left, left_x, left_y, right_x, right_y, majors[key]["index"])
-				d3_drawLines(svg_left, left_x, left_y, right_x, right_y, majors[key]["id"])
-			};
-
-			// majors <--> positions
-			var positions = majors[key]["positions"]
-
-			if (key in majors) {
-				for (var l = 0; l < positions.length; l++) {
-					left_y = 13 + (27 * index)
-					left_x = 0
-					right_y = $("#position-"+positions[l]).attr("cy")
-
-					right_x = parseInt($("#position-"+positions[l]).attr("cx")) - 6	
-					// ++ d3_drawLines(svg_right, right_x, right_y, left_x, left_y, majors[key]["index"])
-					d3_drawLines(svg_right, right_x, right_y, left_x, left_y, majors[key]["id"])
+					right_y = 22 + (27 * index)
+					right_x = 360
+					// ++ d3_drawLines(svg_left, left_x, left_y, right_x, right_y, majors[key]["index"])
+					d3_drawLines(svg_left, left_x, left_y, right_x, right_y, majors[key]["id"])
 				};
-			};
+
+				// majors <--> positions
+				var positions = majors[key]["positions"]
+
+				if (key in majors) {
+					for (var l = 0; l < positions.length; l++) {
+						left_y = 13 + (27 * index)
+						left_x = 0
+						right_y = $("#position-"+positions[l]).attr("cy")
+
+						right_x = parseInt($("#position-"+positions[l]).attr("cx")) - 6	
+						// ++ d3_drawLines(svg_right, right_x, right_y, left_x, left_y, majors[key]["index"])
+						d3_drawLines(svg_right, right_x, right_y, left_x, left_y, majors[key]["id"])
+					};
+				};
+			} catch(e) {
+				console.log(majors[key])
+				return false;
+			}
+
+			// // people <--> majors
+			// var people = majors[key]["people"]
+
+			// for (var j = 0; j < people.length; j++) {
+			// 	// left_y = parseInt($("#person-"+people[j]).attr("y")) + img_height
+			// 	left_y = d3.select("#person-"+people[j]).attr("y")	
+			// 	// left_x = parseInt($("#person-"+people[j]).attr("x")) + 3
+			// 	left_x = d3.select("#person-"+people[j]).attr("x")
+
+			// 	right_y = 22 + (27 * index)
+			// 	right_x = 360
+			// 	// ++ d3_drawLines(svg_left, left_x, left_y, right_x, right_y, majors[key]["index"])
+			// 	d3_drawLines(svg_left, left_x, left_y, right_x, right_y, majors[key]["id"])
+			// };
+
+			// // majors <--> positions
+			// var positions = majors[key]["positions"]
+
+			// if (key in majors) {
+			// 	for (var l = 0; l < positions.length; l++) {
+			// 		left_y = 13 + (27 * index)
+			// 		left_x = 0
+			// 		right_y = $("#position-"+positions[l]).attr("cy")
+
+			// 		right_x = parseInt($("#position-"+positions[l]).attr("cx")) - 6	
+			// 		// ++ d3_drawLines(svg_right, right_x, right_y, left_x, left_y, majors[key]["index"])
+			// 		d3_drawLines(svg_right, right_x, right_y, left_x, left_y, majors[key]["id"])
+			// 	};
+			// };
 		};
 	};
 
@@ -800,8 +849,14 @@
 	function positionMouseover(position_node) {
 
 		// Get user name from node
-		var title = position_node.attr("data-title")
+		try {
+			var title = position_node.attr("data-title")
+		} catch(e) {
+			console.log(e)
+			return false
+		}
 		var id = position_node.attr("id").split("-")[1]
+		// console.log('position_node',id)
 
 		// make sure hover hasn't already been triggered
 		if ($("#position-hover-"+id == 0)) {
@@ -834,6 +889,7 @@
 		// Get user name from node
 		var user_name = user_node.attr("data-name")
 		var id = user_node.attr("id").split("-")[1]
+		// console.log('user_node',id)
 		var el = document.getElementById(user_node.attr("id"))
 		// make sure hover hasn't already been triggered
 		if ($("#person-hover-"+id).length == 0) {

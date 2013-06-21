@@ -1088,6 +1088,7 @@ class CareerPathBase(CareerBase):
 
 		return data
 
+	
 
 	def get_majors_data_new(self,user=None,**opts):
 		"""
@@ -1170,24 +1171,24 @@ class CareerPathBase(CareerBase):
 					continue
 					# print p.title, p.degree, p.field
 					# print p.ideal_position, p.ideal_position.id
-				if p['ideal_position__major'] not in majors_set:
-					majors_set.add(p['ideal_position__major'])
-					majors[p['ideal_position__major']] = {"id":p['ideal_position__id'],"people":[p['person__id']], "positions":[first_ideal.id], "index":len(majors_set), "abbr":p['ideal_position__title'][:5]}
+				if p['ideal_position__title'] not in majors_set:
+					majors_set.add(p['ideal_position__title'])
+					majors[p['ideal_position__title']] = {"id":p['ideal_position__id'],"people":[p['person__id']], "positions":[first_ideal.id], "index":len(majors_set), "abbr":p['ideal_position__title'][:5]}
 				# if p.field not in majors_set:
 				# 	majors_set.add(p.field)
 				# 	majors[p.field] = {"people":[p.person.id], "positions":[first_ideal.id], "index":len(majors_set)}
 				else:
 					# majors[p.field]["people"].append(p.person.id)
 					# majors[p.field]["positions"].append(first_ideal.id)
-					majors[p['ideal_position__major']]["people"].append(p['person__id'])
-					majors[p['ideal_position__major']]["positions"].append(first_ideal.id)
+					majors[p['ideal_position__title']]["people"].append(p['person__id'])
+					majors[p['ideal_position__title']]["positions"].append(first_ideal.id)
 
 				# People
 				if p['person__id'] not in people_set:
 
 					people_set.add(p['person__id'])
 					pic = Profile.objects.get(user__id=p['person__id']).default_profile_pic()
-					people.append({'name':full_name, 'id':p['person__id'], 'major_id':p['ideal_position__id'],"major_index":majors[p['ideal_position__major']]["index"], "major":p['ideal_position__major'],"pic":pic})
+					people.append({'name':full_name, 'id':p['person__id'], 'major_id':p['ideal_position__id'],"major_index":majors[p['ideal_position__title']]["index"], "major":p['ideal_position__major'],"pic":pic})
 
 
 					counter += 1	
@@ -1198,7 +1199,7 @@ class CareerPathBase(CareerBase):
 				if first_ideal.id not in positions_set:
 					positions_set.add(first_ideal.id)
 
-					positions.append({'title':first_ideal.title, 'id':first_ideal.id,'major_id':p['ideal_position__id'], "major_index":majors[p['ideal_position__major']]["index"], "major":p['ideal_position__major']})
+					positions.append({'title':first_ideal.title, 'id':first_ideal.id,'major_id':p['ideal_position__id'], "major_index":majors[p['ideal_position__title']]["index"], "major":p['ideal_position__major']})
 
 
 		data = {
