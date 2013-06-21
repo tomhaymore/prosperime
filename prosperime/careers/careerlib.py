@@ -1188,7 +1188,7 @@ class CareerPathBase(CareerBase):
 
 					people_set.add(p['person__id'])
 					pic = Profile.objects.get(user__id=p['person__id']).default_profile_pic()
-					people.append({'name':full_name, 'id':p['person__id'], 'major_id':p['ideal_position__id'],"major_index":majors[p['ideal_position__title']]["index"], "major":p['ideal_position__major'],"pic":pic})
+					people.append({'name':full_name, 'id':p['person__id'], 'major_id':p['ideal_position__id'],"major_index":majors[p['ideal_position__title']]["index"], "major":p['ideal_position__title'],"pic":pic})
 
 
 					counter += 1	
@@ -1199,7 +1199,7 @@ class CareerPathBase(CareerBase):
 				if first_ideal.id not in positions_set:
 					positions_set.add(first_ideal.id)
 
-					positions.append({'title':first_ideal.title, 'id':first_ideal.id,'major_id':p['ideal_position__id'], "major_index":majors[p['ideal_position__title']]["index"], "major":p['ideal_position__major']})
+					positions.append({'title':first_ideal.title, 'id':first_ideal.id,'major_id':p['ideal_position__id'], "major_index":majors[p['ideal_position__title']]["index"], "major":p['ideal_position__title']})
 
 
 		data = {
