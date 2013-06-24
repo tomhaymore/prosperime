@@ -93,7 +93,7 @@ def register(request):
 		if form.is_valid():
 			# grab cleaned values from form
 			username = form.cleaned_data['username']
-			email = form.cleaned_data['email']
+			email = form.cleaned_data['username']
 			location = form.cleaned_data['location']
 			headline = form.cleaned_data['headline']
 			password = form.cleaned_data['password']
@@ -285,8 +285,8 @@ def finish_registration(request):
 			from accounts.models import Pref
 			import accounts.emaillib as emaillib
 			# grab cleaned values from form
-			username = form.cleaned_data['email']
-			email = form.cleaned_data['email']
+			username = form.cleaned_data['username']
+			email = form.cleaned_data['username']
 			# location = form.cleaned_data['location']
 			# headline = form.cleaned_data['headline']
 			password = form.cleaned_data['password']

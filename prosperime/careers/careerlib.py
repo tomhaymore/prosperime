@@ -1104,7 +1104,7 @@ class CareerPathBase(CareerBase):
 
 		# logger.info('schools in query: ' + str(school_ids))
 
-		people = []
+		people = {}
 		positions = {}
 		majors = {}
 
@@ -1172,11 +1172,14 @@ class CareerPathBase(CareerBase):
 
 					people_set.add(p['person__id'])
 					pic = Profile.objects.get(user__id=p['person__id']).default_profile_pic()
-					people.append({'name':full_name, 'id':p['person__id'], 'major_id':p['ideal_position__id'],"major_index":majors[p['ideal_position__id']]["index"], "major":p['ideal_position__major'],"pic":pic})
+					people[p['person__id']] = {'name':full_name, 'id':p['person__id'], 'majors':[{'id':p['person__id'],'major_id':p['ideal_position__id']}], 'major_id':p['ideal_position__id'],"major_index":majors[p['ideal_position__id']]["index"], "major":p['ideal_position__major'],"pic":pic}
 
 					counter += 1	
 					if counter == 100:
 						break;
+
+				else:
+					people[p['person__id']]['majors'].append({'id':p['person__id'],'major_id':p['ideal_position__id']})
 
 				if first_ideal.id not in positions_set:
 					positions_set.add(first_ideal.id)
@@ -1184,15 +1187,16 @@ class CareerPathBase(CareerBase):
 				else:
 					positions[first_ideal.id]['majors'].append({'id':first_ideal.id,'major_id':p['ideal_position__id']})
 
-		# convert majors / positions data to list
+		# convert dicts to lists
 		majors_list = [{"id":v['id'],"major":v['major'],"people":v['people'],"positions":v['positions'], "index":v['index'], "abbr":v['abbr']} for k,v in majors.iteritems()]
 		positions_list = [{"title":v["title"],"id":v["id"],"majors":v["majors"],"major_id":v["major_id"],"major_index":v["major_index"],"major":v["major"]} for k,v in positions.iteritems()]
-		
+		people_list = [{"name":v["name"],"id":v["id"],"majors":v["majors"],"major_id":v["major_id"],"major_index":v["major_index"],"major":v["major"],"pic":v["pic"]} for k,v in people.iteritems()]
+
 		# compile into one array and convert to json
 		data = {
 			"majors":json.dumps(majors_list),
 			"positions":json.dumps(positions_list),
-			"people":json.dumps(people),
+			"people":json.dumps(people_list),
 			"result":"success"
 		}
 

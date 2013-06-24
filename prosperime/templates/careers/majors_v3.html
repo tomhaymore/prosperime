@@ -640,7 +640,17 @@ $(function() {
 
 		// People lines
 		// bind data
-		var left_lines = svg_left.selectAll("path").data(people,function(d) { return d.id;});
+		var left_lines_group = svg_left.selectAll("g.path-holder")
+			.data(people,function(d) { return d.id;});
+
+		left_lines_group.enter().append("g")
+			.attr("class","path-holder")
+
+		left_lines_group.exit()
+			.remove()
+
+		var left_lines = left_lines_group.selectAll("path")
+				.data(function(d) { return d.majors;});
 
 		// remove old lines
 		left_lines.exit()
@@ -664,9 +674,13 @@ $(function() {
 		// bind data
 		var right_lines_group = svg_right.selectAll("g.path-holder")
 				.data(positions,function(d) { return d.id;})
-			.enter().append("g")
+		
+		right_lines_group.enter().append("g")
 				.attr("class","path-holder");
 		
+		right_lines_group.exit()
+			.remove()
+
 		var right_lines = right_lines_group.selectAll("path")
 				.data(function(d) { return d.majors;});
 		
