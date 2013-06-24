@@ -1,3 +1,4 @@
+
 {% extends "base_full.html" %}
 
 {% block head %}
@@ -485,7 +486,7 @@ $(function() {
 		// update existing nodes
 		svg.transition()
 			.duration(300) // 
-			.each("end", drawLinesGate)
+			// .each("end", drawLinesGate)
 			.attr("x", function(d, i) { // staggers nodes x-value
 				if (i % 4 == 0) return img_width
 				else if (i % 4 == 1) return img_width * 2
@@ -516,7 +517,7 @@ $(function() {
 				else if (i % 4 == 2) return img_width * 3
 				else return img_width * 4
 			})
-			.each("end", drawLinesGate)
+			// .each("end", drawLinesGate)
 
 		svg.on("mouseover", function(d) {
 				if (transition_counter != 0) return false;
@@ -529,11 +530,16 @@ $(function() {
 					.attr("width",img_height+15)
 					.attr("filter","")
 				// major animation
-				majorMouseover(d.major_id)
+				for (m in d.majors) {
+					majorMouseover(d.majors[m].major_id);
+					lineMouseover(d.majors[m].major_id)
+					triggerUserAndPositionWrapper(d.majors[m].major_id, "mouseover")
+				}
+				// majorMouseover(d.major_id)
 				// Make lines blue
-				lineMouseover(d.major_id)
+				// lineMouseover(d.major_id)
 				// Trigger hover on user, position dots
-				triggerUserAndPositionWrapper(d.major_id, "mouseover")
+				// triggerUserAndPositionWrapper(d.major_id, "mouseover")
 			})
 
 			.on("mouseout", function(d) {
@@ -546,11 +552,16 @@ $(function() {
 					.attr("filter","url(#grayscale)")
 				
 				// major animation
-				majorMouseout(d.major_id)
+				for (m in d.majors) {
+					majorMouseout(d.majors[m].major_id);
+					lineMouseout(d.majors[m].major_id)
+					triggerUserAndPositionWrapper(d.majors[m].major_id, "mouseout")
+				}
+				// majorMouseout(d.major_id)
 				// Make lines grey again
-				lineMouseout(d.major_id)
+				// lineMouseout(d.major_id)
 				// Remove user hover
-				triggerUserAndPositionWrapper(d.major_id, "mouseout")
+				// triggerUserAndPositionWrapper(d.major_id, "mouseout")
 			});
 	};
 
@@ -569,6 +580,7 @@ $(function() {
 		// Transitions positions to new location
 		svg.transition()
 			.duration(250)
+			// .each("end", drawLinesGate)
 			.attr("cx", function(d, i) { // staggers nodes x-value
 				if (i % 4 == 0) return 190
 				else if (i % 4 == 1) return 250
@@ -601,26 +613,38 @@ $(function() {
 			.attr("data-major-id",function(d) { return "position-major-"+d.major_id;})
 			// events
 			.on("mouseover", function(d) {
-				if (transition_counter != 0) return false;
+				// if (transition_counter != 0) return false;
 				// d3.select(this)
 				// 	.attr("fill",main_blue_fuller)
 				// 	.attr("r",8)
 				// trigger major animation
-				majorMouseover(d.major_id)
-				// Make lines blue
-				lineMouseover(d.major_id)
-				// Trigger hover on users, position
-				triggerUserAndPositionWrapper(d.major_id, "mouseover")
+				
+				for (m in d.majors) {
+					// console.log(d.majors[m].major_id)
+					majorMouseover(d.majors[m].major_id);
+					lineMouseover(d.majors[m].major_id);
+					triggerUserAndPositionWrapper(d.majors[m].major_id,"mouseover");	
+				}
+				// majorMouseover(d.major_id)
+				// // Make lines blue
+				// lineMouseover(d.major_id)
+				// // Trigger hover on users, position
+				// triggerUserAndPositionWrapper(d.major_id, "mouseover")
 			})
 
 			.on("mouseout", function(d) {
-				if (transition_counter != 0) return false;
+				// if (transition_counter != 0) return false;
 				// trigger major animation
-				majorMouseout(d.major_id)
-				// Make lines grey again
-				lineMouseout(d.major_id)
-				// Trigger mouseout on user, position
-				triggerUserAndPositionWrapper(d.major_id, "mouseout")
+				for (m in d.majors) {
+					majorMouseout(d.majors[m].major_id);
+					lineMouseout(d.majors[m].major_id);
+					triggerUserAndPositionWrapper(d.majors[m].major_id,"mouseout");	
+				}
+				// majorMouseout(d.major_id)
+				// // Make lines grey again
+				// lineMouseout(d.major_id)
+				// // Trigger mouseout on user, position
+				// triggerUserAndPositionWrapper(d.major_id, "mouseout")
 			});
 	};
 
@@ -641,7 +665,7 @@ $(function() {
 		// People lines
 		// bind data
 		var left_lines_group = svg_left.selectAll("g.path-holder")
-			.data(people,function(d) { return d.id;});
+			.data(people,function(d) { return d.id;}).order();
 
 		left_lines_group.enter().append("g")
 			.attr("class","path-holder")
@@ -650,7 +674,7 @@ $(function() {
 			.remove()
 
 		var left_lines = left_lines_group.selectAll("path")
-				.data(function(d) { return d.majors;});
+				.data(function(d) { return d.majors;}).order();
 
 		// remove old lines
 		left_lines.exit()
@@ -658,14 +682,17 @@ $(function() {
 
 		// transition old lines
 		left_lines
-			.attr("d", function(d) { return lineGen(getPathData(d,'people'));} );
+			.attr("d", function(d) { return lineGen(getPathData(d,'people'));}) 
+			.attr("class",function(d) {
+				return "lines line-" + d.major_id;
+			});
 
 		// append new path
 		left_lines.enter().append("path")
 			.attr("d", function(d) { return lineGen(getPathData(d,'people'));} )
 			.attr("fill","none")
 			.attr("stroke-width",1)
-			.attr("id",function(d) { return "line-people-"+d.id})
+			.attr("id",function(d,i) { return "line-people-"+d.id+"_"+i})
 			.attr("class", function(d) { 
 				return "lines line-" + d.major_id
 			});
@@ -673,16 +700,16 @@ $(function() {
 		// Position lines
 		// bind data
 		var right_lines_group = svg_right.selectAll("g.path-holder")
-				.data(positions,function(d) { return d.id;})
+				.data(positions,function(d) { return d.id;}).order();
 		
 		right_lines_group.enter().append("g")
-				.attr("class","path-holder");
-		
+			.attr("class","path-holder");
+
 		right_lines_group.exit()
 			.remove()
 
 		var right_lines = right_lines_group.selectAll("path")
-				.data(function(d) { return d.majors;});
+				.data(function(d) { return d.majors;}).order();
 		
 		// remove old lines
 		right_lines.exit()
@@ -690,16 +717,19 @@ $(function() {
 
 		// transition old lines
 		right_lines
-			.attr("d", function(d) { return lineGen(getPathData(d,'position'));} );
+			.attr("d", function(d) { return lineGen(getPathData(d,'position'));})
+			.attr("class",function(d) {
+				return "lines line-" + d.major_id;
+			});
 
 		// append new paths
 		right_lines.enter().append("path")
 			.attr("d", function(d) { return lineGen(getPathData(d,'position'));} )
 			.attr("fill","none")
 			.attr("stroke-width",1)
-			.attr("id",function(d) { return "line-position-"+d.id})
+			.attr("id",function(d,i) { return "line-position-"+d.id+"_"+i})
 			.attr("class",function(d) { 
-				return "lines line-" + d.major_id
+				return "lines line-" + d.major_id;
 			});
 	};
 
@@ -904,6 +934,7 @@ $(function() {
 
 	// Makes lines blue, bigger
 	function lineMouseover(major_id) {
+		// console.log(".line-"+major_id)
 		lines = d3.selectAll(".line-"+major_id)
 			.attr({
 			"stroke":main_blue,
@@ -992,5 +1023,3 @@ $(function() {
 
 </script>
 {% endblock %}
-
-

@@ -2181,7 +2181,7 @@ def get_majors_data_v3(request):
 		data = cache.get("majors_viz_v3")
 		if data is None:
 			data = path.get_majors_data_v3(**params)
-			cache.set("majors_viz_v3",data,15)
+			cache.set("majors_viz_v3",data,300)
 	else:
 		data = path.get_majors_data_v3(**params)
 
