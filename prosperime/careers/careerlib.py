@@ -1175,7 +1175,7 @@ class CareerPathBase(CareerBase):
 					people[p['person__id']] = {'name':full_name, 'id':p['person__id'], 'majors':[{'id':p['person__id'],'major_id':p['ideal_position__id']}], 'major_id':p['ideal_position__id'],"major_index":majors[p['ideal_position__id']]["index"], "major":p['ideal_position__major'],"pic":pic}
 
 					counter += 1	
-					if counter == 100:
+					if counter == 72:
 						break;
 
 				else:
