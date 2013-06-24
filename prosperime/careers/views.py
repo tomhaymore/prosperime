@@ -105,6 +105,13 @@ def majors_v3(request):
 
 		return render_to_response("careers/majors_v3.html",data,context_instance=RequestContext(request))
 
+@login_required
+def test_majors_v3(request):
+
+	path = careerlib.CareerPathBase()
+	data = path.get_majors_data_v3()
+
+	return render_to_response("careers/test_majors.html",data,context_instance=RequestContext(request))
 
 def majors(request):
 	# try to get from cache

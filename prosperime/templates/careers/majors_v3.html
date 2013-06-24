@@ -105,6 +105,11 @@
 
      	#filters-loading.visible {
      		visibility:visible;
+     		/*background-color:rgba(41,98,152,0.4);*/
+     		color:rgba(41,98,152,0.4);
+     		display:inline-block;
+     		width:150px;
+     		padding:4px 10px 4px 10px;
      	}
 
     </style>
@@ -116,7 +121,7 @@
 	{% if not user.is_authenticated %}
 		<div id="cta-container">
 			
-				See personalized results, filters and more. Connect with one click&nbsp;&nbsp; <a class="flat-button green-button button-med" href="/account/authorize">Connect with LinkedIn</a>
+				See personalized results, filters and more. Don't worry -- no spam! &nbsp;&nbsp; <a class="flat-button green-button button-med" href="/account/authorize">Connect with LinkedIn</a>
 			
 		</div>
 	{% endif %}
@@ -133,16 +138,15 @@
 		
 		{% if user.is_authenticated %}
 		<div id="filter-form">
-			<p>Filter by school or major: <input id="majors-filter-input" data-val-id="" class="flat-input" placeholder="Start typing... "/></p>
+			<p class="feature-paragraph">Filter by school or major: <input id="majors-filter-input" data-val-id="" class="flat-input" placeholder="Start typing... "/>
+			<span id="filters-loading">Updating...</span></p>
 		</div>
 		<div class="filters-container">
 			<ul id="filters-list" class="flat-list inline">
 
 			</ul>
 		</div>
-		<div id="filters-loading">
-			Updating...
-		</div>
+		
 		{% endif %}
 		
 	</div>
@@ -442,7 +446,7 @@ $(function() {
 				lineMouseout(d.id)
 
 				// trigger user and position mouseouts
-				triggerUserAndPositionWrapper(d.id, "mouseout")
+				triggerUserAndPositionWrapper(d.id, "mouseleave")
 			})
 			// Click -- go to individual major page
 			.on("click", function(d) {
@@ -591,9 +595,10 @@ $(function() {
 			.attr("fill", "none")
 			.attr("stroke",main_blue)
 			.attr("stroke-width", 2)
-			.attr("id", function(d) { return "position-"+d.id })
+			.attr("id", function(d) { return "position-"+d.id; })
 			.attr("class","positions")
-			.attr("data-title", function(d) { return d.title })
+			.attr("data-title", function(d) { return d.title; })
+			.attr("data-major-id",function(d) { return "position-major-"+d.major_id;})
 			// events
 			.on("mouseover", function(d) {
 				if (transition_counter != 0) return false;
@@ -652,13 +657,19 @@ $(function() {
 			.attr("stroke-width",1)
 			.attr("id",function(d) { return "line-people-"+d.id})
 			.attr("class", function(d) { 
-				return "line-" + d.major_id
+				return "lines line-" + d.major_id
 			});
 
 		// Position lines
 		// bind data
-		var right_lines = svg_right.selectAll("path").data(positions,function(d) { return d.id;});
-
+		var right_lines_group = svg_right.selectAll("g.path-holder")
+				.data(positions,function(d) { return d.id;})
+			.enter().append("g")
+				.attr("class","path-holder");
+		
+		var right_lines = right_lines_group.selectAll("path")
+				.data(function(d) { return d.majors;});
+		
 		// remove old lines
 		right_lines.exit()
 			.remove()
@@ -673,8 +684,8 @@ $(function() {
 			.attr("fill","none")
 			.attr("stroke-width",1)
 			.attr("id",function(d) { return "line-position-"+d.id})
-			.attr("class", function(d) { 
-				return "line-" + d.major_id
+			.attr("class",function(d) { 
+				return "lines line-" + d.major_id
 			});
 	};
 
@@ -700,7 +711,7 @@ $(function() {
 		if (aspect == "right") {
 			container = $("#right")
 			var x = String(parseInt(node.attr("cx")) + container.offset().left + 10)
-			var y = String(parseInt(node.attr("cy")) + 3 + container.offset().top - 13)
+			var y = String(parseInt(node.attr("cy")) + container.offset().top - 10)
 		}
 
 		var id = "tooltip-" + node.attr("id").split("-")[1]
@@ -713,6 +724,22 @@ $(function() {
 			.style("top",y + "px")
 			.attr("id",id);
 	}
+
+	// function drawTooltip(d,i) {
+	// 	var node = d3.select(this);
+		
+	// 	var container = $("#right");
+
+	// 	var x = String(parseInt(node.attr("cx")) + container.offset().left + 10)
+	// 	var y = String(parseInt(node.attr("cy")) + container.offset().top - 10)
+
+	// 	svg_right.append("div")
+	// 		.text(d.title)
+	// 		.attr("class","abs person-box")
+	// 		.style("left",x + "px")
+	// 		.style("top",y+"px")
+	// 		.attr("id",d.id);
+	// }
 
 	function removeTooltip() {
 		d3.selectAll(".abs").remove()
@@ -736,7 +763,7 @@ $(function() {
 			// get major node coords
 			major_node = $("#major-"+d.major_id)
 			right_x = major_node.offset().left - svg_left_x_offset
-			right_y = major_node.offset().top - svg_left_y_offset
+			right_y = (major_node.offset().top - svg_left_y_offset) + 10
 			// compile coords
 			data = [{"x":left_x,"y":left_y},{"x":hinge_left,"y":left_y},{"x":right_x,"y":right_y}]
 		} else if (aspect == "position") {
@@ -744,18 +771,18 @@ $(function() {
 			major_node = $("#major-"+d.major_id)
 			// left_x = major_node.offset().right - svg_right_x_offset
 			left_x = 5
-			left_y = major_node.offset().top - svg_right_y_offset + 10
+			left_y = (major_node.offset().top - svg_right_y_offset)
 			// get position node
 			position_node = d3.select("#position-"+d.id)
 			right_x = position_node.attr("cx")
 			right_y = position_node.attr("cy") 
 			// compile coords
 			data = [{"x":right_x,"y":right_y},{"x":hinge_right,"y":right_y},{"x":left_x,"y":left_y}]
+			// console.log(data);
 		}
 		
 		return data;
 	};
-
 
 	/* HANDLERS */
 
@@ -781,6 +808,17 @@ $(function() {
 		// draw tooltip
 		drawTooltip("right",position)
 	};
+
+	function positionMouseoverAll(selection) {
+		var position = selection
+			.transition()
+				.duration(50)
+				.attr("fill",main_blue_fuller)
+				.attr("r",8)
+			.each(drawTooltip)
+
+		// drawTooltip("right",position)
+	}
 
 	// returns position node to original attr
 	function positionMouseout(node_id) {
@@ -814,9 +852,18 @@ $(function() {
 		var user = d3.select(node_id)
 			.transition().duration(50)
 				.attr("height",img_height+20)
-				.attr("width",img_height+20)
+				.attr("width",img_width+20)
 				.attr("filter","");
 	};
+
+	function userMouseoverAll(selection) {
+		selection
+			.transition()
+				.duration(50)
+				.attr("height",img_height+20)
+				.attr("width",img_width+20)
+				.attr("filter","");
+	}
 
 	// Returns user nodes to normal state
 	function userMouseout(node_id) {
@@ -876,16 +923,19 @@ $(function() {
 				major = majors[i]
 			}
 		}
+		var ppl = []
 		for (var p in major.people) {
-			
+			// ppl.push("#person-"+major.people[p])
 			userMouseover("#person-"+major.people[p])
+			// d3.selectAll(ppl.join(", ")).call(userMouseoverAll)
 		};
 
 		// Trigger hover on position dots
+		var pos = []
 		for (var p in major.positions) {
-			
+			// pos.push("#position-"+major.positions[p])
 			positionMouseover("#position-"+major.positions[p])
-			
+			// d3.selectAll(pos.join(", ")).call(positionMouseoverAll)
 		}
 	};
 
@@ -904,10 +954,16 @@ $(function() {
 		for (p in major.people) {
 			userMouseout("#person-"+major.people[p])
 		};
-		d3.selectAll("image").call(userMouseoutAll)
+
+		// d3.selectAll("image").call(userMouseoutAll)
 
 		// Trigger hover on position dots
-		d3.selectAll(".positions").call(positionMouseoutAll);
+		for (p in major.positions) {
+			positionMouseout("#position-"+major.positions[p])
+		}
+		// d3.selectAll("[data-major-id='position-major-"+major_id+"']").call(positionMouseoutAll);
+		// console.log("[data-major-id='position-major-"+major_id+"']")
+		// d3.selectAll(".positions").call(positionMouseoutAll);
 		removeTooltip();
 		// positionMouseout("#position-"+major.people[p])
 		
