@@ -40,9 +40,9 @@ class RegisterForm(forms.Form):
 
 	full_name = forms.CharField(label="Full name")
 
-	username = forms.CharField(label="Username",required=False)
+	username = forms.CharField(label="Username")
 
-	email = forms.EmailField(label="Email")
+	email = forms.EmailField(label="Email",required=False)
 	location = forms.CharField(label="Location",required=False)
 	headline = forms.CharField(label="Headline",required=False)
 	password = forms.CharField(widget=forms.PasswordInput,label="Password")
@@ -54,7 +54,7 @@ class RegisterForm(forms.Form):
 	def clean_username(self):
 		username = self.cleaned_data['username']
 		if username and User.objects.filter(username__exact=username).count():
-			raise forms.ValidationError('That username is already taken. Please choose another.')
+			raise forms.ValidationError('That email is already taken. Please choose another.')
 		else:
 			return username
 
