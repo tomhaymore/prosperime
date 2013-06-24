@@ -1,12 +1,18 @@
 Welcome to ProsperMe!
 \n
 \n
-Thanks for trying out ProsperMe. We hope you like it.
+We at ProsperMe are on a mission to help people make better-informed career decisions. 
 \n
 \n
-Please tell your friends about us -- the more people using ProsperMe, the more valuable it comes.
+What should I major in? What jobs and careers do other people like me pursue? How do I land my dream job?
+\n
+These questions represent major life decisions, ones that should be made with as much information as possible. Through our proprietary data crunching of your peer, industry, and alumni networks, we hope to give you relevant insights that allow you to make the best decisions for you.
 \n
 \n
-Sincerely,
+Let your friends know about us--everyone benefits from finding the perfect career.
+\n
+\n
+Thanks friends,
+Thomas & Clayton
 The ProsperMe Team
 http://www.prospr.me
