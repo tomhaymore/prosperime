@@ -664,9 +664,13 @@ $(function() {
 		// bind data
 		var right_lines_group = svg_right.selectAll("g.path-holder")
 				.data(positions,function(d) { return d.id;})
-			.enter().append("g")
+		
+		right_lines_group.enter().append("g")
 				.attr("class","path-holder");
 		
+		right_lines_group.exit()
+			.remove()
+
 		var right_lines = right_lines_group.selectAll("path")
 				.data(function(d) { return d.majors;});
 		
