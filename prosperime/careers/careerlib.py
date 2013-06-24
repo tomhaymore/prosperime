@@ -1105,7 +1105,7 @@ class CareerPathBase(CareerBase):
 		# logger.info('schools in query: ' + str(school_ids))
 
 		people = []
-		positions = []
+		positions = {}
 		majors = {}
 
 		majors_set = set()
@@ -1126,7 +1126,7 @@ class CareerPathBase(CareerBase):
 		
 		# get ideals
 		first_ideals = dict((u['id'],u['profile__first_ideal_job']) for u in User.objects.filter(Q(profile__status="active")|Q(profile__status="dormant")).values('id','profile__first_ideal_job'))
-
+		# first_ideals = dict((u,u.profile.first_ideal_job) for u in User.objects.select_related().filter(Q(profile__status="active")|Q(profile__status="dormant")))
 		# assemble all the positions
 		base_positions = Position.objects.filter(ideal_position__cat="ed",ideal_position__level=1).values('person__profile__status','ideal_position__major','ideal_position__title','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
 
@@ -1144,6 +1144,8 @@ class CareerPathBase(CareerBase):
 			else:
 				first_ideal = None
 		
+			# first_ideal = first_ideals[p['person__id']]
+
 			# get full name
 			full_name = " ".join([p['person__profile__first_name'],p['person__profile__last_name']])
 			
@@ -1178,17 +1180,18 @@ class CareerPathBase(CareerBase):
 
 				if first_ideal.id not in positions_set:
 					positions_set.add(first_ideal.id)
+					positions[first_ideal.id] = {'title':first_ideal.title, 'id':first_ideal.id,'majors':[{'id':first_ideal.id,'major_id':p['ideal_position__id']}],'major_id':p['ideal_position__id'], "major_index":majors[p['ideal_position__id']]["index"], "major":p['ideal_position__major']}
+				else:
+					positions[first_ideal.id]['majors'].append({'id':first_ideal.id,'major_id':p['ideal_position__id']})
 
-					positions.append({'title':first_ideal.title, 'id':first_ideal.id,'major_id':p['ideal_position__id'], "major_index":majors[p['ideal_position__id']]["index"], "major":p['ideal_position__major']})
-
-
-		# convert majors data to list
-
+		# convert majors / positions data to list
 		majors_list = [{"id":v['id'],"major":v['major'],"people":v['people'],"positions":v['positions'], "index":v['index'], "abbr":v['abbr']} for k,v in majors.iteritems()]
-
+		positions_list = [{"title":v["title"],"id":v["id"],"majors":v["majors"],"major_id":v["major_id"],"major_index":v["major_index"],"major":v["major"]} for k,v in positions.iteritems()]
+		
+		# compile into one array and convert to json
 		data = {
 			"majors":json.dumps(majors_list),
-			"positions":json.dumps(positions),
+			"positions":json.dumps(positions_list),
 			"people":json.dumps(people),
 			"result":"success"
 		}
