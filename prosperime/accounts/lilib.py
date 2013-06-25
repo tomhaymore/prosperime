@@ -1007,8 +1007,8 @@ class LIConnections(LIBase):
 
 				
 				# Either way, create the connection object
-				# if user is not None:
-				# 	self.add_connection(self.user, user)
+				if user is not None:
+					self.add_connection(self.user, user)
 
 
 
@@ -1355,7 +1355,7 @@ class LIConnections(LIBase):
 				pic.pic.save(img_filename,img_file,True)
 			os.remove('tmp_img')
 
-	def add_connection(self,user1,user2):
+	def add_connection(self,user1,user2,status="dormant"):
 		"""
 		Adds connections between users
 		"""
@@ -1363,12 +1363,14 @@ class LIConnections(LIBase):
 		cxn.person1 = user1.profile
 		cxn.person2 = user2.profile
 		cxn.service = "linkedin"
+		cxn.status = status
 		cxn.save()
 
 		cxn = Connection()
 		cxn.person1 = user2.profile
 		cxn.person2 = user1.profile
 		cxn.service = "linkedin"
+		cxn.status = status
 		cxn.save()
 
 	###############
