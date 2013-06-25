@@ -139,3 +139,11 @@ class LITest(SessionTestCase):
 		li_cxn_parser = self.lilib.LIConnections(default_user.id,acct.id)
 		res = li_cxn_parser.process_connections()
 		self.assertEqual(res,"Error: LI accont is not active, aborting")
+
+	def test_user_refused(self):
+		# create new user
+		default_user = User.objects.create_user(username="ahamilton",password="aburr")
+
+		resp = self.client.get("/account/authenticate/?oauth_problem=user_refused",follow=True)
+		self.assertEqual(resp.status_code,200) # 
+		self.assertEqual(resp.redirect_chain[0][0],'http://testserver/account/refused')

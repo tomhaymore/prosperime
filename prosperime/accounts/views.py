@@ -153,9 +153,9 @@ def linkedin_authenticate(request):
 	# check for official LI error
 	elif request.GET.getlist("oauth_problem"):
 		# fetch error
-		li_error = request.GET['oauth_problem'][0]
+		li_error = request.GET.getlist('oauth_problem')[0]
 		# user refused access
-		if li_error == 'user refused':
+		if li_error == 'user_refused':
 			return HttpResponseRedirect('/account/refused')
 	
 	# check if user is already logged on
