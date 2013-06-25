@@ -417,6 +417,7 @@ $(function() {
 		svg_left = createSvgContainer("left")
 		svg_left_x_offset = $("#svg-left").offset().left
 		svg_left_y_offset = $("#svg-left").offset().top
+		console.log(svg_left_y_offset)
 		svg_right = createSvgContainer("right")
 		svg_right_x_offset = $("#svg-right").offset().left
 		svg_right_y_offset = $("#svg-right").offset().top
@@ -718,6 +719,9 @@ $(function() {
 	// Iterates through each major, gets ids of positions, people
 	//  draws lines to each
 	function drawLines() {
+		svg_left_y_offset = $("#svg-left").offset().top
+		svg_right_y_offset = $("#svg-right").offset().top
+
 		transition_counter = 0
 
 		// d3 line generation function
