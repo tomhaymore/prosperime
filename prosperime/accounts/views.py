@@ -129,6 +129,9 @@ def logout(request):
 	auth_logout(request)
 	return HttpResponseRedirect('/welcome')
 
+def linkedin_refused(request):
+	return render_to_response('accounts/refused.html',context_instance=RequestContext(request))
+
 def linkedin_authorize(request):
 		
 	liparser = LIProfile()
@@ -144,8 +147,16 @@ def linkedin_authorize(request):
 def linkedin_authenticate(request):  
 	
 	liparser = LIProfile()
-
-	access_token, linkedin_user_info = liparser.authenticate(request.session['request_token'],request.GET['oauth_verifier'])
+	# verify that oauth_verifier was returned
+	if request.GET.getlist("oauth_verifier"):
+		access_token, linkedin_user_info = liparser.authenticate(request.session['request_token'],request.GET['oauth_verifier'])
+	# check for official LI error
+	elif request.GET.getlist("oauth_problem"):
+		# fetch error
+		li_error = request.GET['oauth_problem'][0]
+		# user refused access
+		if li_error == 'user refused':
+			return HttpResponseRedirect('/account/refused')
 	
 	# check if user is already logged on
 	request.session['linkedin_user_info'] = linkedin_user_info
