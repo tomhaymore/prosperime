@@ -10,11 +10,11 @@
 <p>Pick a username and password and you're all set.</p>
 <form action="" method="post" name="finish_login">
 	{% csrf_token %}
-
+	{{form.errors}}
 	<ul>
 		<li><label for="id_username">Email:</label>
 			{{form.username.errors}}
-			<input class="flat-input" type="text" name="username" id="id_username" /></li>
+			<input class="flat-input" type="text" name="username" id="id_username" value="{{email_address}}" /></li>
 <!-- 		<li><label for="id_email">Email:</label>
 			{{form.email.errors}}
 			<input class="flat-input" type="text" name="email" id="id_email" value="{{email_address}}"/></li> -->

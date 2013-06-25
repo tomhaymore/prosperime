@@ -77,9 +77,9 @@ class RegisterForm(forms.Form):
 class FinishAuthForm(forms.Form):
 	error_css_class = 'form_error'
 	required_css_class = 'form_required'
-	username = forms.CharField(label="Username",required=False)
+	username = forms.CharField(label="Username")
 
-	email = forms.EmailField(label="Email")
+	email = forms.EmailField(label="Email",required=False)
 	location = forms.CharField(label="Location",required=False)
 	headline = forms.CharField(label="Headline",required=False)
 	password = forms.CharField(widget=forms.PasswordInput,label="Password")
