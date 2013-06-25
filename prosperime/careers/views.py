@@ -68,12 +68,14 @@ def old_majors(request):
 	return render_to_response("careers/d3.html",data,context_instance=RequestContext(request))
 
 def majors_v3(request):
-	import re
-	# try to get from cache
-	# data = cache.get("majors_viz_"`+str(request.user.id))
-	res = re.search("MSIE 8.0",request.META["HTTP_USER_AGENT"])
-	if res:
-		return render_to_response("no_ie8.html",context_instance=RequestContext(request))
+	# check for meta
+	if request.META and 'HTTP_USER_AGENT' in request.META:
+
+		import re
+		
+		res = re.search("MSIE 8.0",request.META["HTTP_USER_AGENT"])
+		if res:
+			return render_to_response("no_ie8.html",context_instance=RequestContext(request))
 	data = {}
 	import accounts.tasks as tasks
 	data['majors'] = cache.get("majors_viz_v3")
