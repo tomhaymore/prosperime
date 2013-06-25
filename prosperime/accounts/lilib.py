@@ -26,6 +26,7 @@ import careers.careerlib as careerlib
 from django.core.files import File
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
+from django.db import IntegrityError
 
 logger = logging.getLogger(__name__)
 
@@ -1174,7 +1175,7 @@ class LIConnections(LIBase):
 		user.last_name = last_name[:30]
 		try:
 			user.save()
-		except IntegriyError as e:
+		except IntegrityError as e:
 			logger.error("Trying add a duplicate user ({0}): {1} ".format(e.errno,e.strerror))
 			return None
 		except DatabaseError as e:
