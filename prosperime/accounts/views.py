@@ -332,7 +332,10 @@ def finish_registration(request):
 				critical_logger.info("created new user: " + username)
 			# send welcome email
 			welcome = emaillib.WelcomeEmail(user)
-			welcome.send_email()
+			try:
+				welcome.send_email()
+			except:
+				logger.error("couldn't send welcome email")
 			# add email prefs
 			if form.cleaned_data['notification']:
 				pref = Pref(user=user,name="notification",value=1)
