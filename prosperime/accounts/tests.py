@@ -125,3 +125,17 @@ class AuthTest(SessionTestCase):
 		self.assertEqual(resp.status_code,200) # redirects to home page
 		self.assertEqual(resp.context['user'].is_authenticated(),True)
 
+class LITest(SessionTestCase):
+	import lilib 
+
+	def test_unlinked_process_connections(self):
+		# create new user
+		default_user = User.objects.create_user(username="ahamilton",password="aburr")
+		# add bogus LI account
+		acct = Account(service="linkedin",status="unlinked",owner=default_user)
+		acct.save()
+
+		# ensure that lilib won't process connections
+		li_cxn_parser = self.lilib.LIConnections(default_user.id,acct.id)
+		res = li_cxn_parser.process_connections()
+		self.assertEqual(res,"Error: LI accont is not active, aborting")

@@ -956,6 +956,10 @@ class LIConnections(LIBase):
 		"""
 		Fetches LI connections, runs through each, adds new users, creates connections, and process connections' profiles
 		"""
+		# ensure that LI accont is linked and active
+		if self.acct.status == "unlinked":
+			logger.info("LI accont is not active, aborting")
+			return "Error: LI accont is not active, aborting"
 
 		# get & loop through connections
 		connections = self.get_connections()
