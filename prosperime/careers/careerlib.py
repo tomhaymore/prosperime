@@ -1115,14 +1115,14 @@ class CareerPathBase(CareerBase):
 		counter = 0
 
 		# get schools from user
-		if user and school_ids:
-			schools = Entity.objects.filter(Q(li_type="school",positions__person=user,positions__type="education")|Q(id__in=school_ids)).distinct()
-		elif user:
-			schools = Entity.objects.filter(li_type="school",positions__person=user,positions__type="education").distinct()
-		elif school_ids:
-			schools = Entity.objects.filter(id__in=school_ids).distinct()
-		else:
-			schools = None
+		# if user and school_ids:
+		# 	schools = Entity.objects.filter(Q(li_type="school",positions__person=user,positions__type="education")|Q(id__in=school_ids)).distinct()
+		# elif user:
+		# 	schools = Entity.objects.filter(li_type="school",positions__person=user,positions__type="education").distinct()
+		# elif school_ids:
+		# 	schools = Entity.objects.filter(id__in=school_ids).distinct()
+		# else:
+		# 	schools = None
 		
 		# get ideals
 		first_ideals = dict((u['id'],u['profile__first_ideal_job']) for u in User.objects.filter(Q(profile__status="active")|Q(profile__status="dormant")).values('id','profile__first_ideal_job'))
@@ -1130,8 +1130,8 @@ class CareerPathBase(CareerBase):
 		# assemble all the positions
 		base_positions = Position.objects.filter(ideal_position__cat="ed",ideal_position__level=1).values('person__profile__status','ideal_position__major','ideal_position__title','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
 
-		if schools:
-			base_positions = base_positions.filter(entity_id__in=schools)
+		if school_ids:
+			base_positions = base_positions.filter(entity_id__in=school_ids)
 		if major_ids:
 			base_positions = base_positions.filter(ideal_position__id__in=major_ids)	
 
