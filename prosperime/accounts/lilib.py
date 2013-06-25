@@ -14,6 +14,7 @@ from utilities.helpers import retry
 import dateutil
 from sys import stdout
 import json
+import logging
 
 # from Django
 from django.utils import simplejson
@@ -25,6 +26,8 @@ import careers.careerlib as careerlib
 from django.core.files import File
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 class LIBase():
 
@@ -1007,8 +1010,8 @@ class LIConnections(LIBase):
 
 				
 				# Either way, create the connection object
-				# if user is not None:
-				# 	self.add_connection(self.user, user)
+				if user is not None:
+					self.add_connection(self.user, user)
 
 
 
@@ -1154,8 +1157,7 @@ class LIConnections(LIBase):
 		last_name = soup.find_all("span", class_="family-name")[0].contents[0].strip()
 		# headline = soup.find_all("p", class_="headline-title")[0].contents[0].strip()
 		
-		if self.logging:
-			"@process_public_page_full: beginning crawl of: " + first_name + ' ' + last_name
+		logger.info("beginning crawl of: " + first_name + ' ' + last_name)
 
 
 		## Create User
@@ -1164,9 +1166,19 @@ class LIConnections(LIBase):
 		username = username[:30]
 		user.username = username
 		user.is_active = False
-		user.first_name = first_name
-		user.last_name = last_name
-		user.save()
+		user.first_name = first_name[:30]
+		user.last_name = last_name[:30]
+		try:
+			user.save()
+		except IntegriyError as e:
+			logger.error("Trying add a duplicate user ({0}): {1} ".format(e.errno,e.strerror))
+			return None
+		except DatabaseError as e:
+			logger.error("Database error adding new user ({0}): {1}".format(e.errno,e.strerror))
+			return None
+		except:
+			logger.error("Problem adding user")
+			return None
 
 		## Create Profile
 		user.profile.first_name = first_name
@@ -1355,7 +1367,7 @@ class LIConnections(LIBase):
 				pic.pic.save(img_filename,img_file,True)
 			os.remove('tmp_img')
 
-	def add_connection(self,user1,user2):
+	def add_connection(self,user1,user2,status="dormant"):
 		"""
 		Adds connections between users
 		"""
@@ -1363,12 +1375,14 @@ class LIConnections(LIBase):
 		cxn.person1 = user1.profile
 		cxn.person2 = user2.profile
 		cxn.service = "linkedin"
+		cxn.status = status
 		cxn.save()
 
 		cxn = Connection()
 		cxn.person1 = user2.profile
 		cxn.person2 = user1.profile
 		cxn.service = "linkedin"
+		cxn.status = status
 		cxn.save()
 
 	###############
