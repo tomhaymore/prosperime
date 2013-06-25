@@ -57,7 +57,7 @@ class CareerEmail():
 	sender = None
 	# fetch templates
 	plaintext = get_template('emails/career_services_A1.txt')
-	htmlformat    = get_template('emails/career_services_A1.html')
+	htmlformat = get_template('emails/career_services_A1.html')
 
 	def __init__(self):
 		# open backend
