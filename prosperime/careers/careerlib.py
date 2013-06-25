@@ -1139,13 +1139,13 @@ class CareerPathBase(CareerBase):
 		# assemble all the positions
 		base_positions = Position.objects.filter(ideal_position__cat="ed",ideal_position__level=1).values('person__profile__status','ideal_position__major','ideal_position__title','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
 
-		if user and school_ids:
-			# combine any s
-			schools = schools + school_ids
+		# if user and school_ids:
+		# 	# combine any s
+		# 	schools = schools + school_ids
+		# 	base_positions = base_positions.filter(Q(entity_id__in=schools)|Q(person__id__in=connections))
+		if user:
 			base_positions = base_positions.filter(Q(entity_id__in=schools)|Q(person__id__in=connections))
-		elif user:
-			base_positions = base_positions.filter(Q(entity_id__in=schools)|Q(person__id__in=connections))
-		elif school_ids:
+		if school_ids:
 			base_positions = base_positions.filter(entity_id__in=school_ids)
 		if major_ids:
 			base_positions = base_positions.filter(ideal_position__id__in=major_ids)	
