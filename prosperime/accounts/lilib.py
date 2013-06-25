@@ -942,7 +942,7 @@ class LIConnections(LIBase):
 			for i in range(1,int(pages)+1):
 				# construct url with pagination
 				start_num = i*500+1
-				page_api_url = api_url + "start=%i&count=500" % (start_num,)
+				page_api_url = self.api_url + "start=%i&count=500" % (start_num,)
 				
 				# fetch data with new count
 				content = self.fetch_data_oauth(self.acct.id,page_api_url)
