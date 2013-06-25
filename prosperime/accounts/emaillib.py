@@ -1,5 +1,7 @@
 # from python
 import logging
+import csv
+import smtplib
 
 # from Django
 from django.core.mail import EmailMessage
@@ -62,7 +64,37 @@ class CareerEmail():
 	def __init__(self):
 		# open backend
 		pass
+	
+	def process_emails(self,owner,path,round):
 		
+		# open file
+		f = open(path,'rU')
+		# convert to dict object
+		c = csv.DictReader(f)
+		# loop thruogh each row
+		for row in c:
+			# check to make sure it hasn't already been emailed
+			if row['Emailed'] == "Y":
+				continue
+			# check to make sure it's the right round
+			if int(row["Round"]) != round:
+				continue
+			# check to make sure that it's a valid email address
+			if not row["Email"] or row["Email"] == "":
+				continue
+			# compile
+			if row["First Name"] and row["Last Name"]:
+				fullname = row["First Name"] + " " + row["Last Name"]
+			elif row["First Name"]:
+				fullname = row["First Name"]
+			elif row["Last Name"]:
+				fullname = row["Last Name"]
+			else:
+				fullname = None
+			email = row["Email"]
+			# logger.info((owner,fullname,email,))
+			self.send_career_email(owner,fullname,email)
+
 	def send_career_email(self,owner,name,address):
 		d = Context({
 				'full_name':name,
@@ -79,7 +111,7 @@ class CareerEmail():
 		try:
 			self.backend.send_messages([self.msg])
 			logger.info("Email sent: " + str(self.msg.to))
-		except SMTPRecipientRefused, e:
+		except smtplib.SMTPRecipientRefused, e:
 			logger.info("Email recipient refused: " + str(self.msg.to) + " " + str(e))
 		except e:
 			logger.error("Email error: " + str(e))

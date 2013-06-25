@@ -1,4 +1,8 @@
-Hello {{full_name}},
+{% if full_name %}
+	Hello {{full_name}},
+{% else %}
+	Hello,
+{% endif %},
 \n
 \n
 My name is {{owner}}, and I am a recent Stanford graduate and co-founder of ProsperMe. At ProsperMe, we're building tools to help college students explore and think about their careers and career goals.
