@@ -622,6 +622,7 @@ border-radius: 20px;*/
 	width:1000px;
 	margin-left:auto;
 	margin-right:auto;
+	/*height:30px;*/
 	/*text-align:center;*/
 	font-size:1.3em;
 	/*background-color: rgba(48,91,152,0.2);
@@ -636,7 +637,7 @@ border-radius: 20px;*/
 }
 
 .flat-button {
-	margin-top:0px;
+	margin-top:-2px;
 }
 
 #filters-list {

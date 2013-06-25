@@ -93,7 +93,7 @@
      	#loading-message {
      		position:absolute;
      		/*margin-top:100px;*/
-     		top:50px;
+     		top:300px;
      		left:500px;
      		width:250px;
      		/*margin-right: auto;*/
@@ -119,6 +119,21 @@
      		padding:4px 10px 4px 10px;
      	}
 
+     	#sharing-message {
+     		visibility:hidden;
+     		transition:all 0.2s;
+     		-webkit-transition-property:all;
+     		-webkit-transition-duration:0.2s;
+     		
+     	}
+
+     	#sharing-message.visible {
+     		color:rgba(41,98,152,0.4);
+     		display:inline-block;
+     		width:150px;
+     		padding:4px 10px 4px 10px;
+     	}
+
     </style>
 
 
@@ -129,6 +144,12 @@
 		<div id="cta-container">
 			
 				See personalized results, filters and more. Don't worry -- no spam! &nbsp;&nbsp; <a class="flat-button green-button button-med" href="/account/authorize">Connect with LinkedIn</a>
+			
+		</div>
+	{% else %}
+		<div id="cta-container">
+			
+				Hungry for more? The more people who use ProsperMe, the more you can learn. <a class="flat-button green-button button-med" href="http://www.facebook.com/sharer.php?u=http://www.prospr.me/majors" target="blank">Tell your friends to sign up!</a>
 			
 		</div>
 	{% endif %}
@@ -146,7 +167,7 @@
 		{% if user.is_authenticated %}
 		<div class="generic-nav-container">
 			<a class="generic-nav pull-left selected" data-view="network">Your Network</a> 
-			<a class="generic-nav pull-left unselected" data-view="all">ProsprMe Community</a>
+			<a class="generic-nav pull-left unselected" data-view="all">ProsperMe Community</a>
 			<div class="clear"></div>
 			
 		</div>
@@ -159,6 +180,7 @@
 
 			</ul>
 		</div>
+		<div id="sharing-message">Hungry for more? The more people who use ProsperMe, the more you can learn. <a class="flat-button green-button button-med" target="blank" href="http://www.facebook.com/sharer.php?u=http://www.prospr.me/majors">Tell your friends to sign up!</a></div>
 		<div id="loading-message">Loading...<img src="{{STATIC_URL}}img/spinner.gif" /></div>
 		
 		{% endif %}
@@ -345,6 +367,10 @@ $(function() {
 			},
 			success:function(response) {
 				if (response["result"] == "success") {
+					// check for null returns
+					if (people.length == 0) {
+						$("#sharing-message").addClass("visible");
+					}
 					// deconstruct data
 					people = $.parseJSON(response["people"])
 					positions = $.parseJSON(response["positions"])
