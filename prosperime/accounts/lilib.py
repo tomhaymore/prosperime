@@ -1171,10 +1171,10 @@ class LIConnections(LIBase):
 		try:
 			user.save()
 		except IntegriyError as e:
-			logger.error("Trying add a duplicate user ({0}): {1} ".format(e.errno,e.strerror)
+			logger.error("Trying add a duplicate user ({0}): {1} ".format(e.errno,e.strerror))
 			return None
 		except DatabaseError as e:
-			logger.error("Database error adding new user ({0}): {1}").format(e.errno,e.strerror)
+			logger.error("Database error adding new user ({0}): {1}".format(e.errno,e.strerror))
 			return None
 		except:
 			logger.error("Problem adding user")
