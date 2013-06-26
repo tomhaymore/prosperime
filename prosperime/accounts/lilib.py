@@ -858,7 +858,10 @@ class LIProfile(LIBase):
 		for p in self.user.positions.all():
 			careerlib.match_position_to_ideals(p)
 		# set first ideal job
-		self.user.profile.set_first_ideal_job()
+		try:
+			self.user.profile.set_first_ideal_job()
+		except DatabaseError as e:
+			logger.error("Database error setting first ideal job, "+str(e))
 
 
 	def fetch_profile(self):
