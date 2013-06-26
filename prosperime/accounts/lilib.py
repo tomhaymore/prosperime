@@ -1173,17 +1173,18 @@ class LIConnections(LIBase):
 		user.is_active = False
 		user.first_name = first_name[:30]
 		user.last_name = last_name[:30]
+		
 		try:
 			user.save()
 		except IntegrityError as e:
 			logger.error("Trying add a duplicate user")
 			return None
-		except DatabaseError as e:
-			logger.error("Database error adding new user")
-			return None
-		except:
-			logger.error("Problem adding user")
-			return None
+		# except DatabaseError as e:
+		# 	logger.error("Database error adding new user")
+		# 	return None
+		# except:
+		# 	logger.error("Problem adding user")
+		# 	return None
 
 		## Create Profile
 		user.profile.first_name = first_name
