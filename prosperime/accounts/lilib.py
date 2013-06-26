@@ -1182,6 +1182,13 @@ class LIConnections(LIBase):
 			except:
 				transaction.rollback_unless_managed()
 			return None
+		except DatabaseError as e:
+			logger.error(str(e))
+			try:
+				transaction.rollback()
+			except:
+				transaction.rollback_unless_managed()
+			return None
 
 		## Create Profile
 		user.profile.first_name = first_name
