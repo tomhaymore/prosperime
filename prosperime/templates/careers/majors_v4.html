@@ -93,7 +93,7 @@
      	#loading-message {
      		position:absolute;
      		/*margin-top:100px;*/
-     		top:300px;
+     		top:330px;
      		left:500px;
      		width:250px;
      		/*margin-right: auto;*/
@@ -119,19 +119,25 @@
      		padding:4px 10px 4px 10px;
      	}
 
-     	#sharing-message {
-     		visibility:hidden;
-     		transition:all 0.2s;
-     		-webkit-transition-property:all;
-     		-webkit-transition-duration:0.2s;
-     		
+     	#no-results-message {
+			position:absolute;
+			display:none;
+			top:450px;
+     		left:400px;
+     		width:500px;
+     		font-size:1.4em;
+     		line-height:30px;
+     		font-weight:600;
+     		z-index:10;
+     		text-align:center;
      	}
 
-     	#sharing-message.visible {
+     	#no-results-message.visible {
+/*     		display:block;
      		color:rgba(41,98,152,0.4);
      		display:inline-block;
      		width:150px;
-     		padding:4px 10px 4px 10px;
+     		padding:4px 10px 4px 10px;*/
      	}
 
     </style>
@@ -180,7 +186,8 @@
 
 			</ul>
 		</div>
-		<div id="sharing-message">Hungry for more? The more people who use ProsperMe, the more you can learn. <a class="flat-button green-button button-med" target="blank" href="http://www.facebook.com/sharer.php?u=http://www.prospr.me/majors">Tell your friends to sign up!</a></div>
+		<div id="no-results-message">Sorry, we don't know enough about the other people in your network yet... Tell your friends to sign up! <br/>It's a win-win situation. <br/> <a class="flat-button green-button button-med" target="blank" href="http://www.facebook.com/sharer.php?u=http://www.prospr.me/majors">Spread the love</a></div>
+
 		<div id="loading-message">Loading...<img src="{{STATIC_URL}}img/spinner.gif" /></div>
 		
 		{% endif %}
@@ -346,6 +353,7 @@ $(function() {
 				majors = $.parseJSON(response["majors"])
 				console.log(majors)
 				window.majors = majors
+
 				// logging
 				// render viz
 				renderViz()
@@ -367,14 +375,18 @@ $(function() {
 			},
 			success:function(response) {
 				if (response["result"] == "success") {
-					// check for null returns
-					if (people.length == 0) {
-						$("#sharing-message").addClass("visible");
-					}
+
 					// deconstruct data
 					people = $.parseJSON(response["people"])
 					positions = $.parseJSON(response["positions"])
 					majors = $.parseJSON(response["majors"])
+
+					// check for null returns
+					if (people.length == 0) 
+						$("#no-results-message").css("display", "inline-block").hide().fadeIn()					
+					else $("#no-results-message").css("display", "none")
+
+
 					// update data in d3 objects
 					updateMajors();
 					var majors_column_height = parseInt(d3.select("#center").style("height"))
@@ -407,8 +419,13 @@ $(function() {
 			$(".section-header,.section-header-middle,.section-header-right").each(function() {
 				$(this).animate({"opacity":1} , "250")
 			})
-
 		})
+
+		// check for null returns
+		if (people.length == 0)
+			$("#no-results-message").css("display", "block").hide().fadeIn()
+		else $("#no-results-message").css("display", "none")
+
 
 		// add majors
 		updateMajors()
