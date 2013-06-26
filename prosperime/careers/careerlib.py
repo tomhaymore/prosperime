@@ -1118,6 +1118,7 @@ class CareerPathBase(CareerBase):
 		positions_set = set()
 
 		counter = 0
+		majors_counter = {}
 
 		if user:
 			connections = [c.id for c in user.profile.connections.all()]
@@ -1176,10 +1177,14 @@ class CareerPathBase(CareerBase):
 				if p['ideal_position__id'] not in majors_set:
 					majors_set.add(p['ideal_position__id'])
 					majors[p['ideal_position__id']] = {"id":p['ideal_position__id'],"major":p['ideal_position__major'],"people":[p['person__id']],"positions":[first_ideal.id], "index":len(majors_set), "abbr":p['ideal_position__title'].split(" ")[0]}
-
+					majors_counter[p['ideal_position__id']] = 0
 				else:
-					majors[p['ideal_position__id']]["people"].append(p['person__id'])
-					majors[p['ideal_position__id']]["positions"].append(first_ideal.id)
+					if majors_counter[p['ideal_position__id']] > 10:
+						continue
+					else:
+						majors[p['ideal_position__id']]["people"].append(p['person__id'])
+						majors[p['ideal_position__id']]["positions"].append(first_ideal.id)
+						majors_counter[p['ideal_position__id']] += 1
 
 				## People
 
