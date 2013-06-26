@@ -54,10 +54,13 @@ class Profile(models.Model):
 
     # returns first real job after first education
     def set_first_ideal_job(self):
-        positions = self.user.positions.exclude(ideal_position=None).values('id','start_date','end_date','type','ideal_position__id','ideal_position__title','ideal_position__level','title','entity__name','entity__id').order_by("start_date")
+        positions = self.user.positions.values('id','start_date','end_date','type','ideal_position__id','ideal_position__title','ideal_position__level','title','entity__name','entity__id').order_by("start_date")
         ed = None
         next = False
+        
         for p in positions:
+            if p['ideal_position__id'] is None:
+                continue
             # check flag
             if next and ed['end_date'] and p['start_date'] and p['start_date'] > ed['end_date']:
                 # make sure there is an ideal position atached here
