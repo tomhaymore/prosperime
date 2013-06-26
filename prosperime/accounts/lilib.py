@@ -1177,8 +1177,10 @@ class LIConnections(LIBase):
 			user.save()
 		except IntegrityError as e:
 			logger.error("Trying to add a duplicate user")
-			transaction.rollback()
-			transaction.rollback_unless_managed()
+			try:
+				transaction.rollback()
+			except:
+				transaction.rollback_unless_managed()
 			return None
 
 		## Create Profile
