@@ -26,7 +26,7 @@ import careers.careerlib as careerlib
 from django.core.files import File
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
-from django.db import IntegrityError
+from django.db import IntegrityError, DatabaseError
 
 logger = logging.getLogger(__name__)
 
