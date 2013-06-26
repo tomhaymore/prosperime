@@ -1121,7 +1121,7 @@ class CareerPathBase(CareerBase):
 
 		if user:
 			connections = [c.id for c in user.profile.connections.all()]
-			schools = [e.id for e in Entity.objects.filter(li_type="school",positions__person=user)]
+			schools = [e.id for e in Entity.objects.filter(Q(li_type="school")|Q(li_type="educational")).filter(positions__person=user)]
 		# get schools from user
 		# if user and school_ids:
 		# 	schools = Entity.objects.filter(Q(li_type="school",positions__person=user,positions__type="education")|Q(id__in=school_ids)).distinct()
