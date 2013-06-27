@@ -14,6 +14,32 @@ from social.models import Comment, Thread, Vote, FollowThread
 import utilities.helpers as helpers
 
 
+def recruiters(request):
+	from social.forms import RecruiterInterestForm
+	# check to see if email submitted
+	if request.POST:
+		form = RecruiterInterestForm(request.POST)
+		
+		
+		# validate form
+		
+		if form.is_valid():
+			from django.core.mail.backends.smtp import EmailBackend
+			from django.core.mail import EmailMultiAlternatives
+			backend = EmailBackend()
+			msg = EmailMultiAlternatives("ProsperMe: New recruiter signup","New signup: " + form.cleaned_data['email'],"admin@prospr.me",["admin@prospr.me"])
+			backend.send_messages([msg])
+			return HttpResponseRedirect("/recruiters/thanks/")
+
+	else:
+		form = RecruiterInterestForm()
+
+	return render_to_response("recruiters.html",{'form':form},context_instance=RequestContext(request))
+
+def recruiters_thanks(request):
+
+	return render_to_response("recruiters_thanks.html",context_instance=RequestContext(request))
+
 def thread(request, thread_id):
 	thread = Thread.objects.get(id=thread_id)
 	comments = Comment.objects.filter(thread=thread).order_by("index")

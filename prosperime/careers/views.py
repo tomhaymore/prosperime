@@ -50,9 +50,6 @@ logger = logging.getLogger(__name__)
 ################## CORE VIEWS ########################
 ######################################################
 
-def recruiters(request):
-	return render_to_response("recruiters.html",context_instance=RequestContext(request))
-
 # @login_required
 def old_majors(request):
 

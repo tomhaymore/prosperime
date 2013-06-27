@@ -35,7 +35,8 @@ urlpatterns = patterns('',
     # url(r'^majors/v/(\d+)/$', 'careers.views.single_major'),
 
     # Recruiter Views
-    url(r'^recruiters/$', 'careers.views.recruiters'),
+    url(r'^recruiters/$', 'social.views.recruiters'),
+    url(r'^recruiters/thanks/$', 'social.views.recruiters_thanks'),
 
     url(r'^progress/$', 'careers.views.progress'), # Am I on Track?
     
