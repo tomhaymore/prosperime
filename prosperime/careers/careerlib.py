@@ -1156,7 +1156,10 @@ class CareerPathBase(CareerBase):
 				continue
 			
 			if first_ideals[p['person__id']] is not None:
-				first_ideal = IdealPosition.objects.get(position__id=first_ideals[p['person__id']])
+				try:
+					first_ideal = IdealPosition.objects.get(position__id=first_ideals[p['person__id']])
+				except:
+					first_ideal = None
 			else:
 				first_ideal = None
 		
