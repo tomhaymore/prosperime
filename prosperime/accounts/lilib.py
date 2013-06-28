@@ -54,6 +54,17 @@ class LIBase():
 
 	career_mapper = None
 
+	company_types = {
+		"C" : "public company",
+		"D" : "educational",
+		"E" : "self employed",
+		"G" : "government agency",
+		"N" : "nonprofit",
+		"O" : "self-owned",
+		"P" : "privately held",
+		"S" : "partnership"
+	}
+
 	industry_groups = {
 		47:'corp fin',
 		94:'man tech tran',
@@ -363,7 +374,12 @@ class LIBase():
 		if 'universalName' in data:
 			co.li_univ_name = data['universalName']
 		if 'companyType' in data:
-			co.li_type = data['companyType']['code']
+			# try to convert raw LI code to something more readble
+			try:
+				li_type = self.company_types[data['companyType']['code']]
+			except:
+				li_type = data['companyType']['code'] 
+			co.li_type = li_type
 		if 'ticker' in data:
 			co.ticker = data['ticker']
 		if 'websiteUrl' in data:
