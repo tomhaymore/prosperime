@@ -1,6 +1,7 @@
 # Python
 import datetime
 import json
+import logging
 
 # Django
 from django.http import HttpResponseRedirect, HttpResponse
@@ -13,6 +14,7 @@ from careers.models import SavedPath
 from social.models import Comment, Thread, Vote, FollowThread
 import utilities.helpers as helpers
 
+logger = logging.getLogger(__name__)
 
 def recruiters(request):
 	from social.forms import RecruiterInterestForm
@@ -28,7 +30,11 @@ def recruiters(request):
 			from django.core.mail import EmailMultiAlternatives
 			backend = EmailBackend()
 			msg = EmailMultiAlternatives("ProsperMe: New recruiter signup","New signup: " + form.cleaned_data['email'],"admin@prospr.me",["admin@prospr.me"])
-			backend.send_messages([msg])
+			try:
+				backend.send_messages([msg])
+				logger.info("New recruiter added: "+form.cleaned_data['email'])
+			except:
+				logger.error("Failed to email new recruiter: "+form.cleaned_data['email'])
 			return HttpResponseRedirect("/recruiters/thanks/")
 
 	else:
