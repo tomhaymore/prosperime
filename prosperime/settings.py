@@ -5,7 +5,8 @@ import django
 
 # for celery
 # BROKER_BACKEND = 'amqp'
-BROKER_URL = 'amqp://bgretikc:lEmbbjnyf41b5bPT@owjmjbhe.rabbitmq-bigwig.lshift.net:16522/owjmjbhe'
+# BROKER_URL = 'amqp://bgretikc:lEmbbjnyf41b5bPT@owjmjbhe.rabbitmq-bigwig.lshift.net:16522/owjmjbhe'
+BROKER_URL = os.environ.get("RABBITMQ_BIGWIG_URL",None)
 
 import djcelery
 djcelery.setup_loader()
