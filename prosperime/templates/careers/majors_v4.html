@@ -311,9 +311,12 @@ $(function() {
 			if ($(input).val().length < 1) return false;
 
 			var cat = input.data('val-cat')
+			// GA tracking
+			_gaq.push(['_trackEvent','Majors','Filter',input.data('val-id')])
 			// add to global filter set
 
-			filters[cat].push(input.data('val-id'));			
+			filters[cat].push(input.data('val-id'));
+
 			// add to list
 			$("#filters-list").append("<li class='filters-item'>"+input.val()+" <span data-type='" + cat + "' data-id='" + input.data("val-id") + "' data-name='"+$("#majors-filter-input").val() +"' class='remove-filter' onclick='updateFilters(this)'>X</span></li>");
 			// empty out input bar
@@ -380,7 +383,8 @@ $(function() {
 			},
 			success:function(response) {
 				if (response["result"] == "success") {
-
+					// GA tracking
+					_gaq.push(['_trackEvent','Majors','Update',1])		
 					// deconstruct data
 					people = $.parseJSON(response["people"])
 					positions = $.parseJSON(response["positions"])
