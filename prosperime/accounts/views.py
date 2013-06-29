@@ -406,16 +406,25 @@ def finish_registration(request):
 			acct.save()
 
 			# finish processing LI profile
-			profile_task = process_li_profile.delay(user.id,acct.id)
+			try:
+				profile_task = process_li_profile.delay(user.id,acct.id)
+				request.session['tasks']['profile'] = profile_task.id
+			except:
+				logger.error("Failed to process LI profile for user: " + username)
 
 			# start processing connections
-			connections_task = process_li_connections.delay(user.id,acct.id)
+			try:
+				connections_task = process_li_connections.delay(user.id,acct.id)
+				request.session['tasks']['connections'] = connections_task.id
+			except:
+				logger.error("Failed to process LI connections for user: " + username)
 
 			# save task ids to session
-			request.session['tasks'] = {
-				'profile': profile_task.id,
-				'connections': connections_task.id
-			}
+			
+			# request.session['tasks'] = {
+			# 	'profile': profile_task.id,
+			# 	'connections': connections_task.id
+			# }
 			logger.info("added tasks to session")
 
 			#return HttpResponseRedirect('/account/success')
