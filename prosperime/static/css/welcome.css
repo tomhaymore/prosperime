@@ -186,16 +186,16 @@ div#v2-splash-home {
 	margin:0;
 	padding:45px 0px 40px 0px;
 	height:100%;
-
 	min-height:450px;
-
-/*	height:200px;
-*/	/*background-color: rgb(45, 110, 184);*/
-	/*background-image: url('/static/img/blue_texture_1.png');*/
-	/*background-repeat: repeat-y;*/
-	/*background-repeat:repeat;*/
 	background-color:rgba(41,128,179,0.8);
+}
 
+div.v2-splash-inner-container {
+	margin:0;
+	padding:0;
+	margin-right: auto;
+	margin-left: auto;
+	width:1000px;
 }
 
 

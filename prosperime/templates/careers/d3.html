@@ -8,91 +8,12 @@
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
 
 <!-- JS -->
-	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
 
     <style type="text/css">
-        .box {
-			margin:0px;
-			margin-bottom:1px;
-			border:1px solid rgba(104,105,107,0.3);
-			text-align:center;
-			padding:2px;
-			width:250px;
-			font-size:0.9em;
-			-moz-box-sizing: border-box;
-			-webkit-box-sizing: border-box;
-			box-sizing: border-box;
-			border-radius:4px;
-			cursor:pointer;
-			overflow:hidden;
-      	}
-
-     	.block { 
-     		display:inline-block;
-			vertical-align: top;
-     	}
-
-
-	    #center {
-	      	text-align:center;
-	      	width:250px;
-	      	margin:0 auto;
-	     }
-
-     	#left {
-			width:350px;
-     	}
-
-     	#right {
-     		width:350px;
-     	}
-
-     	.abs {
-     		position:absolute;
-     	}
-
-     	.person-box {
-    		background-color:rgba(41,128,185,0.8);
-     		color:#ECF0F1;
-			font-size:0.9em;
-			-moz-box-sizing: border-box;
-			-webkit-box-sizing: border-box;
-			box-sizing: border-box;
-			padding:2px;
-			padding-left:4px;
-			padding-right:4px;
-			border-radius:2px;
-			height:22px;
-			line-height:20px;
-     	}
-
-     	.major-hover {
-     		background-color:rgba(41,128,185,0.7);
-     		color:#ECF0F1;
-     	}
-
-     	.section-header {
-     		font-size:1.2em;
-     		text-align:center;
-     		opacity:0; /* allows animation in */
-     	}
-
-     	#header-container {
-     		width:100%;
-     		height:50px;
-     	}
-
-     	#loading-message {
-     		position:absolute;
-     		left:500px;
-     		top:225px;
-     		font-size:2.8em;
-     		font-weight:600;
-     	}
-
+       
     </style>
 
 
@@ -103,19 +24,8 @@
 {% block content %}
 
 <div id="wide-content-container" class="main-container">
-
-	<div id="header-container">
-		
-			<div class="section-header block pull-left">Your Network</div>
-			<div class="section-header block pull-left">College Majors</div>
-			<div class="section-header block pull-left">First Jobs</div>
-			<div class="clear"></div>
-	</div>
-
-	<!-- These divs have to be written this way with no linebreak between them for the SVG to run flush against the main container. Thank you StackOverflow. -->
-	<div id="left" class="block"></div><div id="center" class="block"></div><div id="right" class="block"></div>
-
-	<div id="loading-message">Loading...<img src="{{STATIC_URL}}img/spinner.gif" /></div>
+<h1>Foobar</h1>
+	
 	
 </div>
 {% endblock %}
@@ -124,510 +34,220 @@
 
 <!-- V3 Script -->
 <script type="text/javascript">
-
-	// Instance Variables (ok they're Globals...)
-	var people = null;
-	var positions = null;
-	var majors = null;
-
 	// Constants
-	var svg_width = 350; var svg_height = 1100; 
-	var magic_number = 575; 
-	// 600 is the upper limit of what fits on my laptop
+	var person_height = 45; var person_width = 45;
+	var entity_height = 75; var entity_width = 75;
+
+	// TODO: defer loading to AJAX
+	var people = {{people|safe}}
+	var entities = {{entities|safe}}
+
+	var container = d3.select("#wide-content-container")
+		.append("svg:svg")
+		.attr("width",1000)
+		.attr("height",400)
+	var filter = container.append("svg:defs")
+		.append("svg:filter")
+			.attr("id","grayscale")
+		.append("svg:feColorMatrix")
+			.attr("type","matrix")
+			.attr("values","0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0");
 
 
-
-	/************/
-	/*** MAIN ***/
-	/************/
-
-	// On DOM ready, AJAX to db for d3 data
-	$(function() {
-		if ("{{cache}}" == "hit") {
-			console.log("Hit Cache, render immediately")
-			// set dst's
-			people = shuffle({{people|safe}})
-			positions = shuffle({{positions|safe}})
-			majors = {{majors|safe}}
-			// render viz
-			renderViz()
-		} else {
-			$.get("/careers/getMajorsData/", function(response) {
-				if (response["result"] == "success") {
-					console.log("Missed Cache, AJAX to DB")
-					// set dst's
-					people = shuffle($.parseJSON(response["people"]))
-					positions = shuffle($.parseJSON(response["positions"]))
-					majors = $.parseJSON(response["majors"])
-					// render viz
-					renderViz()
-				}
-			}, "json");
-		}
-	});
-
-
-	// Main fxn, takes care of all SVG drawing
-	var renderViz = function() {
-		// print out dst sizes (convenience)
-		console.log("#Majors: "+ Object.keys(majors).length)
-		console.log("#People: "+people.length)
-		console.log("#Positons: "+positions.length)
-
-		// hide loading message, fade in column headers
-		$("#loading-message").fadeOut(100, function() {
-			$(".section-header").each(function() {
-				$(this).animate({"opacity":1} , "250")
-			})
-		})
-
-		// add majors
-		addMajors()
-
-		// create each svg container
-		var svg_left = createSvgContainer("left")
-		var svg_right = createSvgContainer("right")
-
-		// get y_offset for scaling dist between dots
-		var y_offset = Math.floor(magic_number / people.length)
-		// add people nodes
-		addPeople(svg_left, y_offset)
-
-		// get y_offset for scaling dist between dots
-		y_offset = Math.floor(magic_number / positions.length)
-		// add position nodes
-		addPositions(svg_right, y_offset)
-
-		// draw connecting lines
-		drawLines(svg_left, svg_right)
-	};
-
-
-
-	function addMajors() {
-		// Add Center divs (Majors)
-		center = d3.select("#center")
-		center.selectAll("div").data(Object.keys(majors)).enter().append("div")
-			.text(function(d) { 
-
-				// Thomas -- just change this # to the max that fit on a line
-				if (d.length >= 36)
-					// AND this to that number - 3
-					return d.substring(0,33) + "..."
+	container.selectAll(".person")
+		.data(Object.keys(people))
+		.enter().append("image")
+			.attr("x", function(d, i) {
+				if (i % 2 == 0)
+					return 20 + (i * ((person_width / 2) + 5))
 				else
-					return d 
+					return 20 + ((i - 1) * ((person_width / 2) + 5))
 			})
-			.attr("class", "box")
-			.attr("id", function(d) { return "major-" + majors[d]["index"]})
-			.attr("data-index", function(d, i) { return i })
+			.attr("y", function(d, i) {
+				if (i % 2 == 0)
+					return person_height
+				else
+					return 5 + (2 * person_height)
+			})
+			.attr("width", person_width)
+			.attr("height", person_height)
+			.attr("xlink:href", function(d) {return people[d]["pic"] })
+			.attr("id", function(d) { return "person-" + d })
+			.attr("filter", "url(#grayscale)")
+			.attr("class", "person")
 
-			// Major mouseover
 			.on("mouseover", function(d) {
+				// enlargens, colors image
+				activateImage(this, "person")
+				// hover on relevant entity
 
-				// Add hover class
-				d3.select(this).attr("class", "box major-hover")
-				
-				// Make lines blue
-				// funky code b/c of closure issues in handler
-				var line_selector = d3.select(this).attr("id").split("-")[1]
-				lineMouseover(d3.selectAll(".line-"+line_selector))
+			})
+
+			.on("mouseout", function(d) {
+				// resizes, grayscales image
+				deactivateImage(this, "person")
 			
-				// Trigger hover on user dots
-				for (p in majors[d]["people"]) {
-					var user_node = d3.select("#person-"+majors[d]["people"][p])
-					userMouseOver(user_node)
-				};
-
-				// Trigger hover on position dots
-				for (p in majors[d]["positions"]) {
-					var position_node = d3.select("#position-"+majors[d]["positions"][p])
-					positionMouseover(position_node)
-				}
 			})
 
-			// Major mouseout
-			.on("mouseout", function(d) {
-				// normalize class
-				d3.select(this).attr("class", "box")
 
-				// Make lines grey again
-				lineMouseout(d3.selectAll(".line-"+majors[d]["index"]))
-
-				// Remove user hover
-				for (p in majors[d]["people"]) {
-					var user_node = d3.select("#person-"+majors[d]["people"][p])
-					userMouseOut(user_node)
-				};
-
-				// Trigger hover on position dots
-				for (p in majors[d]["positions"]) {
-					var position_node = d3.select("#position-"+majors[d]["positions"][p])
-					positionMouseout(position_node)
-				}
+	container.selectAll(".entity")
+		.data(Object.keys(entities))
+		.enter().append("image")
+			.attr("x", function(d, i) {
+				return 100 + (i * 175)
 			})
-
-			.on("click", function(d) {
-				window.location = "/majors/" + majors[d]["id"][0] + "/"
-			});
-	};
-
-	// Creates SVG container, returns d3 handle
-	function createSvgContainer(selector) {
-		container = d3.select("#" + selector).append("svg")
-			.attr("width",svg_width)
-			.attr("height",svg_height)
-			.attr("id","svg-" + selector)
-		return container
-	};
-
-
-	// Adds people nodes in svg container
-	function addPeople(svg_left, y_offset) {
-		// Add user nodes to left svg
-		svg_left.selectAll("circle").data(people).enter().append("circle")
-			.attr("cx", function(d, i) { // staggers nodes x-value
-				if (i % 4 == 0) return 30
-				else if (i % 4 == 1) return 90
-				else if (i % 4 == 2) return 60
-				else return 120
+			.attr("y", 225)
+			.attr("width", entity_width)
+			.attr("height", entity_height)
+			.attr("xlink:href", function(d) {
+				return entities[d]["pic"]
 			})
-			.attr("cy", function(d, i) {
-				if ((i + 1) % 2 == 0) return i * y_offset
-				else return (i + 1) * y_offset
-			})
-			.attr("r", 4)
-			.attr("fill", "#fff")
-			.attr("stroke","rgba(104,105,107,0.5)")
-			.attr("stroke-width",2)
-			.attr("id", function(d) { return "person-"+d.id })
-			.attr("data-name", function(d) { return d.name })
+			.attr("filter", "url(#grayscale)")
+			.attr("class", "entity")
+			.attr("id", function(d) { return "entity-" + d })
 
 			.on("mouseover", function(d) {
+				activateImage(this, "entity")
 
-				// Get major div
-				var major_node = d3.select("#major-"+d.major_index)
-				// Add hover to it
-				major_node.attr("class", "box major-hover")
-				// Make lines blue
-				var line_selector = major_node.attr("id").split("-")[1]
-				lineMouseover(d3.selectAll(".line-"+line_selector))
-				
-				// Trigger hover on user dots
-				for (p in majors[d.major]["people"]) {
-					var user_node = d3.select("#person-"+majors[d.major]["people"][p])
-					userMouseOver(user_node)
-				};
+				for (index in entities[d]["people"]) {
+					var id = entities[d]["people"][index]
 
-				// Trigger hover on position dots
-				for (p in majors[d.major]["positions"]) {
-					var position_node = d3.select("#position-"+majors[d.major]["positions"][p])
-					positionMouseover(position_node)
+					activateImage($("#person-" + id)[0], "person")
 				}
 			})
+
 			.on("mouseout", function(d) {
-				// get major node
-				var major_node = d3.select("#major-"+d.major_index)
-				// normalize class
-				major_node.attr("class", "box")
+				deactivateImage(this, "entity")
 
-				// Make lines grey again
-				lineMouseout(d3.selectAll(".line-"+d.major_index))
+				for (index in entities[d]["people"]) {
+					var id = entities[d]["people"][index]
 
-				// Remove user hover
-				for (p in majors[d.major]["people"]) {
-					var user_node = d3.select("#person-"+majors[d.major]["people"][p])
-					userMouseOut(user_node)
-				};
-
-				// Trigger hover on position dots
-				for (p in majors[d.major]["positions"]) {
-					var position_node = d3.select("#position-"+majors[d.major]["positions"][p])
-					positionMouseout(position_node)
-				}
-			});
-	};
-
-	function addPositions(svg_right, y_offset) {
-		svg_right.selectAll("circle").data(positions).enter().append("circle")
-			.attr("cx", function(d, i) { // staggers nodes x-value
-				if (i % 4 == 0) return 270
-				else if (i % 4 == 1) return 330
-				else if (i % 4 == 2) return 240
-				else return 300
-			})
-			.attr("cy", function(d, i) {
-				if ((i + 1) % 2 == 0) return i * y_offset
-				else return (i + 1) * y_offset
-			})
-			.attr("r", 5)
-			.attr("fill", "none")
-			.attr("stroke","rgba(104,105,107,0.5)")
-			.attr("stroke-width", 2)
-			.attr("id", function(d) { return "position-"+d.id })
-			.attr("data-title", function(d) { return d.title })
-
-			.on("mouseover", function(d) {
-				// Get major div
-				var major_node = d3.select("#major-"+d.major_index)
-				// Add hover to it
-				major_node.attr("class", "box major-hover")
-				// Make lines blue
-				var line_selector = major_node.attr("id").split("-")[1]
-				lineMouseover(d3.selectAll(".line-"+line_selector))
-				
-				// Trigger hover on user dots
-				for (p in majors[d.major]["people"]) {
-					var user_node = d3.select("#person-"+majors[d.major]["people"][p])
-					userMouseOver(user_node)
-				};
-
-				// Trigger hover on position dots
-				for (p in majors[d.major]["positions"]) {
-					var position_node = d3.select("#position-"+majors[d.major]["positions"][p])
-					positionMouseover(position_node)
+					deactivateImage($("#person-" + id)[0], "person")
 				}
 			})
-			.on("mouseout", function(d) {
-				// get major node
-				var major_node = d3.select("#major-"+d.major_index)
-				// normalize class
-				major_node.attr("class", "box")
-
-				// Make lines grey again
-				lineMouseout(d3.selectAll(".line-"+d.major_index))
-
-				// Remove user hover
-				for (p in majors[d.major]["people"]) {
-					var user_node = d3.select("#person-"+majors[d.major]["people"][p])
-					userMouseOut(user_node)
-				};
-
-				// Trigger hover on position dots
-				for (p in majors[d.major]["positions"]) {
-					var position_node = d3.select("#position-"+majors[d.major]["positions"][p])
-					positionMouseout(position_node)
-				}
-			});
-	};
-
-	// Iterates through each major, gets ids of positions, people
-	//  draws lines to each
-	function drawLines(svg_left, svg_right) {
-
-		// Add all connecting lines
-		for (key in majors) {
-
-			var left_y; var left_x; var right_y; var right_x; 
-			var index = d3.select("#major-"+majors[key]["index"]).attr("data-index")
-
-			// people <--> majors
-			var people = majors[key]["people"]
-			for (var j = 0; j < people.length; j++) {
-				left_y = $("#person-"+people[j]).attr("cy")
-				left_x = parseInt($("#person-"+people[j]).attr("cx")) + 3
-				right_y = 13 + (27 * index)
-				right_x = 350 
-				d3_drawLines(svg_left, left_x, left_y, right_x, right_y, majors[key]["index"])
-			};
-
-			// majors <--> positions
-			var positions = majors[key]["positions"]
-			for (var l = 0; l < positions.length; l++) {
-				left_y = 13 + (27 * index)
-				left_x = 0
-				right_y = $("#position-"+positions[l]).attr("cy")
-				right_x = parseInt($("#position-"+positions[l]).attr("cx")) - 6	
-				d3_drawLines(svg_right, right_x, right_y, left_x, left_y, majors[key]["index"])
-			};
-		};
-	};
-
-
-
-	/* HELPERS */
-	function d3_drawLines(container, x1, y1, x2, y2, index) {
-
-		var hinge = (container.attr("id") == "svg-right") ? 185 : 165;
-		var data = [{"x":x1, "y":y1}, {"x":hinge, "y":y1}, {"x":x2, "y":y2}]
-	
-		var line_gen = d3.svg.line()
-			.x(function(d) { return d.x })
-			.y(function(d) { return d.y })
-			.interpolate("monotone")
-
-		container.append("svg:path")
-			.attr("d", line_gen(data))
-			.attr("fill","none")
-			.attr("stroke", "rgba(104,105,107,0.1)")
-			.attr("stroke-width", 1)
-			.attr("class", function(d) { 
-				return "line-" + index
-		});
-	};
-
-	function d3_drawTooltip(container, x, y, text, id, direction) {
-		container.append("div")
-			.text(text)
-			.attr("class", "abs person-box")
-			.style("left", x + "px")
-			.style("top", y + "px")
-			.attr("id", id)
-
-		// if (direction == "left") {
-		// 	// reposition to the other side
-		// 	var width;
-		// 	container.selectAll(".abs").each(function(d) {
-		// 		width = parseInt(d3.select(this).style("width"))
-		// 		//console.log("was: "+ x + " w: " + width)
-		// 		d3.select(this).style("left", x - width - 18 + "px")
-		// 		//console.log(d3.select(this).style("left"))
-		// 	});
-		// };
-		
-	};
 
 
 
 
-	/* HANDLERS */
-	function positionMouseover(position_node) {
-
-		// Get user name from node
-		var title = position_node.attr("data-title")
-		var id = position_node.attr("id").split("-")[1]
-
-		// make sure hover hasn't already been triggered
-		if ($("#position-hover-"+id == 0)) {
-
-			// make node blue, bigger
-			position_node.attr("fill", "#3498DB").attr("r",8)
-
-			// get coordinates for tooltip
-			var container_offset = $("#right").offset()
-			var x = String(parseInt(position_node.attr("cx")) + container_offset.left + 10)
-			var y = String(parseInt(position_node.attr("cy")) + 3 + container_offset.top - 13) 
-
-			// draw tooltip
-			var parent_container = d3.select("#right")
-			d3_drawTooltip(parent_container, x, y, title, "position-hover-"+id, "right")
-		};
-	};
-
-	// returns position node to original attr
-	function positionMouseout(position_node) {
-
-		position_node.transition().duration(250).attr("fill","#fff").attr("stroke-width",2).attr("r",5)
-	};
-
-
-	function userMouseOver(user_node) {
-
-		// Get user name from node
-		var user_name = user_node.attr("data-name")
-		var id = user_node.attr("id").split("-")[1]
-
-		// make sure hover hasn't already been triggered
-		if ($("#person-hover-"+id).length == 0) {
-
-			// make node blue, bigger
-			user_node.attr("fill", "#3498DB").attr("r",6)
-
-			// get coordinates for tooltip
-			var container_offset = $("#left").offset()
-			var x = String(parseInt(user_node.attr("cx")) + container_offset.left + 10)
-			var y = String(parseInt(user_node.attr("cy")) + 3 + container_offset.top - 13) 
-
-			// append tooltip
-			var parent_container = d3.select("#left")
-			d3_drawTooltip(parent_container, x, y, user_name, "person-hover-"+id, "left")
-		};
-	};
-
-	// Returns user nodes to normal state
-	function userMouseOut(user_node) {
-		// animate node to normal size
-		user_node.transition().duration(250).attr("fill", "#fff").attr("r",4)
-
-		// fade out and remove name boxes
-		d3.selectAll(".abs").transition(250).duration(200).style("opacity", 0).remove()
-	};
-
-	// Makes lines blue, bigger
-	function lineMouseover(selection) {
-		selection.attr("stroke","rgba(41,128,185,0.7)")
-			.attr("stroke-width",2)
-	};
-	// Makes lines grey, smaller
-	function lineMouseout(selection) {
-		selection
-			.attr("stroke", "rgba(104,105,107,0.3)")
-			.attr("stroke-width",1)
-	};
 
 
 
-	
-	// function personMouseover(d) {
 
-	// 	// make sure hover hasn't already been triggered
-	// 	if ($("#person-hover-"+d.name.split(" ")[0]).length == 0) {
+function activateImage(el, type) {
+	console.log(el)
+	el.parentNode.appendChild(el);
 
-	// 		// get dot
-	// 		var parent = d3.select(this)
-
-	// 		// make node blue, bigger
-	// 		parent.attr("fill", "#3498DB").attr("r",6)
-
-	// 		// get coordinates for tooltip
-	// 		var container_offset = $("#left").offset()
-	// 		var x = String(parseInt(parent.attr("cx")) + container_offset.left + 10)
-	// 		var y = String(parseInt(parent.attr("cy")) + 3 + container_offset.top - 13) // 10 = person-box.height / 2 ?
-
-	// 		// append tooltip
-	// 		var parent_container = d3.select("#left")
-	// 		parent_container.append("div")
-	// 			.text(d.name)
-	// 			.attr("class", "abs person-box")
-	// 			.style("left", x + "px")
-	// 			.style("top", y + "px")
-	// 			.attr("id", "person-hover-"+d.name.split(" ")[0])
-	// 	}
-	// };
-
-	// svg_right.selectAll("rect").data(positions).enter().append("rect")
-// 	.attr("x", function(d, i) { return 290 })
-// 	.attr("y", function(d, i) { return 10 * i })
-// 	.attr("width", 50)
-// 	.attr("height", 10)
-// 	.attr("stroke","#ECF0F1")
-// 	.attr("stroke-width","1")
-// 	.attr("fill", "rgba(41,128,185,0.7)")
-// 	.attr("id", function(d) { return "position-"+d.id })
-// 	.attr("data-title", function(d) { return d.title })
-
-// 	// add mouseover/mouseout events (hover)
-// 	.on("mouseover", function(d) {
-// 		d3.select(this).transition(400)
-// 			.text(function(d) { return d.title })
-// 			.attr("color", "#ECF0F1")
-// 			.attr("x", function(d) {
-// 				 return d3.select(this).attr("x") - 105 })
-// 			.attr("y", function(d) {
-// 				return d3.select(this).attr("y") - 12 })
-// 			.attr("height",25)
-// 			.attr("width",100)
-// 			.toFront()
-// 	});
-	// .on("mouseout", function(d) {
-	// 	userMouseOut(d3.select(this))
-	// });
+	var node = d3.select(el)
+	var prev_x = parseInt(node.attr("x"))
+	var prev_y = parseInt(node.attr("y"))
 
 
-	function shuffle(o) {
-	    for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
-	    return o;
+	if (type == "person") {
+		node
+			.attr("height", person_height + 10)
+			.attr("width", person_width + 10)
+			.attr("x", prev_x - 5)
+			.attr("y", prev_y - 5)
+	} else if (type == "entity") {
+		node
+			.attr("height", entity_height + 25)
+			.attr("width", entity_width + 25)
+			.attr("x", prev_x - 15)
+			.attr("y", prev_y - 15)
 	}
 
+	node.attr("filter", "")
+};
+
+function deactivateImage(el, type) {
+	var node = d3.select(el)
+	var prev_x = parseInt(node.attr("x"))
+	var prev_y = parseInt(node.attr("y"))
+
+	if (type == "person") {
+		node
+			.attr("height", person_height)
+			.attr("width", person_width)
+			.attr("x", prev_x + 5)
+			.attr("y", prev_y + 5)
+	} else if (type == "entity") {
+		node
+			.attr("height", entity_height)
+			.attr("width", entity_width)
+			.attr("x", prev_x + 15)
+			.attr("y", prev_y + 15)
+	}
+
+
+	node.attr("filter", "url(#grayscale)")
+
+};
+
+
+// // Attr
+// var label_attr = {
+// 	"text-anchor":"middle",
+// 	"font-family":"Helvetica",
+// 	"font-size":"8pt"
+// }
+
+// var data = [
+// 	{"major":"Symbolic Systems", "prop":.2}, 
+//     {"major":"Computer Science", "prop":.5}, 
+//     {"major":"Communicatins", "prop":.15},
+//     {"major":"Rest", "prop":.15}
+// ];
+
+// var w = 900,                        
+//     h = 300,                           
+//     r = 100,                         
+//     color = d3.scale.category20c();     //builtin range of colors
+	
+// var vis = d3.select("#wide-content-container")
+//     .append("svg:svg")              
+//     .data([data])                   //associate our data with the document
+//         .attr("width", w)        
+//         .attr("height", h)
+//     .append("svg:g")                //make a group to hold our pie chart
+//         .attr("transform", "translate(" + (w / 2) + "," + r + ")")    //move the center of the pie chart from 0, 0 to radius, radius
+
+// // arc drawing function
+// var arc = d3.svg.arc()             
+//     .outerRadius(r);
+
+// var pie = d3.layout.pie()       
+//     .value(function(d) { return (d.prop * 100); });    //we must tell it out to access the value of each element in our data array
+
+// var arcs = vis.selectAll("g.slice")    
+//     .data(pie)                          //associate the generated pie data (an array of arcs, each having startAngle, endAngle and value properties) 
+//     .enter()             
+//         .append("svg:g")                //create a group to hold each slice (we will have a <path> and a <text> element associated with each slice)
+//             .attr("class", "slice");  
+
+//     arcs.append("svg:path")
+//             .attr("fill", function(d, i) {
+//             	console.log(color(i))
+//             	return color(i); 
+//          	})
+//             .attr("d", arc);   
+
+//     // Add Labels
+//     arcs.append("svg:text")            
+//             .attr("transform", function(d) {                    //set the label's origin to the center of the arc
+//             //we have to make sure to set these before calling arc.centroid
+//             d.innerRadius = 0;
+//             d.outerRadius = r;
+//             return "translate(" + arc.centroid(d) + ")";        //this gives us a pair of coordinates like [50, 50]
+//         })
+//         .attr(label_attr) 
+                       
+//         .text(function(d, i) {
+//         	var major = data[i].major
+//         	if (major.indexOf(" ") != -1)
+//         		major = major.substring(0, major.indexOf(" ")) + "\n" + major.substring(major.indexOf(" "))
+//         	return major;
+//         });   
+    
 
 </script>
 {% endblock %}
