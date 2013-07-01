@@ -31,18 +31,101 @@ import utilities.helpers as helpers
 logger = logging.getLogger(__name__)
 
 
-## Clayton - DEV
-# def single_major(request, major_id):
+# Clayton - DEV
+def internships(request):
 
-# 	positions = Position.objects.filter(field="Mechanical Engineering")
+	data = cache.get("feed_me_some_terns")
+	if data is not None:
+		return render_to_response("careers/d3.html", data, context_instance=RequestContext(request))
 
 
-# 	people = [{'name':p.person.profile.full_name(), 'profile_pic':p.person.profile.default_profile_pic()} for p in positions]
-# 	data = {
-# 		"people":json.dumps(people)
-# 	}
 
-# 	return render_to_response("careers/major_viz.html", data, context_instance=RequestContext(request))
+	## IDEA 1: MAP COLLEGE TO TOP ENTITIES
+	# # Get users who went to Stanford
+	# # stanford = Entity.objects.get(name="Stanford University", li_type="school")
+	# stanford_students = [p.person for p in Position.objects.filter(entity__name__icontains="stanford", entity__li_type="school").select_related("person")] 
+	# # Get users who interned
+	# intern_positions = Position.objects.filter(Q(title__icontains="intern") | Q(title__icontains="summer")).select_related("entity", "person")
+	# interns = [p.person for p in intern_positions]
+	# # Get the intersection
+	# intersection = set(stanford_students).intersection(set(interns))
+	# # Filter original intern set down to college
+	# internships_from_college = intern_positions.filter(person__in=intersection)
+	# # Construct entity_dict
+	# entity_dict = {}
+	# for i in internships_from_college:
+	# 	if i.entity.name in entity_dict:
+	# 		entity_dict[i.entity.name] += 1
+	# 	else:
+	# 		entity_dict[i.entity.name] = 1
+
+	# import operator
+	# sorted_dict = sorted(entity_dict.iteritems(), key=operator.itemgetter(1))
+	# data = {
+	# 	"foo":"bar",
+	# 	"entity_dict":sorted_dict,
+	# }
+
+	## IDEA 2: MAP TOP ENTIITIES TO... SOMETHING ELSE
+	all_internships = Position.objects.filter(Q(title__icontains="intern") | Q(title__icontains="summer")).select_related("person", "entity")
+	all_interns = [p.person for p in all_internships]
+
+	college_students = [p.person for p in Position.objects.filter(type="education", entity__name__icontains="Stanford").select_related("person")]
+	# = people who attended college X + held an internship
+	intersection = set(all_interns).intersection(set(college_students))
+
+
+	entity_mappings = {}
+	for user in intersection:
+		internships = all_internships.filter(person=user)
+		for i in internships:
+			if i.entity.name is not None:
+				if i.entity.name in entity_mappings:
+					entity_mappings[i.entity.name] += 1
+				else:
+					entity_mappings[i.entity.name] = 1
+
+	from heapq import nlargest
+	from operator import itemgetter
+	nlargest = nlargest(5, entity_mappings.iteritems(), itemgetter(1))
+	nlargest = [t[0] for t in nlargest]
+
+	people = {}
+	entities = {}
+
+	related_positions = all_internships.filter(entity__name__in=nlargest)
+	people_counter = 0	
+	for user in intersection:
+		internships = related_positions.filter(person=user)
+		if internships is not None:
+			for i in internships:
+				# People
+				if user.id in people:
+					people[user.id]["entities"].append(i.entity.id)
+				else:
+					people[user.id] = {"pic":user.profile.default_profile_pic(), "entities":[i.entity.id], "id":user.id}
+				# Entities
+				if i.entity.name in entities:
+					entities[i.entity.name]["people"].append(user.id)
+				else:
+					entities[i.entity.name] = {"people":[user.id], "pic":i.entity.default_logo().url, "id":i.entity.id}
+
+				people_counter += 1
+				if people_counter <= 40:
+					break;
+
+	data = {
+		"people":json.dumps(people),
+		"entities":json.dumps(entities),
+	}
+
+	cache.set("feed_me_some_terns", data, 1000)
+
+	# data = {
+	# 	"nlargest":nlargest,
+	# }
+
+	return render_to_response("careers/d3.html", data, context_instance=RequestContext(request))
 
 
 
@@ -2227,6 +2310,7 @@ def get_majors_data_v3(request):
 		params['user'] = request.GET.getlist('user')[0]
 
 	path = careerlib.CareerPathBase()
+
 
 	# If there are no params, look back at the cache 
 	if not params:
