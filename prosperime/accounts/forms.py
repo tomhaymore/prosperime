@@ -34,6 +34,10 @@ class TermsField(forms.BooleanField):
 		else:	 
 			super(TermsField, self).validate(value)
 
+class EmailUnsubscribeForm(forms.Form):
+
+	email = forms.EmailField(label="Email",required=True)
+
 class RegisterForm(forms.Form):
 	error_css_class = 'form_error'
 	required_css_class = 'form_required'
@@ -73,6 +77,8 @@ class RegisterForm(forms.Form):
 			raise forms.ValidationError('You must agree to the Terms of Service and Privacy Policy to use Prospr.me.')
 		else:
 			return terms
+
+
 
 class FinishAuthForm(forms.Form):
 	error_css_class = 'form_error'

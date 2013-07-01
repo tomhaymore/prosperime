@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     # url(r'^$','careers.views.proto'),
     url(r'^home/$', 'careers.views.home'),
     url(r'^welcome/$','entities.views.welcome'),
+    url(r'^unsubscribe/$','accounts.views.unsubscribe'),
 
     # Accounts Views
     url(r'^privacy/$','accounts.views.privacy'),
