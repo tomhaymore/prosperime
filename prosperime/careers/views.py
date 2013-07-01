@@ -254,18 +254,38 @@ def major(request,major_id):
 	"""
 	view for detailed information on a particular major
 	"""
-	C = careerlib.CareerPathBase()
-
 	# get degree
 	major = IdealPosition.objects.get(pk=major_id)
 
+	# check if user is authenticated
+	if not request.user.is_authenticated():
+		data = {
+			'major':major
+		}
+		return render_to_response('careers/major_profile_old.html',data,context_instance=RequestContext(request)) 
+
+	C = careerlib.CareerPathBase()
+
+	
+	# get connections
+
+	connections = [c.id for c in request.user.profile.connections.all()]
+	schools = [e.id for e in Entity.objects.filter(Q(li_type="school")|Q(li_type="educational")).filter(positions__person=request.user)]
+
 	paths  = []
-	positions = Position.objects.filter(ideal_position=major).select_related("person")
-	for p in positions[:10]:
-		# this returns an array --> [first_positions, last_position]
-		first_and_last_positions = p.person.profile.first_and_last_positions() 
+	# positions = Position.objects.filter(ideal_position=major).select_related("person")
+
+	# # for p in positions[:10]:
+	# # 	# this returns an array --> [first_positions, last_position]
+	# # 	first_and_last_positions = p.person.profile.first_and_last_positions() 
+	# # 	if first_and_last_positions is not None:
+	# # 		paths.append({"id":p.person.id, "full_name":p.person.profile.full_name(), "profile_pic":p.person.profile.default_profile_pic(), "first":first_and_last_positions[0].title + " at " + first_and_last_positions[0].entity.name, "latest":first_and_last_positions[1].title + " at " + first_and_last_positions[1].entity.name})
+	users = User.objects.filter(Q(id__in=connections)|Q(positions__entity__id__in=schools)).filter(positions__ideal_position=major)
+	for u in users[:10]:
+	# this returns an array --> [first_positions, last_position]
+		first_and_last_positions = u.profile.first_and_last_positions() 
 		if first_and_last_positions is not None:
-			paths.append({"id":p.person.id, "full_name":p.person.profile.full_name(), "profile_pic":p.person.profile.default_profile_pic(), "first":first_and_last_positions[0].title + " at " + first_and_last_positions[0].entity.name, "latest":first_and_last_positions[1].title + " at " + first_and_last_positions[1].entity.name})
+			paths.append({"id":u.id, "full_name":u.profile.full_name(), "profile_pic":u.profile.default_profile_pic(), "first":first_and_last_positions[0].title + " at " + first_and_last_positions[0].entity.name, "latest":first_and_last_positions[1].title + " at " + first_and_last_positions[1].entity.name})
 
 	data = {
 		"paths": paths,
