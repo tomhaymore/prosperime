@@ -69,7 +69,7 @@ a {
 .flat-button {
 	display:inline-block;
 	vertical-align:middle;
-	margin-top:5px;
+	/*margin-top:5px;*/
 	width:auto;
 	/*height:24px;*/
 	line-height:24px;
@@ -141,9 +141,6 @@ a.flat-button:hover {
 	font-size:1.6em;
 	padding:6px 8px;
 }
-
-
-
 
 /* Components */
 
@@ -1147,14 +1144,8 @@ button.general-add-button:active {
 .flat-input {
 	width: 350px !important; 
 	border-radius:1px !important; 
-<<<<<<< HEAD
-	/*margin-top: 5px;*/
-	padding: 0px 6px 4px 6px; 
-	margin-bottom:0px !important; 
-	height: 24px !important; 
-	font-size:16px !important;
-=======
-	border:2px solid rgba(51,51,51,0.5);
+
+	/*border:2px solid rgba(51,51,51,0.5);*/
 	/*margin-top: 5px;*/
 	padding: 0px 6px 2px 6px; 
 	margin-bottom:0px !important; 
@@ -1163,7 +1154,6 @@ button.general-add-button:active {
 	font-size:16px !important;
 	color:rgba(51,51,51,0.8);
 	font-family:Helvetica, "Helvetica Neue", "Lato";
->>>>>>> 50402b2a748ffff16b1fb5d883e323082eeede0f
 }
 
 form ul li {
@@ -1938,88 +1928,7 @@ a {
 	cursor: pointer;
 }
 
-/* Flat Button */
-.flat-button {
-	display:inline-block;
-	vertical-align:middle;
-	margin-top:5px;
-	width:auto;
-	/*height:24px;*/
-	line-height:24px;
-	min-width:16px;
-	padding:7px 10px 7px 10px;
-	font-size:14px;
-	font-weight:normal;
-	text-align:center;
-	background-color:#fffffe;
-	border-radius:2px;
-	border:none;
-	cursor:pointer;
-	font-weight:500;
-	transition: all 0.2s;
-	-moz-transition: all 0.2s;
-	-webkit-transition: all 0.2s;
-	-o-transition: all 0.2s;
-}
 
-a.flat-button:hover {
-	text-decoration:none;
-	color:#ffffff;
-	/*font-weight: bold;*/
-	/*transition:, color 2s;*/
-}
-
-.flat-button a:hover {
-	text-decoration:none;
-	color:#fffffe;
-}
-
-.button-med {
-	height:16px;
-	line-height:16px;
-	font-size:16px;
-}
-
-.green-button {
-	background-color: #339933;
-	color:#fffffe;
-}
-
-/*.blue-button {
-	background-color: #265f98;
-	color:#fffffe;
-}*/
-
-.inline-button {
-	display:inline-block;
-}
-
-.button-small {
-	height:12px;
-	line-height:12px;
-	font-size:12px;
-}
-
-.blue-button {
-	background-color:rgb(41,98,152);
-	color:#fffffe;
-}
-
-.lightblue-button {
-	background-color:#6FB6D4;
-	color:#fffffe;
-}
-
-.wide-button {
-	width: 150px;
-}
-
-.button-large {
-	height:auto;
-	width:auto;
-	font-size:1.6em;
-	padding:6px 8px;
-}
 
 
 /* Components */

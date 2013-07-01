@@ -92,14 +92,28 @@ class AuthTest(SessionTestCase):
 		# init session variables
 		s = self.session
 		s['linkedin_user_info'] = {
-			'emailAddress': 'n/a'
+			'id': 1234567,
+			'emailAddress': 'n/a',
+			'firstName': 'Alexander',
+			'lastName': 'Hamilton',
+			'headline': 'Postal'
 		}
-		s['access_token'] = -1
+		s['access_token'] = {
+			'oauth_token': 'monkey',
+			'oauth_token_secret': 'pelvis',
+			'oauth_authorization_expires_in': 123456789
+		}
 		s.save()
+		
 		# ensure that empty form is rejected
 		resp = self.client.post('/account/finish/')
 		self.assertEqual(resp.status_code,200)
 		self.assertEqual(resp.context['form']['username'].errors,['This field is required.'])
+
+		# check that log usernames / email are accepted
+		resp = self.client.post('/account/finish/',{'username':'alexanderalexanderalexanderalexander@gmail.com','password':'pass1234','confirm_password':'pass1234','terms':True},follow=True)
+		self.assertEqual(resp.status_code,200)
+		self.assertEqual(resp.redirect_chain[0][0],'http://testserver/majors/')
 
 	def test_login_form(self):
 		# create new user
@@ -125,3 +139,25 @@ class AuthTest(SessionTestCase):
 		self.assertEqual(resp.status_code,200) # redirects to home page
 		self.assertEqual(resp.context['user'].is_authenticated(),True)
 
+class LITest(SessionTestCase):
+	import lilib 
+
+	def test_unlinked_process_connections(self):
+		# create new user
+		default_user = User.objects.create_user(username="ahamilton",password="aburr")
+		# add bogus LI account
+		acct = Account(service="linkedin",status="unlinked",owner=default_user)
+		acct.save()
+
+		# ensure that lilib won't process connections
+		li_cxn_parser = self.lilib.LIConnections(default_user.id,acct.id)
+		res = li_cxn_parser.process_connections()
+		self.assertEqual(res,"Error: LI accont is not active, aborting")
+
+	def test_user_refused(self):
+		# create new user
+		default_user = User.objects.create_user(username="ahamilton",password="aburr")
+
+		resp = self.client.get("/account/authenticate/?oauth_problem=user_refused",follow=True)
+		self.assertEqual(resp.status_code,200) # 
+		self.assertEqual(resp.redirect_chain[0][0],'http://testserver/account/refused')

@@ -26,6 +26,7 @@ import careers.careerlib as careerlib
 from django.core.files import File
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
+from django.db import IntegrityError, DatabaseError, transaction
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +53,17 @@ class LIBase():
 	# career_mapper = CareerMapBase()
 
 	career_mapper = None
+
+	company_types = {
+		"C" : "public company",
+		"D" : "educational",
+		"E" : "self employed",
+		"G" : "government agency",
+		"N" : "nonprofit",
+		"O" : "self-owned",
+		"P" : "privately held",
+		"S" : "partnership"
+	}
 
 	industry_groups = {
 		47:'corp fin',
@@ -362,7 +374,12 @@ class LIBase():
 		if 'universalName' in data:
 			co.li_univ_name = data['universalName']
 		if 'companyType' in data:
-			co.li_type = data['companyType']['code']
+			# try to convert raw LI code to something more readble
+			try:
+				li_type = self.company_types[data['companyType']['code']]
+			except:
+				li_type = data['companyType']['code'] 
+			co.li_type = li_type
 		if 'ticker' in data:
 			co.ticker = data['ticker']
 		if 'websiteUrl' in data:
@@ -857,7 +874,10 @@ class LIProfile(LIBase):
 		for p in self.user.positions.all():
 			careerlib.match_position_to_ideals(p)
 		# set first ideal job
-		self.user.profile.set_first_ideal_job()
+		try:
+			self.user.profile.set_first_ideal_job()
+		except DatabaseError as e:
+			logger.error("Database error setting first ideal job, "+str(e))
 
 
 	def fetch_profile(self):
@@ -956,6 +976,10 @@ class LIConnections(LIBase):
 		"""
 		Fetches LI connections, runs through each, adds new users, creates connections, and process connections' profiles
 		"""
+		# ensure that LI accont is linked and active
+		if self.acct.status == "unlinked":
+			logger.info("LI accont is not active, aborting")
+			return "Error: LI accont is not active, aborting"
 
 		# get & loop through connections
 		connections = self.get_connections()
@@ -1170,14 +1194,19 @@ class LIConnections(LIBase):
 		user.last_name = last_name[:30]
 		try:
 			user.save()
-		except IntegriyError as e:
-			logger.error("Trying add a duplicate user ({0}): {1} ".format(e.errno,e.strerror))
+		except IntegrityError as e:
+			logger.error("Trying to add a duplicate user")
+			try:
+				transaction.rollback()
+			except:
+				transaction.rollback_unless_managed()
 			return None
 		except DatabaseError as e:
-			logger.error("Database error adding new user ({0}): {1}".format(e.errno,e.strerror))
-			return None
-		except:
-			logger.error("Problem adding user")
+			logger.error(str(e))
+			try:
+				transaction.rollback()
+			except:
+				transaction.rollback_unless_managed()
 			return None
 
 		## Create Profile

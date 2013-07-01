@@ -1,6 +1,7 @@
 # Python
 import datetime
 import json
+import logging
 
 # Django
 from django.http import HttpResponseRedirect, HttpResponse
@@ -13,6 +14,37 @@ from careers.models import SavedPath
 from social.models import Comment, Thread, Vote, FollowThread
 import utilities.helpers as helpers
 
+logger = logging.getLogger(__name__)
+
+def recruiters(request):
+	from social.forms import RecruiterInterestForm
+	# check to see if email submitted
+	if request.POST:
+		form = RecruiterInterestForm(request.POST)
+		
+		
+		# validate form
+		
+		if form.is_valid():
+			from django.core.mail.backends.smtp import EmailBackend
+			from django.core.mail import EmailMultiAlternatives
+			backend = EmailBackend()
+			msg = EmailMultiAlternatives("ProsperMe: New recruiter signup","New signup: " + form.cleaned_data['email'],"admin@prospr.me",["admin@prospr.me"])
+			try:
+				backend.send_messages([msg])
+				logger.info("New recruiter added: "+form.cleaned_data['email'])
+			except:
+				logger.error("Failed to email new recruiter: "+form.cleaned_data['email'])
+			return HttpResponseRedirect("/recruiters/thanks/")
+
+	else:
+		form = RecruiterInterestForm()
+
+	return render_to_response("recruiters.html",{'form':form},context_instance=RequestContext(request))
+
+def recruiters_thanks(request):
+
+	return render_to_response("recruiters_thanks.html",context_instance=RequestContext(request))
 
 def thread(request, thread_id):
 	thread = Thread.objects.get(id=thread_id)

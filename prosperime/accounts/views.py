@@ -153,9 +153,9 @@ def linkedin_authenticate(request):
 	# check for official LI error
 	elif request.GET.getlist("oauth_problem"):
 		# fetch error
-		li_error = request.GET['oauth_problem'][0]
+		li_error = request.GET.getlist('oauth_problem')[0]
 		# user refused access
-		if li_error == 'user refused':
+		if li_error == 'user_refused':
 			return HttpResponseRedirect('/account/refused')
 	
 	# check if user is already logged on
@@ -332,7 +332,10 @@ def finish_registration(request):
 				critical_logger.info("created new user: " + username)
 			# send welcome email
 			welcome = emaillib.WelcomeEmail(user)
-			welcome.send_email()
+			try:
+				welcome.send_email()
+			except:
+				logger.error("couldn't send welcome email")
 			# add email prefs
 			if form.cleaned_data['notification']:
 				pref = Pref(user=user,name="notification",value=1)
@@ -403,16 +406,25 @@ def finish_registration(request):
 			acct.save()
 
 			# finish processing LI profile
-			profile_task = process_li_profile.delay(user.id,acct.id)
+			try:
+				profile_task = process_li_profile.delay(user.id,acct.id)
+				request.session['tasks']['profile'] = profile_task.id
+			except:
+				logger.error("Failed to process LI profile for user: " + username)
 
 			# start processing connections
-			connections_task = process_li_connections.delay(user.id,acct.id)
+			try:
+				connections_task = process_li_connections.delay(user.id,acct.id)
+				request.session['tasks']['connections'] = connections_task.id
+			except:
+				logger.error("Failed to process LI connections for user: " + username)
 
 			# save task ids to session
-			request.session['tasks'] = {
-				'profile': profile_task.id,
-				'connections': connections_task.id
-			}
+			
+			# request.session['tasks'] = {
+			# 	'profile': profile_task.id,
+			# 	'connections': connections_task.id
+			# }
 			logger.info("added tasks to session")
 
 			#return HttpResponseRedirect('/account/success')

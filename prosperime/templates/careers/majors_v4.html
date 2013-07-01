@@ -123,12 +123,13 @@
 			position:absolute;
 			display:none;
 			top:450px;
-     		left:400px;
-     		width:500px;
-     		font-size:1.4em;
+     		left:250px;
+     		width:650px;
+     		font-size:1.3em;
      		line-height:30px;
-     		font-weight:600;
+     		font-weight:400;
      		z-index:10;
+     		/*background-color: #ffffee;*/
      		text-align:center;
      	}
 
@@ -186,11 +187,15 @@
 
 			</ul>
 		</div>
-		<div id="no-results-message">Sorry, we don't know enough about the other people in your network yet... Tell your friends to sign up! <br/>It's a win-win situation. <br/> <a class="flat-button green-button button-med" target="blank" href="http://www.facebook.com/sharer.php?u=http://www.prospr.me/majors">Spread the love</a></div>
+		{% endif %}
+		<div id="no-results-message">
+				<p>Sorry, we don't know enough about the other people in your network yet... Tell your friends to sign up! 
+				<p>It's a win-win situation.
+				<p><a class="flat-button blue-button button-med" target="blank" href="http://www.facebook.com/sharer.php?u=http://www.prospr.me/majors">Spread the love</a></div>
 
 		<div id="loading-message">Loading...<img src="{{STATIC_URL}}img/spinner.gif" /></div>
 		
-		{% endif %}
+		
 		
 	</div>
 	
@@ -280,7 +285,7 @@ $(function() {
 	if ($("#cta-container")) {
 		setTimeout(function() {
 			$("#cta-container").addClass("show")
-		},2500);
+		},5000);
 	};	
 
 	// Filters Autocomplete
@@ -306,9 +311,12 @@ $(function() {
 			if ($(input).val().length < 1) return false;
 
 			var cat = input.data('val-cat')
+			// GA tracking
+			_gaq.push(['_trackEvent','Majors','Filter',input.data('val-id')])
 			// add to global filter set
 
-			filters[cat].push(input.data('val-id'));			
+			filters[cat].push(input.data('val-id'));
+
 			// add to list
 			$("#filters-list").append("<li class='filters-item'>"+input.val()+" <span data-type='" + cat + "' data-id='" + input.data("val-id") + "' data-name='"+$("#majors-filter-input").val() +"' class='remove-filter' onclick='updateFilters(this)'>X</span></li>");
 			// empty out input bar
@@ -375,7 +383,8 @@ $(function() {
 			},
 			success:function(response) {
 				if (response["result"] == "success") {
-
+					// GA tracking
+					_gaq.push(['_trackEvent','Majors','Update',1])		
 					// deconstruct data
 					people = $.parseJSON(response["people"])
 					positions = $.parseJSON(response["positions"])

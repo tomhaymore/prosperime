@@ -27,12 +27,16 @@ urlpatterns = patterns('',
     url(r'^feed/$', 'careers.views.feed'),
     url(r'^build/$', 'careers.views.build'),
     url(r'^schools/$', 'careers.views.schools'),
-    url(r'^majors/$', 'careers.views.majors_v3'),
+    url(r'^majors/$', 'careers.views.majors_v4'),
     url(r'^majors_v3/$', 'careers.views.majors_v3'),
     url(r'^majors_v4/$', 'careers.views.majors_v4'),
     url(r'^majors_test/$', 'careers.views.test_majors_v3'),
     url(r'^majors/(\d+)/$','careers.views.major'),
     # url(r'^majors/v/(\d+)/$', 'careers.views.single_major'),
+
+    # Recruiter Views
+    url(r'^recruiters/$', 'social.views.recruiters'),
+    url(r'^recruiters/thanks/$', 'social.views.recruiters_thanks'),
 
     url(r'^progress/$', 'careers.views.progress'), # Am I on Track?
     
@@ -141,6 +145,7 @@ urlpatterns = patterns('',
     url(r'^account/success','accounts.views.success'),
     url(r'^account/logout','accounts.views.logout'),
     url(r'^account/login','accounts.views.login'),
+    url(r'^account/refused','accounts.views.linkedin_refused'),
     url(r'^tasks/', include('djcelery.urls')),
     url(r'^saved_paths/$','careers.views.show_paths'),
     url(r'^saved_paths/save/$', 'careers.views.save'),

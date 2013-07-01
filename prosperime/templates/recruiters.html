@@ -1,0 +1,104 @@
+{% extends "base_full_spare.html" %}
+
+{% block head %}
+
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/recruiters.css" />
+
+	<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Source+Sans+Pro|Signika+Negative|Bitter|Volkhov">
+
+{% endblock %}
+
+<!-- Messages -->
+{% block message %}
+{% endblock %}
+
+{% block content %}
+
+<div id="recruiters-splash-home">
+
+	<div class="splash-inner-container">
+
+		<div class="splash-module pull-left" style="margin-top:75px;margin-bottom:75px;">
+			<p class="v2-splash-message-header">Find the best candidates</p>
+			<p class="v2-splash-message-header">Who are already looking for you</p>
+			<p class="splash-submessage no-hover">
+				<form method="POST">
+					{% csrf_token %}
+					<input type="text" class="flat-input" name="email" id="email-input" style="width:275px;" placeholder="Enter your email address" /><input type="submit" value="Get More Info" id="get-more-info-button" class="flat-button green-button">
+					{{form.email.errors}}
+				</form>
+			</p>
+			<!-- <p class="splash-submessage"><a href="/account/register">With email only</a></> -->
+			<div class="clear"></div>
+		</div>
+
+		<div class="splash-module pull-left">
+			<img src="/static/img/recruiters_splash_1.png" id="recruiters-splash-img-1"/>
+		</div>
+
+	<div class="clear"></div>
+	</div>
+	
+
+</div>
+<div class="promo-container">
+	<div class="promo-module">
+		<div class="promo-left pull-left">
+			<img src="/static/img/recruiters_splash_right_cand_1.png" id="recruiters-right-cand-img-1" />
+		</div>
+		<div class="promo-right pull-left">
+			<p class="promo-header">
+				Find the <span class="promo-emph">right</span> candidate
+			</p>
+			<p class="promo-text">
+				ProsperMe candidates share their goals and aspirations. That way, you don't waste your time cultivating candidates that aren't interested anyway. This makes your sourcing even more efficient.
+			</p>
+		</div>
+		<div class="clear"></div>
+	</div>
+</div>
+<div class="promo-container-grey">
+	<div class="promo-module">
+		<div class="promo-left pull-left">
+			<p class="promo-header">
+				At the <span class="promo-emph">right</span> time
+			</p>
+			<p class="promo-text">
+				Timing is everything. With ProsperMe's proprietary data and algorithms, you can focus on those candidates who are "ripe" for recruiting and not waste time on those who aren't planning on moving anytime soon.
+			</p>
+		</div>
+		<div class="promo-right pull-left">
+			<img src="/static/img/recruiters_splash_right_time_1.png" id="recruiters-right-time-img-1" />
+		</div>
+		<div class="clear"></div>
+	</div>
+</div>
+<div class="promo-container">
+	<div class="promo-module">
+		<div class="promo-left pull-left">
+			<img src="/static/img/recruiters_splash_right_data_1.png" id="recruiters-right-data-img-1" />
+		</div>
+		<div class="promo-right pull-left">
+			<p class="promo-header">
+				With the <span class="promo-emph">right</span> data
+			</p>
+			<p class="promo-text">
+				Don't start cultivating a candidate without the data to make it stick. ProsperMe provides active intelligence on why candidates are selecting their jobs and how your company stacks up agains the competition.
+			</p>
+		</div>
+		<div class="clear"></div>
+	</div>
+</div>
+{% endblock %}
+
+{% block promo %}
+
+
+{% endblock %}
+
+{% block templates %}
+
+{% endblock %}
+
+
+

@@ -1118,10 +1118,11 @@ class CareerPathBase(CareerBase):
 		positions_set = set()
 
 		counter = 0
+		majors_counter = {}
 
 		if user:
 			connections = [c.id for c in user.profile.connections.all()]
-			schools = [e.id for e in Entity.objects.filter(li_type="school",positions__person=user)]
+			schools = [e.id for e in Entity.objects.filter(Q(li_type="school")|Q(li_type="educational")).filter(positions__person=user)]
 		# get schools from user
 		# if user and school_ids:
 		# 	schools = Entity.objects.filter(Q(li_type="school",positions__person=user,positions__type="education")|Q(id__in=school_ids)).distinct()
@@ -1139,13 +1140,13 @@ class CareerPathBase(CareerBase):
 		# assemble all the positions
 		base_positions = Position.objects.filter(ideal_position__cat="ed",ideal_position__level=1).values('person__profile__status','ideal_position__major','ideal_position__title','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
 
-		if user and school_ids:
-			# combine any s
-			schools = schools + school_ids
+		# if user and school_ids:
+		# 	# combine any s
+		# 	schools = schools + school_ids
+		# 	base_positions = base_positions.filter(Q(entity_id__in=schools)|Q(person__id__in=connections))
+		if user:
 			base_positions = base_positions.filter(Q(entity_id__in=schools)|Q(person__id__in=connections))
-		elif user:
-			base_positions = base_positions.filter(Q(entity_id__in=schools)|Q(person__id__in=connections))
-		elif school_ids:
+		if school_ids:
 			base_positions = base_positions.filter(entity_id__in=school_ids)
 		if major_ids:
 			base_positions = base_positions.filter(ideal_position__id__in=major_ids)	
@@ -1155,7 +1156,10 @@ class CareerPathBase(CareerBase):
 				continue
 			
 			if first_ideals[p['person__id']] is not None:
-				first_ideal = IdealPosition.objects.get(position__id=first_ideals[p['person__id']])
+				try:
+					first_ideal = IdealPosition.objects.get(position__id=first_ideals[p['person__id']])
+				except:
+					first_ideal = None
 			else:
 				first_ideal = None
 		
@@ -1176,10 +1180,14 @@ class CareerPathBase(CareerBase):
 				if p['ideal_position__id'] not in majors_set:
 					majors_set.add(p['ideal_position__id'])
 					majors[p['ideal_position__id']] = {"id":p['ideal_position__id'],"major":p['ideal_position__major'],"people":[p['person__id']],"positions":[first_ideal.id], "index":len(majors_set), "abbr":p['ideal_position__title'].split(" ")[0]}
-
+					majors_counter[p['ideal_position__id']] = 0
 				else:
-					majors[p['ideal_position__id']]["people"].append(p['person__id'])
-					majors[p['ideal_position__id']]["positions"].append(first_ideal.id)
+					if majors_counter[p['ideal_position__id']] > 10:
+						continue
+					else:
+						majors[p['ideal_position__id']]["people"].append(p['person__id'])
+						majors[p['ideal_position__id']]["positions"].append(first_ideal.id)
+						majors_counter[p['ideal_position__id']] += 1
 
 				## People
 

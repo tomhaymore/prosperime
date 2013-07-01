@@ -6,4 +6,7 @@ prosperime/settings_dev.py
 prosperime/media/logos
 prosperime/media/pictures
 !prosperime/media/pictures/anon.jpg
+prosperime/tmp_img
+prosperime/celerybeat-schedule.db
+rabbitmq
 prosprenv

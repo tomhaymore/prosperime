@@ -10,7 +10,7 @@
 <p>Pick a username and password and you're all set.</p>
 <form action="" method="post" name="finish_login">
 	{% csrf_token %}
-	{{form.errors}}
+	<!-- {{form.errors}} -->
 	<ul>
 		<li><label for="id_username">Email:</label>
 			{{form.username.errors}}
