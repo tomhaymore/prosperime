@@ -15,6 +15,34 @@ from django.template import Context
 
 logger = logging.getLogger(__name__)
 
+class EmailBase():
+	msg = None
+
+	client = mandrill.Mandrill("IT3A1T6VpHnqHhwdg9Kbsg")
+
+	def trigger(self):
+		res = self.client.messages.send(message=self.msg)
+		return res
+
+class NotificationEmail(EmailBase):
+
+	def __init__(self,text):
+		d = Context({
+				'text':text
+			})
+		text_content = get_template('emails/notification_email.txt').render(d)
+		html_content = get_template('emails/notification_email.html').render(d)
+		self.msg = {
+			'from_email':'admin@prospr.me',
+			'from_name':'ProsperMe',
+			'text':text_content,
+			'html':html_content,
+			'subject':"New email to blocklist",
+			'track_clicks':False,
+			'track_opens':False,
+			'to':[{'name':'admins','email':'admin@prospr.me'}]
+		}
+
 class WelcomeEmail():
 	"""
 	Thin wrapper around Mandrill client
@@ -39,6 +67,7 @@ class WelcomeEmail():
 			'track_clicks': True,
 			'track_opens':True,
 			'google_campaign_name':'prosper_welcome',
+			'to':[{'name':user.profile.full_name(),'email':user.email}]
 		}
 
 	def trigger(self):
