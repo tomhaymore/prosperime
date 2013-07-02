@@ -1,0 +1,19 @@
+{% block content %}
+
+{% endblock %}
+\n
+\n
+Copyright &copy; 2013 ProsperMe, All rights reserved
+\n
+\n
+You are receiving this email because {% block reason %} you are publicly listed as a career counseling professional for your university or other institution{% endblock %}.
+\n
+\n
+Our mailing address is:\n
+	420 James Road #1\n
+	Palo Alto, CA 94306 \n
+
+\n
+\n
+Unsubscribe from this list by following this link: http://www.prospr.me/unsubscribe/?email_address={{email_address}}
+

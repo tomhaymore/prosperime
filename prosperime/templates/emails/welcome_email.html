@@ -1,3 +1,6 @@
+{% extends "email_base.html" %}
+
+{% block content %}
 <strong>Welcome to ProsperMe!</strong>
 
 <p>Thanks for trying out ProsperMe. We hope you like it and it helps you make better education and career decisions.</p>
@@ -6,3 +9,9 @@
 <p>Sincerely,<br />
 The ProsperMe Team</p>
 <a href="http://www.prospr.me">http://www.prospr.me</a>
+{% endblock %}
+
+{% block reason %}
+you signed up for ProsperMe.
+{% endblock %}
+

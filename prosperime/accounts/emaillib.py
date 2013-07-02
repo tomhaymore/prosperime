@@ -1,6 +1,7 @@
 # from python
 import logging
 import csv
+import mandrill
 # from smtplib import SMTPRecipientRefused
 
 # from Django
@@ -14,39 +15,95 @@ from django.template import Context
 
 logger = logging.getLogger(__name__)
 
-class WelcomeEmail():
-	"""
-	Thin wrapper around Django email classes
-	"""
+class EmailBase():
 	msg = None
 
-	backend = EmailBackend()
+	client = mandrill.Mandrill("IT3A1T6VpHnqHhwdg9Kbsg")
 
-	# basic email settings
-	subject = "Welcome to ProsperMe!"
-	origin = "ProsperMe <welcome@prospr.me>"
+	def trigger(self):
+		res = self.client.messages.send(message=self.msg)
+		return res
 
-	# fetch templates
-	plaintext = get_template('emails/welcome_email.txt')
-	htmlformat    = get_template('emails/welcome_email.html')
+class NotificationEmail(EmailBase):
 
+	def __init__(self,text):
+		d = Context({
+				'text':text
+			})
+		text_content = get_template('emails/notification_email.txt').render(d)
+		html_content = get_template('emails/notification_email.html').render(d)
+		self.msg = {
+			'from_email':'admin@prospr.me',
+			'from_name':'ProsperMe',
+			'text':text_content,
+			'html':html_content,
+			'subject':"New email to blocklist",
+			'track_clicks':False,
+			'track_opens':False,
+			'to':[{'name':'admins','email':'admin@prospr.me'}]
+		}
 
+class WelcomeEmail():
+	"""
+	Thin wrapper around Mandrill client
+	"""
+
+	msg = None
+
+	client = None
 
 	def __init__(self,user):
-		# get context for email message
 		d = Context({
 			'full_name':user.profile.full_name()
 			})
-		text_content = self.plaintext.render(d)
-		html_content = self.htmlformat.render(d)
-		self.msg = EmailMultiAlternatives(self.subject,text_content,self.origin,[user.email])
-		self.msg.attach_alternative(html_content, "text/html")
+		text_content = get_template('emails/welcome_email.txt').render(d)
+		html_content = get_template('emails/welcome_email.html').render(d)
+		self.msg = {
+			'from_email':'welcome@prospr.me',
+			'from_name':'ProsperMe',
+			'text':text_content,
+			'html':html_content,
+			'subject': "Welcome to ProsperMe!",
+			'track_clicks': True,
+			'track_opens':True,
+			'google_campaign_name':'prosper_welcome',
+			'to':[{'name':user.profile.full_name(),'email':user.email}]
+		}
 
-		self.backend.open()
+	def trigger(self):
+		self.client = mandrill.Mandrill("IT3A1T6VpHnqHhwdg9Kbsg")
+		res = self.client.messages.send(message=self.msg)
+		return res
 
-	def send_email(self):
-		self.backend.send_messages([self.msg])
-		self.backend.close()
+	# msg = None
+
+	# backend = EmailBackend()
+
+	# # basic email settings
+	# subject = "Welcome to ProsperMe!"
+	# origin = "ProsperMe <welcome@prospr.me>"
+
+	# # fetch templates
+	# plaintext = get_template('emails/welcome_email.txt')
+	# htmlformat    = get_template('emails/welcome_email.html')
+
+
+
+	# def __init__(self,user):
+	# 	# get context for email message
+	# 	d = Context({
+	# 		'full_name':user.profile.full_name()
+	# 		})
+	# 	text_content = self.plaintext.render(d)
+	# 	html_content = self.htmlformat.render(d)
+	# 	self.msg = EmailMultiAlternatives(self.subject,text_content,self.origin,[user.email])
+	# 	self.msg.attach_alternative(html_content, "text/html")
+
+	# 	self.backend.open()
+
+	# def send_email(self):
+	# 	self.backend.send_messages([self.msg])
+	# 	self.backend.close()
 
 class UniversityEmail():
 	msg = None

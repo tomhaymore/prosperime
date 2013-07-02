@@ -1,0 +1,14 @@
+{% extends "base_full.html" %}
+
+{% block content %}
+
+<div class="main-container" id="content-container">
+	<p class="feature-page-header">Unsubscribe</p>
+	<p class="feature-page-subheader">Remove the following email address from all correspondence with ProsperMe except for necessary product updates and critical announcements.</p>
+	<form method="POST">
+		{% csrf_token %}
+		<input name="email" type="text" class="flat-input" placeholder="{{email}}" /> <input type="submit" class="flat-button blue-button" value="Submit" />
+	</form>
+</div>
+
+{% endblock %}

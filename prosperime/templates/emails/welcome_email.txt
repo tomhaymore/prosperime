@@ -1,3 +1,5 @@
+{% extends "base_full.txt" %}
+{% block content %}
 Welcome to ProsperMe!
 \n
 \n
@@ -10,3 +12,8 @@ The more people use ProsperMe, the more valuable it becomes. Tell your friends w
 Sincerely,
 The ProsperMe Team
 http://www.prospr.me
+{% endblock %}
+
+{% block reason %}
+you signed up for ProsperMe
+{% endblock %}

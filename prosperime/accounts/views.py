@@ -75,6 +75,45 @@ def use(request):
 
 	return render_to_response('use.html',context_instance=RequestContext(request))
 
+def unsubscribe(request):
+	from accounts.forms import EmailUnsubscribeForm
+	import accounts.emaillib as emaillib
+	if request.POST:
+
+		form = EmailUnsubscribeForm(request.POST)
+
+		if form.is_valid():
+			# if user is auth'd, update prferences
+			if request.user.is_authenticated():
+				try:
+					pref = Pref(user=request.user,name="notification")
+				except:
+					pref = Pref(user=user,name="notification")
+				# save new value
+				pref.value = 0
+				pref.save()
+				
+			# if anonymous, send email to admins to remove
+			else:
+				notification = emaillib.NotificationEmail("Add following user to blocklist: " + form.cleaned_data['email'])
+				notification.trigger()
+			# log flash message
+			messages.success(request, 'You have successfully unsubscribed.')
+			return HttpResponseRedirect('/unsubscribe')
+		else:
+			email = request.POST['email']
+	else:
+		# empty form
+		form = EmailUnsubscribeForm(request.POST)
+		# check if email specified in URL
+		if 'email_address' in request.GET:
+			email = request.GET['email_address']
+		elif request.user.is_authenticated():
+			email = request.user.email
+		else:
+			email = None
+	return render_to_response('accounts/unsubscribe.html',{'form':form,'email':email},context_instance=RequestContext(request))
+
 def register_slim(request):
 
 	if request.user.is_authenticated():
