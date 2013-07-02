@@ -280,7 +280,7 @@ def major(request,major_id):
 	# # 	first_and_last_positions = p.person.profile.first_and_last_positions() 
 	# # 	if first_and_last_positions is not None:
 	# # 		paths.append({"id":p.person.id, "full_name":p.person.profile.full_name(), "profile_pic":p.person.profile.default_profile_pic(), "first":first_and_last_positions[0].title + " at " + first_and_last_positions[0].entity.name, "latest":first_and_last_positions[1].title + " at " + first_and_last_positions[1].entity.name})
-	users = User.objects.filter(Q(id__in=connections)|Q(positions__entity__id__in=schools)).filter(positions__ideal_position=major)
+	users = User.objects.filter(Q(id__in=connections)|Q(positions__entity__id__in=schools)).filter(positions__ideal_position=major).distinct()
 	for u in users[:10]:
 	# this returns an array --> [first_positions, last_position]
 		first_and_last_positions = u.profile.first_and_last_positions() 

@@ -623,8 +623,10 @@ $(function() {
 				// major animation
 				for (m in d.majors) {
 					majorMouseover(d.majors[m].major_id);
-					lineMouseover(d.majors[m].major_id)
-					triggerUserAndPositionWrapper(d.majors[m].major_id, "mouseover")
+					// lineMouseover(d.majors[m].major_id);
+					singleLineMouseover(d.id,d.pos_id);
+					positionMouseover("#position-"+d.pos_id);
+					// triggerUserAndPositionWrapper(d.majors[m].major_id, "mouseover")
 				}
 				// majorMouseover(d.major_id)
 				// Make lines blue
@@ -645,8 +647,10 @@ $(function() {
 				// major animation
 				for (m in d.majors) {
 					majorMouseout(d.majors[m].major_id);
-					lineMouseout(d.majors[m].major_id)
-					triggerUserAndPositionWrapper(d.majors[m].major_id, "mouseout")
+					// lineMouseout(d.majors[m].major_id);
+					singleLineMouseout(d.id,d.pos_id)
+					positionMouseout("#position-"+d.pos_id);
+					// triggerUserAndPosi?tionWrapper(d.majors[m].major_id, "mouseout")
 				}
 				// majorMouseout(d.major_id)
 				// Make lines grey again
@@ -708,12 +712,13 @@ $(function() {
 				// d3.select(this)
 				// 	.attr("fill",main_blue_fuller)
 				// 	.attr("r",8)
-				// trigger major animation
+				//trigger major animation
 				
 				for (m in d.majors) {
 					// console.log(d.majors[m].major_id)
 					majorMouseover(d.majors[m].major_id);
 					lineMouseover(d.majors[m].major_id);
+					// positionMouseover()
 					triggerUserAndPositionWrapper(d.majors[m].major_id,"mouseover");	
 				}
 				// majorMouseover(d.major_id)
@@ -725,6 +730,9 @@ $(function() {
 
 			.on("mouseout", function(d) {
 				// if (transition_counter != 0) return false;
+				// d3.select(this)
+				// 	.attr("fill","")
+				// 	.attr("r",5)
 				// trigger major animation
 				for (m in d.majors) {
 					majorMouseout(d.majors[m].major_id);
@@ -947,13 +955,19 @@ $(function() {
 		drawTooltip("right",position)
 	};
 
-	function positionMouseoverAll(selection) {
-		var position = selection
-			.transition()
-				.duration(50)
-				.attr("fill",main_blue_fuller)
-				.attr("r",8)
-			.each(drawTooltip)
+	function positionMouseoverAll(major_id) {
+		for (i=0;i<=majors.length-1;i++) {
+			if (majors[i].id == major_id) {
+				major = majors[i]
+			}
+		}
+		// Trigger hover on position dots
+		var pos = []
+		for (var p in major.positions) {
+			// pos.push("#position-"+major.positions[p])
+			positionMouseover("#position-"+major.positions[p])
+			// d3.selectAll(pos.join(", ")).call(positionMouseoverAll)
+		}
 
 		// drawTooltip("right",position)
 	}
@@ -971,13 +985,20 @@ $(function() {
 		removeTooltip();
 	};
 
-	function positionMouseoutAll(selection) {
-		selection
-			.transition()
-				.duration(250)
-				.attr("fill","none")
-				.attr("stroke-width",2)
-				.attr("r",5)
+	function positionMouseoutAll(major_id) {
+		
+		for (i=0;i<=majors.length-1;i++) {
+			if (majors[i].id == major_id) {
+				major = majors[i]
+			}
+		}
+		// Trigger hover on position dots
+		var pos = []
+		for (var p in major.positions) {
+			// pos.push("#position-"+major.positions[p])
+			positionMouseout("#position-"+major.positions[p])
+			// d3.selectAll(pos.join(", ")).call(positionMouseoverAll)
+		}
 	}
 
 
@@ -1036,11 +1057,40 @@ $(function() {
 		});
 	};
 
+	// makes single path blue, bigger
+	function singleLineMouseover(people_id,position_id) {
+		for (var i = 0;i<3;i++) {
+			d3.select("#line-people-"+people_id+"_"+i)
+				.attr({
+					"stroke":main_blue,
+					"stroke-width":1
+				});
+			d3.select("#line-position-"+position_id+"_"+i)
+				.attr({
+					"stroke":main_blue,
+					"stroke-width":1
+				});
+			i ++;
+		}
+	}
+
 	// Makes lines grey, smaller
 	function lineMouseout(major_id) {
 		lines = d3.selectAll(".line-"+major_id)
 			.attr("stroke","")
 	};
+
+	// makes single path regular
+	function singleLineMouseout(people_id,position_id) {
+
+		for (var i = 0;i<3;i++) {
+			d3.select("#line-people-"+people_id+"_"+i)
+				.attr("stroke","");
+			d3.select("#line-position-"+position_id+"_"+i)
+				.attr("stroke","");
+			i ++;
+		}
+	}
 
 
 	// Wrapper allows us to delay calling the trigger  event
