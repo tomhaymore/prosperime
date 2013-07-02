@@ -624,7 +624,9 @@ $(function() {
 				for (m in d.majors) {
 					majorMouseover(d.majors[m].major_id);
 					// lineMouseover(d.majors[m].major_id);
-					singleLineMouseover(d.id,d.pos_id);
+					singleLineMouseover('people',d.id,d.majors[m].major_id);
+					singleLineMouseover('position',d.pos_id,d.majors[m].major_id);
+
 					positionMouseover("#position-"+d.pos_id);
 					// triggerUserAndPositionWrapper(d.majors[m].major_id, "mouseover")
 				}
@@ -648,7 +650,8 @@ $(function() {
 				for (m in d.majors) {
 					majorMouseout(d.majors[m].major_id);
 					// lineMouseout(d.majors[m].major_id);
-					singleLineMouseout(d.id,d.pos_id)
+					singleLineMouseout('people',d.id,d.majors[m].major_id);
+					singleLineMouseout('position',d.pos_id,d.majors[m].major_id);
 					positionMouseout("#position-"+d.pos_id);
 					// triggerUserAndPosi?tionWrapper(d.majors[m].major_id, "mouseout")
 				}
@@ -794,7 +797,7 @@ $(function() {
 			.attr("d", function(d) { return lineGen(getPathData(d,'people'));} )
 			.attr("fill","none")
 			.attr("stroke-width",1)
-			.attr("id",function(d,i) { return "line-people-"+d.id+"_"+i})
+			.attr("id",function(d,i) { return "line-people-"+d.id+"-"+d.major_id})
 			.attr("class", function(d) { 
 				return "lines line-" + d.major_id
 			});
@@ -829,7 +832,7 @@ $(function() {
 			.attr("d", function(d) { return lineGen(getPathData(d,'position'));} )
 			.attr("fill","none")
 			.attr("stroke-width",1)
-			.attr("id",function(d,i) { return "line-position-"+d.id+"_"+i})
+			.attr("id",function(d,i) { return "line-position-"+d.id+"-"+d.major_id})
 			.attr("class",function(d) { 
 				return "lines line-" + d.major_id;
 			});
@@ -1058,20 +1061,17 @@ $(function() {
 	};
 
 	// makes single path blue, bigger
-	function singleLineMouseover(people_id,position_id) {
-		for (var i = 0;i<3;i++) {
-			d3.select("#line-people-"+people_id+"_"+i)
-				.attr({
-					"stroke":main_blue,
-					"stroke-width":1
-				});
-			d3.select("#line-position-"+position_id+"_"+i)
-				.attr({
-					"stroke":main_blue,
-					"stroke-width":1
-				});
-			i ++;
-		}
+	function singleLineMouseover(type,id,major_id) {
+		d3.select("#line-"+type+"-"+id+"-"+major_id)
+			.attr({
+				"stroke":main_blue,
+				"stroke-width":1
+			});
+		d3.select("#line-"+type+"-"+id+"-"+major_id)
+			.attr({
+				"stroke":main_blue,
+				"stroke-width":1
+			});
 	}
 
 	// Makes lines grey, smaller
@@ -1081,15 +1081,11 @@ $(function() {
 	};
 
 	// makes single path regular
-	function singleLineMouseout(people_id,position_id) {
-
-		for (var i = 0;i<3;i++) {
-			d3.select("#line-people-"+people_id+"_"+i)
-				.attr("stroke","");
-			d3.select("#line-position-"+position_id+"_"+i)
-				.attr("stroke","");
-			i ++;
-		}
+	function singleLineMouseout(type,id,major_id) {
+		d3.select("#line-"+type+"-"+id+"-"+major_id)
+			.attr("stroke","");
+		d3.select("#line-"+type+"-"+id+"-"+major_id)
+			.attr("stroke","");
 	}
 
 

@@ -1195,7 +1195,7 @@ class CareerPathBase(CareerBase):
 
 					people_set.add(p['person__id'])
 					pic = Profile.objects.get(user__id=p['person__id']).default_profile_pic()
-					people[p['person__id']] = {'name':full_name, 'id':p['person__id'], 'majors':[{'id':p['person__id'],'major_id':p['ideal_position__id']}], 'major_id':p['ideal_position__id'],"major_index":majors[p['ideal_position__id']]["index"], "major":p['ideal_position__major'],"pic":pic}
+					people[p['person__id']] = {'name':full_name, 'id':p['person__id'], 'majors':[{'id':p['person__id'],'major_id':p['ideal_position__id']}],'pos_id':first_ideal.id,'major_id':p['ideal_position__id'],"major_index":majors[p['ideal_position__id']]["index"], "major":p['ideal_position__major'],"pic":pic}
 
 					counter += 1	
 					if counter == 72:
@@ -1213,7 +1213,7 @@ class CareerPathBase(CareerBase):
 		# convert dicts to lists
 		majors_list = [{"id":v['id'],"major":v['major'],"people":v['people'],"positions":v['positions'], "index":v['index'], "abbr":v['abbr']} for k,v in majors.iteritems()]
 		positions_list = [{"title":v["title"],"id":v["id"],"majors":v["majors"],"major_id":v["major_id"],"major_index":v["major_index"],"major":v["major"]} for k,v in positions.iteritems()]
-		people_list = [{"name":v["name"],"id":v["id"],"majors":v["majors"],"major_id":v["major_id"],"major_index":v["major_index"],"major":v["major"],"pic":v["pic"]} for k,v in people.iteritems()]
+		people_list = [{"name":v["name"],"id":v["id"],"majors":v["majors"],"major_id":v["major_id"],"major_index":v["major_index"],"major":v["major"],"pic":v["pic"],"pos_id":v['pos_id']} for k,v in people.iteritems()]
 
 		# compile into one array and convert to json
 		data = {
