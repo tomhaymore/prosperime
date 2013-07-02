@@ -113,7 +113,8 @@ urlpatterns = patterns('',
     url(r'^careers/getMajorsData/v3/$', 'careers.views.get_majors_data_v3'),
     url(r'^careers/getMajorsFilters/$','careers.views.get_majors_filters'),
     url(r'^careers/getSingleMajorData/(\d+)/$','careers.views.get_major_data'),
-
+    url(r'^careers/getInternshipData/$', 'careers.views.get_internship_data'),
+    url(r'^careers/getInternshipFilters/$', 'careers.views.get_internship_filters'),
 
     ## Accounts - AJAX calls
     url(r'^accounts/updateProfile/$', 'accounts.views.updateProfile'),

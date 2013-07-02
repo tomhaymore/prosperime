@@ -13,7 +13,33 @@
 	<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
 
     <style type="text/css">
+
+    .label {
+		cursor:pointer;
+    }
+
+    .slice {
+    	cursor:pointer;
+    }
+
+    .cancel-button {
+		font-size:1.2em;
+    }
+
+    .cancel-button:hover {
+		font-size:1.3em;
+		font-weight:bold;
+    }
+
+    .section-header { font-size: 1.4em; }
        
+	#no-data {
+		position:absolute;
+		left:395px;
+		top:410px;
+		font-size:1.2em;
+		display:none;
+	}
     </style>
 
 
@@ -23,10 +49,41 @@
 
 {% block content %}
 
-<div id="wide-content-container" class="main-container">
-<h1>Foobar</h1>
-	
-	
+<div id="wide-content-container" style="min-height:600px;"class="main-container">
+
+	<div id="header-container">
+		<p class="feature-page-header">Internships: <span id="school-name"></span></p>
+		<p class="feature-page-subheader">Use the chart below to learn more about which employers are hiring interns from which schools. Click on an employer to dive deeper.</p>
+		
+		{% if user.is_authenticated %}
+		<!-- <div class="generic-nav-container">
+			<a class="generic-nav pull-left selected" data-view="network">Your Network</a> 
+			<a class="generic-nav pull-left unselected" data-view="all">ProsperMe Community</a>
+			<div class="clear"></div>
+			
+		</div> -->
+		<div id="filter-form">
+			<p class="feature-paragraph">Filter by school or major: <input id="majors-filter-input" data-val-id="" class="flat-input" placeholder="Start typing... "/>
+			<span id="filters-loading">Updating...</span></p>
+		</div>
+		<div class="filters-container">
+			<ul id="filters-list" class="flat-list inline">
+
+			</ul>
+		</div>
+		{% endif %}
+
+		<div id="no-data">Sorry... no data returned</div>
+
+<!-- 
+		<div id="loading-message">Loading...<img src="{{STATIC_URL}}img/spinner.gif" /></div>
+		
+		 -->
+		
+	</div>
+
+
+
 </div>
 {% endblock %}
 
@@ -34,220 +91,629 @@
 
 <!-- V3 Script -->
 <script type="text/javascript">
+
+	/* VIZ INSTANCE VARIABLES */
+	var data = null; var school_id = null; var main_container = null; var chart_container = null;
+	var outer_ring_is_activated = false;
+	var label_attr = {
+		"text-anchor":"start",
+		"font-family":"Helvetica",
+		"font-size":"10pt",
+		"font-weight":"400"
+	}
+
 	// Constants
-	var person_height = 45; var person_width = 45;
-	var entity_height = 75; var entity_width = 75;
-
-	// TODO: defer loading to AJAX
-	var people = {{people|safe}}
-	var entities = {{entities|safe}}
-
-	var container = d3.select("#wide-content-container")
-		.append("svg:svg")
-		.attr("width",1000)
-		.attr("height",400)
-	var filter = container.append("svg:defs")
-		.append("svg:filter")
-			.attr("id","grayscale")
-		.append("svg:feColorMatrix")
-			.attr("type","matrix")
-			.attr("values","0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0");
-
-
-	container.selectAll(".person")
-		.data(Object.keys(people))
-		.enter().append("image")
-			.attr("x", function(d, i) {
-				if (i % 2 == 0)
-					return 20 + (i * ((person_width / 2) + 5))
-				else
-					return 20 + ((i - 1) * ((person_width / 2) + 5))
-			})
-			.attr("y", function(d, i) {
-				if (i % 2 == 0)
-					return person_height
-				else
-					return 5 + (2 * person_height)
-			})
-			.attr("width", person_width)
-			.attr("height", person_height)
-			.attr("xlink:href", function(d) {return people[d]["pic"] })
-			.attr("id", function(d) { return "person-" + d })
-			.attr("filter", "url(#grayscale)")
-			.attr("class", "person")
-
-			.on("mouseover", function(d) {
-				// enlargens, colors image
-				activateImage(this, "person")
-				// hover on relevant entity
-
-			})
-
-			.on("mouseout", function(d) {
-				// resizes, grayscales image
-				deactivateImage(this, "person")
-			
-			})
-
-
-	container.selectAll(".entity")
-		.data(Object.keys(entities))
-		.enter().append("image")
-			.attr("x", function(d, i) {
-				return 100 + (i * 175)
-			})
-			.attr("y", 225)
-			.attr("width", entity_width)
-			.attr("height", entity_height)
-			.attr("xlink:href", function(d) {
-				return entities[d]["pic"]
-			})
-			.attr("filter", "url(#grayscale)")
-			.attr("class", "entity")
-			.attr("id", function(d) { return "entity-" + d })
-
-			.on("mouseover", function(d) {
-				activateImage(this, "entity")
-
-				for (index in entities[d]["people"]) {
-					var id = entities[d]["people"][index]
-
-					activateImage($("#person-" + id)[0], "person")
-				}
-			})
-
-			.on("mouseout", function(d) {
-				deactivateImage(this, "entity")
-
-				for (index in entities[d]["people"]) {
-					var id = entities[d]["people"][index]
-
-					deactivateImage($("#person-" + id)[0], "person")
-				}
-			})
-
-
-
-
-
-
-
-
-function activateImage(el, type) {
-	console.log(el)
-	el.parentNode.appendChild(el);
-
-	var node = d3.select(el)
-	var prev_x = parseInt(node.attr("x"))
-	var prev_y = parseInt(node.attr("y"))
-
-
-	if (type == "person") {
-		node
-			.attr("height", person_height + 10)
-			.attr("width", person_width + 10)
-			.attr("x", prev_x - 5)
-			.attr("y", prev_y - 5)
-	} else if (type == "entity") {
-		node
-			.attr("height", entity_height + 25)
-			.attr("width", entity_width + 25)
-			.attr("x", prev_x - 15)
-			.attr("y", prev_y - 15)
+	var filters = {
+		"majors":[],  // Note, right now, we can only filter by 1 of each
+		"schools":[],
 	}
+	var w = 900,                        
+	    h = 325,                           
+	    r = 120,
+	    horizontal_translate = 350,
+	    vertical_translate = r + 45,                         
+	    color = d3.scale.category20c();     //builtin range of colors
 
-	node.attr("filter", "")
-};
+	/* MAIN */ 
+	$(function() {
+		// Filters Autocomplete
+		$('#majors-filter-input').autocomplete({
+			minLength: 3,
+			source: '/careers/getMajorsFilters/',
+			select: function(event,ui) {
+				event.preventDefault();
+				$(this).val(ui.item.label_short);
+				$(this).data('val-id',ui.item.value);
+				$(this).data('val-cat',ui.item.type)
+			},
+			// Makes the display the major instead of id
+			focus: function(event,ui) {
+				event.preventDefault()
+				$(this).val(ui.item.label_short)
+			},
+		})
+		// Filters keypress
+		.keypress(function(e) {
+			if(e.which == 13) {
+				var input = $('#majors-filter-input')
+				if ($(input).val().length < 1) return false;
 
-function deactivateImage(el, type) {
-	var node = d3.select(el)
-	var prev_x = parseInt(node.attr("x"))
-	var prev_y = parseInt(node.attr("y"))
+				var cat = input.data('val-cat')
+				// GA tracking
+				// _gaq.push(['_trackEvent','Majors','Filter',input.data('val-id')])
+				// add to global filter set
 
-	if (type == "person") {
-		node
-			.attr("height", person_height)
-			.attr("width", person_width)
-			.attr("x", prev_x + 5)
-			.attr("y", prev_y + 5)
-	} else if (type == "entity") {
-		node
-			.attr("height", entity_height)
-			.attr("width", entity_width)
-			.attr("x", prev_x + 15)
-			.attr("y", prev_y + 15)
-	}
+				filters[cat].push(input.data('val-id'));
 
+				// set school id
+				school_id = input.data("val-id")
 
-	node.attr("filter", "url(#grayscale)")
+				// add to list
+				$("#filters-list").append("<li class='filters-item'>"+input.val()+" <span data-type='" + cat + "' data-id='" + input.data("val-id") + "' data-name='"+$("#majors-filter-input").val() +"' class='remove-filter' onclick='updateFilters(this)'>X</span></li>");
+				// empty out input bar
+				input.val("")
+				// update data
+				getAndRenderData()
+			}
+		});
 
-};
+		// This will always be returned from API
+		school_id = {{school_id}}
 
+		if ("{{cache}}" == "hit") {
+			console.log("Cache Hit, render immediately")
+			data = {% if entities %} {{entities|safe}} {% else %} null {% endif %}
+			renderViz()
+			$("#school-name").text("{{school_name}}")
+		} else {
+			console.log("Cache Miss, AJAX to DB")
+			getAndRenderData()
+		};
+	});
 
-// // Attr
-// var label_attr = {
-// 	"text-anchor":"middle",
-// 	"font-family":"Helvetica",
-// 	"font-size":"8pt"
-// }
+	function getAndRenderData(entity_id) {
+		var return_type = null;
+		// Query on the school
+		if (entity_id === undefined) {
+			params = {"school_id":school_id}
+			return_type = "entities"
+		// Query on school + entity
+		} else {
+			params = {"school_id":school_id, "entity_id":entity_id}
+			return_type = "majors"
+		}
 
-// var data = [
-// 	{"major":"Symbolic Systems", "prop":.2}, 
-//     {"major":"Computer Science", "prop":.5}, 
-//     {"major":"Communicatins", "prop":.15},
-//     {"major":"Rest", "prop":.15}
-// ];
+		$.ajax({
+			type: "GET",
+			url: "/careers/getInternshipData/",
+			data: params,
+			dataType: "json",
+			success:function(response) {
+				console.log(response)
+				data = response[return_type]
 
-// var w = 900,                        
-//     h = 300,                           
-//     r = 100,                         
-//     color = d3.scale.category20c();     //builtin range of colors
+				if (data.length == 0)
+					$("#no-data").css("display", "block")
+				else 
+					$("#no-data").css("display", "none")
+
+				if ("intern_titles" in response) {
+					updateInternshipTitles(response["intern_titles"])
+				} else{
+					$("#school-name").text(response["school_name"])
+					updateInternshipTitles([])
+				}
+				renderViz()
+			}
+		});
+	};
+
+	function renderViz() {
+		// Create SVG canvas for first time
+		if (main_container == null) {
+			createSVGMain()
+			// append internship container
+			d3.select("#wide-content-container").append("div").attr("id", "internship-container").attr("width", "100px").attr("height", "100px")
+		}
+		// Create pie chart
+		updatePieChart()
+		// Create labels
+		updateLabels()
+	};	
+
 	
-// var vis = d3.select("#wide-content-container")
-//     .append("svg:svg")              
-//     .data([data])                   //associate our data with the document
-//         .attr("width", w)        
-//         .attr("height", h)
-//     .append("svg:g")                //make a group to hold our pie chart
-//         .attr("transform", "translate(" + (w / 2) + "," + r + ")")    //move the center of the pie chart from 0, 0 to radius, radius
+	function updateInternshipTitles(titles) {
 
-// // arc drawing function
-// var arc = d3.svg.arc()             
-//     .outerRadius(r);
+		var selection = d3.select("#internship-container").selectAll("div").data(titles)
 
-// var pie = d3.layout.pie()       
-//     .value(function(d) { return (d.prop * 100); });    //we must tell it out to access the value of each element in our data array
+		selection.exit().remove()
 
-// var arcs = vis.selectAll("g.slice")    
-//     .data(pie)                          //associate the generated pie data (an array of arcs, each having startAngle, endAngle and value properties) 
-//     .enter()             
-//         .append("svg:g")                //create a group to hold each slice (we will have a <path> and a <text> element associated with each slice)
-//             .attr("class", "slice");  
+		selection.enter().append("div")
+				.attr("class", "list-item")
+				.text(function(d) { return d })
+	};
 
-//     arcs.append("svg:path")
-//             .attr("fill", function(d, i) {
-//             	console.log(color(i))
-//             	return color(i); 
-//          	})
-//             .attr("d", arc);   
 
-//     // Add Labels
-//     arcs.append("svg:text")            
-//             .attr("transform", function(d) {                    //set the label's origin to the center of the arc
-//             //we have to make sure to set these before calling arc.centroid
-//             d.innerRadius = 0;
-//             d.outerRadius = r;
-//             return "translate(" + arc.centroid(d) + ")";        //this gives us a pair of coordinates like [50, 50]
-//         })
-//         .attr(label_attr) 
-                       
-//         .text(function(d, i) {
-//         	var major = data[i].major
-//         	if (major.indexOf(" ") != -1)
-//         		major = major.substring(0, major.indexOf(" ")) + "\n" + major.substring(major.indexOf(" "))
-//         	return major;
-//         });   
+
+	function updateFilters(el) {
+		// Get id, filter type
+		var type = $(el).data("type")
+		var id = parseInt($(el).data("id"))
+		// Remove filter from list
+		$(el).parent().remove()
+
+		// Get new data
+		var index = filters[type].indexOf(id)
+		filters[type].splice(index, 1) 
+		updateData()
+	};
+
+
+
+	// arc drawing function
+	var arc = d3.svg.arc()             
+	    .outerRadius(r);
+	// arc hovering function
+	var arcHover = d3.svg.arc()
+		.outerRadius(r + 10);
+	var arcOut = d3.svg.arc()
+		.outerRadius(r-50)
+	// pie gen
+	var pie = d3.layout.pie()       
+		.value(function(d) { return (d.prop * 100); });   
+
+
+	// Creates pie chart and inner arcs
+	function updatePieChart() {
+		// Associate parent SVG w/ data... not sure why
+		chart_container.data([data])
+
+		var arcs = chart_container.selectAll("g.slice")    
+		    .data(pie, function(d) {
+		    	return d.data.id
+		    })                       //associate the generated pie data (an array of arcs, each having startAngle, endAngle and value properties) 
+
+		arcs.exit().remove()
+
+		arcs.enter()             
+		        .append("svg:g")                //create a group to hold each slice (we will have a <path> and a <text> element associated with each slice)
+		            .attr("class", "slice")
+
+		    arcs.append("svg:path")
+		            .attr("fill", function(d, i) { return color(i); })
+		            .attr("d", arc)
+		            .attr("class", function(d) {
+		            	return "slice-" + d.data.id
+		            })
+
+		            .on("mouseover", function(d) {
+		            	piePieceMouseover(d3.select(this), d3.selectAll("g.label-" + d.data.id))
+		            })
+
+		            .on("mouseout", function(d) {
+		            	piePieceMouseout(d3.select(this), d3.selectAll("g.label-"+ d.data.id))
+		            })
+
+		            .on("click", function(d) {
+		            	// d3.selectAll(".slice").attr("transform", function(d) {
+		            	// 	return "rotate(90)"
+		            	// })
+		            	piePieceClicked(d.data.id, d.data.key)
+		            });
+	};
+
+	// Creates rect and text labels for each datum
+	function updateLabels() {
+	    var labels = chart_container.selectAll("g.label")
+	    	.data(data, function(d) { return d.id })
+
+	    labels.exit()
+	    	.transition()
+	    		.duration(250)
+	    			.attr("y", 0)
+			.remove()
+
+	    labels.enter()        
+		   		.append("svg:g")
+			   		.attr("class", function(d) {
+			   			return "label label-" + d.id
+			   		})
+			   		.on("mouseover", function(d) {
+			   			piePieceMouseover(d3.selectAll(".slice-"+d.id), d3.select(this))
+			   		})
+			   		.on("mouseout", function(d) {
+			   			piePieceMouseout(d3.selectAll(".slice-"+d.id), d3.select(this))
+			   		})
+			   		.on("click", function(d) {
+			   			piePieceClicked(d.id, d.key)
+			   		})
+		   // Add text
+		   labels.append("svg:text")  
+		        .attr("x", 300)
+		        .attr("y", function(d, i) {
+		        	return (-r + 12) + (31 * i)
+		        })
+		        .attr(label_attr) 
+		                       
+		        .text(function(d, i) {
+		        	var major = data[i].key
+		        	if (major.indexOf(" ") != -1)
+		        		major = major.substring(0, major.indexOf(" ")) + "\n" + major.substring(major.indexOf(" "))
+		        	return major;
+		        });  
+		    // Add rect
+		    labels.append("svg:rect")
+		    	.attr("x", 260)
+		    	.attr("y", function(d, i) { return -r + (30 * i) })
+		    	.attr("height", 20)
+		    	.attr("width", 20)
+		    	.attr("fill", function(d, i) { return color(i); })
+		    	.attr("data-id", function(d) { return d.id })
+		    	.attr("data-color", function(d, i) { return color(i); })
+	};
+
+
+     // TODO: labels look like crap
+ //    // Add prop label to each slice
+	// arcs.append("svg:text")   
+	// 	//set the label's origin to the center of the arc                                  
+	// 	.attr("transform", function(d) {                    
+	// 		//we have to make sure to set these before calling arc.centroid
+	// 		d.innerRadius = 0;
+	// 		d.outerRadius = r;
+	// 		return "translate(" + arc.centroid(d) + ")";       
+	// 	})
+	// .attr("text-anchor", "middle")                          
+	// .text(function(d, i) { return Math.round(data[i].prop * 100) + "%" });        //get the label from our original data array
+
+
+    // Add Labels // 
+    // Create G for label = rect + text
+
+
+
+    function updateRingText(id, text) {
+    	// Remove text
+    	if (text === undefined) {
+    		d3.select("#outer-ring-text").text("")
+    	// Add text
+    	} else {
+    		d3.select("#outer-ring-text")
+    			.text(text + "		x  ")
+    			.on("mouseover", function(d) {
+    				d3.select(this)
+    					.attr("font-weight", "700")
+    			})
+    			.on("mouseout", function(d) {
+    				d3.select(this)
+    					.attr("font-weight", "400")
+    			})
+    			.on("click", function(d) {
+    				// update pie to previous
+    				getAndRenderData()
+    				deselectEntity(id)
+    			})
+    	}
+    };
+
+    function updateSingleLabel(id, is_activated) {
+
+    	var g = d3.select(".label-"+id)
+    	// If label not currently on screen, do nothing
+    	if (g[0][0] == null) return true;
+	    var rect = d3.select(g[0][0].childNodes[1])
+
+    	// Activate it (turn it grey)
+    	if (!is_activated) {
+	    	rect
+	    		.attr("fill", "#c8c8c8")
+	    		.on("click", function() {
+	    			deselectEntity($(this).data("id"))
+	    		});
+	    } else {
+	    	var fill_color = rect.attr("data-color")
+	    	rect
+	    		.attr("fill", fill_color)
+	    		.on("click", null)
+	    };
+    };
+
+    function deselectEntity(id) {
+    	// reduce size of outside ring
+    	reduceOuterRing()
+    	// clear text
+    	updateRingText(id)
+    	// change back rect
+    	updateSingleLabel(id, true)
+    	// flip flag
+    	outer_ring_is_activated = false;
+    };
+
+    function enlargeOuterRing() {
+		d3.select("#outer_ring")
+			.transition()
+				.duration(250)
+					.attr("r", 150)
+    };
+
+    function reduceOuterRing() {
+    	d3.select("#outer_ring")
+    		.transition()
+    			.duration(250)
+    				.attr("r", r)
+    };
+
+
+	function piePieceMouseover(slice, label) {
+		// Don't do anything if filter in place
+		if (outer_ring_is_activated) return false;
+		// extend slice
+		slice.attr("d", arcHover)
+		// bold text (Note... nested indexing the way svg:g works...)
+		d3.select(label[0][0].childNodes[0]).attr("font-weight", 700)
+		// enlarge rect
+		var rect = d3.select(label[0][0].childNodes[1])
+		var prev_x = parseInt(rect.attr("x"))
+		var prev_y = parseInt(rect.attr("y"))
+		rect.attr("height",24).attr("width",24).attr("x",prev_x-2).attr("y",prev_y-2)
+	};
+
+	function piePieceMouseout(slice, label) {
+		// Don't do anything if filter in place
+		if (outer_ring_is_activated) return false;
+		// reduce slice
+		slice.attr("d", arc)
+		// lighten text (Note... nested indexing the way svg:g works...)
+		d3.select(label[0][0].childNodes[0]).attr("font-weight", 400)
+		// reduce rect
+		var rect = d3.select(label[0][0].childNodes[1])
+		var prev_x = parseInt(rect.attr("x"))
+		var prev_y = parseInt(rect.attr("y"))
+		rect.attr("height",20).attr("width",20).attr("x",prev_x+2).attr("y",prev_y+2)
+	};
+
+	function piePieceClicked(id, key) {
+    	// If not already a ring
+    	if (!outer_ring_is_activated) {
+    		// set flag
+    		outer_ring_is_activated = true
+        	// enlarge outer ring
+        	enlargeOuterRing()
+        	// add text
+        	updateRingText(id, key)
+        	// update corresponding label
+        	updateSingleLabel(id, false)
+    		// hit API for top majors
+    		getAndRenderData(id)
+    	}
+	};
     
+	// Creates main SVG container that holds pie chart
+	function createSVGMain() {
+		// Main SVG Container
+		main_container = d3.select("#wide-content-container")
+		    .append("svg:svg")              
+		        .attr("width", w)        
+		        .attr("height", h)
+
+		createOuterRing()
+
+		// Translated chart container
+		chart_container = main_container
+		    .append("svg:g")  //make a group to hold our pie chart
+
+		        .attr("transform", "translate(" + horizontal_translate + "," + vertical_translate + ")")  
+	};
+
+
+    // arc drawing function
+	var donutArc = d3.svg.arc()             
+	    .outerRadius(r)
+	    .innerRadius(r-20)
+
+
+    function createOuterRing() {
+
+    	main_container.append("svg:circle")
+	    		.attr("r",120)
+	    		// .attr("cx",0)
+	    		// .attr("cy",0)
+	    		.attr("cx", horizontal_translate)
+	    		.attr("cy", vertical_translate)
+	    		.attr("stroke-width",1)
+	    		.attr("id", "outer_ring")
+	    		.attr("fill", "#ECF0F1")
+	    		.attr("class", "outer_ring")
+	    		// .attr("transform", "translate(" + horizontal_translate + "," + vertical_translate + ")")
+    
+	    createRingText()
+    };
+
+    function createRingText() {
+    	var t = main_container.append("svg:text")
+    		.attr("text-anchor", "middle")
+    		.attr("x", horizontal_translate)
+    		.attr("y", vertical_translate - r - 7)
+    		.attr("id", "outer-ring-text")
+    		.attr("cursor","pointer")
+    	
+
+    };
+
+
+
+
+    
+
+
+
+
+//     // Constants
+// 	var person_height = 45; var person_width = 45;
+// 	var entity_height = 75; var entity_width = 75;
+
+// 	// TODO: defer loading to AJAX
+// 	var people = {{people|safe}}
+// 	var entities = {{entities|safe}}
+
+// 	var container = d3.select("#wide-content-container")
+// 		.append("svg:svg")
+// 		.attr("width",1000)
+// 		.attr("height",400)
+// 	var filter = container.append("svg:defs")
+// 		.append("svg:filter")
+// 			.attr("id","grayscale")
+// 		.append("svg:feColorMatrix")
+// 			.attr("type","matrix")
+// 			.attr("values","0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0");
+
+
+// 	container.selectAll(".person")
+// 		.data(Object.keys(people))
+// 		.enter().append("image")
+// 			.attr("x", function(d, i) {
+// 				if (i % 2 == 0)
+// 					return 20 + (i * ((person_width / 2) + 5))
+// 				else
+// 					return 20 + ((i - 1) * ((person_width / 2) + 5))
+// 			})
+// 			.attr("y", function(d, i) {
+// 				if (i % 2 == 0)
+// 					return person_height
+// 				else
+// 					return 5 + (2 * person_height)
+// 			})
+// 			.attr("width", person_width)
+// 			.attr("height", person_height)
+// 			.attr("xlink:href", function(d) {return people[d]["pic"] })
+// 			.attr("id", function(d) { return "person-" + d })
+// 			.attr("filter", "url(#grayscale)")
+// 			.attr("class", "person")
+
+// 			.on("mouseover", function(d) {
+// 				// enlargens, colors image
+// 				activateImage(this, "person")
+// 				// hover on relevant entity
+
+// 			})
+
+// 			.on("mouseout", function(d) {
+// 				// resizes, grayscales image
+// 				deactivateImage(this, "person")
+			
+// 			})
+
+
+// 	container.selectAll(".entity")
+// 		.data(Object.keys(entities))
+// 		.enter().append("image")
+// 			.attr("x", function(d, i) {
+// 				return 100 + (i * 175)
+// 			})
+// 			.attr("y", 225)
+// 			.attr("width", entity_width)
+// 			.attr("height", entity_height)
+// 			.attr("xlink:href", function(d) {
+// 				return entities[d]["pic"]
+// 			})
+// 			.attr("filter", "url(#grayscale)")
+// 			.attr("class", "entity")
+// 			.attr("id", function(d) { return "entity-" + d })
+
+// 			.on("mouseover", function(d) {
+// 				activateImage(this, "entity")
+
+// 				for (index in entities[d]["people"]) {
+// 					var id = entities[d]["people"][index]
+
+// 					activateImage($("#person-" + id)[0], "person")
+// 				}
+// 			})
+
+// 			.on("mouseout", function(d) {
+// 				deactivateImage(this, "entity")
+
+// 				for (index in entities[d]["people"]) {
+// 					var id = entities[d]["people"][index]
+
+// 					deactivateImage($("#person-" + id)[0], "person")
+// 				}
+// 			})
+
+
+
+
+
+
+
+
+// function activateImage(el, type) {
+// 	console.log(el)
+// 	el.parentNode.appendChild(el);
+
+// 	var node = d3.select(el)
+// 	var prev_x = parseInt(node.attr("x"))
+// 	var prev_y = parseInt(node.attr("y"))
+
+
+// 	if (type == "person") {
+// 		node
+// 			.attr("height", person_height + 10)
+// 			.attr("width", person_width + 10)
+// 			.attr("x", prev_x - 5)
+// 			.attr("y", prev_y - 5)
+// 	} else if (type == "entity") {
+// 		node
+// 			.attr("height", entity_height + 25)
+// 			.attr("width", entity_width + 25)
+// 			.attr("x", prev_x - 15)
+// 			.attr("y", prev_y - 15)
+// 	}
+
+// 	node.attr("filter", "")
+// };
+
+// function deactivateImage(el, type) {
+// 	var node = d3.select(el)
+// 	var prev_x = parseInt(node.attr("x"))
+// 	var prev_y = parseInt(node.attr("y"))
+
+// 	if (type == "person") {
+// 		node
+// 			.attr("height", person_height)
+// 			.attr("width", person_width)
+// 			.attr("x", prev_x + 5)
+// 			.attr("y", prev_y + 5)
+// 	} else if (type == "entity") {
+// 		node
+// 			.attr("height", entity_height)
+// 			.attr("width", entity_width)
+// 			.attr("x", prev_x + 15)
+// 			.attr("y", prev_y + 15)
+// 	}
+
+
+// 	node.attr("filter", "url(#grayscale)")
+
+// };
+
+
+/*
+Plan: 
+1. autocomplete entities - FINISHED
+2. auto update entities - FINISHED
+3. click entity pings API for majors + - FINISHED
+4. majors API - FINISHED
+5. auto update pie w/ majors - FINISHED
+6. hover displays titles, maybe current positions
+7. x-out ring to go back - FINISHED
+
+8. Fix autocomplete to only allow real schools
+9. Need some id or default to go back to
+10. what to do if no data for majors returned?
+11. what happens is "rest" is clicked
+*/
+
 
 </script>
 {% endblock %}

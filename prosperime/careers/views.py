@@ -34,10 +34,25 @@ logger = logging.getLogger(__name__)
 # Clayton - DEV
 def internships(request):
 
-	data = cache.get("feed_me_some_terns")
-	if data is not None:
-		return render_to_response("careers/d3.html", data, context_instance=RequestContext(request))
+	## WHAT TO SHOW IF NOT LOGGED IN?
+	# Figure out which school to get
+	users_school = request.user.positions.filter(type="education")
+	if users_school:
+		school_id = 2368
+		# school_id = users_school[0].id
+	else:
+		## TODO... what to do here?
+		school_id = 2116 # "University of Pennsylvania"
+		# 2368 = "Stanford University" (one of them)
 
+
+	data = cache.get("feed_me_some_terns_"+str(school_id))
+	if data is not None:
+		data["cache"] = "hit"
+		data["school_id"] = school_id
+		return render_to_response("careers/d3.html", data, context_instance=RequestContext(request))
+	else:
+		return render_to_response("careers/d3.html", {"cache":"miss", "school_id":school_id}, context_instance=RequestContext(request))
 
 
 	## IDEA 1: MAP COLLEGE TO TOP ENTITIES
@@ -66,60 +81,59 @@ def internships(request):
 	# 	"entity_dict":sorted_dict,
 	# }
 
-	## IDEA 2: MAP TOP ENTIITIES TO... SOMETHING ELSE
-	all_internships = Position.objects.filter(Q(title__icontains="intern") | Q(title__icontains="summer")).select_related("person", "entity")
-	all_interns = [p.person for p in all_internships]
+	## IDEA 3: MAP TOP SCHOOLS -> COMMON MAJORS -> ENTITIES
+	
 
-	college_students = [p.person for p in Position.objects.filter(type="education", entity__name__icontains="Stanford").select_related("person")]
+
 	# = people who attended college X + held an internship
-	intersection = set(all_interns).intersection(set(college_students))
+	# intersection = set(all_interns).intersection(set(college_students))
 
 
-	entity_mappings = {}
-	for user in intersection:
-		internships = all_internships.filter(person=user)
-		for i in internships:
-			if i.entity.name is not None:
-				if i.entity.name in entity_mappings:
-					entity_mappings[i.entity.name] += 1
-				else:
-					entity_mappings[i.entity.name] = 1
+	### IDEA 2: Map People to Entities
+	# entity_mappings = {}
+	# for user in intersection:
+	# 	internships = all_internships.filter(person=user)
+	# 	for i in internships:
+	# 		if i.entity.name is not None:
+	# 			if i.entity.name in entity_mappings:
+	# 				entity_mappings[i.entity.name] += 1
+	# 			else:
+	# 				entity_mappings[i.entity.name] = 1
 
-	from heapq import nlargest
-	from operator import itemgetter
-	nlargest = nlargest(5, entity_mappings.iteritems(), itemgetter(1))
-	nlargest = [t[0] for t in nlargest]
+	# from heapq import nlargest
+	# from operator import itemgetter
+	# nlargest = nlargest(5, entity_mappings.iteritems(), itemgetter(1))
+	# nlargest = [t[0] for t in nlargest]
 
-	people = {}
-	entities = {}
+	# people = {}
+	# entities = {}
 
-	related_positions = all_internships.filter(entity__name__in=nlargest)
-	people_counter = 0	
-	for user in intersection:
-		internships = related_positions.filter(person=user)
-		if internships is not None:
-			for i in internships:
-				# People
-				if user.id in people:
-					people[user.id]["entities"].append(i.entity.id)
-				else:
-					people[user.id] = {"pic":user.profile.default_profile_pic(), "entities":[i.entity.id], "id":user.id}
-				# Entities
-				if i.entity.name in entities:
-					entities[i.entity.name]["people"].append(user.id)
-				else:
-					entities[i.entity.name] = {"people":[user.id], "pic":i.entity.default_logo().url, "id":i.entity.id}
+	# related_positions = all_internships.filter(entity__name__in=nlargest)
+	# people_counter = 0	
+	# for user in intersection:
+	# 	internships = related_positions.filter(person=user)
+	# 	if internships is not None:
+	# 		for i in internships:
+	# 			# People
+	# 			if user.id in people:
+	# 				people[user.id]["entities"].append(i.entity.id)
+	# 			else:
+	# 				people[user.id] = {"pic":user.profile.default_profile_pic(), "entities":[i.entity.id], "id":user.id}
+	# 			# Entities
+	# 			if i.entity.name in entities:
+	# 				entities[i.entity.name]["people"].append(user.id)
+	# 			else:
+	# 				entities[i.entity.name] = {"people":[user.id], "pic":i.entity.default_logo().url, "id":i.entity.id}
 
-				people_counter += 1
-				if people_counter <= 40:
-					break;
+	# 			people_counter += 1
+	# 			if people_counter <= 40:
+	# 				break;
 
-	data = {
-		"people":json.dumps(people),
-		"entities":json.dumps(entities),
-	}
+	# data = {
+	# 	"people":json.dumps(people),
+	# 	"entities":json.dumps(entities),
+	# }
 
-	cache.set("feed_me_some_terns", data, 1000)
 
 	# data = {
 	# 	"nlargest":nlargest,
@@ -127,6 +141,149 @@ def internships(request):
 
 	return render_to_response("careers/d3.html", data, context_instance=RequestContext(request))
 
+
+def get_internship_data(request):
+
+	### GET n-MOST COMMON INTERNSHIP ENTITIES FOR GIVEN SCHOOL ###
+
+## Housekeeping ##
+	# TODO: get the alternate ID and positions for each school
+	school_id = request.GET.get("school_id")
+
+	# Get params, create cache suffix (for cache storage/lookup)
+	if request.GET.get("entity_id"):
+		entity_id = request.GET.get("entity_id")
+		cache_suffix = str(school_id) + "_" + str(entity_id)
+	else:
+		entity_id = None
+		cache_suffix = str(school_id)
+
+	# Look in the cache... may not be the best idea for this
+	response = cache.get("feed_me_some_terns_" + cache_suffix)
+	if response is not None:
+		return HttpResponse(json.dumps(response))
+
+
+## Base Data Pulls ##
+
+	# Get all internship positions
+	all_internships = Position.objects.filter(Q(title__icontains="intern") | Q(title__icontains="summer")).select_related("person", "entity")
+	# Get all Users who held them
+	all_interns = [p.person for p in all_internships]
+	# Get all college student Users from given school
+	college_students = [p.person for p in Position.objects.filter(type="education", entity__id=school_id).exclude(ideal_position__major=None).select_related("person")]
+	
+	if entity_id:
+		# get interns from entity + school
+		people_who_worked_at_entity = [i.person for i in all_internships.filter(entity__id=entity_id, person__in=college_students)]
+		# get majors
+		majors = Position.objects.filter(person__in=people_who_worked_at_entity, type="education").exclude(field=None).exclude(ideal_position=None).exclude(ideal_position__major=None)
+		# get frequences
+		frequencies = {}
+		for m in majors:
+			if m.ideal_position.major in frequencies:
+				frequencies[m.ideal_position.major] += 1
+			else:
+				frequencies[m.ideal_position.major] = 1
+		# get majors proportions from frequences for pie chart
+		majors_proportions = []
+		total_num_majors = len(majors)
+		rest = total_num_majors
+		counter = 1
+		for m in frequencies:
+			majors_proportions.append({
+				"key":m,
+				"prop":(float(frequencies[m]) / total_num_majors),
+				"id":counter
+			})
+			rest -= frequencies[m]
+			counter += 1
+
+		# Add the remainder (if there is one)
+		if rest > 1:
+			majors_proportions.append({"key":"Rest", "prop":float(rest) / total_num_majors, "index":counter})
+
+		from pprint import pprint
+		pprint(majors_proportions)
+
+		response = {
+			"majors":majors_proportions,
+			"school_id":school_id,
+			"entity_id":entity_id,
+			"intern_titles":[t.title for t in all_internships.filter(person__in=college_students, entity__id=entity_id)]
+		}
+
+
+
+	else:
+		# majors = Position.objects.filter(type="education", person__in=college_students).exclude(ideal_position__major=None).select_related("ideal_position")
+		# # Map most common
+		# majors_map = {}
+		# for m in majors:
+		# 	if m.ideal_position.major in majors_map:
+		# 		majors_map[m.ideal_position.major] += 1
+		# 	else:
+		# 		majors_map[m.ideal_position.major] = 1
+
+		# # Get 8 most common majors
+		# from heapq import nlargest; from operator import itemgetter;
+		# most_common_majors = nlargest(8, majors_map.iteritems(), itemgetter(1))
+
+		# Get most common entities
+		intersection = set(all_interns).intersection(set(college_students))
+		print "Drawing from pool of: " + str(len(intersection))
+		# Maps {entity_name: frequency}
+		frequencies = {}
+		# Maps {entity_name: entity_id}
+		entities_map = {} # Sorry... this is ugly but I'm rushing
+		internship_counter = 0
+		for user in intersection:
+			# Exclude internships at the college itself
+			internships = all_internships.filter(person=user).exclude(entity__id=school_id)
+			for i in internships:
+				internship_counter += 1
+				if i.entity.name is not None:
+					if i.entity.name in frequencies:
+						frequencies[i.entity.name] += 1
+					else:
+						frequencies[i.entity.name] = 1
+						entities_map[i.entity.name] = i.entity.id
+		
+		from pprint import pprint
+		pprint(frequencies)
+
+
+		# Sort using heap queue (it's fast)
+		from heapq import nlargest; from operator import itemgetter; 
+		most_common_entities = nlargest(8, frequencies.iteritems(), itemgetter(1))
+
+		entities_proportions = []
+		total_num_entities = internship_counter # just for code legibility
+		rest = total_num_entities
+
+		for e in most_common_entities:
+			entities_proportions.append({
+				"key":str(e[0]),
+				"prop":(float(e[1]) / total_num_entities),
+				"id":entities_map[e[0]]
+			})
+			rest -= e[1]
+
+		if rest > 1:
+			entities_proportions.append({"key":"Other", "prop":(float(rest) / total_num_entities), "id":-1})
+
+
+		response = {
+			"school_id":school_id,
+			"entities":entities_proportions,
+			"school_name":Entity.objects.get(id=school_id).name
+		}
+
+
+	cache.set("feed_me_some_terns_" + cache_suffix, response, 1000)
+
+
+	return HttpResponse(json.dumps(response))
 
 
 ######################################################
@@ -1488,6 +1645,30 @@ def get_majors_filters(request):
 		results = sorted(results, key=itemgetter('label_short'))
 
 		return HttpResponse(json.dumps(results))
+
+def get_internship_filters(request):
+	# make sure it's a get request
+	from operator import itemgetter
+	if request.GET:
+
+		params = request.GET['term']
+
+		# TODO: limit to schools that actually have internship data on 
+		# applicable_schools = cache.get("schools_of_repute")
+		# if applicable_schools is None:
+		# 	applicable_schools = 
+
+		majors = []
+		# majors = [{'label_short':m['major'] + " ("+m['title'].split(" ")[0]+")",'label':m['major'] +  " ("+m['title'].split(" ")[0]+")",'value':m['id'],'type':'majors'} for m in IdealPosition.objects.filter(cat="ed",major__icontains=params).values('major','id','title').distinct()]
+		schools = [{'label_short':s['name'],'label':s['name'] + " (school)",'value':s['id'],'type':'schools'} for s in Entity.objects.filter(Q(li_type="school")|Q(type="school")|Q(li_type="educational")).filter(name__icontains=params).exclude(li_uniq_id=None,li_univ_name=None).values('name','id')]
+		# jobs = [{'label_short':p['title'],'label':p['title'] + " (job)",'value':p['id'],'type':'jobs'} for p in IdealPosition.objects.filter(title__icontains=params).values('title','id')]
+
+		results = majors + schools
+
+		results = sorted(results, key=itemgetter('label_short'))
+
+		return HttpResponse(json.dumps(results))
+
 
 
 
