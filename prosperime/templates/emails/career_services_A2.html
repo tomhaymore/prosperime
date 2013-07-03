@@ -1,0 +1,29 @@
+{% extends "emails/email_base.html" %}
+
+{% block content %}
+
+{% if full_name %}
+	<p>Hello {{full_name}},</p>
+{% else %}
+	<p>Hello</p>
+{% endif %}
+
+<p>My name is {{owner}} and I am a recent Stanford University graduate and co-founder of <a href="http://www.prospr.me">ProsperMe</a>. At ProsperMe, we're building tools to help college students explore and think about their careers and career goals.</p>
+
+<p>Our newest tool is called "What can you do with your major?" and helps students visualize what jobs they can expect depending on their major. The information for this tool comes from the student's own school and alumni network. The more people who use it at a university, the more valuable it becomes.</p>
+
+<p>Interested? It's free and easy to use. <span class="flat-button blue-button"><a href="http://www.prospr.me/majors">Try it now!</a></span></p>
+
+<p>This tool works best the more people at your school use it. As we said, it's free for universities and students. Would you be willing to share this with your students?</p>
+
+<p>We'd also love to hear your feedback -- how can we make this better? How could this make your job easier?</p>
+
+<p>Thanks,<br />
+Clayton &amp; Thomas<br/>
+Co-Founders @ ProsperMe</p>
+
+{% endblock %}
+
+{% block reason %}
+you are publicly listed as a career advising or guidance professional for your university
+{% endblock %}
