@@ -312,7 +312,8 @@ $(function() {
 
 			var cat = input.data('val-cat')
 			// GA tracking
-			_gaq.push(['_trackEvent','Majors','Filter',input.data('val-id')])
+			_gaq.push(['_trackEvent','Majors','Filter',cat,input.data('val-id')])
+
 			// add to global filter set
 
 			filters[cat].push(input.data('val-id'));
@@ -384,7 +385,7 @@ $(function() {
 			success:function(response) {
 				if (response["result"] == "success") {
 					// GA tracking
-					_gaq.push(['_trackEvent','Majors','Update',1])		
+					_gaq.push(['_trackEvent','Majors','Update'])		
 					// deconstruct data
 					people = $.parseJSON(response["people"])
 					positions = $.parseJSON(response["positions"])
