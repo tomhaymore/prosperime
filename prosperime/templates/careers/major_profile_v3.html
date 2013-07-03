@@ -57,6 +57,7 @@
 			<div id="career-profile-stats">
 				<div class="pull-left">
 					<p class="stats-module-header">Universities:</p>
+					
 					{% if schools %}
 						<ul class="flat">
 							<li><a class="generic-nav selected" data-stats-view="all">All</a></li>
@@ -69,6 +70,7 @@
 							{% endfor %}
 						</ul>
 					{% endif %}
+					<span style="margin-top:5px; display:inline-block;" class="note">Select a university to narrow down results</span>
 				</div>
 				<div class="clear"></div>
 				<div class="stats-module pull-left">
@@ -101,6 +103,7 @@
 				</div>
 				<div class="clear"></div>
 			</div>
+			<hr />
 			{% if paths %}
 			<div id="paths-container">
 				<div>
