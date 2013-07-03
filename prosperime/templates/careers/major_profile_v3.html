@@ -54,6 +54,7 @@
 			<p><a href="/account/authorize" class="flat-button green-button">Connect with LinkedIn</a></p>
 		</div>
 		{% else %}
+			{% if paths %}
 			<div id="career-profile-stats">
 				<div class="pull-left">
 					<p class="stats-module-header">Universities:</p>
@@ -104,7 +105,7 @@
 				<div class="clear"></div>
 			</div>
 			<hr />
-			{% if paths %}
+			
 			<div id="paths-container">
 				<div>
 					<div class="major-profile-pic-holder pull-left">
@@ -152,7 +153,8 @@
 				</div>
 			{% endfor %}
 			{% else %}
-			<p>Sorry, no people with this degree.</p>
+			<p>Sorry, no people with this degree in your network. Think we're missing someone?</p>
+			<p><a class="flat-button green-button button-med" href="http://www.facebook.com/sharer.php?u=http://www.prospr.me/majors" target="blank">Tell your friends about ProsperMe!</a></p>
 			{% endif %}
 			</div>
 		{% endif %}
