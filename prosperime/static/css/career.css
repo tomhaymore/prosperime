@@ -41,10 +41,12 @@ div.career-profile-nav-container {
 
 .stats-holder {
 	text-align: center;
-	width: 150px;
+	width: 200px;
 	display: inline-block;
 	color: rgb(41,98,152);
-	font-size:18px;
+	font-size:16px;
+	margin-left:auto;
+	margin-right:auto;
 }
 
 .career-profile-stats-container {
@@ -241,3 +243,18 @@ div.spacer {
 }
 
 .center { text-align:center; }
+
+div#paths-container {
+	margin-top:25px;
+}
+
+.stats-module-header {
+	font-size:15px;
+	color:#000;
+}
+
+.stats-module {
+	margin: 15px 15px 0px 10px;
+	width:300px;
+	height:100px;
+}

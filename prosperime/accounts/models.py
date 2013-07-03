@@ -62,24 +62,28 @@ class Profile(models.Model):
             if p['ideal_position__id'] is None:
                 continue
             # check flag
-            if next and ed['end_date'] and p['start_date'] and p['start_date'] > ed['end_date']:
-                # make sure there is an ideal position atached here
-                if p['ideal_position__id']:
-                    # return p
-                    self.first_ideal_job = Position.objects.get(id=p['id'])
-                    self.save()
-            elif next:
+            # if next and ed['end_date'] and p['start_date'] and p['start_date'] > ed['end_date']:
+            #     # make sure there is an ideal position atached here
+            #     if p['ideal_position__id']:
+            #         # return p
+            #         self.first_ideal_job = Position.objects.get(id=p['id'])
+            #         self.save()
+            if next and p['ideal_position__level'] > 0:
+                # print "picking: " + p['title']
                 # return p
                 self.first_ideal_job = Position.objects.get(id=p['id'])
                 self.save()
+                return None
             # if this is first education position, grab next position
             if p['type'] == "education" and p['ideal_position__level'] > 0:
+                # print "trigger: " + p['title']
                 next = True
                 ed = p
         # check to see if there were simply no ed positions
         if ed is None and positions.exists():
             self.first_ideal_job = Position.objects.get(id=positions[0]['id'])
             self.save()
+            return None
 
     # returns a dictionary w/ frequencies of each career
     def get_all_careers(self):
@@ -174,7 +178,14 @@ class Profile(models.Model):
             return None
 
     def educations(self):
-        return self.user.positions.all().filter(type="education").order_by('start_date')
+        return self.user.positions.filter(type="education").order_by('start_date')
+
+    def schools_ids(self):
+        schools_ids = [s['entity__id'] for s in self.user.positions.filter(type="education").values("entity__id")]
+        return list(set(schools_ids))
+
+    def schools(self):
+        return Entity.objects.filter(positions__person=self.user,positions__type="education")
 
     def _industries(self):
         all_domains = []

@@ -1018,75 +1018,165 @@ class CareerPathBase(CareerBase):
 		returns on a specific major, including users, first jobs, and current jobs
 		"""
 		from accounts.models import Profile
-		
+		from operator import itemgetter
 		# init arrays and sets
 		people = []
 		first_jobs = {}
 		current_jobs = {}
+		schools_dict = {}
 
 		people_set = set()
 		first_jobs_set = set()
 		current_jobs_set = set()
 
-		# get schools from user
+		# get schools and cxn filters from user
 		if user:
-			schools = Entity.objects.filter(li_type="school",positions__person=user,positions__type="education").distinct()
+			schools = Entity.objects.filter(Q(li_type="school")|Q(li_type="educational")).filter(positions__person=user,positions__type="education").distinct()
+			connections = [c.id for c in user.profile.connections.all()]
+			focal_schools_ids = [s.id for s in schools]
 		else:
 			schools = None
+			focal_schools_ids = None
 
-		users = User.objects.filter(positions__ideal_position__id=major)
-		# add schools filter if present
-		if schools:
-			users = users.filter(positions__entity__in=schools)
+		# get all users in major
+		users = User.objects.filter(positions__ideal_position=major)
+		
+		# add schools and connections filter if present
+		if user:
+			users = users.filter(Q(positions__entity__in=schools)|Q(id__in=connections))
 
-		first_ideals = dict((u.id,u.profile.first_ideal_job) for u in users)
+		# first_ideals = dict((u.id,u.profile.first_ideal_job) for u in users)
 
-		current_ideals = dict((u.id,u.profile.current_ideal_position()) for u in users)
+		# current_ideals = dict((u.id,u.profile.current_ideal_position()) for u in users)
 
-		base_positions = Position.objects.filter(type="education",ideal_position__id=major).values('person__profile__status','ideal_position__major','ideal_position__title','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
-		if schools:
-			base_positions = base_positions.filter(entity__in=schools)
-
-
-		for p in base_positions:
-			# get first and current ideals 
-			first_ideal = first_ideals[p['person__id']]
-			current_ideal = current_ideals[p['person__id']]
-			# skip this relationship if they don't have ideal position on either end
+		# build array of users information
+		for u in users:
+			# get first and current ideals
+			# first_ideal = Position.objects.get(id=first_ideals[u.id])
+			first_ideal = u.profile.first_ideal_job
+			# current_ideal = Position.objects.get(id=current_ideals[u.id])
+			current_ideal = u.profile.latest_position_with_ideal()
+			if focal_schools_ids:
+				schools_ids = set(u.profile.schools_ids()).intersection(focal_schools_ids)
+			else:
+				schools_ids = u.profile.schools_ids()
+			# if either is undefined, skip to next person
 			if first_ideal is None or current_ideal is None:
 				continue
 
-			if p['person__id'] not in people_set:
-				pic = Profile.objects.get(user__id=p['person__id']).default_profile_pic()
-				fullname = p['person__profile__first_name'] + " " + p['person__profile__last_name']
-				people_set.add(p['person__id'])
-				people.append({"id":p['person__id'],"fullname":fullname,"first_job":first_ideal.id, "current_job":current_ideal.id,"pic":pic})
+			if u.id not in people_set:
+				people_set.add(u.id)
+				people.append({'id':u.id,'full_name':u.profile.full_name(),'first_job':{'id':first_ideal.id,'title':first_ideal.title},'current_job':{'id':current_ideal.id,'title':current_ideal.title},'pic':u.profile.default_profile_pic(),'schools':schools_ids})
+
+			if first_ideal.ideal_position.id not in first_jobs_set:
+				first_jobs_set.add(first_ideal.ideal_position.id)
+				first_jobs[first_ideal.ideal_position_id] = {"id":first_ideal.ideal_position.id,"title":first_ideal.ideal_position.title,'count':1,'schools':schools_ids}
+			else:
+				first_jobs[first_ideal.ideal_position_id]['count'] += 1
+				first_jobs[first_ideal.ideal_position_id]['schools'] = list(set(first_jobs[first_ideal.ideal_position.id]['schools'])|set(schools_ids))
+
+			if current_ideal.ideal_position.id not in current_jobs_set:
+				current_jobs_set.add(current_ideal.ideal_position.id)
+				current_jobs[current_ideal.ideal_position.id] = {'id':current_ideal.ideal_position.id,'title':current_ideal.ideal_position.title,'count':1,'schools':schools_ids}
+			else:
+				current_jobs[current_ideal.ideal_position.id]['count'] += 1
+				current_jobs[current_ideal.ideal_position.id]['schools'] = list(set(current_jobs[current_ideal.ideal_position.id]['schools'])|set(schools_ids))
+
+			for s in schools_ids:
+				if s not in schools_dict:
+					school = Entity.objects.get(id=s)
+					schools_dict[s] = {
+						'people_ids':[],
+						'people':[],
+						'first_jobs_ids':[],
+						'first_jobs':{},
+						'current_jobs_ids':[],
+						'current_jobs':{},
+						'number': 0,
+						'school': {'name':school.name,'id':school.id}
+					}
+				if u.id not in schools_dict[s]['people_ids']:
+					schools_dict[s]['people_ids'].append(u.id)
+					schools_dict[s]['people'] = [{'id':u.id,'full_name':u.profile.full_name(),'first_job':{'id':first_ideal.id,'title':first_ideal.id},'current_job':{'id':current_ideal.id,'title':current_ideal.title},'pic':u.profile.default_profile_pic()}]
+					schools_dict[s]['number'] += 1
+	
+				if first_ideal.ideal_position.id not in schools_dict[s]['first_jobs_ids']:
+					schools_dict[s]['first_jobs_ids'].append(first_ideal.ideal_position.id)
+					schools_dict[s]['first_jobs'][first_ideal.ideal_position.id] = {"id":first_ideal.ideal_position.id,"title":first_ideal.ideal_position.title,'count':1}
+				else:
+					schools_dict[s]['first_jobs'][first_ideal.ideal_position.id]['count'] += 1
+				if current_ideal.ideal_position.id not in schools_dict[s]['current_jobs_ids']:
+					schools_dict[s]['current_jobs_ids'].append(current_ideal.ideal_position_id)
+					schools_dict[s]['current_jobs'][current_ideal.ideal_position.id]= {'id':current_ideal.ideal_position.id,'title':current_ideal.ideal_position.title,'count':1}
+				else:
+					schools_dict[s]['current_jobs'][current_ideal.ideal_position.id]['count'] += 1
+
+		# convert to lists
+		first_jobs_list = [{"id":v['id'],"title":v['title'],"count":v['count'],'schools':v['schools']} for k,v in first_jobs.iteritems()]
+		current_jobs_list = [{"id":v['id'],"title":v['title'],"count":v['count'],'schools':v['schools']} for k,v in current_jobs.iteritems()]
+		# sort
+		first_jobs_sorted = sorted(first_jobs_list, key=itemgetter('count'),reverse=True)
+		current_jobs_sorted = sorted(current_jobs_list, key=itemgetter('count'),reverse=True)
+
+		for k,v in schools_dict.iteritems():
+			# print k,v
+			# flatten to lists
+			school_first_jobs = v['first_jobs']
+			school_current_jobs = v['current_jobs']
+			school_first_jobs_list = [{"id":v1['id'],"title":v1['title'],"count":v1['count']} for k1,v1 in school_first_jobs.items()]
+			school_current_jobs_list = [{"id":v1['id'],"title":v1['title'],"count":v1['count']} for k1,v1 in school_current_jobs.items()]
+			# sort lists
+			# print v
+			v['first_jobs'] = sorted(school_first_jobs_list,key=itemgetter('count'),reverse=True)
+			v['current_jobs'] = sorted(school_current_jobs_list,key=itemgetter('count'),reverse=True)
+
+
+		# base_positions = Position.objects.filter(type="education",ideal_position__id=major).values('person__profile__status','ideal_position__major','ideal_position__title','title','degree','field','ideal_position__id','person__id','person__profile__first_name','person__profile__last_name')
+		# if user:
+		# 	base_positions = base_positions.filter(entity__in=schools)
+
+		# for p in base_positions:
+		# 	# get first and current ideals 
+		# 	first_ideal = first_ideals[p['person__id']]
+		# 	current_ideal = current_ideals[p['person__id']]
+		# 	# skip this relationship if they don't have ideal position on either end
+		# 	if first_ideal is None or current_ideal is None:
+		# 		continue
+
+		# 	if p['person__id'] not in people_set:
+		# 		pic = Profile.objects.get(user__id=p['person__id']).default_profile_pic()
+		# 		fullname = p['person__profile__first_name'] + " " + p['person__profile__last_name']
+		# 		people_set.add(p['person__id'])
+		# 		people.append({"id":p['person__id'],"fullname":fullname,"first_job":first_ideal.id, "current_job":current_ideal.id,"pic":pic})
 				
-			if first_ideal.id not in first_jobs_set:
-				first_jobs_set.add(first_ideal.id)
-				first_jobs[first_ideal.id] = {"id":first_ideal.id,"title":first_ideal.title,"people":[p['person__id']],'current_jobs':[current_ideal.id]}
-			else:
-				first_jobs[first_ideal.id]['people'].append(p['person__id'])
-				first_jobs[first_ideal.id]['current_jobs'].append(current_ideal.id)
+		# 	if first_ideal.id not in first_jobs_set:
+		# 		first_jobs_set.add(first_ideal.id)
+		# 		first_jobs[first_ideal.id] = {"id":first_ideal.id,"title":first_ideal.title,"people":[p['person__id']],'current_jobs':[current_ideal.id]}
+		# 	else:
+		# 		first_jobs[first_ideal.id]['people'].append(p['person__id'])
+		# 		first_jobs[first_ideal.id]['current_jobs'].append(current_ideal.id)
 
-			if current_ideal.id not in current_jobs_set:
-				current_jobs_set.add(current_ideal.id)
-				current_jobs[current_ideal.id] = {'id':current_ideal.id,"title":current_ideal.title,"people":[p['person__id']],"first_jobs":[first_ideal.id]}
-			else:
-				current_jobs[current_ideal.id]['people'].append(p['person__id'])
-				current_jobs[current_ideal.id]['first_jobs'].append(first_ideal.id)
+		# 	if current_ideal.id not in current_jobs_set:
+		# 		current_jobs_set.add(current_ideal.id)
+		# 		current_jobs[current_ideal.id] = {'id':current_ideal.id,"title":current_ideal.title,"people":[p['person__id']],"first_jobs":[first_ideal.id]}
+		# 	else:
+		# 		current_jobs[current_ideal.id]['people'].append(p['person__id'])
+		# 		current_jobs[current_ideal.id]['first_jobs'].append(first_ideal.id)
 
-		first_jobs_list = [{"id":v['id'],"title":v['title'],"people":v['people'],'current_jobs':v['current_jobs']} for k,v in first_jobs.iteritems()]
-		current_jobs_list = [{"id":v['id'],"title":v['title'],"people":v['people'],'first_jobs':v['first_jobs']} for k,v in current_jobs.iteritems()]
+		# first_jobs_list = [{"id":v['id'],"title":v['title'],"people":v['people'],'current_jobs':v['current_jobs']} for k,v in first_jobs.iteritems()]
+		# current_jobs_list = [{"id":v['id'],"title":v['title'],"people":v['people'],'first_jobs':v['first_jobs']} for k,v in current_jobs.iteritems()]
 
 		data = {
-			"current_jobs":current_jobs_list,
-			"first_jobs":first_jobs_list,
+			"current_jobs":current_jobs_sorted,
+			"first_jobs":first_jobs_sorted,
 			"people":people,
-			"result":"success"
+			"schools":schools_dict
 		}
 
 		return data
+
+	def get_starting_jobs_from_school(self,**opts):
+		pass
 
 	def get_majors_data_v3(self,**opts):
 		"""
