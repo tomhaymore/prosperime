@@ -43,6 +43,28 @@ class NotificationEmail(EmailBase):
 			'to':[{'name':'admins','email':'admin@prospr.me'}]
 		}
 
+class MarketingEmail(EmailBase):
+
+	def __init__(self,**params):
+		# pass params to context
+		d = Context(params['template_vars'])
+		# render html and text versions
+		text_content = get_template('emails/'+params['template']+'.txt').render(d)
+		html_content = get_template('emails/'+params['template']+'.html').render(d)
+		# compile message attributes
+		self.msg = {
+			'from_email':'admin@prospr.me',
+			'from_name':'ProsperMe',
+			'text':text_content,
+			'html':html_content,
+			'subject':params['subject'],
+			'track_clicks':True,
+			'track_opens':True,
+			'google_campaign_name':'prosper_welcome',
+			'tags':['marketing','career-services'],
+			'to':[{'name':params['name'],'email':params['email_address']}]
+		}
+
 class WelcomeEmail():
 	"""
 	Thin wrapper around Mandrill client
