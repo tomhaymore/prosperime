@@ -372,7 +372,7 @@ def finish_registration(request):
 			# send welcome email
 			welcome = emaillib.WelcomeEmail(user)
 			try:
-				welcome.send_email()
+				res = welcome.trigger()
 			except:
 				logger.error("couldn't send welcome email")
 			# add email prefs
