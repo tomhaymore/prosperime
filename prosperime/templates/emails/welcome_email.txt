@@ -1,4 +1,4 @@
-{% extends "base_full.txt" %}
+{% extends "email_base.txt" %}
 {% block content %}
 Welcome to ProsperMe!
 \n
