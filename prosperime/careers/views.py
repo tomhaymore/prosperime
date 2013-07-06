@@ -417,43 +417,60 @@ def major(request,major_id):
 	"""
 	view for detailed information on a particular major
 	"""
+	
 	# get degree
 	major = IdealPosition.objects.get(pk=major_id)
+	# instantiate career lib class
+	C = careerlib.CareerPathBase()
 
 	# check if user is authenticated
 	if not request.user.is_authenticated():
 		data = {
-			'major':major
+			'major':major,
+			'major_data':C.get_major_data(major)
 		}
-		return render_to_response('careers/major_profile_old.html',data,context_instance=RequestContext(request)) 
-
-	C = careerlib.CareerPathBase()
-
+		return render_to_response('careers/major_profile_v3.html',data,context_instance=RequestContext(request)) 
 	
-	# get connections
+	# get major data
+	major_data = C.get_major_data(major,request.user)
+	
+	# get connections and schools
+	# connections = [c.id for c in request.user.profile.connections.all()]
+	# schools = Entity.objects.filter(Q(li_type="school")|Q(li_type="educational")).filter(positions__person=request.user).annotate(number=Count("positions"))
 
-	connections = [c.id for c in request.user.profile.connections.all()]
-	schools = [e.id for e in Entity.objects.filter(Q(li_type="school")|Q(li_type="educational")).filter(positions__person=request.user)]
+	# # expand universities array
+	# for s in schools:
+	# 	s.starting = C.get_starting_jobs_from_school(major=major,user=request.user) 
+	# 	s.current = C.get_current_jobs_from_school(major=major,user=request.user)
+	# 	s.number = len(IdealPosition.objects.filter(Q(position__person__id__in=connections)|Q(position__entity__in=schools)).annotate(num=Count("position__person")))
 
-	paths  = []
-	# positions = Position.objects.filter(ideal_position=major).select_related("person")
+	# init array
+	# paths  = []
 
-	# # for p in positions[:10]:
-	# # 	# this returns an array --> [first_positions, last_position]
-	# # 	first_and_last_positions = p.person.profile.first_and_last_positions() 
-	# # 	if first_and_last_positions is not None:
-	# # 		paths.append({"id":p.person.id, "full_name":p.person.profile.full_name(), "profile_pic":p.person.profile.default_profile_pic(), "first":first_and_last_positions[0].title + " at " + first_and_last_positions[0].entity.name, "latest":first_and_last_positions[1].title + " at " + first_and_last_positions[1].entity.name})
-	users = User.objects.filter(Q(id__in=connections)|Q(positions__entity__id__in=schools)).filter(positions__ideal_position=major)
-	for u in users[:10]:
-	# this returns an array --> [first_positions, last_position]
-		first_and_last_positions = u.profile.first_and_last_positions() 
-		if first_and_last_positions is not None:
-			paths.append({"id":u.id, "full_name":u.profile.full_name(), "profile_pic":u.profile.default_profile_pic(), "first":first_and_last_positions[0].title + " at " + first_and_last_positions[0].entity.name, "latest":first_and_last_positions[1].title + " at " + first_and_last_positions[1].entity.name})
+	# users = User.objects.filter(Q(id__in=connections)|Q(positions__entity__id=schools)).filter(positions__ideal_position=major).distinct()
+	# for u in users:
+
+	# 	first_and_last_positions = u.profile.first_and_last_positions() 
+	# 	if first_and_last_positions is not None:
+	# 		paths.append({"id":u.id, "full_name":u.profile.full_name(), "profile_pic":u.profile.default_profile_pic(), "first":first_and_last_positions[0].title + " at " + first_and_last_positions[0].entity.name, "latest":first_and_last_positions[1].title + " at " + first_and_last_positions[1].entity.name})
 
 	data = {
-		"paths": paths,
+		"paths": major_data['people'],
 		"major": major,
+		"schools": major_data['schools'],
+		"number": len(major_data['people'])
+		# "starting": major_data['first_jobs'][0],
+		# "current": major_data['current_jobs'][0]
 	}
+	if major_data['first_jobs']:
+		data['starting'] = major_data['first_jobs'][0]
+	else:
+		data['starting'] = None
+
+	if major_data['current_jobs']:
+		data['current'] = major_data['current_jobs'][0]
+	else:
+		data['current'] = None
 
 	if "tasks" in request.session:
 		data['tasks'] = True
@@ -464,55 +481,7 @@ def major(request,major_id):
 		data['profile_task_id'] = None
 		data['connections_task_id'] = None
 
-	# # get schools
-	# focal_schools = Entity.objects.filter(positions__person=request.user).values_list('id')
-	# schools_in = Entity.objects.filter(positions__ideal_position=major,id__in=focal_schools).annotate(pos=Count("positions__id")).values("id","name","pos").distinct()
-	# schools_all = Entity.objects.filter(positions__ideal_position=major).annotate(pos=Count("positions__id")).values("id","name","pos").distinct()
-
-	# # get first jobs
-	# first_jobs_in = C.get_first_jobs_from_major(major,request.user)
-	# first_jobs_all = C.get_first_jobs_from_major(major)
-
-	# # get careers
-	# careers_in = C.get_careers_from_major(major,request.user)
-	# careers_all = C.get_careers_from_major(major)
-
-	# # get paths
-	# paths_in = User.objects.filter(positions__ideal_position=major,positions__entity_id__in=focal_schools)
-	# paths_all = User.objects.filter(positions__ideal_position=major)
-
-	# # get comments
-	# # TODO
-
-	# data_in = {
-	# 	'first_jobs':first_jobs_in,
-	# 	'paths':paths_in,
-	# 	'careers':careers_in,
-	# 	'schools':schools_in
-	# }
-
-	# print "DATA- in "
-	# print data_in
-
-	# data_all = {
-		
-	# 	'first_jobs':first_jobs_all,
-	# 	'paths':paths_all,
-	# 	'careers':careers_all,
-	# 	'schools':schools_all
-	# }
-
-	# print '######################'
-	# print "DATA- out "
-	# print data_all
-
-	# data = {
-	# 	'major':major,
-	# 	'network':data_in,
-	# 	'all':data_all
-	# }
-
-	return render_to_response('careers/major_profile_old.html',data,context_instance=RequestContext(request))
+	return render_to_response('careers/major_profile_v3.html',data,context_instance=RequestContext(request))
 
 def get_school_fragment(request,school_id=None):
 	c = careerlib.CareerPathBase()

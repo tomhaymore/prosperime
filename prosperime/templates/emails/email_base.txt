@@ -12,7 +12,6 @@ You are receiving this email because {% block reason %} you are publicly listed 
 Our mailing address is:\n
 	420 James Road #1\n
 	Palo Alto, CA 94306 \n
-
 \n
 \n
 Unsubscribe from this list by following this link: http://www.prospr.me/unsubscribe/?email_address={{email_address}}

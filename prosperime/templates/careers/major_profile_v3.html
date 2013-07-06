@@ -1,0 +1,185 @@
+{% extends "base_full.html" %}
+{% load cache %}
+{% block head %}
+
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/career.css" />
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/majors.css" />
+<style type="text/css">
+	
+
+</style>
+<script type="text/javascript" src="{{ STATIC_URL }}js/majors.js" /></script>
+
+{% endblock %}
+
+{% block extramessage %}
+	{% if not user.is_authenticated %}
+		<div id="cta-container">
+			
+			Create an account to see personalized results, filters and more &nbsp;&nbsp; <a class="flat-button green-button button-med" href="/account/authorize">Connect with LinkedIn</a>
+			
+		</div>
+	{% endif %}
+
+{% endblock %}
+
+{% block content %}
+
+
+
+<div id="content-container" class="main-container">
+
+	
+		{% if major.long_title %}
+			<p class="feature-page-header">
+				<span class="black">Major: </span>
+				{{major.long_title}}
+			</p>
+		{% else %}
+			<p class="feature-page-header">
+				<span class="black">Major: </span>
+				{{major.title}}
+			</p>
+		{% endif %}
+
+		{% if major.description %}
+			<p class="main-sub-header">{{major.description}}</p>
+		{% endif %}
+
+		<div id="career-profile-container">
+		{% if not user.is_authenticated %}
+		<div class="career-descrption">
+			<p>To see details on this major, you need authenticate with your LinkedIn account.</p>
+			<p>Authenticating helps personalize your experience and keeps our user data safe.</p>
+			<p><a href="/account/authorize" class="flat-button green-button">Connect with LinkedIn</a></p>
+		</div>
+		{% else %}
+			{% if paths %}
+			<div id="career-profile-stats">
+				<div class="pull-left">
+					<p class="stats-module-header">Universities:</p>
+					
+					{% if schools %}
+						<ul class="flat">
+							<li><a class="generic-nav selected" data-stats-view="all">All</a></li>
+							{% for k,v in schools.items %}
+								{% if forloop.counter0 == 0%}
+									<li><a class="generic-nav unselected" data-stats-view="{{v.school.id}}">{{v.school.name}}</a></li>
+								{% else %}
+									<li><a class="generic-nav unselected" data-stats-view="{{v.school.id}}">{{v.school.name}}</a></li>
+								{% endif %}
+							{% endfor %}
+						</ul>
+					{% endif %}
+					<span style="margin-top:5px; display:inline-block;" class="note">Select a university to narrow down results</span>
+				</div>
+				<div class="clear"></div>
+				<div class="stats-module pull-left">
+					{% if schools %}
+						<p class="stats-module-header">Number of people with his major:</p>
+							<span class="stats-holder" data-stats-type="number" data-stats-view="all">{{number}}</span>
+						{% for k,v in schools.items %}
+							<span class="stats-holder" style="display:none;" data-stats-type="number" data-stats-view="{{v.school.id}}">{{v.number}}</span>
+						{% endfor %}
+					{% endif %}
+				</div>
+				<div class="stats-module pull-left">
+					{% if schools %}
+						<p class="stats-module-header">Most common starting position:</p>
+							<span class="stats-holder" data-stats-type="starting" data-stats-view="all">{{starting.title}}</span>
+							{% for k,v in schools.items %}
+								<span class="stats-holder" style="display:none;" data-stats-type="starting" data-stats-view="{{v.school.id}}">{{v.first_jobs.0.title}}</span>
+							{% endfor %}
+					{% endif %}
+				</div>
+				<div class="stats-module pull-left">
+					{% if schools %}
+						<p class="stats-module-header">Most common current position:</p>
+							<span class="stats-holder" data-stats-type="current" data-stats-view="all">{{current.title}}</span>
+							{% for k,v in schools.items %}
+								<span class="stats-holder" style="display:none;" data-stats-type="current" data-stats-view="{{v.school.id}}">{{v.current_jobs.0.title}}</span>
+							{% endfor %}
+						
+					{% endif %}
+				</div>
+				<div class="clear"></div>
+			</div>
+			<hr />
+			
+			<div id="paths-container">
+				<div>
+					<div class="major-profile-pic-holder pull-left">
+						<div class="major-column-header">People</div>
+					</div>
+					<div class="first-position-holder pull-left" style="height:35px;">
+						<div class="major-column-header">
+							First Position
+						</div>
+					</div>
+					<div class="path-holder pull-left" style="height:20px;">
+						<div class="major-column-header">
+						</div>
+					</div>
+					<div class="current-position-holder pull-left" style="height:35px;">
+						<div class="major-column-header">
+							Current Position
+						</div>
+					</div>
+					<div class="clear"></div>
+				</div>
+				{% for p in paths %}
+				<div class="path-row" data-p_id="{{p.id}}">
+					<div class="major-profile-pic-holder center pull-left">
+						<div class="path-person-title">{{p.full_name}}</div>
+						<img class="major-profile-pic" src="{{p.pic}}" />
+					</div>
+					<div class="first-position-holder pull-left">
+						<div class="first-position-inner">
+						{{p.first_job.title}}
+						</div>
+					</div>
+					<div class="path-holder pull-left">
+						<div class="path-holder-inner">
+							<img src="{{STATIC_URL}}img/connector.png" />
+						</div>
+					</div>
+					<div class="current-position-holder pull-left">
+						<div class="current-position-inner">
+						{{p.current_job.title}}
+						</div>
+					</div>
+					<div class="clear"></div>
+
+				</div>
+			{% endfor %}
+			{% else %}
+			<p>Sorry, no people with this degree in your network. Think we're missing someone?</p>
+			<p><a class="flat-button green-button button-med" href="http://www.facebook.com/sharer.php?u=http://www.prospr.me/majors" target="blank">Tell your friends about ProsperMe!</a></p>
+			{% endif %}
+			</div>
+		{% endif %}
+	</div>
+</div>
+
+{% endblock %}
+
+{% block templates %}
+<script type="text/javascript">
+$(function() {
+
+	if ($("#cta-container")) {
+			setTimeout(function() {
+				$("#cta-container").addClass("show")
+			},2500);
+		};
+
+
+
+
+
+
+})
+</script>
+
+
+{% endblock %}

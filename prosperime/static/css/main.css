@@ -1983,3 +1983,8 @@ div.generic-nav-container {
 	border-bottom: solid 1px rgb(41,98,152);
 	margin-bottom: 15px;
 }
+
+.note {
+	font-size:12px;
+	color:rgb(75,74,74);
+}

@@ -41,10 +41,12 @@ div.career-profile-nav-container {
 
 .stats-holder {
 	text-align: center;
-	width: 150px;
+	width: 200px;
 	display: inline-block;
 	color: rgb(41,98,152);
-	font-size:18px;
+	font-size:16px;
+	margin-left:auto;
+	margin-right:auto;
 }
 
 .career-profile-stats-container {
@@ -175,8 +177,9 @@ div.first-position-holder {
 div.first-position-inner {
 	font-size:0.85em;
 	text-align:center;
-	position:absolute;
-	top:50%;
+	/*position:absolute;*/
+	/*top:50%;*/
+	margin-top:42px;
 }
 
 div.path-holder {
@@ -202,8 +205,9 @@ div.current-position-holder {
 div.current-position-inner {
 	text-align:center;
 	font-size:0.85em;
-	position:absolute;
-	top:50%;
+	/*position:absolute;*/
+	/*top:50%;*/
+	margin-top:42px;
 }
 
 img.major-profile-pic {
@@ -241,3 +245,18 @@ div.spacer {
 }
 
 .center { text-align:center; }
+
+div#paths-container {
+	margin-top:25px;
+}
+
+.stats-module-header {
+	font-size:15px;
+	color:#000;
+}
+
+.stats-module {
+	margin: 15px 15px 0px 10px;
+	width:300px;
+	height:70px;
+}
