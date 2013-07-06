@@ -1,0 +1,533 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+<!-- CSS -->
+	<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Lato">
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/chosen.css"/>
+
+<!-- JS -->
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<script src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
+	<script src="{{ STATIC_URL }}js/cache.js"></script>
+
+    <style type="text/css">
+
+
+			
+	.axis path,
+	.axis line {
+		fill: none;
+		stroke: black;
+		shape-rendering: crispEdges;
+	}
+	
+	.axis text {
+		font-family: sans-serif;
+		font-size: 11px;
+	}
+
+	.node {
+		cursor:pointer;
+	}
+
+	select {
+		width:350px;
+	}
+		
+    </style>
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div id="wide-content-container" style="min-height:600px;"class="main-container">
+			<a href="/internships/">Other</a>
+
+
+	<div id="header-container">
+
+		<p class="feature-page-header">Internships: <span id="school-name"></span></p>
+		<p class="feature-page-subheader">Use the chart below to learn more about which employers are hiring interns from which schools. Click on an employer to dive deeper.</p>
+		
+		{% if user.is_authenticated %}
+			<select id="schools-select" multiple class="chzn-select" data-placeholder="School" data-type="school">
+				<!-- Fill in -->
+			</select>
+
+			<select id="majors-select" multiple class="chzn-select" data-placeholder="Major" data-type="major">
+				<!-- Fill in -->
+			</select>
+
+			<select id="locations-select" multiple class="chzn-select" data-placeholder="Location" data-type="location">
+				<!-- Fill in -->
+			</select>
+
+			<select id="pay-select" multiple class="chzn-select"
+			data-placeholder="Paid" data-type="pay">
+				<!-- Fill in -->
+			</select>
+
+			<br/>
+			<br/>
+			<br/>
+
+		{% endif %}
+
+	
+	</div>
+
+
+
+</div>
+{% endblock %}
+
+{% block templates %}
+
+<!-- V3 Script -->
+<script type="text/javascript">
+
+	var filters = {
+		"majors":[],
+		"schools":[],
+		"locations":[],
+		"pay":[],
+	}
+	// Dictates logging to the console or not
+	var logging = true,
+		w = 1100,
+		h = 550,
+		padding = 50,
+		color = d3.scale.category20c(),   
+		cache = null,
+		svg = null,
+		entity_data = null,
+		data = null,
+		major_data = null;
+
+	var grid_l = 60
+	var first_offset = 150
+
+
+
+
+	$(function() {
+		// Set up inputs
+		fillSelectInputs(schools, majors, locations, pay)
+		setupInputs($("#schools-select"))
+		setupInputs($("#majors-select"))
+		setupInputs($("#locations-select"))
+		setupInputs($("#pay-select"))
+		$(".chzn-select").chosen()
+		// Set up cache
+		cache = new ClientCache()
+		// Get Data
+		// data = updateData()
+		// Run viz
+		createSVG()
+		updateData()
+		run()
+	});
+
+	
+	function updateData() {
+		// check cache
+		if (cache.contains(filtersToKey(filters))) {
+			console.log("cache hit")
+			var all = cache.get(filtersToKey(filters))
+			entity_data = all["entity_data"]
+			major_data = all["major_data"]
+			data = all["data"]
+			return true;
+		}
+
+
+		// slice dummy arrays to fit screen dimensions
+		if (filters["majors"].length > 0)
+			major_data = filters["majors"]
+		else
+			major_data = majors_d.slice(0, (h-first_offset) / grid_l) 
+
+		entity_data = entities_d.slice(0, (w - first_offset) / grid_l)
+		data = []
+
+		for (var m = 0; m < major_data.length; m++){
+			data.push({"major":null, "frequencies":[], "key":null})
+
+			for (var n = 0; n < entity_data.length; n++) { 
+
+				data[m]["major"] = major_data[m]
+				data[m]["key"] = createKey(major_data[m])
+				var num = Math.round(Math.random() * 9) + 1
+				if (Math.round(Math.random() * 3) == 3)
+					data[m]["frequencies"].push("")
+				else
+					data[m]["frequencies"].push(num)
+			};
+		};
+
+		// set cache
+		var all_data = {
+			"data":data,
+			"major_data":major_data,
+			"entity_data":entity_data,
+		}
+		cache.set(filtersToKey(filters), all_data)
+	};
+
+	function createSVG() {
+		// create svg
+		svg = d3.select("#wide-content-container")
+			.append("svg:svg")
+				.attr("width", w).attr("height", h)
+	}
+
+
+	function run() {
+		// select rows, bind data
+		var rows = svg.selectAll("g.rows")
+			.data(data, function(d) {
+				return d.key
+			})
+		// remove old rows
+		rows.exit()
+			// .transition()
+			// 	.duration(250)
+					// .attr("transform", "translate("+0+","+h+")")
+			.remove()
+
+		// append g to entire row, apply handlers to it
+		var row = rows.enter().append("svg:g")
+			.attr("class", "rows")
+			.on("mouseover", function(d) {
+				d3.select(this).selectAll(".row-container")
+					.attr("stroke", "#333")
+					.attr("stroke-width", "3")
+			})
+			.on("mouseout", function(d) {
+				d3.select(this).selectAll(".row-container")
+					.attr("stroke", "none")
+					.attr("stroke-width", "0")
+			})
+
+		// this is the "hover" row that is hidden by default
+		row.append("svg:rect")
+			.attr("height", grid_l)
+			.attr("width", w)
+			.attr("x", 0)
+			.attr("y", 0)
+			.attr("fill", "none")
+			.attr("stroke", "none")
+			.attr("class", "row-container")
+			
+		// updates majors and entities
+		updateMajors(rows)
+		updateEntities(svg)
+
+		// create g element for each square
+		var squares = row.selectAll("g.square")
+			.data(function(d, i) {
+				return d.frequencies
+			})
+			.enter().append("svg:g")
+				.attr("class", "square")
+				.attr("data-color", function(d,i) {
+					return color(i)
+				})
+		// create each individual colored square
+		squares
+			.append("svg:rect")
+				.attr("x", function(d,i) {
+					return first_offset + (grid_l *i)
+				})
+				.attr("y", 0)
+				.attr("height", grid_l).attr("width", grid_l)
+				.attr("fill", function(d, i) {
+					return color(i)
+				})
+				.attr("stroke","rgba(51,51,51,0.5)")
+				.attr("stroke-width",2)
+				
+		// add text to each individual square
+		squares
+			.append("svg:text")
+				.text(function(d, i) { 
+					return d 
+				})
+				.attr("x", function(d, i) {
+					return first_offset + (grid_l * i) + (grid_l / 2)
+				})
+				.attr("y", function(d) {
+					return (grid_l / 2) + 6
+				})
+				.attr("class", "num")
+				.attr("text-anchor", "middle")
+
+
+		// reposition rows
+		var f_y = first_offset
+		d3.selectAll(".rows").each(function() {
+			d3.select(this)
+				.attr("transform", "translate("+0+","+f_y+")")
+			f_y = f_y + grid_l
+		})
+
+	}
+
+
+	function updateMajors(rows) {
+		
+		var major_labels = rows.selectAll("g.major")
+			// have to return as array otherwise breaks into chars
+			.data(function(d,i) { return [d.major] }) 
+			.enter().append("svg:g")
+				.attr("class", "major")
+
+		major_labels
+			.append("svg:rect")
+			.attr("x", 0)
+			.attr("y", 0)
+			.attr("height", grid_l)
+			.attr("width", first_offset)
+			.attr("fill", "none")
+			.attr("stroke", "rgba(51,51,51,0.5)")
+			.attr("stroke-width",1)
+
+
+		major_labels.append("svg:text")
+			.attr("y", grid_l / 2)
+			.attr("x", first_offset / 2)
+			.attr("text-anchor", "middle")
+			.text(function(d) {
+				return d
+			})
+			.attr("font-size", "12")
+	}
+
+
+
+
+	function updateEntities(svg) {
+
+		var ents = svg.selectAll("g.entity")
+			.data(entity_data).enter()
+			.append("svg:g")
+				.attr("class", "entity")
+					.on("click", function(d) {
+						console.log("foo")
+					})
+
+
+		ents.append("svg:rect")
+			.attr("height", first_offset)
+			.attr("width", grid_l)
+			.attr("y", 0)
+			.attr("x", function(d, i) {
+				return first_offset + (grid_l * i)
+			})
+			.attr("stroke", "rgba(51,51,51,0.5)")
+			.attr("fill", "none")
+
+		ents.append("svg:text")
+			.attr("x", function(d, i) { 
+				return first_offset + (grid_l) * i + (grid_l / 2)
+			})
+			.attr("y", 0)
+			.attr("text-anchor", "middle")
+			.text(function(d) {
+				if (d.length > 25) return d.substring(0,23) + "..."
+				else return d 
+			})
+			.attr("font-size", "10")
+			.attr("transform", function(d, i) {
+				var x = first_offset + (grid_l * i) - 10
+				return "rotate(90 " + x	+","+37+")"
+			})
+
+		ents.append("svg:rect")
+			.attr("height", h)
+			.attr("width", grid_l)
+			.attr("y", 0)
+			.attr("x", function(d, i) {
+				return first_offset + (grid_l * i)
+			})
+			.attr("fill", "none")
+			.attr("stroke", "none")
+			.attr("class", "row-container")
+			.on("mouseover", function(d) {
+				console.log('m')
+					// d3.select(this).selectAll(".row-container")
+					// 	.attr("stroke", "#333")
+					// 	.attr("stroke-width", "3")
+				})
+				.on("mouseout", function(d) {
+					// d3.select(this).selectAll(".row-container")
+					// 	.attr("stroke", "none")
+					// 	.attr("stroke-width", "0")
+				})
+			
+	}
+
+
+
+  	/* Lowly Helpers */
+  	// Given some string or int "a", create a uniq key w/ filters
+  	function createKey(a) {
+  		return a + filters["majors"].join("-") + filters["schools"].join("-") + filters["locations"].join("-") + filters["pay"].join("-")
+  	};
+
+  	function mean(a) {
+  		var sum = 0
+  		for (i in a)
+  			sum += a[i]
+  		return sum/a.length
+  	};
+
+  	function standardDeviation(a, mean) {
+  		var sum = 0, length = a.length
+  		for (var i = 0; i < length; i++) {
+  			sum += Math.pow(a[i] - mean, 2)
+  		}
+  		return Math.pow(sum/length, 0.5)
+  	};
+
+	function shuffle(o) {
+	    for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+	    return o;
+	};
+
+	function random_array(max_elems, min, max) {
+		var num_elems = Math.ceil(Math.random() * max_elems)
+		var array = []
+
+		// // for truly random numbers
+		// for (var j = 0; j < num_elems; j++) {
+		// 	array.push(Math.floor(Math.random() * (max - min)) + min)
+		// };
+
+		// for slight localization
+		// set first #
+		array.push(Math.floor(Math.random() * (max - min)) + min)
+		for (var i = 0; i < num_elems - 1; i++) {
+			array.push(Math.floor(Math.random() * (array[0] + (max - array[0]) / 2)) + (array[0] - (min + array[0])/2))
+		};
+		return array;
+	};
+
+	function fillSelectInputs(schools, majors, locations, pay) {
+		var majors_html = "", schools_html = ""; var locations_html =""; var pay_html = "";
+		for (index in majors)
+			majors_html += "<option value='" + majors[index]["value"] + "'>" + majors[index]["name"] + "</option>"
+	
+		for (index in schools)
+			schools_html += "<option value='" + schools[index]["value"] + "'>" + schools[index]["name"] + "</option>"
+	
+		for (index in locations)
+		locations_html += "<option value='" + locations[index]["value"] + "'>" + locations[index]["name"] + "</option>"
+		
+		for (index in pay)
+		pay_html += "<option value='" + pay[index]["value"] + "'>" + pay[index]["name"] + "</option>"
+
+
+		$("#schools-select").html(schools_html)
+		$("#majors-select").html(majors_html)
+		$("#locations-select").html(locations_html)
+		$("#pay-select").html(pay_html)
+	};
+
+	function setupInputs(input) {
+		$(input).on("change", function(ev) {
+			// check if query filter added or removed
+			var is_null = ($(this).val()) ? false : true;
+			// get input type
+			var type = $(this).data("type")
+			// update filter
+			switch(type) {
+				case "major":
+					if (is_null) filters["majors"] = []
+					else filters["majors"].push($(this).val())
+					break;
+				case "school":
+					if (is_null) filters["schools"] = []
+					else filters["schools"].push($(this).val())
+					break;
+				case "location":
+					if (is_null) filters["locations"] = []
+					else filters["locations"].push($(this).val())
+					break;
+				case "pay":
+					if (is_null) filters["pay"] = []
+					else filters["pay"].push($(this).val())
+					break;
+			}	
+
+			// update data
+			updateData()
+			// update viz
+			run()
+		});
+	};
+
+	function filtersToKey(filters) {
+		var string = filters["majors"].join()+filters["schools"].join()+filters["locations"].join()+filters["pay"].join()
+	    return cache.generateKey(string)
+	};
+
+	function _log(text) {
+		if (logging) console.log(text)
+	};
+
+
+
+	
+
+	var entities_d = ['Stanford Law Review', 'Storm Ventures', 'The Church of Jesus Christ of Latter-day Saints', 'Legal Aid Society - Employment Law Center', 'Marathon Petroleum Company', 'REED', 'eFund', 'U.S. Venture Partners', 'Salomon Brothers', 'Montgomery Securities', 'Oxford University - Stanford Overseas Studies Program', 'Cathedral and John Connon School', 'MICROS Systems Inc', 'IBM', 'Keio University', 'Richmond Times-Dispatch', 'friedNerve', 'NONOBJECT', 'Neato Robotics', 'Art Center College of Design', 'Aarki', 'De Anza College', 'Sensory Access Foundation']
+
+	var majors_d = ["Mechanical Engineering", "Computer Science", "English", "Communications", "Symbolic Systems", "History", "Biology", "Physics"]
+
+	
+   	// Dummy Select Data               
+	var schools = [
+		{"name": "Stanford University", "value":7},
+		{"name": "California Institute of Technology", "value":10},
+		{"name": "UC-Berkeley", "value":22},
+		{"name": "University of Southern California", "value":17},
+		{"name": "Yale", "value":4},
+	]
+
+	var majors = [
+		{"name": "Mechanical Engineering", "value":"Mechanical Engineering"},
+		{"name": "Computer Science", "value":"Computer Science"},
+		{"name": "Communications", "value":"Communications"},
+		{"name": "English", "value":"English"},
+		{"name": "Biology", "value":"Biology"},
+		{"name": "Symbolic Systems", "value":"Symbolic Systems"},
+		{"name": "History", "value":"History"},
+		{"name": "Physics", "value":"Physics"},
+	]
+
+	var locations = [
+		{"name": "San Francisco", "value":72},
+		{"name": "Palo Alto", "value":73},
+		{"name": "Mountain View", "value":74},
+		{"name": "Los Angeles", "value":75},
+		{"name": "New York", "value":76},
+		{"name": "Chicago", "value":77},
+	]
+
+	var pay = [
+		{"name":"Paid"},
+		{"name":"Unpaid"},
+		{"name":"Don't care/Unknown"}
+	]
+
+
+
+</script>
+{% endblock %}
+
+

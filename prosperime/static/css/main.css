@@ -193,7 +193,7 @@ div.main-container {
 	/*box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);*/
 	margin-top:15px;
 	min-height: 550px;
-
+	height:100%;
 	margin-bottom:15px;
 }
 
@@ -361,7 +361,7 @@ div#splash-home {
 div.splash-container {
 	margin:0;
 	padding:0;
-
+	height:100%;
 }
 
 div.splash-module {
@@ -1952,6 +1952,7 @@ div.background-container {
 	/*min-height:100%;*/
 	/*height: auto !important;*/
 	/*margin:0 auto -60px;*/
+	min-height:100%;
 
 }
 

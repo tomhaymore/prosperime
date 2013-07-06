@@ -31,8 +31,6 @@
 	<!--<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>-->
 	<script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
 
-<!-- Alternates (= no wifi) -->
-<!-- <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js"></script> -->
 
 
 {% block head %} {% endblock %}
@@ -50,12 +48,9 @@
 				<!-- <div class="row-fluid"> -->
 					<div class="log-container pull-left">
 						<!-- <a class="brand" href="/">Prosperime</a> -->
-						
-						
-						<a href="/"><img class="main-logo" src="{{STATIC_URL}}img/splash_logo.png" /></a>
-						
-						
+						<a href="/majors/"><img class="main-logo" src="{{STATIC_URL}}img/splash_logo.png" /></a>	
 					</div>
+
 					<div class="pull-right">
 						<ul class="topbar-nav pull-right">
 							
@@ -84,7 +79,6 @@
 									<a href="/contact/">Contact</a>
 								</li>
 	                		{% endif %}
-							
 						</ul>
 						<div class="clear"></div>
 					</div>
@@ -109,9 +103,7 @@
 			{% endblock %}
 
 
-			{% block extramessage %}
-
-			{% endblock %}
+			{% block extramessage %}  {% endblock %}
 
 		</div>
 		{% if user.is_authenticated %}
@@ -121,17 +113,11 @@
 		{% endif %}
 	   
 	    <div class="container-fluid splash-container">
-	        
-	      <!--   <div class="row-fluid">
-	      		<span class="span12"> -->
-	      			{% block content %} {% endblock %}
-	      	<!-- 	</span>
-	      	</div> -->
+	   
+	      	{% block content %} {% endblock %}
+
 	      	<div class="row-fluid">
-		        <!-- <span class="span11 offset1"> -->
-		        	{% block promo %} {% endblock %}
-		        <!-- </span> -->
-		        
+		        	{% block promo %} {% endblock %}		        
 		    </div>
 	    </div>
 	</div>

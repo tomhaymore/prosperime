@@ -48,6 +48,7 @@ urlpatterns = patterns('',
     url(r'^plan/(\d+)/$', 'careers.views.plan'),
 
     url(r'^internships/$', 'careers.views.internships'),
+    url(r'^internships_v2/$', 'careers.views.internships_simple'),
 
     url(r'^personalize/$','accounts.views.personalize'),
 
