@@ -47,7 +47,6 @@ class LIBase():
 	acct = None
 
 	# initialize variable for career / positions map
-
 	careers_to_positions_map = {}
 
 	# career_mapper = CareerMapBase()
@@ -215,9 +214,14 @@ class LIBase():
 		103:'art med rec',
 		}
 
+###############
+###  Setup  ###
+###############
+
 	def __init__(self):
 		# self.careers_to_positions_map = self.get_career_positions_map()
 		pass
+
 
 	def get_career_positions_map(self):
 		careers = Career.objects.filter(status="active")
@@ -291,9 +295,31 @@ class LIBase():
 
 		return content
 
-#############
-## Entity ##
-#############
+	def fetch_co_li_profile(self,co_id=None,name=None):
+		"""
+		returns raw data of company profile from LI api
+		"""
+		# construct api url 
+		if name:
+			co_api_url = self.co_api_url + "universal-name=" + str(name) + ":"  + self.co_fields + "?format=json"
+		else:
+			co_api_url = self.co_api_url + str(co_id) + ":"  + self.co_fields + "?format=json"
+
+		# print co_api_url
+
+		content = self.fetch_data_oauth(self.acct.id,co_api_url)
+
+		# check for errors
+		if 'errorCode' in content:
+			if self.logging:
+				print 'Error getting li profile: ' + str(content)
+			return None
+		return content
+
+
+#################
+##   Getters   ##
+#################
 	def get_company(self,id=None,name=None):
 		co = None
 		if id:
@@ -310,6 +336,7 @@ class LIBase():
 				return None
 		# return company
 		return co
+
 
 	def get_institution(self,name=None,type="school"):
 		try:
@@ -335,6 +362,25 @@ class LIBase():
 
 		return co
 
+	def get_company_name_only(self, name):
+	"""
+	Special case for pure-text matching, tries to return Entity w/ li_uniq_id and li_univ_name if found 
+	Return: Entity || None
+
+	"""
+	cos = Entity.objects.filter(name=name)
+	# use Filter for safety
+	if len(cos) > 0:
+		# check if one has li_univ_name and li_uniq_id
+		for c in cos:
+			if c.li_univ_name is not None and c.li_uniq_id is not None:
+				return c
+		# else just return first result
+		return cos[0]
+	else:
+		return None
+
+
 	## NOTE: this shouldn't be needed, but w/ duplicate data
 	##	need 'filter' instead of 'get' because of MultipleObjectsReturned
 	def get_institution_safe(self, name):
@@ -344,6 +390,44 @@ class LIBase():
 		else:
 			return None
 
+
+	def get_industry(self,name,code):
+		"""
+		tries to find, and return, matching industry from local db based on LI params
+		"""
+		industry = Industry.objects.filter(name=name)
+		if len(industry) == 0:
+			industry = Industry.objects.filter(li_code=code)
+		if len(industry) == 0:
+			if self.logging:
+				if name is not None:
+					print "Failed to find Industry: " + str(name)
+				else:
+					print "Failed to find Industry: " + str(code)
+			return None
+		else:
+			return industry[0]
+
+	
+	def get_position(self,user,co,data,**kwargs):
+		if kwargs.get('type') == 'ed':
+			if 'degree' in data:
+				pos = Position.objects.filter(entity=co,person=user,degree=data['degree'])
+			else:
+				pos = None
+		else:
+			pos = Position.objects.filter(entity=co,person=user,title=data['title'])
+		if pos:
+			# if position exists, return it
+			return pos
+
+		return None
+
+
+
+###################
+##    Setters    ##
+###################
 	def add_company(self,id=None,name=None):
 		# get company profile from LinkedIn
 		if name is not None:
@@ -364,9 +448,6 @@ class LIBase():
 		co = Entity()
 		co.name = data['name']
 		co.type = 'organization'
-		# co.li_uniq_id = id
-
-
 		
 		## V2 Edit -- make sure we get that id
 		if 'id' in data:
@@ -443,13 +524,33 @@ class LIBase():
  
 		return co
 
+
+	def add_unverified_company(self, data):
+		"""
+		Special case in which no co_uniq_name found, so we can't hit the LI API. Tries to create a stub company.
+		Return: Entity || None
+
+		"""
+		if data["entity_name"] is not None:
+
+			co = Entity()
+			co.name = data["entity_name"]
+			co.type = "organization"
+			co.status = "unverified"
+			co.save()
+			return co
+
+		else:
+			return None
+
+
 	def add_institution(self,data):
 		ed = Entity()
 		ed.name = data['inst_name']
 		ed.type = 'organization'
 		ed.subtype = 'ed-institution'
 		ed.li_type = 'school'
-		# ed.li_uniq_id = data['inst_uniq_id'] ## this will always be None
+		# ed.li_uniq_id = data['inst_uniq_id'] ## this will always be None ## No it won't.... but we don't need it anyway
 		ed.save()
 
 		if self.logging:
@@ -480,54 +581,7 @@ class LIBase():
 		o.save()
 
 
-	def fetch_co_li_profile(self,co_id=None,name=None):
-		"""
-		returns raw data of company profile from LI api
-		"""
-		# construct api url 
-		if name:
-			co_api_url = self.co_api_url + "universal-name=" + str(name) + ":"  + self.co_fields + "?format=json"
-		else:
-			co_api_url = self.co_api_url + str(co_id) + ":"  + self.co_fields + "?format=json"
 
-		# print co_api_url
-
-		content = self.fetch_data_oauth(self.acct.id,co_api_url)
-
-		# check for errors
-		if 'errorCode' in content:
-			if self.logging:
-				print 'Error getting li profile: ' + str(content)
-			return None
-		return content
-
-
-
-#######################
-## Entity - Industry ##
-#######################
-	def get_industry(self,name,code):
-		"""
-		tries to find, and return, matching industry from local db based on LI params
-		"""
-		industry = Industry.objects.filter(name=name)
-		if len(industry) == 0:
-			industry = Industry.objects.filter(li_code=code)
-		if len(industry) == 0:
-			if self.logging:
-				if name is not None:
-					print "Failed to find Industry: " + str(name)
-				else:
-					print "Failed to find Industry: " + str(code)
-			return None
-		else:
-			return industry[0]
-
-	
-
-####################
-## Entity - Image ##
-####################
 	def save_li_image(self,co,img_url):
 		"""
 		fetches LI image, saves locally
@@ -552,12 +606,50 @@ class LIBase():
 				logo.logo.save(img_filename,img_file,True)
 			os.remove('tmp_img')
 
-#########################
-## Careers - Positions ##
-#########################
+
+	def add_unverified_position(self,user,co,data):
+		""" 
+		Special case in which entity has no li_uniq_id, try and add "unverified" position
+			TODO: merge this with add_position, only a single line difference
+		Return: None
+		"""
+		positionValues = {'title':'title','description':'summary','current':'isCurrent'}
+		
+		pos = Position()
+		pos.entity = co
+		pos.person = user
+		pos.status = "unverified"
+
+		for k,v in positionValues.iteritems():
+			if v in data:
+				setattr(pos,k,data[v])
+		
+		# check for start date
+		if 'startDate' in data:
+			pos.start_date = self.format_dates(data['startDate'])
+		# check for end date
+		if 'endDate' in data:
+			pos.end_date = self.format_dates(data['endDate'])
+		pos.save()
+
+		careers = careerlib.match_careers_to_position(pos)
+		# match position to ideal position
+		careerlib.match_position_to_ideals(pos)
+		# print careers
+		for c_id in careers:
+			c = Career.objects.get(pk=c_id)
+			# print c
+			pos.careers.add(c)
+		pos.save()
+
+
 	def add_position(self,user,co,data):
 		# dectionary of values to test for and then add if present
 		positionValues = {'title':'title','description':'summary','current':'isCurrent'}
+
+		# Toss out "student" positions in experience (v3 edit, 7/12)
+		if data["title"] == "Student" or data["title"] == "student":
+			return
 		
 		pos = Position()
 		pos.entity = co
@@ -585,29 +677,7 @@ class LIBase():
 			pos.careers.add(c)
 		pos.save()
 
-		# if self.logging:
-		# 	if pos.title is not None:
-		# 		print 'Add Position: (' + str(pos.id) + ') ' + pos.title + ' ' + pos.entity.name
-		# 	else:
-		# 		print 'Add Position: (' + str(pos.id) + ') ' + 'no title ' + pos.entity.name
 
-		# career = self.add_careers_to_position(pos)
-		
-
-	def get_position(self,user,co,data,**kwargs):
-		if kwargs.get('type') == 'ed':
-			if 'degree' in data:
-				pos = Position.objects.filter(entity=co,person=user,degree=data['degree'])
-			else:
-				pos = None
-		else:
-			pos = Position.objects.filter(entity=co,person=user,title=data['title'])
-		if pos:
-			# if position exists, return it
-			return pos
-
-		# new position, return None
-		return None
 
 	def update_position(self,user,co,data):
 		# selets po
@@ -647,6 +717,10 @@ class LIBase():
 
 
 	def add_ed_position(self,user,ed,data):
+		"""
+		Adds position with type='education', attempts to add 'degree' and 'field' if found
+		Return: None
+		"""
 		pos = Position()
 		pos.entity = ed
 		pos.person = user
@@ -665,13 +739,6 @@ class LIBase():
 			pos.end_date = self.format_dates(data['end_date'])
 		
 		pos.save()
-
-		if self.logging:
-			if pos.title is not None:
-				print 'Add Ed Positions (' + str(pos.id) + ') ' + pos.title + ' ' + ed.name
-			else:
-				print 'Add Ed Position: (' + str(pos.id) + ') ' + 'no name' + ' ' + ed.name
-
 
 
 	def add_profile_pic(self,user,img_url):
@@ -765,6 +832,9 @@ class LIProfile(LIBase):
 	# def __init__(self,CareerMapBase):
 	# 	self.career_mapper = CareerMapBase()
 
+#################
+##    Setup    ##
+#################
 	def authorize(self):
 		# setup OAuth
 		consumer = oauth.Consumer(self.linkedin_key, self.linkedin_secret)
@@ -789,8 +859,8 @@ class LIProfile(LIBase):
 		return (redirect_url, request_token,)
 
 	def authenticate(self,request_token,oauth_verifier):
+
 		# construct oauth client
-	
 		token = oauth.Token(request_token['oauth_token'],request_token['oauth_token_secret'])
 		token.set_verifier(oauth_verifier)
 		client = oauth.Client(self.consumer, token)
@@ -813,74 +883,14 @@ class LIProfile(LIBase):
 
 		return (access_token,simplejson.loads(content),)
 
-	def process_profile(self,user_id,acct_id):
-
-		self.user = User.objects.get(pk=user_id)
-		self.acct = Account.objects.get(owner=self.user,service="linkedin")
-
-		# fetch profile data from LinkedIn
-		profile = self.fetch_profile()
-
-		# add public profile url
-		if 'publicProfileUrl' in profile:
-			self.acct.public_url = profile['publicProfileUrl']
-
-		# make sure positions are present
-		if 'positions' in profile:
-			for p in profile['positions']['values']:
-				# print p
-				# some LinkedIn positions do not have a company id value
-				if 'id' in p['company']:
-					# check to see if new company
-					#co = self.get_company(id=p['company']['id'])
-					co = self.get_company_safe(id=p['company']['id'])
-					print "@process_profile: getting co: " + str(p['company']['id'])
-					print "returned: " + str(co)
-					if co is None:
-						# add new company
-						co = self.add_company(id=p['company']['id'])
-						# if it's a new company, position must be new as well
-						if co is not None:
-							self.add_position(self.user,co,p)
-					else:
-						# TODO update company
-						pos = self.get_position(self.user,co,p)
-						if pos is None:
-							self.add_position(self.user,co,p)
-
-		if 'educations' in profile:
-			for p in profile['educations']['values']:
-				# inst = self.get_institution(name=p['schoolName'])
-				inst = self.get_institution_safe(name=p['schoolName'])
-
-				print "@process_profile: getting inst: " + str(p['schoolName'])
-				print "returned: " + str(inst)
-				if inst is None:
-					# add new institusion
-					
-					inst = self.add_institution({
-						'inst_name':p['schoolName']
-					})
-
-					# if it's a new company, position must be new as well
-					if inst is not None:
-						self.add_ed_position(self.user,inst,p)
-				else:
-					# TODO update company
-					pos = self.get_position(self.user,inst,p,type="ed")
-					if pos is None:
-						self.add_ed_position(self.user,inst,p)
-		# match all positions to ideals
-		for p in self.user.positions.all():
-			careerlib.match_position_to_ideals(p)
-		# set first ideal job
-		try:
-			self.user.profile.set_first_ideal_job()
-		except DatabaseError as e:
-			logger.error("Database error setting first ideal job, "+str(e))
-
 
 	def fetch_profile(self):
+		"""
+		Gets full LI profile from API (as much as they'll give us)
+
+		Return: API content (JSON)
+
+		"""
 
 		# set fields to fetch from API
 		fields = "(headline,id,first-name,last-name,picture-urls::(original),positions:(start-date,end-date,title,is-current,summary,company:(id)),public-profile-url,educations:(school-name,field-of-study,degree,start-date,end-date))"
@@ -899,28 +909,93 @@ class LIProfile(LIBase):
 
 		return json.loads(content)
 
-	# def add_profile_pic(self,user,url):
-	# 	img = None
-	# 	img_ext = urlparse.urlparse(img_url).path.split('/')[-1].split('.')[1]
-	# 	img_filename = user.profile.std_name() + "." + img_ext
-	# 	try:
-	# 		img = urllib2.urlopen(img_url)
-	# 	except urllib2.HTTPError, e:
-	# 		self.stdout.write(str(e.code))
-	# 	if img:
-	# 		pic = Picture()
-	# 		pic.person = user.profile
-	# 		pic.source = 'linkedin'
-	# 		pic.description = 'linkedin profile pic'
-	# 		pic.save()
-	# 		with open('tmp_img','wb') as f:
-	# 			f.write(img.read())
-	# 		with open('tmp_img','r') as f:
-	# 			img_file = File(f)
-	# 			pic.pic.save(img_filename,img_file,True)
-	# 		os.remove('tmp_img')
 
 
+	def process_profile(self,user_id,acct_id):
+		"""
+		Main method, pings API for profile data, then stores to DB. 
+			Also, maps all positions to ideals, tries to set first_ideal_job
+		Return: None
+		"""
+
+		self.user = User.objects.get(pk=user_id)
+		self.acct = Account.objects.get(owner=self.user,service="linkedin")
+
+		# fetch profile data from LinkedIn
+		profile = self.fetch_profile()
+
+		# add public profile url
+		if 'publicProfileUrl' in profile:
+			self.acct.public_url = profile['publicProfileUrl']
+
+		# make sure positions are present
+		if 'positions' in profile:
+
+			# process "experience"
+			for p in profile['positions']['values']:
+				# print p
+				# some LinkedIn positions do not have a company id value
+				if 'id' in p['company']:
+					# check to see if new company
+					co = self.get_company_safe(id=p['company']['id'])
+					if co is None:
+						# add new company
+						co = self.add_company(id=p['company']['id'])
+						# if it's a new company, position must be new as well
+						if co is not None:
+							self.add_position(self.user,co,p)
+					else:
+						# TODO update company
+						pos = self.get_position(self.user,co,p)
+						if pos is None:
+							self.add_position(self.user,co,p)
+				else:
+					## ENDPOINT -- untested! -- need to setup the API and see what it's returning 
+					print "foo"
+					# # check to see if new company (name only)
+					# co = self.get_company_name_only(p["entity_name"]) 
+					# if co is None:
+					# 	# add new unverified company
+					# 	co = self.add_unverified_company(p)
+					# 	if co is not None:
+					# 		self.add_unverified_position(user, co, p)
+					# else:
+					# 	pos = self.get_position(user, co, p)
+					# 	if pos is None:
+					# 		self.add_unverified_position(user, co ,p)
+
+
+
+		# process "education"
+		if 'educations' in profile:
+			for p in profile['educations']['values']:
+				# inst = self.get_institution(name=p['schoolName'])
+				inst = self.get_company_name_only(name=p['schoolName'])
+
+				if inst is None:
+					# add new institusion
+					inst = self.add_institution({
+						'inst_name':p['schoolName']
+					})
+
+					# if it's a new company, position must be new as well
+					if inst is not None:
+						self.add_ed_position(self.user,inst,p)
+				else:
+					# TODO update company
+					pos = self.get_position(self.user,inst,p,type="ed")
+					if pos is None:
+						self.add_ed_position(self.user,inst,p)
+
+		# match all positions to ideals
+		for p in self.user.positions.all():
+			careerlib.match_position_to_ideals(p)
+
+		# set first ideal job
+		try:
+			self.user.profile.set_first_ideal_job()
+		except DatabaseError as e:
+			logger.error("Database error setting first ideal job, "+str(e))
 
 
 
@@ -931,11 +1006,16 @@ class LIConnections(LIBase):
 
 	# fields from connections API
 	## EDIT - fields = "(id,picture-url,headline,first-name,last-name,positions:(start-date,end-date,title,is-current,summary,company:(id)),public-profile-url)"
+	
 	## Need picture-url b/c not crawlable, first-name/last-name to check if private
 	fields = "(id,picture-url,first-name,last-name,public-profile-url)"
 
 	# construct api url
 	api_url = "http://api.linkedin.com/v1/people/~/connections:" + fields + "?format=json"
+
+#################
+##    Setup    ##
+#################
 
 	def __init__(self,user_id,acct_id):
 		self.user = User.objects.get(pk=user_id)
@@ -943,7 +1023,10 @@ class LIConnections(LIBase):
 
 
 	def get_connections(self,start=0):
-		
+		""" 
+		Gets all connections from API, paginates if necessary
+		Return: array of connections
+		"""
 		# fetch connections data		
 		content = self.fetch_data_oauth(self.acct.id,self.api_url)
 		# print content
@@ -951,10 +1034,8 @@ class LIConnections(LIBase):
 		# parse out connections from returned data
 		connections = content['values']
 
-		# get count to check for pagination
+		# check for pagination
 		total_count = int(content['_total'])
-
-		# check fo pagination
 		if total_count > 500:
 			# need to paginate
 			pages = ceil((total_count - 500)/ 500)
@@ -984,7 +1065,7 @@ class LIConnections(LIBase):
 		# get & loop through connections
 		connections = self.get_connections()
 
-		# c = {first_name, last_name, id, public_profile_url, picture_url}
+		# connection = {first_name, last_name, id, public_profile_url, picture_url}
 		for c in connections:
 			# initiate partial flag
 			partial = False
@@ -1016,21 +1097,12 @@ class LIConnections(LIBase):
 					if self.logging:
 						print "@process_connections: user is partial, create rest" + c['firstName'] + ' ' + c['lastName']
 					user = self.process_connection_and_finish_user(user,c)
-					# match all positions to ideals
-					for p in user.positions.all():
-						careerlib.match_position_to_ideals(p)
-					# process first_ideal_position
-					user.profile.set_first_ideal_job()
+
 				else:
 					if self.logging:
 						print "@process_connections: create new user: " + c['firstName'] + ' ' + c['lastName']
 					user = self.process_connection_and_create_user(c)
-					# match all positions to ideals
-					if user:
-						for p in user.positions.all():
-							careerlib.match_position_to_ideals(p)
-						# process first_ideal_position
-						user.profile.set_first_ideal_job()
+
 
 				
 				# Either way, create the connection object
@@ -1039,49 +1111,13 @@ class LIConnections(LIBase):
 
 
 
-			# # check to see if privacy settings prohibit getting any useful information
-			# if c['firstName'] == 'private' and c['lastName'] == 'private':
-			# 	if self.logging:
-			# 		print 'Add Connection: privacy settings set, passing on user'
-			# 	pass
-			# else:				
-			# 	if user is None:					
-			# 		# add new dormant user
-			# 		user = self.add_dormant_user(c)
-			# 		self.add_connection(self.user,user)
 
-			# 	# V2 EDIT
-			# 	# Don't need to process if active user
-			# 	if user.profile.status == "dormant":
-					
-			# 		# process positions from API
-			# 		if 'values' in c['positions']:
-			# 			for p in c['positions']['values']:
-
-			# 				# some LinkedIn positions do not have a company id value
-			# 				if 'id' in p['company']:
-			# 					# check to see if new company
-			# 					co = self.get_company(id=p['company']['id'])
-			# 					if co is None:
-			# 						# add new company
-			# 						co = self.add_company(id=p['company']['id'])
-			# 						# if it's a new company, position must be new as well
-			# 						if co is not None:
-			# 							self.add_position(user,co,p)
-			# 					else:
-			# 						# TODO update company
-			# 						pos = self.get_position(user,co,p)
-			# 						if pos is None:
-			# 							self.add_position(user,co,p)
-			# 						# else:
-			# 						# 	self.add_position(user,co,p)
-			# 		# process public profile page
-			# 		if 'publicProfileUrl' in c:
-			# 			self.process_public_page(user,c['publicProfileUrl'])
-				
-			# 	self.add_connection(self.user,user)
 
 	def process_connection_and_create_user(self, user_info):
+		"""
+		Delegates to helpers to try and create User object. If successful, creates Account object, maps positions.
+		Return: User || None
+		"""
 
 		## Edge case that showed up in production
 		if 'publicProfileUrl' not in user_info:
@@ -1105,11 +1141,22 @@ class LIConnections(LIBase):
 			acct.status = "unlinked"
 			acct.save()
 
+			## Match Positions
+			# match all positions to ideals
+			for p in user.positions.all():
+				careerlib.match_position_to_ideals(p)
+			# process first_ideal_position
+			user.profile.set_first_ideal_job()
+
 			return user
 		else:
 			return None
 
 	def process_connection_and_finish_user(self, user, user_info):
+		"""
+		Delegates to helpers to process rest of User, adds Account, maps positions
+		Return: User
+		"""
 
 		## add LI account
 		acct = Account()
@@ -1128,15 +1175,27 @@ class LIConnections(LIBase):
 		## parse public page
 		self.process_public_page_existing(user_info['publicProfileUrl'], user)
 
+		## Map Positions
+		# match all positions to ideals
+		for p in user.positions.all():
+			careerlib.match_position_to_ideals(p)
+		# process first_ideal_position
+		user.profile.set_first_ideal_job()
+
 		return user
 
 	## processing for users who were partially created
 	def process_public_page_existing(self,url,user):
+		"""
+		Tries to parse public_url of a given User.
+		Return: None
+		"""
 		try:
 			html = urllib2.urlopen(url)
 		except:
-			print "ERROR PROCESSING PUBLIC PAGE - HTML OPEN FAILED: " + url
+			logger.error("Error processing public page - html open failed: " + url)
 			return None
+
 		soup = BeautifulSoup(html)
 
 		# GET First Name, Last Name, Headline
@@ -1144,8 +1203,7 @@ class LIConnections(LIBase):
 		last_name = soup.find_all("span", class_="family-name")[0].contents[0].strip()
 		# headline = soup.find_all("p", class_="headline-title")[0].contents[0].strip()
 		
-		if self.logging:
-			"@process_public_page_existing: beginning crawl of: " + first_name + ' ' + last_name
+		logger.info("beginning crawl of existing user: " + first_name + " " + last_name)
 
 		# GET Orgs/Positions
 		experience = soup.find_all("div", id="profile-experience")
@@ -1156,6 +1214,9 @@ class LIConnections(LIBase):
 				# check to see if a co uniq was returned
 				if p['co_uniq_name'] is not None:
 					self.process_org_position(p, user)
+				else:
+					self.process_unverified_org_position(p, user)
+					
 
 			
 		# GET Institutions/Eds
@@ -1166,8 +1227,13 @@ class LIConnections(LIBase):
 			for p in ed_positions:
 				self.process_ed_position(p, user)
 
+
 	## V2 CODE TAKES INTO ACCOUNT ADDITIONAL FIELDS
 	def process_public_page_full(self, url, user_id):
+		"""
+		Tries to parse public_url of a given User.
+		Return: None
+		"""
 
 		try:
 			html = urllib2.urlopen(url)
@@ -1182,7 +1248,6 @@ class LIConnections(LIBase):
 		# headline = soup.find_all("p", class_="headline-title")[0].contents[0].strip()
 		
 		logger.info("beginning crawl of: " + first_name + ' ' + last_name)
-
 
 		## Create User
 		user = User()
@@ -1229,6 +1294,8 @@ class LIConnections(LIBase):
 				# check to see if a co uniq was returned
 				if p['co_uniq_name'] is not None:
 					self.process_org_position(p, user)
+				else:
+					self.process_unverified_org_position(p, user)
 
 			
 		# GET Institutions/Eds
@@ -1241,6 +1308,24 @@ class LIConnections(LIBase):
 
 		return user
 			
+	def process_unverified_org_position(self, p, user):
+		"""
+		Takes in raw position data (scraped) that does not have a co_uniq_name, creates a Position w/ status="unverified"
+		Return: None
+
+		"""
+
+		co = self.get_company_name_only(p["entity_name"]) 
+		if co is None:
+			# create new unverified company
+			co = self.add_unverified_company(p)
+			if co is not None:
+				self.add_unverified_position(user, co, p)
+		else:
+			pos = self.get_position(user, co, p)
+			if pos is None:
+				self.add_unverified_position(user, co ,p)
+
 
 	def process_org_position(self, p, user):
 
@@ -1249,10 +1334,6 @@ class LIConnections(LIBase):
 		co = self.get_company_safe(name=p['co_uniq_name'])
 
 		if co is None:
-
-			if self.logging:
-				"@process_org_position: new company being added: " + p['co_uniq_name']
-
 			# add new company & pos
 			co = self.add_company(name=p['co_uniq_name'])
 			if co is not None:
@@ -1265,12 +1346,13 @@ class LIConnections(LIBase):
 
 	def process_ed_position(self, p, user):
 
-		# inst = self.get_institution(name=p['inst_name'])
-		inst = self.get_institution_safe(name=p['inst_name'])
-		if inst is None:
+		## Endpoint 3- ** - check here if matches an existing company!
 
-			if self.logging:	
-				print '@process_ed_position: new inst being added:' + p['inst_name']
+		# inst = self.get_institution(name=p['inst_name'])
+		# inst = self.get_institution_safe(name=p['inst_name'])
+		# V3 Edit -- try to get the real institution
+		inst = self.get_company_name_only(name=p['inst_name'])
+		if inst is None:
 
 			# add new company & pos 
 			inst = self.add_institution(p)
@@ -1284,49 +1366,70 @@ class LIConnections(LIBase):
 				self.add_ed_position(user,inst,p)
 
 
-	def extract_pos_from_public_page(self,data):
-		# initialize positions array
-		positions = []
-		# get all position divs
-		raw_positions = data.find_all("div","position")
-		# loop through each position
-		for p in raw_positions:
-			# get title of position
-			title = p.find("div","postitle").span.contents[0]
-			# get unique name of company
-			co_uniq_name = p.find("a","company-profile-public")
+	## Untested on full parse !! ## 
+	def extract_pos_from_public_page(self, data):
+	"""
+	V3 Edit: return position even if co_uniq not returned, include "entity_name"
+	Parses soup data for position title, co_uniq_name, start_date, end_date, current, and description
+	Return: [{title, entity_name, co_uniq_name, startDate, endDate, summary, isCurrent}]
 
-			if co_uniq_name:
-				co_uniq_name = co_uniq_name.get('href')
-				m = re.search("(?<=\/company\/)([\\.&\w-]*)",co_uniq_name)
-				co_uniq_name = m.group(0).strip()
-				# print co_uniq_name
-				# get start and end dates
-				start_date = p.find("abbr","dtstart")
-				if start_date is not None:
-					start_date = start_date.get('title')
-				try:
-					end_date = p.find('abbr','dtstamp').get('title')
-					current = True
-				except:
-					current = False
+	"""
+	# initialize positions array
+	positions = []
+	# get all position divs
+	raw_positions = data.find_all("div","position")
 
-				try:
-					end_date = p.find("abbr","dtend").get("title")
-				except:
-					end_date = None
-				# get descriptions
-				try:
-					descr = p.find("p","description").contents[0]
-				except:
-					descr = None
-				# append to main positions array
-				positions.append({'title':title,'co_uniq_name':co_uniq_name,'startDate':start_date,'endDate':end_date,'summary':descr,'isCurrent':current})
-		
-			elif self.logging:
-				print "@extract_pos_from_public_page, no co_uniq_name found, bailing out"
-				
-		return positions
+	# loop through each position
+	for p in raw_positions:
+
+		# get header, then title and company
+		header_info = p.find("div","postitle").find_all("span")
+		title = header_info[0].contents[0]
+		entity_name = header_info[1].contents[0]
+
+		# get unique name of company
+		co_uniq_name = p.find("a","company-profile-public")
+		if co_uniq_name:
+			co_uniq_name = co_uniq_name.get('href')
+			m = re.search("(?<=\/company\/)([\\.&\w-]*)",co_uniq_name)
+			co_uniq_name = m.group(0).strip()
+		else:
+			co_uniq_name = None
+			
+		# get start_date, end_date, current
+		start_date = p.find("abbr","dtstart")
+		if start_date is not None:
+			start_date = start_date.get('title')
+		try:
+			end_date = p.find('abbr','dtstamp').get('title')
+			current = True
+		except:
+			current = False
+		try:
+			end_date = p.find("abbr","dtend").get("title")
+		except:
+			end_date = None
+
+		# get descriptions
+		try:
+			descr = p.find("p","description").contents[0]
+		except:
+			descr = None
+
+		# append to main positions array
+		positions.append({
+			'title':title,
+			'entity_name':entity_name,
+			'co_uniq_name':co_uniq_name,
+			'startDate':start_date,
+			'endDate':end_date,
+			'summary':descr,
+			'isCurrent':current
+			})
+	
+			
+	return positions
+
 
 	def extract_ed_pos_from_public_page(self,data):
 		# initialize positions array
@@ -1375,6 +1478,10 @@ class LIConnections(LIBase):
 		"""
 		fetches LI profile pic and uploads to db
 		"""
+
+		"""
+		V3 Edit: just store img_url as a field on Profile, then do this scrimshaw as a Profile accessor
+		"""
 		img = None
 		
 		img_filename = user.profile.std_name() + ".jpg"
@@ -1395,6 +1502,7 @@ class LIConnections(LIBase):
 				img_file = File(f)
 				pic.pic.save(img_filename,img_file,True)
 			os.remove('tmp_img')
+
 
 	def add_connection(self,user1,user2,status="dormant"):
 		"""
