@@ -50,6 +50,8 @@ urlpatterns = patterns('',
     url(r'^internships/$', 'careers.views.internships'),
     url(r'^internships_v2/$', 'careers.views.internships_simple'),
 
+    url(r'^chrome_api/$', 'careers.views.chrome_api'),
+
     url(r'^personalize/$','accounts.views.personalize'),
 
     # Social Views

@@ -30,6 +30,21 @@ import utilities.helpers as helpers
 
 logger = logging.getLogger(__name__)
 
+def chrome_api(request):
+
+	print request.GET.get("foo")
+
+
+	print "\n\n"
+
+	request.GET.getlist("data[]")
+
+	print "\n\n"
+
+
+	response = {"foo":"bar"}
+	return HttpResponse(json.dumps(response))
+
 def internships_simple(request):
 
 	data = {"foo":"bar"}
@@ -1904,28 +1919,63 @@ def industryAutocomplete(request):
 
 def home_proto(request):
 
-	# biz_dev = Position.objects.filter(title__contains="Business Development").select_related("entity", "person")
-	# designer = Position.objects.filter(title__contains="Design").select_related("entity", "person")
-	# developer = Position.objects.filter(Q(title__contains="Developer") | Q(title__contains="Engineer")).select_related("entity", "person")
-	# marketer = Position.objects.filter(title__contains="Marketing").select_related("entity", "person")
-	sales = Position.objects.filter(title__contains="Sales").select_related("entity", "person")
-	pr = Position.objects.filter(Q(title__icontains="PR ") | Q(title__icontains="Public Relations")).select_related("entity", "person")
-	associates = Position.objects.filter(title__icontains="Associate").select_related("entity", "person")
+	user_jobs = [
+		{"title":"Product Management Intern", "entity":"Wordnik", "position_id":7, "entity_id":8},
+		{"title":"Marketing & Banking Intern", "entity":"Montgomery & Co.", "position_id":7, "entity_id":8},
+		{"title":"Intern", "entity":"Bankinter", "position_id":7, "entity_id":8},
+		{"title":"Co-Founder", "entity":"ProsperMe", "position_id":7, "entity_id":8},
+	]
+
+	popular_tags = [
+		{"title":"Great Hours", "id":7, "type":"Good"},
+		{"title":"What Perks", "id":7, "type":"Bad"},
+		{"title":"Crazy Hours", "id":7, "type":"Bad"},
+		{"title":"Strict Culture", "id":7, "type":"Eh"},
+		{"title":"Great Pay", "id":7, "type":"Good"},
+		{"title":"Great Cause", "id":7, "type":"Good"},
+		{"title":"Just a Paycheck", "id":7, "type":"Bad"},
+	]
+
+	related_reviews = [
+		{"position":"Product Manager", "entity":"Wordnik", "id":10},
+		{"position":"Web Developer", "entity":"Greystripe", "id":10},
+		{"position":"Editor", "entity":"Penguin Books", "id":10},
+	]
+	body1 = "Not the greatest experience, to be brutally honest. While no one can argue that passion at the company runs high, it just isn't a particularly well-run organization. Our particular division was beset by managerial issues and relationship tensions. All this stemmed from poor or weak top-down leadership."
+	body2 = "An amazing experience!! Karen is the absolute best, pray that you work for her."
+	body3 = "Use the sleeves of my sweater, let's have an adventure. The things that I think about, one heart, one mouth, one love, two mouths, one house, two blouses. Just us, you find out, and it's becoming increasingly difficult to make this look like a really long post. Oh what's this under my bed? Looks like chapstick. I'll use that."
+	body4 = "Emma Way has been summonsed to court to answer driving charges A 21-year-old woman who tweeted she had knocked a cyclist off his bike after an alleged crash in Norfolk has been summonsed to appear in court. Emma Way is to answer charges of driving without due care and attention and failing to stop after an accident."
+	body5 = "Use the sleeves of my sweater, let's have an adventure. The things that I think about, one heart, one mouth, one love, two mouths, one house, two blouses. Just us, you find out, and it's becoming increasingly difficult to make this look like a really long post. Oh what's this under my bed? Looks like chapstick. I'll use that."
+
+	reviews = [
+		{"pic":"/media/pictures/anon.jpg", "position":"Product Manager", "entity":"Genentech", "position_id":4, "entity_id":7, "id":11, "tags":[{"title":"Great Pay", "type":"Good", "id":12}, {"title":"Long Hours", "type":"Bad", "id":14}], "rating":4.5, "body":body1},
+		{"pic":"/media/pictures/anon.jpg", "position":"Product Manager", "entity":"Genentech", "position_id":4, "entity_id":7, "id":11, "tags":[{"title":"Great Pay", "type":"Good", "id":12}, {"title":"Long Hours", "type":"Bad", "id":14}], "rating":2.0, "body":body2},
+		{"pic":"/media/pictures/anon.jpg", "position":"Product Manager", "entity":"Genentech", "position_id":4, "entity_id":7, "id":11, "tags":[{"title":"Great Pay", "type":"Good", "id":12}, {"title":"Long Hours", "type":"Bad", "id":14}], "rating":5.0, "body":body3},
+		{"pic":"/media/pictures/anon.jpg", "position":"Product Manager", "entity":"Genentech", "position_id":4, "entity_id":7, "id":11, "tags":[{"title":"Great Pay", "type":"Good", "id":12}, {"title":"Long Hours", "type":"Bad", "id":14}], "rating":3.5, "body":body4},
+		{"pic":"/media/pictures/anon.jpg", "position":"Product Manager", "entity":"Genentech", "position_id":4, "entity_id":7, "id":11, "tags":[{"title":"Great Pay", "type":"Good", "id":12}, {"title":"Long Hours", "type":"Bad", "id":14}], "rating":3.0, "body":body5},
+	]
+
+	suggested = [
+		{"title":"Google" , "type":"entity" ,"id":7},
+		{"title":"Facebook" , "type":"entity" ,"id":7},
+		{"title":"Apple" , "type":"entity" ,"id":7},
+		{"title":"Product Manager" , "type":"position" ,"id":7},
+		{"title":"Web Developer" , "type":"position" ,"id":7},
+		{"title":"Full-Stack Ruby Developer" , "type":"position" ,"id":7},
+	]
 
 
 	data = {
-		# 'biz_dev':_split_and_jsonify(biz_dev),
-		# 'design':_split_and_jsonify(designer),
-		# 'developer':_split_and_jsonify(developer),
-		# 'marketer':_split_and_jsonify(marketer),
-		'sales':_split_and_jsonify(sales),
-		'pr':_split_and_jsonify(pr),
-		'associates':_split_and_jsonify(associates),
+		"user_jobs":user_jobs,
+		"popular_tags":popular_tags,
+		"related_reviews":related_reviews,
+		"suggested":suggested,
+		"reviews":reviews,
 	}
-	return HttpResponse(simplejson.dumps(data))
 
-	# render_to_response("home_v3.html", data, context_instance=RequestContext(request))
 
+
+	return render_to_response("proto.html", data, context_instance=RequestContext(request))
 
 
 

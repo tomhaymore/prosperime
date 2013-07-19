@@ -363,22 +363,22 @@ class LIBase():
 		return co
 
 	def get_company_name_only(self, name):
-	"""
-	Special case for pure-text matching, tries to return Entity w/ li_uniq_id and li_univ_name if found 
-	Return: Entity || None
+		"""
+		Special case for pure-text matching, tries to return Entity w/ li_uniq_id and li_univ_name if found 
+		Return: Entity || None
 
-	"""
-	cos = Entity.objects.filter(name=name)
-	# use Filter for safety
-	if len(cos) > 0:
-		# check if one has li_univ_name and li_uniq_id
-		for c in cos:
-			if c.li_univ_name is not None and c.li_uniq_id is not None:
-				return c
-		# else just return first result
-		return cos[0]
-	else:
-		return None
+		"""
+		cos = Entity.objects.filter(name=name)
+		# use Filter for safety
+		if len(cos) > 0:
+			# check if one has li_univ_name and li_uniq_id
+			for c in cos:
+				if c.li_univ_name is not None and c.li_uniq_id is not None:
+					return c
+			# else just return first result
+			return cos[0]
+		else:
+			return None
 
 
 	## NOTE: this shouldn't be needed, but w/ duplicate data
@@ -1368,67 +1368,67 @@ class LIConnections(LIBase):
 
 	## Untested on full parse !! ## 
 	def extract_pos_from_public_page(self, data):
-	"""
-	V3 Edit: return position even if co_uniq not returned, include "entity_name"
-	Parses soup data for position title, co_uniq_name, start_date, end_date, current, and description
-	Return: [{title, entity_name, co_uniq_name, startDate, endDate, summary, isCurrent}]
+		"""
+		V3 Edit: return position even if co_uniq not returned, include "entity_name"
+		Parses soup data for position title, co_uniq_name, start_date, end_date, current, and description
+		Return: [{title, entity_name, co_uniq_name, startDate, endDate, summary, isCurrent}]
 
-	"""
-	# initialize positions array
-	positions = []
-	# get all position divs
-	raw_positions = data.find_all("div","position")
+		"""
+		# initialize positions array
+		positions = []
+		# get all position divs
+		raw_positions = data.find_all("div","position")
 
-	# loop through each position
-	for p in raw_positions:
+		# loop through each position
+		for p in raw_positions:
 
-		# get header, then title and company
-		header_info = p.find("div","postitle").find_all("span")
-		title = header_info[0].contents[0]
-		entity_name = header_info[1].contents[0]
+			# get header, then title and company
+			header_info = p.find("div","postitle").find_all("span")
+			title = header_info[0].contents[0]
+			entity_name = header_info[1].contents[0]
 
-		# get unique name of company
-		co_uniq_name = p.find("a","company-profile-public")
-		if co_uniq_name:
-			co_uniq_name = co_uniq_name.get('href')
-			m = re.search("(?<=\/company\/)([\\.&\w-]*)",co_uniq_name)
-			co_uniq_name = m.group(0).strip()
-		else:
-			co_uniq_name = None
-			
-		# get start_date, end_date, current
-		start_date = p.find("abbr","dtstart")
-		if start_date is not None:
-			start_date = start_date.get('title')
-		try:
-			end_date = p.find('abbr','dtstamp').get('title')
-			current = True
-		except:
-			current = False
-		try:
-			end_date = p.find("abbr","dtend").get("title")
-		except:
-			end_date = None
+			# get unique name of company
+			co_uniq_name = p.find("a","company-profile-public")
+			if co_uniq_name:
+				co_uniq_name = co_uniq_name.get('href')
+				m = re.search("(?<=\/company\/)([\\.&\w-]*)",co_uniq_name)
+				co_uniq_name = m.group(0).strip()
+			else:
+				co_uniq_name = None
+				
+			# get start_date, end_date, current
+			start_date = p.find("abbr","dtstart")
+			if start_date is not None:
+				start_date = start_date.get('title')
+			try:
+				end_date = p.find('abbr','dtstamp').get('title')
+				current = True
+			except:
+				current = False
+			try:
+				end_date = p.find("abbr","dtend").get("title")
+			except:
+				end_date = None
 
-		# get descriptions
-		try:
-			descr = p.find("p","description").contents[0]
-		except:
-			descr = None
+			# get descriptions
+			try:
+				descr = p.find("p","description").contents[0]
+			except:
+				descr = None
 
-		# append to main positions array
-		positions.append({
-			'title':title,
-			'entity_name':entity_name,
-			'co_uniq_name':co_uniq_name,
-			'startDate':start_date,
-			'endDate':end_date,
-			'summary':descr,
-			'isCurrent':current
-			})
-	
-			
-	return positions
+			# append to main positions array
+			positions.append({
+				'title':title,
+				'entity_name':entity_name,
+				'co_uniq_name':co_uniq_name,
+				'startDate':start_date,
+				'endDate':end_date,
+				'summary':descr,
+				'isCurrent':current
+				})
+		
+				
+		return positions
 
 
 	def extract_ed_pos_from_public_page(self,data):
@@ -1482,6 +1482,9 @@ class LIConnections(LIBase):
 		"""
 		V3 Edit: just store img_url as a field on Profile, then do this scrimshaw as a Profile accessor
 		"""
+		
+
+
 		img = None
 		
 		img_filename = user.profile.std_name() + ".jpg"

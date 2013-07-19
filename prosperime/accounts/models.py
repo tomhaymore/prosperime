@@ -50,7 +50,9 @@ class Profile(models.Model):
     status = models.CharField(max_length=15,default="active")
     prefs = models.TextField(null=True)
     first_ideal_job = models.ForeignKey(Position,null=True,blank=True)
+    # profile_pic_url = models.CharField(max_length=150, null=True)
     # profile_pic = models.ImageField(max_length=450, upload_to=_get_profile_pic_path, blank=True, null=True)
+
 
     # returns first real job after first education
     def set_first_ideal_job(self):
