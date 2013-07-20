@@ -16,6 +16,156 @@ import utilities.helpers as helpers
 
 logger = logging.getLogger(__name__)
 
+
+def home(request):
+
+	tags = [
+		{"title":"Great Hours", "id":7, "type":"Good"},
+		{"title":"What Perks", "id":7, "type":"Bad"},
+		{"title":"Crazy Hours", "id":7, "type":"Bad"},
+		{"title":"Strict Culture", "id":7, "type":"Eh"},
+		{"title":"Great Pay", "id":7, "type":"Good"},
+		{"title":"Great Cause", "id":7, "type":"Good"},
+		{"title":"Just a Paycheck", "id":7, "type":"Bad"},
+	]
+
+	filters = [
+		{"title":"Symbolic Systems", "id":7, "value":"major-7"},
+		{"title":"Mechanical Engineering", "id":7, "value":"major-7"},
+		{"title":"Banking", "id":7, "value":"major-7"},
+		{"title":"First Job", "id":7, "value":"major-7"},
+		{"title":"Internship", "id":7, "value":"major-7"},
+	]
+
+	data = {
+		"most_recent":None, # [ {"user_pic", "title", "body", "tags[]", "comments[]", }]
+		"popular_tags":tags, # [ {"title", "type", "id"} ]
+		"filters":filters,
+	}
+
+
+	return render_to_response("social/home.html", data, context_instance=RequestContext(request))
+
+
+# @login_required
+def ask(request):
+
+	tags = [
+		{"title":"Great Hours", "id":7, "type":"Good"},
+		{"title":"What Perks", "id":7, "type":"Bad"},
+		{"title":"Crazy Hours", "id":7, "type":"Bad"},
+		{"title":"Strict Culture", "id":7, "type":"Eh"},
+		{"title":"Great Pay", "id":7, "type":"Good"},
+		{"title":"Great Cause", "id":7, "type":"Good"},
+		{"title":"Just a Paycheck", "id":7, "type":"Bad"},
+	]
+
+	data = {
+		"tags": tags,  # {"title", "type", "id"}
+	}
+
+	return render_to_response("social/ask.html", data, context_instance=RequestContext(request))
+
+# Force login to view questions?
+def question(request, question_id):
+
+
+	popular_tags = [
+		{"title":"Great Hours", "id":7, "type":"Good"},
+		{"title":"What Perks", "id":7, "type":"Bad"},
+		{"title":"Crazy Hours", "id":7, "type":"Bad"},
+		{"title":"Strict Culture", "id":7, "type":"Eh"},
+		{"title":"Great Pay", "id":7, "type":"Good"},
+		{"title":"Great Cause", "id":7, "type":"Good"},
+		{"title":"Just a Paycheck", "id":7, "type":"Bad"},
+	]
+
+
+	body1 = "Not the greatest experience, to be brutally honest. While no one can argue that passion at the company runs high, it just isn't a particularly well-run organization. Our particular division was beset by managerial issues and relationship tensions. All this stemmed from poor or weak top-down leadership."
+	body2 = "An amazing experience!! Karen is the absolute best, pray that you work for her."
+	body3 = "Use the sleeves of my sweater, let's have an adventure. The things that I think about, one heart, one mouth, one love, two mouths, one house, two blouses. Just us, you find out, and it's becoming increasingly difficult to make this look like a really long post. Oh what's this under my bed? Looks like chapstick. I'll use that."
+	body4 = "Emma Way has been summonsed to court to answer driving charges A 21-year-old woman who tweeted she had knocked a cyclist off his bike after an alleged crash in Norfolk has been summonsed to appear in court. Emma Way is to answer charges of driving without due care and attention and failing to stop after an accident."
+	body5 = "Use the sleeves of my sweater, let's have an adventure. The things that I think about, one heart, one mouth, one love, two mouths, one house, two blouses. Just us, you find out, and it's becoming increasingly difficult to make this look like a really long post. Oh what's this under my bed? Looks like chapstick. I'll use that."
+
+	reviews = [
+		{"pic":"/media/pictures/anon.jpg", "position":"Product Manager", "entity":"Genentech", "position_id":4, "entity_id":7, "id":11, "tags":[{"title":"Great Pay", "type":"Good", "id":12}, {"title":"Long Hours", "type":"Bad", "id":14}], "rating":4.5, "body":body1},
+		{"pic":"/media/pictures/anon.jpg", "position":"Product Manager", "entity":"Genentech", "position_id":4, "entity_id":7, "id":11, "tags":[{"title":"Great Pay", "type":"Good", "id":12}, {"title":"Long Hours", "type":"Bad", "id":14}], "rating":2.0, "body":body2},
+		{"pic":"/media/pictures/anon.jpg", "position":"Product Manager", "entity":"Genentech", "position_id":4, "entity_id":7, "id":11, "tags":[{"title":"Great Pay", "type":"Good", "id":12}, {"title":"Long Hours", "type":"Bad", "id":14}], "rating":5.0, "body":body3},
+		{"pic":"/media/pictures/anon.jpg", "position":"Product Manager", "entity":"Genentech", "position_id":4, "entity_id":7, "id":11, "tags":[{"title":"Great Pay", "type":"Good", "id":12}, {"title":"Long Hours", "type":"Bad", "id":14}], "rating":3.5, "body":body4},
+		{"pic":"/media/pictures/anon.jpg", "position":"Product Manager", "entity":"Genentech", "position_id":4, "entity_id":7, "id":11, "tags":[{"title":"Great Pay", "type":"Good", "id":12}, {"title":"Long Hours", "type":"Bad", "id":14}], "rating":3.0, "body":body5},
+	]
+
+	pics = ['https://prosperme_images.s3.amazonaws.com/pictures/vincent_cannon/vincent_cannon.jpg?Signature=7xxvfw%2Fm5w69ZWGHfNWztfpBFy4%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/patrick_carroll/patrick_carroll.jpg?Signature=0lzUGun%2BwW9Cx9to8V4X%2BVD%2FaVQ%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/melissa_arano/melissa_arano.jpg?Signature=eVa%2BcBanvN4hOLNLxZjhZrUBfck%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/amanda_berry/amanda_berry.jpg?Signature=UTojQ6FgK5WV09rZKf42M4LH7G4%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/annie_bezbatchenko/annie_bezbatchenko.jpg?Signature=ids6gN%2FO56RQkx23wyNvn2CZqho%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/tahira_%28taida%29_adaya/tahira_%28taida%29_adaya.jpg?Signature=VWfZ4rbUE0ERGi6VEQlpH0o9vN8%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/tara_adiseshan/tara_adiseshan.jpg?Signature=YcOlphSeufZZgSG7qAAw4At5jzE%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/william_clayton/william_clayton.jpg?Signature=y6wz0jGjo1dPwpgI3Pw5AH4yNrc%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/chike_amajoyi/chike_amajoyi.jpg?Signature=4uRwh%2Ftkll%2FtbOnbvlxUyJuZKns%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/emily_cox/emily_cox.jpg?Signature=ngLuwgSoGVuB7yVNpQCfi%2BU3CoE%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/carly_crandall/carly_crandall.jpg?Signature=xwNGhCmuDvJOHbgVkSqQE4h%2F8OI%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ '/media/pictures/anon.jpg',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/yosem_companys/yosem_companys.jpg?Signature=PnJSInv8fXiCN4PNpOrMriHtQdI%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/christopher_condlin/christopher_condlin.jpg?Signature=OWZjiYaV9MtqB97PZj1Jd6SYBIk%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/stan_darger%2C_jr./stan_darger%2C_jr..jpg?Signature=5EsqyCdi7YM%2FzlrMK2ld5IbpFPs%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/heather_davidson/heather_davidson.jpg?Signature=5il3pSbUTPDnwWsq4cCFgvunVLI%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/jason_davies%2C_md%2C_phd/jason_davies%2C_md%2C_phd.jpg?Signature=246d%2BPgWxTdnQh4QY5AnqddPrgs%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/miles_davis/miles_davis.jpg?Signature=6h4i1%2BFzsDZ6ABHU1MlkJqpiFek%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/logan_deans/logan_deans.jpg?Signature=Co4yeSkjbEYwVEG62Mr0hClskpg%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/aidan_dunn/aidan_dunn.jpg?Signature=V3zww4EXagVcuh90tSov32RYwQk%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/marie_dutton/marie_dutton.jpg?Signature=TDW7qb7xld0f6ssKr11QC6bHFMk%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/greta_dyer/greta_dyer.jpg?Signature=fv%2Bzp%2Fl2u7%2BBs7x%2BK%2BjBdVa6ovo%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/michael_elgarico/michael_elgarico.jpg?Signature=w0wFtS%2Fp%2FbIMuFFE0FBBAkNM%2B08%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/solomon_k._enos/solomon_k._enos.jpg?Signature=NqRLRBFts0zM0%2Ffo9L7oF%2FveYnY%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82',
+ 'https://prosperme_images.s3.amazonaws.com/pictures/mike_field/mike_field.jpg?Signature=x1gjOjP5%2B3Ti9K48Q%2BVntCnDfrs%3D&Expires=1374270810&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82']
+
+ 	followers = [{"id":7, "pic":p, "name":"Christina Phillips"} for p in pics]
+ 	related_questions = [
+ 		{"title":"What can I do with my Math degree?", "id":7},
+ 		{"title":"What is the biggest professional mistake you've ever made?", "id":7},
+ 		{"title":"Are there any options out there for STS majors?", "id":7},
+ 		{"title":"What is like to work in Management Consulting from Stanford?", "id":7},
+ 		{"title":"What are the most important classes that you ever took? Why?", "id":7},
+ 	]
+
+ 	question = {
+ 		"title":"What can I do with my English degree?",
+ 		"body":"I don't want to go into editing or publishing or journalism... maybe tech? I just want to know what my options are. The only thing that I think I may be interested is the music industry, but I'm open to all new experiences. Are there any fellow alums out there who could shine some light on this? Thanks!",
+ 		"user_pic":pics[-1:][0],
+ 		"user_name":"Adam Jahn",
+ 		"tags":popular_tags[:3],
+ 		"user_id":7,
+ 	}
+
+ 	comments = [
+ 		{"user_name":"James Buchanan", "user_pic":pics[10], "body":"There are tons of options out there for English majors. These options may include: cutting brush, taking out the trash, walking cats, being a meathead, and/or depression fueled by narcotics and hipster alcohol. Please be advised, that, of these paths, taking out the trash is the most respected and, probably, the most safe.", "votes":"27"},
+ 		# {"user_name":"James Buchanan", "user_pic":pics[14], "body":" ", "votes":"27"},
+ 		# {"user_name":"James Buchanan", "user_pic":pics[14], "body":" ", "votes":"27"},
+ 		# {"user_name":"James Buchanan", "user_pic":pics[14], "body":" ", "votes":"27"},
+
+ 	]
+
+
+
+	data = {
+		"is_active":True, # boolean
+		"is_following":False, # boolean
+		"question":question, # {"title", "body", "user_pic", "user_name", "tags = []"}
+		"stats":{"num_followers":17, "num_answers":12, "days_active":4}, # {"num_followers", "num_answers", "num_days_active"}
+		"comments":comments, # [ {"body", "user_name", "user_pic", "votes"} ]
+		"user_pic":request.user.profile.default_profile_pic(), # = profile_pic of the viewer
+		"related_questions":related_questions,
+		"followers":followers,
+		"popular_tags":popular_tags, # [ {"title", "type", "id"} ]
+		"url":request.build_absolute_uri(),
+	}
+
+
+	return render_to_response("social/question.html", data, context_instance=RequestContext(request))
+
+
 def recruiters(request):
 	from social.forms import RecruiterInterestForm
 	# check to see if email submitted
@@ -46,6 +196,8 @@ def recruiters_thanks(request):
 
 	return render_to_response("recruiters_thanks.html",context_instance=RequestContext(request))
 
+
+## DEPRECATED: keep around for now for code review
 def thread(request, thread_id):
 	thread = Thread.objects.get(id=thread_id)
 	comments = Comment.objects.filter(thread=thread).order_by("index")
@@ -78,7 +230,7 @@ def thread(request, thread_id):
 
 	return render_to_response("social/thread.html",data,context_instance=RequestContext(request))
 
-
+## DEPRECATED: keep around for now for code review
 def create_thread(request):
 
 	data = {}

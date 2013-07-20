@@ -6,9 +6,9 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^$', 'careers.views.home', name='home'),
+    url(r'^$', 'social.views.home', name='home'),
     # url(r'^$','careers.views.proto'),
-    url(r'^home/$', 'careers.views.home'),
+    url(r'^home/$', 'social.views.home'),
     url(r'^welcome/$','entities.views.welcome'),
     url(r'^unsubscribe/$','accounts.views.unsubscribe'),
 
@@ -57,7 +57,8 @@ urlpatterns = patterns('',
     # Social Views
     url(r'^thread/(\d+)/$', 'social.views.thread'),
     url(r'^thread/$', 'social.views.create_thread'),
-
+    url(r'^question/(\d+)/$', 'social.views.question'),
+    url(r'^ask/$', 'social.views.ask'),
 
     # url(r'^personalize/$','careers.views.personalize_careers_jobs'),
     url(r'^personalize/careers/$','careers.views.personalize_careers'),
@@ -133,6 +134,8 @@ urlpatterns = patterns('',
     url(r'^social/updateVotes/$', 'social.views.updateVotes'),
     url(r'^social/postComment/$', 'social.views.postComment'),
     url(r'^social/createThread/$', 'social.views.createThread'),
+
+
 
 
 
