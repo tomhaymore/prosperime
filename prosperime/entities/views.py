@@ -124,11 +124,7 @@ def meet(request):
 	data = {}
 	return render_to_response('meet.html', data, context_instance = RequestContext(request))
 
-def welcome(request):
-	if request.user.is_authenticated():
-		# user is logged in, display personalized information
-		return HttpResponseRedirect('/feed')
-	return render_to_response('welcome.html',context_instance=RequestContext(request))
+
 
 # view for org profiles
 @login_required

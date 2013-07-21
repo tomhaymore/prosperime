@@ -16,8 +16,17 @@ import utilities.helpers as helpers
 
 logger = logging.getLogger(__name__)
 
+def welcome(request):
+	if request.user.is_authenticated():
+		# user is logged in, display personalized information
+		return HttpResponseRedirect('/home')
+	return render_to_response('welcome.html',context_instance=RequestContext(request))
 
 def home(request):
+
+	# check if user is logged in
+	if not request.user.is_authenticated():
+		return HttpResponseRedirect('/welcome')
 
 	tags = [
 		{"title":"Great Hours", "id":7, "type":"Good"},
