@@ -10,3 +10,4 @@ prosperime/tmp_img
 prosperime/celerybeat-schedule.db
 rabbitmq
 prosprenv
+prosperime/.sass-cache
