@@ -6,42 +6,36 @@
 {% endblock %}
 
 {% block content %}
-<div class="main-container" id="content-container">
+<div id="content-container">
 <p class="feature-page-header">Register</p>
-<div class="register-form-nav">
-	<a id="linkedin_authenticate" class="flat-button lightblue-button wide-button pull-left" href="/account/authorize/" title="Quick and easy registration with LinkedIn">Register with LinkedIn</a> 
-	<!-- <a id="email-authenticate" class="flat-button blue-button wide-button pull-left left-spacer">Register with email</a> -->
-	<div class="clear"></div>
+<div class="form-nav">
+	<a id="linkedin_authenticate" class="flat-button lightblue-button" href="/account/authorize/" title="Quick and easy registration with LinkedIn">Register with LinkedIn</a> 
 </div>
 <p></p>
 <div id="register-form-container">
 <form action="" method="post" name="finish_login">
 	{% csrf_token %}
-	
-	<ul>
-		<li><label for="id_full_name">Full Name:</label>
+
+		<p><label for="id_full_name">Full Name:</label>
 			{{form.full_name.errors}}
-			<input type="text" name="full_name" id="id_full_name" /></li>
-		<li><label for="id_username">Email:</label>
+			<input type="text" name="full_name" id="id_full_name" /></p>
+		<p><label for="id_username">Email:</label>
 			{{form.username.errors}}
-			<input type="text" name="username" id="id_username" /></li>
-<!-- 		<li><label for="id_email">Email:</label>
-			{{form.email.errors}}
-			<input type="text" name="email" id="id_email" /></li> -->
-		<li><label for="id_location">Location:</label>
+			<input type="text" name="username" id="id_username" /></p>
+		<p><label for="id_location">Location:</label>
 			{{form.location.errors}}
-			<input type="text" name="location" id="id_location" /></li>
+			<input type="text" name="location" id="id_location" /></p>
 		
-		<li><label for="id_password">Password:</label>
+		<p><label for="id_password">Password:</label>
 			{{form.password.errors}}
-			<input type="password" name="password" id="id_password" /></li>
-		<li><label for="id_confirm_password">Confirm Password:</label>
+			<input type="password" name="password" id="id_password" /></p>
+		<p><label for="id_confirm_password">Confirm Password:</label>
 			{{form.confirm_password.errors}}
-			<input type="password" name="confirm_password" id="id_confirm_password" /></li>
-		<li><input class="pull-left" type="checkbox" name="terms" id="id_terms" /> 
-			<label class="left-spacer pull-left" for="id_terms">I have read and understand the <a href='/terms'>Terms of Service</a> and <a href='/privacy'>Privacy Policy</a>.</label><div class="clear"></div>
+			<input type="password" name="confirm_password" id="id_confirm_password" /></p>
+		<p><input class="pull-left" type="checkbox" name="terms" id="id_terms" />
+			<label class="left-spacer pull-left" for="id_terms">&nbsp;I have read and understand the <a href='/terms'>Terms of Service</a> and <a href='/privacy'>Privacy Policy</a>.</label><div class="clear"></div>
 			{{form.terms.errors}}
-		</li>
+		</p>
 	</ul>
 	<fieldset>
 		<button type="submit" class="top-spacer flat-button green-button">Submit</button>
