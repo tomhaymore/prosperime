@@ -14,90 +14,51 @@
 
 {% block content %}
 
-<div id="v2-splash-home">
+<div id="welcome-splash-container">
 
-	<div class="v2-splash-inner-container">
+	<div id="welcome-splash-inner-container">
 
-		<div class="splash-module pull-left" style="margin-top:125px;margin-bottom:75px;">
+		<div class="splash-module" style="margin-top:15px;">
 
-			<p class="v2-splash-message-header">Learn where you're going</p>
-			<p class="v2-splash-message-header">And how you're going to get there</p>
-			<!-- <p class="v2-splash-message-header">Find the right path for you</p>
-			<p class="splash-message-subheader">Connect with fellow alumns</p>
-			<p class="splash-message-subheader">Explore possible career paths</p>
-			<p class="splash-message-subheader">Seek and share career advice</p> -->
-			<p class="splash-submessage no-hover">
-				<a id="get-started-button" class="flat-button green-button" href="/account/authorize">Get started</a>
-			</p>
-			<!-- <p class="splash-submessage"><a href="/account/register">With email only</a></> -->
+			<p class="splash-message-header">Get trusted advice<br/>
+			from classmates and alumni</p>
+
+		</div>
+
+		<div class="splash-module"  style="margin-top:45px;">
+			<div class="splash-submodule pull-left">
+				<span class="pull-left">
+					<img class="splash-poitrait" src="{{ STATIC_URL}}img/splash_poitrait_1.png"/>
+				</span>
+				<div class="splash-quote-left pull-left"></div>
+				<span class="splash-poitrait-quote pull-left">
+					What's the difference between a Product Manager and a Product Marketing Manager?
+				</span>
+				<div class="splash-quote-right pull-left"></div>
+				<div class="clear"></div>
+			</div>
+			<div class="splash-submodule pull-left">
+				<span class="pull-left">
+					<img class="splash-poitrait" src="{{ STATIC_URL}}img/splash_poitrait_2.png"/>
+				</span>
+				<div class="splash-quote-left pull-left"></div>
+				<p class="splash-poitrait-quote pull-left">
+					What can I do with my Math major besides work for the NSA?
+				</p>
+				<div class="splash-quote-right pull-left"></div>
+				<div class="clear"></div>
+			</div>
 			<div class="clear"></div>
 		</div>
 
-		<div class="splash-module pull-left">
-			<img src="/static/img/welcome_splash_1.png" id="splash-img-1"/>
+		<div class="splash-module"  style="margin-top:65px;">
+				<a id="get-started-button" class="flat-button green-button" href="/account/register">Get started</a>
 		</div>
 
-	<div class="clear"></div>
 	</div>
 
 </div>
 
-<!-- <div class="pad-top pad-bottom promo-container">
-<div class="promo-module">
-	<div class="promo-left pull-left">
-		<img src="/static/img/splash_alumni_1.png" id="splash-img-alumni" />
-	</div>
-
-	<div class="promo-right pull-left pad-left pad-top">
-		<p class="v2-promo-header">Connect with alumni. Find mentors.</p>
-		<p class="v2-promo-body">Your alumni network is one of your most valuable assets -- don't let it go to waste. Whether you're searching for a new job or just looking for advice on your next career move, fellow alums have been down the same road before and can help.<br/><br/> Before you know it, you will be in their shoes, and younger alums will be asking for your advice, too.</p>
-	</div>
-	<div class="clear"></div>
-</div>
-</div>
-
-<div class="v2-promo-container-grey pad-top pad-bottom">
-<div class="promo-module">
-	<div class="promo-left pull-left pad-top">
-		<p class="v2-promo-header">Ask for and share advice.</p>
-		<p class="v2-promo-body">Whether you realize or not, you've
-		 got a lot of career-related information stored, on internships, college majors, and jobs inside your head. And your fellow alums are the same way. Together, you can swap and share advice on what jobs, careers and companies you should be taking a look at. <br/><br/> Career decisions have a huge impact on your life: there's no reason to make them alone.</p>
-
-	</div>
-	<div class="promo-right pull-left">
-		<img src="/static/img/splash_advice_1.png" id="splash-img-advice" />
-	</div>
-	<div class="clear"></div>
-</div>
-
-</div>
-<div class="promo-container pad-top pad-bottom">
-<div class="promo-module">
-	<!-- <div class="promo-full"> -->
-<!-- 	<div class="row-fluid">
-		<div class="offset2 span8 center">
-			<div class="v2-promo-header">
-				Interested? Signing up takes only a second.
-			</div>
-
-			<br/>
-
-			<div>
-				<a class="flat-button call-to-action" href="/account/register">Get started</a>
-			</div>
-		</div>
-	</div> -->
-	<!-- <div class="promo-left pull-left">
-		<img src="/static/img/splash_plan_1.png" id="splash-img-plan" />
-	</div>
-	<div class="promo-right pull-left">
-		
-		<p class="promo-header">Explore possible career paths</p>
-		<p class="promo-body">When you're just graduating, and even for a few years affter, you can feel confused by the bewildering array of seeming opportunities. You shouldn't try to sort through it all on your own. Hundreds, if not thousands, of other people have traveled down the same road and can share their experiences.</p>
-	</div>
-	<div class="clear"></div> 
-</div> -->
-<!-- </div> -->
 {% endblock %}
 
 {% block promo %}
