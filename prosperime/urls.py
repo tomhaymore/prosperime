@@ -6,10 +6,10 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^$', 'social.views.home', name='home'),
+    url(r'^$', 'social.views.welcome'),
     # url(r'^$','careers.views.proto'),
     url(r'^home/$', 'social.views.home'),
-    url(r'^welcome/$','entities.views.welcome'),
+    url(r'^welcome/$','social.views.welcome'),
     url(r'^unsubscribe/$','accounts.views.unsubscribe'),
 
     # Accounts Views
