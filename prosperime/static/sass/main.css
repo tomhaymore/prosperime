@@ -1,10 +1,3 @@
-/* Element styles */
-a {
-  color: #253139; }
-
-ul {
-  list-decoration: none; }
-
 /* General styles */
 .pull-left {
   float: left; }
@@ -48,15 +41,6 @@ ul#topbar-nav {
       color: #fffffe; }
 
 /* Main Container Styles */
-div#content-container {
-  width: 1000px;
-  margin-right: auto;
-  margin-left: auto;
-  margin-top: 15px;
-  min-height: 500px;
-  padding: 5px 0 5px 0;
-  background-color: white; }
-
 div#background-container {
   background-color: white;
   min-height: 100%; }
@@ -65,17 +49,6 @@ div.splash-container {
   margin: 0;
   padding: 0;
   height: 100%; }
-
-.feature-page-header {
-  font-size: 2.5em;
-  font-family: "Helvetica Neue", Helvetica, "Lato";
-  color: #253139;
-  margin-bottom: 15px; }
-
-.main-sub-header {
-  font-size: 1.2em;
-  font-weight: bold;
-  line-height: 1.4em; }
 
 /* Messages Container Styles */
 div#messages-container {
@@ -153,42 +126,3 @@ a.flat-button:hover {
   width: auto;
   font-size: 1.6em;
   padding: 6px 8px; }
-
-/* Footer Styles */
-div.footer-container {
-  background-color: #333332;
-  font-size: 1.2em;
-  color: #fffffe;
-  height: 100%; }
-
-div.footer-inner {
-  padding-top: 15px;
-  width: 1000px;
-  margin-left: auto;
-  margin-right: auto;
-  min-height: 35px; }
-
-ul.footer-links {
-  margin-left: 0px; }
-  ul.footer-links li {
-    display: inline; }
-  ul.footer-links a {
-    margin-right: 50px;
-    color: #fffffe;
-    text-decoration: none; }
-
-div.footer {
-  font-size: 0.9em;
-  padding-top: 10px; }
-
-/* Form Styles */
-.flat-input {
-  border-radius: 0px;
-  width: 275px;
-  font-size: 18px;
-  height: 24px;
-  color: rgba(51, 51, 51, 0.8); }
-
-.form-nav {
-  margin-top: 15px;
-  margin-bottom: 15px; }
