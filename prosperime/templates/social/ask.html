@@ -429,7 +429,7 @@
 				<div class="control-group">	
 					<select class="chzn-select" multiple data-placeholder="Tags">
 						{% for t in tags %}
-							<option value="{{t.id}}">{{t.title}}</option>
+							<option value="{{t.id}}">{{t.name}}</option>
 						{% endfor %}
 					</select>	
 					<label>Add all tags that are relevant to this question--tags help other people like you find this question, and it helps potential answerers get you the knowledge that you need!</label>
@@ -500,7 +500,7 @@
 		// TODO: AJAX to DB
 		$.ajax({
 			type: "POST",
-			url: "/social/startConversation/",
+			url: "/api/startConversation/",
 			data: {"title":title, "body":body, "tags":tag_ids, "csrfmiddlewaretoken":"{{csrf_token}}"},
 			dataType:"json",
 			beforeSend: function() {

@@ -8,6 +8,7 @@
 
 <!-- JS -->
 	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
 
 
     <style type="text/css">
@@ -113,6 +114,7 @@
 	.question-title {
 		font-size:2em;
 		margin-bottom:12px;
+		line-height:32px;
 	}
 
 	.question-body { margin-bottom:6px; line-height:26px; }
@@ -401,15 +403,9 @@
 				<div class="question-column-right">
 					<div class="question-title">{{question.title}}</div>
 					<div class="question-body">{{question.body}}</div>
+
 					{% for t in question.tags %}
-						{% if t.type == "Good" %}
-							<div class="tag good-tag">
-						{% elif t.type == "Bad" %}
-							<div class="tag bad-tag">
-						{% else %}
-							<div class="tag eh-tag">
-						{% endif %}
-							{{t.title}}</div>
+						<div class="tag good-tag">{{t.name}}</div>
 					{% endfor %}
 
 					<div class="question-subtext">
@@ -430,7 +426,7 @@
 
 
 		<!-- Answers -->
-		<div class="center-column-module">
+		<div class="center-column-module comment-row">
 			
 
 			{% if is_active %}
@@ -448,7 +444,7 @@
 
 			<!-- Edge Case: inactive -->
 			{% else %}
-					<div class="no-comments-modele">
+					<div class="no-comments-module">
 						This conversation isn't active yet, but you can be the catalyst, <br/>
 						or ask one of your friends to answer. Drop them this link: <br/>
 						<a>{{url}}</a>
@@ -457,7 +453,6 @@
 
 			{% for c in comments %}
 				<div class="row-fluid">
-
 					<div class="span1">
 						<div class="vote-container">
 							<div class="upvote">+ </div>
@@ -479,15 +474,7 @@
 						</div>
 
 						{% for t in c.tags %}
-							{% if t.type == "Good" %}
-								<div class="tag good-tag">
-							{% elif t.type == "Bad" %}
-								<div class="tag bad-tag">
-							{% else %}
-								<div class="tag eh-tag">
-							{% endif %}
-									{{t.title}}
-								</div>
+							<div class="tag good-tag">{{t.name}}</div>
 						{% endfor %}
 					</div>
 				</div>
@@ -536,16 +523,7 @@
 		<div class="right-column-module">
 			<div class="v2-module-header">Popular Tags</div>
 			{% for t in popular_tags %}
-				{% if t.type == "Good" %}
-					<div class="tag good-tag">
-				{% elif t.type == "Bad" %}
-					<div class="tag bad-tag">
-				{% else %}
-					<div class="tag eh-tag">
-				{% endif %}
-						{{t.title}}
-					</div>
-
+				<div class="tag good-tag">{{t.name}}</div>
 			{% endfor %}
 		</div>
 		
@@ -646,27 +624,120 @@
 <script type="text/javascript">
 
 	function follow(ev) {
-		$(ev.currentTarget).text("Following").addClass("following").off("click")
-		var num_followers = parseInt($(".stats-right div :first").text())
 
-		// Update stats container
-		$(".stats-right div :first").animate({"background-color":"#E74C3C"}, 330, function() {
-			// Animate it red & change #
-			$(this).text(num_followers + 1).animate({"background-color":"rgba(51,51,51,0.8)"}, 330)
-		})
+		var conversation_id = getConversationId();
+
+
+		// Post to DB
+		$.ajax({
+			type: "POST",
+			url: "/api/followConversation/",
+			data: {"conversation_id":conversation_id, "csrfmiddlewaretoken":"{{csrf_token}}"},
+			dataType:"json",
+
+			beforeSend: function() {
+				$(ev.currentTarget).text("Following").addClass("following").off("click")
+			},
+
+			success:function(response) {
+				if (response["result"] == "success") {
+					console.log("success")
+					
+				} else console.log(response["errors"])
+			},
+
+			complete:function() {
+				var num_followers = parseInt($(".stats-right div :first").text())
+				// Update stats container
+				$(".stats-right div :first").animate({"background-color":"#E74C3C"}, 330, function() {
+					// Animate it red & change #
+					$(this).text(num_followers + 1).animate({"background-color":"rgba(51,51,51,0.8)"}, 330)
+				})
+			}
+		});
 	};
 
 	function submitComment(ev) {
-		// clear textarea & disable button
-		$(".comment-module textarea").val("")
-		$(".comment-module .comment-button").addClass("disabled")
 
-		// TODO: post comment to DB, reflect change in the dom
+		var conversation_id = getConversationId();
+		var body = $(".comment-module").find("textarea").val()
+
+		// Post to DB
+		$.ajax({
+			type: "POST",
+			url: "/api/addComment/",
+			data: {"conversation_id":conversation_id, "body":body, "csrfmiddlewaretoken":"{{csrf_token}}"},
+			dataType:"json",
+
+			beforeSend: function() {
+
+				// clear textarea & disable button
+				$(".comment-module textarea").val("")
+				$(".comment-module .comment-button").addClass("disabled")
+				// flash button
+			},
+
+			success:function(response) {
+				if (response["result"] == "success") {
+					console.log("success")
+					
+					// append comment to DOM
+					var template = _.template($("#single-comment-template").html())
+					$(".comment-row").append(template({
+						"user_name":response["user_name"],
+						"user_pic":response["user_pic"],
+						"votes":0,
+						"body":body
+					})).hide().fadeIn(250)
+
+
+				} else console.log(response["errors"])
+			},
+
+			complete:function() {
+				// check if this was the first comment. if so, fix viz
+				if ($(".no-comments-module").length > 0) $(".no-comments-module").fadeOut(100).remove()
+			}
+		});
+	};
+
+
+	// Does some URL chopping to get conversation id
+	function getConversationId() {
+		var conversation_id = document.URL.substring(document.URL.indexOf("question/") + "question/".length)
+		if (conversation_id[conversation_id.length - 1] == "/") return conversation_id.substring(0, conversation_id.length - 1)
+		else return conversation_id
 	};
 
 
 
 
+</script>
+
+<script type="text/template" id="single-comment-template">
+
+	<div class="row-fluid">
+		<div class="span1">
+			<div class="vote-container">
+				<div class="upvote">+ </div>
+				<div class="comment-vote"><%=votes%></div>
+				<div class="downvote">- </div>
+			</div>
+		</div>
+
+		<div class="span2 question-column-left">
+			<div class="profile-pic-container">
+				<img src="<%=user_pic%>"/>
+			</div>
+			<div class="comment-user"><%=user_name%></div>
+		</div>
+
+		<div class="span8">
+			<div class="body-text">
+				<%=body%>
+			</div>
+		</div>
+	</div>
 
 </script>
 

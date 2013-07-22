@@ -41,7 +41,9 @@ urlpatterns = patterns('',
     # API
     url(r'^api/conversations/$', 'social.views.api_conversation_search'),
     url(r'^api/conversations_autocomplete/$', 'social.views.api_conversation_autocomplete'),
-
+    url(r'^api/startConversation/$', 'social.views.api_start_conversation'),
+    url(r'^api/followConversation/$', 'social.views.api_follow_conversation'),
+    url(r'^api/addComment/$', 'social.views.api_add_comment'),
     # Recruiter Views
     url(r'^recruiters/$', 'social.views.recruiters'),
     url(r'^recruiters/thanks/$', 'social.views.recruiters_thanks'),
@@ -52,7 +54,6 @@ urlpatterns = patterns('',
     url(r'^social/unfollowThread/$', 'social.views.unfollowThread'),   
     url(r'^social/updateVotes/$', 'social.views.updateVotes'),
     url(r'^social/postComment/$', 'social.views.postComment'),
-    url(r'^social/startConversation/$', 'social.views.startConversation'),
 
 
 
