@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 
 # ProsperMe
 from careers.models import SavedPath
-from social.models import Comment, Conversation, Vote, FollowConversation
+from social.models import Comment, Conversation, Vote, FollowConversation, Tag
 import utilities.helpers as helpers
 
 logger = logging.getLogger(__name__)
@@ -77,6 +77,8 @@ def ask(request):
 
 # Force login to view questions?
 def question(request, question_id):
+
+	## IF there's an error getting here, question_id will be -1, so redirect accordingly
 
 
 	popular_tags = [
@@ -394,32 +396,67 @@ def postComment(request):
 
 	return HttpResponse(json.dumps(response))
 
-# Creates a thread given a thread title, user, and comment body
-def createThread(request):
+# Starts a new conversation (AJAX)
+def startConversation(request):
 
-	response = {}
+	response = {
+		"errors":[],
+		"result":None,
+	}
 
+	# check that ajax
+	if not request.is_ajax:
+		response["errors"].append("Not an AJAX request")
+	# check that POST
+	if not request.POST:
+		response["errors"].append("Not a POST request")
+	# check for params
 	try:
 		title = request.POST.get("title")
 		body = request.POST.get("body")
+		tag_ids = request.POST.getlist("tags[]")
 	except:
+		response["errors"].append("Missing data from template.")
+	
+	# If there were errors, respond before creating object
+	if len(response["errors"]) > 0:
 		response["result"] = "failure"
-		response["errors"] = "Missing data from template."
 		return HttpResponse(json.dumps(response))
 
-	t = Thread()
-	t.name = title
-	t.save()
 
-	c = Comment()
-	c.owner = request.user
-	c.thread = t
-	c.index = 0
-	c.body = body
-	c.save()
+	# try to create the new conversation
+	conversation_id = -1
+	c = None
+	try:
+		c = Conversation()
+		c.name = title
+		c.summary = body
+		c.owner = request.user
+		c.save()
+		conversation_id = c.id
+	except:
+		response["errors"].append("Failed instantiating Conversation")
 
-	response["result"] = "success"
-	response["thread_id"] = t.id
+	# now add tags
+	try:
+		# convert unicode to ints
+		tag_ids = [int(t) for t in tag_ids]
+		# get tags from ids
+		tags = Tag.objects.filter(id__in=tag_ids)
+		for t in tags:
+			c.tags.add(t)
+		c.save()
+
+	except:
+		response["errors"].append("Failed to add Tags to new Conversation")
+
+	# check for any final errors
+	if len(response["errors"]) > 0:
+		response["result"] = "failure"
+	# return the id of the recently created conversation
+	else:
+		response["result"] = "success"
+		response["conversation_id"] = conversation_id
 
 	return HttpResponse(json.dumps(response))
 

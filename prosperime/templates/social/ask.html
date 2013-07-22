@@ -371,6 +371,7 @@
 			margin:0 auto;
 			font-size:1.2em;
 			padding:6px 6px;
+			cursor:pointer;
 		}
 
 		.share-module {
@@ -410,7 +411,7 @@
 	<div id="center-column" class="span7">
 		<div class="form-module" style="text-align:center;">
 
-			<div class="ask-header">Ask a question</div>
+			<div class="ask-header">Start a Conversation</div>
 
 			<form id="ask-question-form">
 				<div class="control-group"> <!-- TODO: add maxlength attributes to these -->
@@ -489,10 +490,35 @@
 		// Don't allow if disabled
 		if ($(ev.currentTarget).hasClass("disabled")) return false;
 
-		// TODO: AJAX to DB
-		// Note, call needs to return id of newly created question
+		var title = $("#ask-question-form").find("input :first").val(),
+			body = $("#ask-question-form").find("textarea").val(),
+			tag_ids = $("#ask-question-form").find("select").val(),
+			conversation_id;
 
-		formSuccess(7)
+		console.log(tag_ids)
+		
+		// TODO: AJAX to DB
+		$.ajax({
+			type: "POST",
+			url: "/social/startConversation/",
+			data: {"title":title, "body":body, "tags":tag_ids, "csrfmiddlewaretoken":"{{csrf_token}}"},
+			dataType:"json",
+			beforeSend: function() {
+
+			},
+			success:function(response) {
+				if (response["result"] == "success") {
+					console.log("success")
+					conversation_id = response["thread_id"]
+					formSuccess(conversation_id)
+
+				} else console.log(response["errors"])
+			},
+			complete:function() {
+				// redirect directly to newly created question? or offer call to action here?
+				// window.location = "/question/" + conversation_id
+			}
+		});
 	};
 
 	function formSuccess(id) {
