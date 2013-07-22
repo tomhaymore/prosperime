@@ -1,0 +1,120 @@
+/* Imports */
+
+@import "colors"
+
+/* General Styles */
+
+$left-column-width: 75px
+$right-column-width: 200px
+$center-column-width: 1000px - $left-column-width - $right-column-width - 20
+
+#search-container
+	margin-left: $left-column-width + 10
+	width: 630px
+	height: 50px
+
+#left-column 
+	margin-right: 10px
+	width: $left-column-width
+
+#center-column
+	margin-right: 10px
+	width: $center-column-width
+	min-height: 200px
+
+#right-column
+	width: $right-column-width
+
+/* Left Column */
+
+/* Main Content Styles */
+
+.single-question-module 
+	margin-top: 24px
+	margin-bottom: 24px
+
+.question-column-left 
+	display: inline-block 
+	width: 75px
+	margin-right: 5px
+	vertical-align: top
+	
+.question-column-right 
+	width: 550px
+	display: inline-block
+	vertical-align: top
+
+.question-title
+	font-size: 2em
+	margin-bottom: 12px
+	line-height: 32px
+
+.question-body 
+	margin-bottom: 6px
+	line-height: 26px
+
+.question-subtext 
+	text-align: right
+	a 
+		text-decoration: none
+
+.question-tags-container
+	margin-left: 90px
+
+.follow-button 
+	width: 100px
+	height: 25px
+	line-height: 25px
+	background-color: #2ECC71
+	border-radius: 2px 
+	display: inline-block
+	margin-right: 16px
+	padding: 2px 2px
+	cursor: pointer
+
+.following 
+	background-color: #C0C0C0
+	cursor: default
+
+.comment-module
+	margin-left: 17%
+	width: 80%
+	margin-top: 32px
+	img 
+		float: left
+		display: inline-block
+		width: 50px
+		height: 50px
+		border-radius: 50px
+		margin-right: 36px
+	
+	textarea
+		width: 80%
+		height: 50px
+		resize: none
+
+	.comment-button 
+		text-align: center
+		float: right
+		margin-right: 16px
+		width: 100px
+		height: 25px
+		line-height: 25px
+		background-color: #2ECC71
+		border-radius: 2px
+		display: inline-block
+		margin-right: 16px
+		padding: 2px 2px
+		cursor: pointer
+
+/* Right Column Styles */
+
+.right-column-module
+	margin-bottom: 10px
+
+.module-header
+	font:
+		size: 18px
+		color: #181818
+	line-height: 24px
+	margin-bottom: 10px

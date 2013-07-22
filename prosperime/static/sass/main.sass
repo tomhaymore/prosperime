@@ -1,14 +1,17 @@
-/* Element styles */
+@import "colors"
 
-$link: #253139
+/* Element styles */
 
 a
 	color: $link
+	cursor: pointer
 
 ul
 	list-decoration: none
 
 /* General styles */
+
+$lightblue: 6FB6D4
 
 .pull-left 
 	float: left
@@ -162,7 +165,7 @@ a.flat-button:hover
 	color: #fffffe
 
 .lightblue-button
-	background-color: #6FB6D4
+	background-color: $lightblue
 	color: #fffffe
 
 .wide-button 
@@ -215,3 +218,36 @@ div.footer
 .form-nav 
 	margin-top: 15px
 	margin-bottom: 15px
+
+/* Picture Styles */
+
+.profile-pic-container 
+	width: 75px
+	height: 75px
+	display: inline-block
+	margin-right: 16px
+	margin-bottom: 16px
+	img 
+		border-radius: 75px
+
+/* Tag Styles */
+
+.filter-tags
+	color: #181818
+
+.tag
+	border-radius: 2px
+	padding: 4px 6px
+	margin-top: 4px
+	display: inline-block
+	background-color: $tag-background
+	cursor: pointer
+	font-size: 12px
+	line-height: 14px
+	color: #181818
+
+.tag:hover
+	text-decoration: none
+
+.tag-inline
+	margin-left: 8px
