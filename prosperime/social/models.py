@@ -19,11 +19,12 @@ class Notification(models.Model):
 	def __unicode__(self):
 		return self.type + " for " + self.target.username
 
-
-class Thread(models.Model):
+class Conversation(models.Model):
 	name = models.CharField(max_length=450,null=True)
 	summary = models.TextField(null=True)
-	followers = models.ManyToManyField(User,related_name="followers",through="FollowThread")
+	followers = models.ManyToManyField(User,related_name="followers",through="FollowConversation")
+	owner = models.ForeignKey(User,related_name="conversations")
+	tags = models.ManyToManyField("Tag",related_name="tags")
 	created = models.DateTimeField(auto_now_add=True, null=True)
 	updated = models.DateTimeField(auto_now=True, null=True)
 
@@ -32,7 +33,7 @@ class Thread(models.Model):
 
 class Comment(models.Model):
 	owner = models.ForeignKey(User,related_name="comments")
-	thread = models.ForeignKey(Thread,related_name="comments")
+	conversation = models.ForeignKey(Conversation,related_name="comments")
 	meta = models.CharField(max_length=150,null=True)
 	index = models.IntegerField(null=True)
 	body = models.TextField(null=True)
@@ -43,9 +44,8 @@ class Comment(models.Model):
 	def __unicode__(self):
 		return "Comment #" + str(self.index) + " on " + self.thread.name
 
-
-class FollowThread(models.Model):
-	thread = models.ForeignKey(Thread)
+class FollowConversation(models.Model):
+	conversation = models.ForeignKey(Conversation)
 	user = models.ForeignKey(User)
 	status = models.CharField(max_length=45,default="active")
 	created = models.DateTimeField(auto_now_add=True, null=True)
@@ -53,7 +53,8 @@ class FollowThread(models.Model):
 
 class Vote(models.Model):
 	owner = models.ForeignKey(User,related_name="votes")
-	comment = models.ForeignKey(Comment,related_name="votes")
+	comment = models.ForeignKey(Comment,related_name="votes",null=True)
+	conversation = models.ForeignKey(Conversation,related_name="votes",null=True)
 	value = models.IntegerField(default=1)
 	type = models.CharField(max_length=50,null=True)
 	created = models.DateTimeField(auto_now_add=True, null=True)
@@ -64,3 +65,9 @@ class Vote(models.Model):
 			return "Up vote by " + self.owner.username + " on " + self.comment
 		else:
 			return "Down vote by " + self.owner.username + " on " + self.comment
+
+class Tag(models.Model):
+	name = models.CharField(max_length=450)
+
+	def tag_count(self):
+		return len(Conversation.objects.filter(tags=self))
