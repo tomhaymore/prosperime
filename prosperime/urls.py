@@ -6,17 +6,18 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    
+    # Social Views
     url(r'^$', 'social.views.welcome'),
-    # url(r'^$','careers.views.proto'),
     url(r'^home/$', 'social.views.home'),
     url(r'^welcome/$','social.views.welcome'),
-    url(r'^unsubscribe/$','accounts.views.unsubscribe'),
 
     # Accounts Views
     url(r'^privacy/$','accounts.views.privacy'),
     url(r'^terms/$','accounts.views.terms'),
     url(r'^copyright/$','accounts.views.copyright'),
     url(r'^use/$','accounts.views.use'),
+    url(r'^unsubscribe/$','accounts.views.unsubscribe'),
 
     # Entities Views
     url(r'^contact/$', 'entities.views.contact'),
@@ -34,6 +35,10 @@ urlpatterns = patterns('',
     url(r'^majors_test/$', 'careers.views.test_majors_v3'),
     url(r'^majors/(\d+)/$','careers.views.major'),
     # url(r'^majors/v/(\d+)/$', 'careers.views.single_major'),
+
+    # API
+    url(r'^api/conversations/$', 'social.views.api_conversation_search'),
+    url(r'^api/conversations_autocomplete/$', 'social.views.api_conversation_autocomplete'),
 
     # Recruiter Views
     url(r'^recruiters/$', 'social.views.recruiters'),

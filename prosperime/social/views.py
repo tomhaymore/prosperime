@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 
 # ProsperMe
 from careers.models import SavedPath
-from social.models import Comment, Thread, Vote, FollowThread
+from social.models import Comment, Conversation, Vote, FollowConversation
 import utilities.helpers as helpers
 
 logger = logging.getLogger(__name__)
@@ -204,6 +204,34 @@ def recruiters(request):
 def recruiters_thanks(request):
 
 	return render_to_response("recruiters_thanks.html",context_instance=RequestContext(request))
+
+## API ##
+
+def api_conversation_search(request):
+	# get filters from url
+	params = request.GET.get('query',None)
+	# check to see that there are params
+	if params:
+		convos = Conversation.objects.filter(name__icontains=params).order_by("-created")[:10]
+	else:
+		convos = Conversation.objects.order_by("-created")[:10]
+				
+	convos_list = [{'name':c.name,'summary':c.summary,'no_answers':len(c.comments.all()),'tags':[{'id':t.id,'name':t.name} for t in c.tags],'comments':[{'id':comment.id,'body':comment.body,'owner_id':comment.owner.id,'owner_name':comment.owner.profile.full_name(),'owner_pic':comment.owner.profile.default_profile_pic()} for comment in c.comments]} for c in convos]
+
+	response = convos_list
+	return HttpResponse(json.dumps(response))
+
+def api_conversation_autocomplete(request):
+	# get params from get
+	params = request.GET.get('q')
+	# check for params
+	if params: 
+		convos = Conversation.objects.filter(name__icontains=params).order_by("-created")[:10]
+		convos_list = [c.name for c in convos]
+
+		response = convos_list
+		return HttpResponse(json.dumps(response))
+
 
 
 ## DEPRECATED: keep around for now for code review

@@ -5,440 +5,70 @@
 
 <!-- CSS -->
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/chosen.css"/>
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/home.css"/>
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/typeahead.min.css" />
+
 
 <!-- JS -->
-	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>
-	<script type="text/javascript" src="{{ STATIC_URL }}js/backbone_QA.js"></script>
-	
-
-    <style type="text/css">
-
-	/* Main */
-    body { color:#333; }
-    #question-page-container { padding-top:36px; }
-	#left-column { width:15%; /* Bootstrap is acting weird on the span1 */ }
-	#center-column { margin-left:0px; width:63%; }
-	#right-column { margin-left:0px; width:22%;}
-
-
-	.body-text { margin-bottom:6px; line-height:26px; }
-
-
-    /* Left Column */
-
-    .left-column-module {
-    }
-
-    .stats-container {
-		margin-top:48px;
-		margin-left:18px;
-		text-align: center;
-    }
-
-    .stat {
-		padding:4px 4px;
-    }
-
-    .stats-left { text-align:right; }
-    .stats-right div {
-    	background-color: rgba(51,51,51,0.8);
-		color:#fffffe;
-		border:1px solid #fffffe;
-		border-radius:3px;
-		padding:4px 4px;
-    }
-    .stats-right { }
-
-
-
-	/* Right Column */
-	.right-column-module {
-		padding:8px 10px;
-		padding-top:24px;
-		padding-bottom:24px;
-		border-bottom:1px solid #f0f0f0;
-		border-left:1px solid #f0f0f0;
-		min-height:75px;
-	}
-
-	.followers-profile-pic {
-		display:inline-block;
-		margin:0;
-		width:48px;
-		height:48px;
-		margin-top:6px;
-	}
-
-	.followers-profile-pic img { border-radius:48px; }
-	.followers-more-followers { text-align:right; margin-top:6px; }
-
-	.related-question { margin-top:6px; }
-	.related-question a { text-decoration: none; }
-
-	.ask-button {
-		display:inline-block;
-		margin:0 auto;
-		background-color: #2ECC71;
-		width:75px;
-		height:20px;
-		padding:6px 8px;
-		margin-top:6px;
-		text-align:center;
-		font-size:1.2em;
-		line-height:20px;
-		border-radius:4px;
-		transition:font-weight 0.5s;
-	}
-
-	.ask-button:hover { font-weight:700; }
-
-
-	/* Center Column */
-	.center-column-module {
-		border-bottom:1px solid #e0e0e0;
-		border-right:1px solid #e0e0e0;
-		padding-left:36px;
-		padding-right:24px;
-		padding-top:24px;
-		padding-bottom:24px;
-	}
-
-	.question-column-left {
-		text-align:center;
-		width:15%;
-		display:inline-block;
-		vertical-align: top;
-	}
-	.question-column-right { width:80%; display:inline-block; vertical-align: top;}
-
-	.question-title {
-		font-size:2em;
-		margin-bottom:12px;
-		line-height:32px;
-	}
-	.question-title a:hover { text-decoration: none; }
-
-	.question-body { margin-bottom:6px; line-height:26px; }
-	.question-subtext { text-align:right; }
-	.question-subtext a { text-decoration: none; }
-
-	.profile-pic-container {
-		width:75px;
-		height:75px;
-		display:inline-block;
-		margin-right:16px;
-		margin-bottom:16px;
-	}
-
-	.profile-pic-container img { border-radius:75px; }
-	.question-tags-container { margin-left: 90px; /* = pic_width + margin */ }
-
-	.follow-button {
-		width:100px;
-		height:25px;
-		line-height:25px;
-		background-color:#2ECC71;
-		border-radius:2px;
-		display:inline-block;
-		margin-right:16px;
-		padding:2px 2px;
-		cursor:pointer;
-	}
-
-	.following {
-		background-color:#C0C0C0; 
-		cursor:default;
-	}
-
-	.comment-module { margin-left:17%; width:80%; margin-top:32px;}
-	.comment-module img {
-		float:left;
-		display:inline-block;
-		width:50px;
-		height:50px;
-		border-radius:50px;
-		margin-right:36px;
-	}
-	.comment-module textarea {
-		width:80%;
-		height:50px;
-		resize:none;
-	}
-	.comment-module .comment-button {
-		text-align: center;
-		float:right;
-		margin-right:16px;
-		width:100px;
-		height:25px;
-		line-height:25px;
-		background-color:#2ECC71;
-		border-radius:2px;
-		display:inline-block;
-		margin-right:16px;
-		padding:2px 2px;
-		cursor:pointer;
-	}
-
-	.disabled {
-		background-color:#C0C0C0 !important; 
-		cursor:default !important;
-	}
-
-	.no-comments-module { text-align:center; } 
-	.no-comments-call-out-text { font-size:1.2em; line-height:28px; }
-
-	.comment-votes {
-/*		text-align:center;
-		margin:0 auto;
-		width:36px;
-		height:24px;
-		line-height:24px;
-		background-color:rgba(231,76,60,1); 
-		margin-top:6px;
-		border-radius:2px;*/
-	}
-
-	.vote-container div {
-		width:24px;
-		height:24px;
-		border-radius:2px;
-		text-align:center;
-		line-height:24px;
-	}
-
-	.upvote {
-		background-color: rgba(39,174,96,1); font-size:1.2em; line-height:22px;
-	}
-
-	.downvote {
-		background-color:rgba(231,76,60,1); font-size:1.2em; line-height:22px;
-	}
-
-
-	.icon-container i {
-		display:inline-block;
-		padding:2px;
-	}
-
-	.icon-container span {
-		display: inline-block;
-		margin-left:30px;
-	}
-
-	.star-filled {
-		color:#D35400;
-	}
-
-
-
-
-
-
-	.add-button {
-		width:20px;
-		height:20px;
-		line-height:18px;
-		border-radius:2px;
-		display:inline-block;
-		text-align:center;
-		margin-left:4px;
-		margin-right:8px;
-		cursor:pointer;
-		color:#fffffe;
-		background-color: rgba(51,51,51,0.2);
-		transition: background-color 0.5s;
-	}
-
-	.add-button:hover {
-		background-color:#2ECC71;
-	}
-
-	.review-job {
-		margin-top:6px;
-	}
-
-	.v2-module-header {
-		font-weight:600;
-		font-size:1.1em;
-	}
-
-	.good-tag { background-color: rgba(52,152,219,0.7); }
-	.good-tag:hover { background-color: rgba(51,152,219,1); }
-
-	.bad-tag { background-color:rgba(231,76,60,0.7); }
-	.bad-tag:hover { background-color:rgba(231,76,60,1); }
-
-	.eh-tag { background-color: rgba(39,174,96,0.7); }
-	.eh-tag:hover { background-color: rgba(39,174,96,1); }
-
-	.tag {
-		border-radius:2px;
-		padding:6px 8px;
-		margin-top:6px;
-		display:inline-block;
-		cursor:pointer;
-	}
-
-
-	.logo {
-		font-size:2.2em;
-		font-weight:bold;
-		line-height:35px;
-	}
-
-	.blue {
-		color:#3498DB;
-	}
-
-	.review {
-		border-bottom:1px solid #f0f0f0;
-		line-height:28px;
-		margin-top:16px;
-		padding-bottom:16px;
-	}
-
-	.review-header {
-		font-weight:600;
-	}
-
-
-
-
-
-	.review-rating {
-		font-size:2.0em;
-		font-weight:bold;
-		margin-top:12px;
-	}
-
-	.suggested-table {
-		width:100%;
-		margin-top:6px;
-	}
-
-	.suggested-table tr {
-		margin-top:6px;
-	}
-
-	.suggested-table tr td {
-		width:33%;
-		padding-left:12px;
-	}
-
-
-	/* Home */
-	#main-filter-field select { width:450px; text-align: center;}
-	#main-filter-field .filter-button {
-		background-color:#2ECC71;
-		margin-left:16px;
-	}
-	.single-question-module {
-		margin-top:24px;
-		margin-bottom:24px;
-	}
-
-	.tag-inline { margin-left:8px; }
-	.homepage-subtext {
-		margin-top:24px;
-		margin-right:128px;
-		font-size:1.2em;
-	}
-
-	.home-header { margin-bottom:12px; font-size:1.4em;}
-
-
-    </style>
-
+	<script type="text/javascript" src="{{ STATIC_URL }}js/home.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/typeahead.min.js"></script>
 
 {% endblock %}
 
 {% block extramessage %} {% endblock %}
 
 {% block content %}
-
 	
 <!-- Main -->
-<div id="question-page-container" class="row-fluid">
+<div id="content-container">
+
+	<!-- Search -->
+	<div id="search-container">
+		<input type="text" id="search-conversations-input" data-placeholder="Start typing" />
+		<a class="flat-button lightblue-button" id="search-conversations-button">Search</a>
+	</div>
 
 	<!-- Left -->
-	<div id="left-column" class="span2">
-		<div class="left-column-module">
-			<!-- EMPTY -->
-		</div>
+	<div id="left-column" class="pull-left">
+		<span style="visibility:hidden;">&nbsp;</span>
 	</div>
 	
 	<!-- Center -->
-	<div id="center-column" class="span7">
-		<div class="single-question-module">
+	<div id="center-column" class="pull-left">
+		
+		<div class="feature-page-header">Conversations: <span class="filter-tags">Most Recent</span></div>
 
-			<div id="main-filter-field">
-				<div class="home-header">Questions: <span class="filter-tags">Most Recent</span></div>
-
-				<select class="chzn-select" data-placeholder="Select filters" multiple>
-					<!-- Backbone fills this -->
-				</select>
-				<div class="flat-button filter-button">Filter Results</div>
-			</div>
-
-			<div id="questions-list"> <!-- Backbone here --> </div>
-		</div>
+		<div id="questions-list"></div>
 	</div>
 
 	<!-- Right --> 
-	<div id="right-column" class="span3">
+	<div id="right-column" class="pull-left">
 
 		<!-- Ask a Question -->
 		<div class="right-column-module">
-			<div class="v2-module-header">Ask a Question!</div>
-			<a href="/ask/" style="text-decoration:none; color:#333;"><div class="ask-button">Ask</div></a>
+			<p>
+				<a href="/ask/" class="flat-button green-button">Start</a> a conversation
+			</p>
 		</div>
-
-		<!-- Related Questions -->
-<!-- 		<div class="right-column-module">
-			<div class="v2-module-header">Related Questions: </div>
-			{% for q in related_questions %}
-				<div class="related-question">
-					<a href="/question/{{q.id}}">{{q.title}}</a>
-				</div>
-			{% endfor %}
-		</div> -->
-
 	
 		<!-- Popular Tags -->
 		<div class="right-column-module">
-			<div class="v2-module-header">Popular Tags</div>
+			<p class="module-header">Popular Tags</p>
 			{% for t in popular_tags %}
-				{% if t.type == "Good" %}
-					<div class="tag good-tag">
-				{% elif t.type == "Bad" %}
-					<div class="tag bad-tag">
-				{% else %}
-					<div class="tag eh-tag">
-				{% endif %}
-						{{t.title}}
-					</div>
+				<p><a href="/tags/{{t.id}}" class="tag">{{t.title}}</a></p>
 			{% endfor %}
 		</div>
 		
 	</div>
+	<div class="clear"></div>
 </div>
 
 	
 {% endblock %}
 
 {% block templates %}
-
-<!-- V3 Script -->
-<script type="text/javascript">
-	
-	$(function() {
-		
-	});
-	
-</script>
 
 <script type="text/template" id="question-list-template">
 
@@ -459,11 +89,9 @@
 		<div class="question-column-right">
 			<div class="question-title"><a href="/question/<%=id%>"><%=title%></a></div>
 			<div class="question-body"><%=body%></div>
-			<% for (t in tags) {
-				if (tags[t].type == "Good") %><div class="tag good-tag tag-inline"><%=tags[t].title%></div><%
-				if (tags[t].type == "Bad") %><div class="tag bad-tag tag-inline"><%=tags[t].title%></div><%
-				else %><div class="tag eh-tag tag-inline"><%=tags[t].title%></div><%
-			} %>
+			<% for (t in tags) { %>
+				<div class="tag tag-inline"><%=tags[t].title%></div>
+			<% } %>
 		</div>
 
 		<div class="question-subtext homepage-subtext">

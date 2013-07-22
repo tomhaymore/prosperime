@@ -4,7 +4,7 @@
 <meta property="og:title" content="ProsperMe: Get trusted advice from classmates and alumni">
 <meta property="og:description" content="A trusted platform for sharing career advice among alumni">
 <!-- Favicon -->
-<link href="{{ STATIC_URL }}img/favicon.ico" rel="icon"  />
+<link href="{{ STATIC_URL }}img/favicon.ico" rel="icon" />
 
 <!-- CSS -->
 	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css" />
@@ -51,7 +51,10 @@
 						<ul id="topbar-nav" class="pull-right">
 							
                 			{% if user.is_authenticated %}
-		             
+		             	
+		             			<li>
+		                			<a href="/">Home</a>
+		                		</li>
 		                		<li>
 		                			<a href="/account/logout/">Logout</a>
 		                		</li>
