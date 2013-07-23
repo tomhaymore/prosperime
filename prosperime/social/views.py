@@ -2,6 +2,7 @@
 import datetime
 import json
 import logging
+import datetime
 
 # Django
 from django.http import HttpResponseRedirect, HttpResponse
@@ -75,29 +76,10 @@ def question(request, conversation_id):
 		x = 5
 		# TODO: redirect to 404 here
 
-	popular_tags = Tag.objects.all()[:8].values("name", "id")
+	## THEN, check if INACTIVE 
 
-
-	body1 = "Not the greatest experience, to be brutally honest. While no one can argue that passion at the company runs high, it just isn't a particularly well-run organization. Our particular division was beset by managerial issues and relationship tensions. All this stemmed from poor or weak top-down leadership."
-	body2 = "An amazing experience!! Karen is the absolute best, pray that you work for her."
-	body3 = "Use the sleeves of my sweater, let's have an adventure. The things that I think about, one heart, one mouth, one love, two mouths, one house, two blouses. Just us, you find out, and it's becoming increasingly difficult to make this look like a really long post. Oh what's this under my bed? Looks like chapstick. I'll use that."
-	body4 = "Emma Way has been summonsed to court to answer driving charges A 21-year-old woman who tweeted she had knocked a cyclist off his bike after an alleged crash in Norfolk has been summonsed to appear in court. Emma Way is to answer charges of driving without due care and attention and failing to stop after an accident."
-	body5 = "Use the sleeves of my sweater, let's have an adventure. The things that I think about, one heart, one mouth, one love, two mouths, one house, two blouses. Just us, you find out, and it's becoming increasingly difficult to make this look like a really long post. Oh what's this under my bed? Looks like chapstick. I'll use that."
-
-
-	pics = User.objects.all()[25:35].select_related("profile")
-	pics = [p.profile.default_profile_pic() for p in pics]
-
- 	followers = [{"id":7, "pic":p, "name":"Christina Phillips"} for p in pics]
- 	related_questions = [
- 		{"title":"What can I do with my Math degree?", "id":7},
- 		{"title":"What is the biggest professional mistake you've ever made?", "id":7},
- 		{"title":"Are there any options out there for STS majors?", "id":7},
- 		{"title":"What is like to work in Management Consulting from Stanford?", "id":7},
- 		{"title":"What are the most important classes that you ever took? Why?", "id":7},
- 	]
-
- 	conversation = Conversation.objects.get(id=conversation_id)
+	# (1) Get Conversation 
+	conversation = Conversation.objects.get(id=conversation_id)
  	question = {
  		"title":conversation.name,
  		"body":conversation.summary,
@@ -107,7 +89,7 @@ def question(request, conversation_id):
  		"user_id":conversation.owner.id
  	}
 
- 
+ 	# (2) Get comments
  	comments = Comment.objects.filter(conversation=conversation).select_related("owner")
  	formatted_comments = []
  	for c in comments:
@@ -119,21 +101,43 @@ def question(request, conversation_id):
  			"votes":Vote.objects.filter(comment=c).count()
  		})
 
+ 	# (3) Get followers
+ 	## TODO: optimize this query
+ 	followers = [{"id":u.id, "pic":u.profile.default_profile_pic(), "name":u.profile.full_name()} for u in conversation.followers.all()]
 
+ 	# (4) Get popular tags
+ 	## TODO: popular_tags API
+ 	popular_tags = Tag.objects.all()[:8].values("name", "id")
 
- 	## What's the idiomatic way to do this?? This sucks.
- 	try:
- 		FollowConversation.objects.get(conversation=conversation, user=request.user)
- 		is_following = True;
- 	except:
- 		is_following = False;
+ 	# (5) Get related questions
+ 	## TODO: related_questions API
+ 	related_questions = [
+ 		{"name":"What can I do with my Math degree?", "id":7},
+ 		{"name":"What is the biggest professional mistake you've ever made?", "id":8},
+ 		{"name":"Are there any options out there for STS majors?", "id":9},
+ 		{"name":"What is like to work in Management Consulting from Stanford?", "id":4},
+ 		{"name":"What are the most important classes that you ever took? Why?", "id":5},
+ 	]
 
+ 	# (6) Check if following    (oh what up ternary operator in Python, you thought I'd forgotten about you)
+ 	is_following = True if (request.user in conversation.followers.all()) else False
+
+ 	# (7) Get stats for conversation:
+ 	num_followers = conversation.followers.count()
+ 	num_answers = comments.count()
+ 	delta = datetime.datetime.now() - conversation.created
+ 	days_active = delta.days + 1
+ 	stats = {
+ 		"num_followers": num_followers,
+ 		"num_answers": num_answers,
+ 		"days_active": days_active
+ 	}
 
 	data = {
-		"is_active":True, # boolean
+		"is_active": False, # boolean
 		"is_following":is_following,
 		"question":question, # {"title", "body", "user_pic", "user_name", "tags = []"}
-		"stats":{"num_followers":17, "num_answers":12, "days_active":4}, # {"num_followers", "num_answers", "num_days_active"}
+		"stats": stats, # {"num_followers", "num_answers", "num_days_active"}
 		"comments":formatted_comments, # [ {"body", "user_name", "user_pic", "votes", "id"} ]
 		"user_pic":request.user.profile.default_profile_pic(), # = profile_pic of the viewer
 		"related_questions":related_questions,
@@ -390,6 +394,7 @@ def api_add_comment(request):
 		response["result"] = "success"
 		response["user_name"] = request.user.profile.full_name()
 		response["user_pic"] = request.user.profile.default_profile_pic()
+		response["user_id"] = request.user.id
 
 	return HttpResponse(json.dumps(response))
 

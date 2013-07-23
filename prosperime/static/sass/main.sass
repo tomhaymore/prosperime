@@ -9,6 +9,9 @@ a
 ul
 	list-decoration: none
 
+body
+	color: $main-font-color
+
 /* General styles */
 
 $lightblue: 6FB6D4
@@ -149,8 +152,7 @@ a.flat-button:hover
 	color: #fffffe
 
 .green-button
-	background-color: #339933
-	color: #fffffe
+	background-color: $button-green
 
 .inline-button
 	display: inline-block
@@ -176,6 +178,11 @@ a.flat-button:hover
 	width: auto
 	font-size: 1.6em
 	padding: 6px 8px
+
+.disabled
+	background-color: $lightgray !important 
+	cursor: default !important
+
 	
 /* Footer Styles */
 

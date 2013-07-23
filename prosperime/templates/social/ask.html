@@ -6,389 +6,10 @@
 <!-- CSS -->
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/chosen.css"/>
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/home.css"/>
+
 <!-- JS -->
 	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
-
-
-    <style type="text/css">
-
-	/* Main */
-    body { color:#333; }
-    #question-page-container { padding-top:36px; }
-	#left-column { width:15%; /* Bootstrap is acting weird on the span1 */ }
-	#center-column { margin-left:0px; width:63%; }
-	#right-column { margin-left:0px; width:22%;}
-
-
-	.body-text { margin-bottom:6px; line-height:26px; }
-
-
-    /* Left Column */
-
-    .left-column-module {
-    }
-
-    .stats-container {
-		margin-top:48px;
-		margin-left:18px;
-		text-align: center;
-    }
-
-    .stat {
-		padding:4px 4px;
-    }
-
-    .stats-left { text-align:right; }
-    .stats-right div {
-    	background-color: rgba(51,51,51,0.8);
-		color:#fffffe;
-		border:1px solid #fffffe;
-		border-radius:3px;
-		padding:4px 4px;
-    }
-    .stats-right { }
-
-
-
-	/* Right Column */
-	.right-column-module {
-		padding:8px 10px;
-		padding-top:24px;
-		padding-bottom:24px;
-		border-bottom:1px solid #f0f0f0;
-		border-left:1px solid #f0f0f0;
-		min-height:75px;
-	}
-
-	.followers-profile-pic {
-		display:inline-block;
-		margin:0;
-		width:48px;
-		height:48px;
-		margin-top:6px;
-	}
-
-	.followers-profile-pic img { border-radius:48px; }
-	.followers-more-followers { text-align:right; margin-top:6px; }
-
-	.related-question { margin-top:6px; }
-	.related-question a { text-decoration: none; }
-
-	.ask-button {
-		display:inline-block;
-		margin:0 auto;
-		background-color: #2ECC71;
-		width:75px;
-		height:20px;
-		padding:6px 8px;
-		margin-top:6px;
-		text-align:center;
-		font-size:1.2em;
-		line-height:20px;
-		border-radius:4px;
-		transition:font-weight 0.5s;
-	}
-
-	.ask-button:hover { font-weight:700; }
-
-
-	/* Center Column */
-	.center-column-module {
-		border-bottom:1px solid #e0e0e0;
-		border-right:1px solid #e0e0e0;
-		padding-left:36px;
-		padding-right:24px;
-		padding-top:24px;
-		padding-bottom:24px;
-	}
-
-	.question-column-left {
-		text-align:center;
-		width:15%;
-		display:inline-block;
-		vertical-align: top;
-	}
-	.question-column-right { width:80%; display:inline-block; vertical-align: top;}
-
-	.question-title {
-		font-size:2em;
-		margin-bottom:12px;
-	}
-
-	.question-body { margin-bottom:6px; line-height:26px; }
-	.question-subtext { text-align:right; }
-	.question-subtext a { text-decoration: none; }
-
-	.profile-pic-container {
-		width:75px;
-		height:75px;
-		display:inline-block;
-		margin-right:16px;
-		margin-bottom:16px;
-	}
-
-	.profile-pic-container img { border-radius:75px; }
-	.question-tags-container { margin-left: 90px; /* = pic_width + margin */ }
-
-	.follow-button {
-		width:100px;
-		height:25px;
-		line-height:25px;
-		background-color:#2ECC71;
-		border-radius:2px;
-		display:inline-block;
-		margin-right:16px;
-		padding:2px 2px;
-		cursor:pointer;
-	}
-
-	.following {
-		background-color:#C0C0C0; 
-		cursor:default;
-	}
-
-	.comment-module { margin-left:17%; width:80%; margin-top:32px;}
-	.comment-module img {
-		float:left;
-		display:inline-block;
-		width:50px;
-		height:50px;
-		border-radius:50px;
-		margin-right:36px;
-	}
-	.comment-module textarea {
-		width:80%;
-		height:50px;
-		resize:none;
-	}
-	.comment-module .comment-button {
-		text-align: center;
-		float:right;
-		margin-right:16px;
-		width:100px;
-		height:25px;
-		line-height:25px;
-		background-color:#2ECC71;
-		border-radius:2px;
-		display:inline-block;
-		margin-right:16px;
-		padding:2px 2px;
-		cursor:pointer;
-	}
-
-	.disabled {
-		background-color:#C0C0C0 !important; 
-		cursor:default !important;
-	}
-
-	.no-comments-module { text-align:center; } 
-	.no-comments-call-out-text { font-size:1.2em; line-height:28px; }
-
-	.comment-votes {
-/*		text-align:center;
-		margin:0 auto;
-		width:36px;
-		height:24px;
-		line-height:24px;
-		background-color:rgba(231,76,60,1); 
-		margin-top:6px;
-		border-radius:2px;*/
-	}
-
-	.vote-container div {
-		width:24px;
-		height:24px;
-		border-radius:2px;
-		text-align:center;
-		line-height:24px;
-	}
-
-	.upvote {
-		background-color: rgba(39,174,96,1); font-size:1.2em; line-height:22px;
-	}
-
-	.downvote {
-		background-color:rgba(231,76,60,1); font-size:1.2em; line-height:22px;
-	}
-
-
-	.icon-container i {
-		display:inline-block;
-		padding:2px;
-	}
-
-	.icon-container span {
-		display: inline-block;
-		margin-left:30px;
-	}
-
-	.star-filled {
-		color:#D35400;
-	}
-
-
-
-
-
-
-	.add-button {
-		width:20px;
-		height:20px;
-		line-height:18px;
-		border-radius:2px;
-		display:inline-block;
-		text-align:center;
-		margin-left:4px;
-		margin-right:8px;
-		cursor:pointer;
-		color:#fffffe;
-		background-color: rgba(51,51,51,0.2);
-		transition: background-color 0.5s;
-	}
-
-	.add-button:hover {
-		background-color:#2ECC71;
-	}
-
-	.review-job {
-		margin-top:6px;
-	}
-
-	.v2-module-header {
-		font-weight:600;
-		font-size:1.1em;
-	}
-
-	.good-tag { background-color: rgba(52,152,219,0.7); }
-	.good-tag:hover { background-color: rgba(51,152,219,1); }
-
-	.bad-tag { background-color:rgba(231,76,60,0.7); }
-	.bad-tag:hover { background-color:rgba(231,76,60,1); }
-
-	.eh-tag { background-color: rgba(39,174,96,0.7); }
-	.eh-tag:hover { background-color: rgba(39,174,96,1); }
-
-	.tag {
-		border-radius:2px;
-		padding:6px 8px;
-		margin-top:6px;
-		display:inline-block;
-		cursor:pointer;
-	}
-
-
-	.logo {
-		font-size:2.2em;
-		font-weight:bold;
-		line-height:35px;
-	}
-
-	.blue {
-		color:#3498DB;
-	}
-
-	.review {
-		border-bottom:1px solid #f0f0f0;
-		line-height:28px;
-		margin-top:16px;
-		padding-bottom:16px;
-	}
-
-	.review-header {
-		font-weight:600;
-	}
-
-
-
-
-
-	.review-rating {
-		font-size:2.0em;
-		font-weight:bold;
-		margin-top:12px;
-	}
-
-	.suggested-table {
-		width:100%;
-		margin-top:6px;
-	}
-
-	.suggested-table tr {
-		margin-top:6px;
-	}
-
-	.suggested-table tr td {
-		width:33%;
-		padding-left:12px;
-	}
-
-    </style>
-
-
-    <style type="text/css">
-
-		.ask-header { font-size:2.0em; margin-bottom:16px;}
-	
-		.form-module {
-			padding-left:24px;
-			padding-right:24px;
-			padding-top:12px;
-			padding-bottom:24px;
-		}
-
-		#ask-question-form #ask-form-title {
-			width:650px;
-			height:40px;
-			line-height:40px;
-			font-size:1.2em;
-		}
-
-		#ask-question-form .chzn-select {
-			width:400px;
-
-		}
-
-		#ask-question-form .control-group {
-			margin-top:12px;
-			margin-bottom:36px;
-		}
-
-		#ask-question-form textarea {
-			resize:none;
-			width:650px;
-			line-height:24px;
-			height:80px;
-		}
-
-		#ask-question-form .submit-button {
-			width:115px;
-			height:45px;
-			line-height:45px;
-			border-radius:2px;
-			text-align: center;
-			background-color: rgba(39,174,96,1);
-			display:inline-block;
-			margin:0 auto;
-			font-size:1.2em;
-			padding:6px 6px;
-			cursor:pointer;
-		}
-
-		.share-module {
-			visibility: hidden;
-			text-align:center;
-			line-height:28px;
-			font-size:1.1em;
-			margin-top:0px;
-			margin-bottom:36px;
-			padding-top:24px;
-			padding-bottom:18px;
-			background-color: rgba(41,128,185,0.5);
-			border-radius:4px;
-		}
-	
-
-    </style>
 
 
 
@@ -403,12 +24,12 @@
 <div id="question-page-container" class="row-fluid">
 
 	<!-- Left -->
-	<div id="left-column" class="span2">
+	<div class="span2">
 		
 	</div>
 	
 	<!-- Center -->
-	<div id="center-column" class="span7">
+	<div class="span8">
 		<div class="form-module" style="text-align:center;">
 
 			<div class="ask-header">Start a Conversation</div>
@@ -437,15 +58,10 @@
 
 				<div class="submit-button disabled">Post Question</div>
 		</div>
-
-		<div class="share-module">
-			Start the conversation with your friends.<br/> Know someone who would be interested in this discussion? Someone who might know the perfect answer for you? <br/>Share it with them: <br/>
-			<a>http://prospr.me/question/<span id="question-id"></span></a>
-		</div>
 	</div>
 
 	<!-- Right --> 
-	<div id="right-column" class="span3">
+	<div class="span2">
 		
 	</div>
 </div>
@@ -509,22 +125,19 @@
 			success:function(response) {
 				if (response["result"] == "success") {
 					console.log("success")
-					conversation_id = response["thread_id"]
+					conversation_id = response["conversation_id"]
 					formSuccess(conversation_id)
 
 				} else console.log(response["errors"])
 			},
 			complete:function() {
-				// redirect directly to newly created question? or offer call to action here?
-				// window.location = "/question/" + conversation_id
 			}
 		});
 	};
 
 	function formSuccess(id) {
-		$("#question-id").text(id)
-		$(".share-module").hide().css("visibility","visible").fadeIn(250)
-		$("html, body").animate({ scrollTop: $(document).height() }, "slow");
+		$(".submit-button").fadeOut(150).fadeIn(150).fadeOut(150).fadeIn(150)
+		window.location = "/question/" + id + "/"
 	};
 
 

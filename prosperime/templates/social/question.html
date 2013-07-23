@@ -17,41 +17,13 @@
 	/* Main */
     body { color:#333; }
     #question-page-container { padding-top:36px; }
-/*	#left-column { width:15%;}
-	#center-column { margin-left:0px; width:63%; }
-	#right-column { margin-left:0px; width:22%;}*/
 
 
 	.body-text { margin-bottom:6px; line-height:26px; }
 
 
-    /* Left Column */
-
-    .left-column-module {
-    }
-
-   /* .stats-container {
-		margin-top:48px;
-		margin-left:18px;
-		text-align: center;
-    }
-
-    .stat {
-		padding:4px 4px;
-    }
-
-    .stats-left { text-align:right; }
-    .stats-right div {
-    	background-color: rgba(51,51,51,0.8);
-		color:#fffffe;
-		border:1px solid #fffffe;
-		border-radius:3px;
-		padding:4px 4px;
-    }
-    .stats-right { }
 
 
-*/
 	/* Right Column */
 	.right-column-module {
 		padding:8px 10px;
@@ -59,7 +31,7 @@
 		padding-bottom:24px;
 		border-bottom:1px solid #f0f0f0;
 		border-left:1px solid #f0f0f0;
-		min-height:75px;
+		min-height:50px;
 	}
 
 	.followers-profile-pic {
@@ -75,23 +47,6 @@
 
 	.related-question { margin-top:6px; }
 	.related-question a { text-decoration: none; }
-
-	.ask-button {
-		display:inline-block;
-		margin:0 auto;
-		background-color: #2ECC71;
-		width:75px;
-		height:20px;
-		padding:6px 8px;
-		margin-top:6px;
-		text-align:center;
-		font-size:1.2em;
-		line-height:20px;
-		border-radius:4px;
-		transition:font-weight 0.5s;
-	}
-
-	.ask-button:hover { font-weight:700; }
 
 
 	/* Center Column */
@@ -112,18 +67,6 @@
 	}
 	.question-column-right { width:80%; display:inline-block; vertical-align: top;}
 
-	.question-title {
-		font-size:2em;
-		margin-bottom:12px;
-		line-height:32px;
-	}
-
-	.question-body { margin-bottom:6px; line-height:26px; }
-	.question-subtext { text-align:right; }
-	.question-subtext a { text-decoration: none; }
-
-
-	.profile-pic-container img { border-radius:75px; }
 	.question-tags-container { margin-left: 90px; /* = pic_width + margin */ }
 
 	.follow-button {
@@ -143,63 +86,14 @@
 		cursor:default;
 	}
 
-	.comment-module { margin-left:17%; width:80%; margin-top:32px;}
-	.comment-module img {
-		float:left;
-		display:inline-block;
-		width:50px;
-		height:50px;
-		border-radius:50px;
-		margin-right:36px;
-	}
-	.comment-module textarea {
-		width:80%;
-		height:50px;
-		resize:none;
-	}
-	.comment-module .comment-button {
-		text-align: center;
-		float:right;
-		margin-right:16px;
-		width:100px;
-		height:25px;
-		line-height:25px;
-		background-color:#2ECC71;
-		border-radius:2px;
-		display:inline-block;
-		margin-right:16px;
-		padding:2px 2px;
-		cursor:pointer;
-	}
+
+
+
 
 	.disabled {
 		background-color:#C0C0C0 !important; 
 		cursor:default !important;
 	}
-
-	.no-comments-module { text-align:center; } 
-	.no-comments-call-out-text { font-size:1.2em; line-height:28px; }
-
-
-
-
-
-	.icon-container i {
-		display:inline-block;
-		padding:2px;
-	}
-
-	.icon-container span {
-		display: inline-block;
-		margin-left:30px;
-	}
-
-	.star-filled {
-		color:#D35400;
-	}
-
-
-
 
 
 
@@ -222,71 +116,11 @@
 		background-color:#2ECC71;
 	}
 
-	.review-job {
-		margin-top:6px;
-	}
 
 	.v2-module-header {
 		font-weight:600;
 		font-size:1.1em;
 	}
-
-
-	.tag {
-		border-radius:2px;
-		padding:6px 8px;
-		margin-top:6px;
-		display:inline-block;
-		cursor:pointer;
-	}
-
-
-	.logo {
-		font-size:2.2em;
-		font-weight:bold;
-		line-height:35px;
-	}
-
-	.blue {
-		color:#3498DB;
-	}
-
-	.review {
-		border-bottom:1px solid #f0f0f0;
-		line-height:28px;
-		margin-top:16px;
-		padding-bottom:16px;
-	}
-
-	.review-header {
-		font-weight:600;
-	}
-
-
-
-
-
-	.review-rating {
-		font-size:2.0em;
-		font-weight:bold;
-		margin-top:12px;
-	}
-
-	.suggested-table {
-		width:100%;
-		margin-top:6px;
-	}
-
-	.suggested-table tr {
-		margin-top:6px;
-	}
-
-	.suggested-table tr td {
-		width:33%;
-		padding-left:12px;
-	}
-
-
 
 
     </style>
@@ -337,9 +171,31 @@
 				<div class="question-column-right">
 					<div class="question-title">{{question.title}}</div>
 					<div class="stat-container">
-						<div class="stat">{{stats.days_active}}</div> Days Active&nbsp;&nbsp;
-						<div class="stat">{{stats.num_answers}}</div> Answers&nbsp;&nbsp;
-						<div class="stat">{{stats.num_followers}}</div> Followers&nbsp;&nbsp;
+					
+						<div class="stat">{{stats.days_active}} </div>
+							{% if stats.days_active == 1 %}
+								Day Active
+							{% else %}
+								Days Active
+							{% endif %}
+							&nbsp;&nbsp;
+
+						<div class="stat">{{stats.num_answers}}</div>
+							{% if stats.num_answers == 1 %}
+								Answer
+							{% else %}
+								Answers
+							{% endif %}
+							&nbsp;&nbsp;
+
+						<div class="stat">{{stats.num_followers}}</div>
+							{% if stats.num_followers == 1 %}
+								Follower
+							{% else %}
+								Followers
+							{% endif %}
+							&nbsp;&nbsp;
+
 						{% if is_following %}
 							<div class="follow-button following" disabled>Following</div>
 						{% else %}
@@ -358,6 +214,7 @@
 				</div>
 			</div>
 
+			{% if is_active or user.id != question.user_id %}
 			<div class="row-fluid">
 				<div class="comment-module">
 					<img src="{{user_pic}}" />
@@ -365,74 +222,86 @@
 					<div class="comment-button disabled">Post Comment</div>
 				</div>
 			</div>
+			{% endif %}
 		</div>
 
 
 
 		<!-- Answers -->
-		<div class="center-column-module comment-row">
-			
+		{% if is_active %}
 
-			{% if is_active %}
+			<!-- Edge Case: no comments && active -->
+			{% if not comments or comments|length == 0 %}
+				<div class="no-comments-module comment-row">
+					<div class="call-out-text">
+						Have a thought? Get this conversation started and help {{question.user_name}} out,
+						<br/> or ask one of your friends to answer. Drop them this link: <br/>
+						<a>{{url}}</a>
+					</div>
+				</div>	
+			{% endif %}
 
-				<!-- Edge Case: no comments && active -->
-				{% if not comments or comments|length == 0 %}
-					<div class="no-comments-module">
-						<div class="no-comments-call-out-text">
-							Have a thought? Get this conversation started and help {{question.user_name}} out,
-							<br/> or ask one of your friends to answer. Drop them this link: <br/>
-							<a>{{url}}</a>
-						</div>
-					</div>	
-				{% endif %}
-
-			<!-- Edge Case: inactive -->
-			{% else %}
-					<div class="no-comments-module">
+		<!-- Edge Case: inactive -->
+		{% else %}
+				{% if user.id == question.user_id %}
+				<div class="no-comments-module comment-row">
+					<div class="call-out-text">
 						This conversation isn't active yet, but you can be the catalyst, <br/>
 						or ask one of your friends to answer. Drop them this link: <br/>
 						<a>{{url}}</a>
 					</div>
-			{% endif %}
-
-			{% for c in comments %}
-				<div class="row-fluid">
-					<div class="span1">
-						<!-- <div data-comment_id="{{c.id}}" class="vote-container">
-							<div data-type="up" class="upvote vote-button">+ </div>
-							<div class="comment-vote">{{c.votes}}</div>
-							<div data-type="down" class="downvote vote-button">- </div>
-						</div> -->
-					</div>
-
-					<div class="span2 question-column-left">
-						<div class="profile-pic-container">
-							<img src="{{c.user_pic}}"/>
-						</div>
-
-						<div data-comment_id="{{c.id}}" class="vote-container">
-							<div data-type="down" class="vote-button vote"><i class="icon-chevron-left"></i></div>
-							<div class="comment-vote vote">{{c.votes}}</div>
-							<div data-type="up" class="vote-button vote"><i class="icon-chevron-right"></i></div>
-
-						</div>					
-					</div>
-
-					<div class="span8">
-						<div class="body-text">
-							{{c.body}}
-						</div>
-
-						{% for t in c.tags %}
-							<div class="tag">{{t.name}}</div>
-						{% endfor %}
-					</div>
-
-					<div class="question-subtext">Comment by <a href="/profile/{{c.id}}">{{c.user_name}}</a></div>
 				</div>
-			{% endfor %}
+				{% else %}
+				<div class="no-comments-module comment-row">
+					<div class="call-out-text">
+						This conversation isn't active yet, but you can be the catalyst, <br/>
+						or ask one of your friends to answer. Drop them this link: <br/>
+						<a>{{url}}</a>
+					</div>
+				</div>
+				{% endif %}
+		{% endif %}
+
+
+		{% for c in comments %}
+		<div class="center-column-module comment-row">
+			
+			<div class="row-fluid">
+				<div class="span1">
+					<!-- <div data-comment_id="{{c.id}}" class="vote-container">
+						<div data-type="up" class="upvote vote-button">+ </div>
+						<div class="comment-vote">{{c.votes}}</div>
+						<div data-type="down" class="downvote vote-button">- </div>
+					</div> -->
+				</div>
+
+				<div class="span2 question-column-left">
+					<div class="profile-pic-container">
+						<img src="{{c.user_pic}}"/>
+					</div>
+
+					<div data-comment_id="{{c.id}}" class="vote-container">
+						<div data-type="down" class="vote-button vote"><i class="icon-chevron-left"></i></div>
+						<div class="comment-vote vote">{{c.votes}}</div>
+						<div data-type="up" class="vote-button vote"><i class="icon-chevron-right"></i></div>
+
+					</div>					
+				</div>
+
+				<div class="span8">
+					<div class="body-text">
+						{{c.body}}
+					</div>
+
+					{% for t in c.tags %}
+						<div class="tag">{{t.name}}</div>
+					{% endfor %}
+				</div>
+
+				<div class="question-subtext">Comment by <a href="/profile/{{c.id}}">{{c.user_name}}</a></div>
+			</div>
 		</div>
-	
+		{% endfor %}
 	</div>
 
 	<!-- Right --> 
@@ -440,20 +309,22 @@
 
 		<!-- Ask a Question -->
 		<div class="right-column-module">
-			<p>Start a
-				<a href="/ask/" style="text-decoration:none; color:#333;"><div class="ask-button">Conversation</div></a>
+			<p>
+				<a href="/ask/" class="flat-button green-button">Start</a> a conversation
 			</p>
 		</div>
 
 		<!-- Related Questions -->
+		{% if related_questions|length > 0 %}
 		<div class="right-column-module">
 			<div class="v2-module-header">Related Questions: </div>
 			{% for q in related_questions %}
 				<div class="related-question">
-					<a href="/question/{{q.id}}">{{q.title}}</a>
+					<a href="/question/{{q.id}}/">{{q.name}}</a>
 				</div>
 			{% endfor %}
 		</div>
+		{% endif %}
 
 		<!-- Followers -->
 		<div class="right-column-module">
@@ -469,6 +340,10 @@
 
 			{% if followers|length > 5 %}
 				<div class="followers-more-followers">and {{followers|length|add:-5}} more... </div>
+			{% endif %}
+
+			{% if followers|length == 0 %} 
+				<p>&nbsp;&nbsp;&nbsp;No followers yet</p>
 			{% endif %}
 		</div>
 
@@ -498,18 +373,18 @@
 		if ("{{is_following}}" == "False")
 			$(".follow-button").on("click", follow)
 
-		// // Active post comment button
-		// // TODO: provide safeguards against commenting tons of times
-		// $(".comment-module textarea").on("keypress", function(e) {
-		// 	var comment_button = $(".comment-module .comment-button")
-		// 	// If now empty, disable
-		// 	if ($(this).val().length == 0 && !$(comment_button).hasClass("disabled")) $(comment_button).addClass("disabled")
-		// 	// If now valid, enable
-		// 	else if ($(this).val().length > 0 && $(comment_button).hasClass("disabled")) $(comment_button).removeClass("disabled")
+		// Active post comment button
+		// TODO: provide safeguards against commenting tons of times
+		$(".comment-module textarea").on("keypress", function(e) {
+			var comment_button = $(".comment-module .comment-button")
+			// If now empty, disable
+			if ($(this).val().length == 0 && !$(comment_button).hasClass("disabled")) $(comment_button).addClass("disabled")
+			// If now valid, enable
+			else if ($(this).val().length > 0 && $(comment_button).hasClass("disabled")) $(comment_button).removeClass("disabled")
 
-		// 	// If "enter" && active, submit
-		// 	// if (e.which == 13 && !$(comment_button).hasClass("disabled")) submitComment()
-		// })
+			// If "enter" && active, submit
+			// if (e.which == 13 && !$(comment_button).hasClass("disabled")) submitComment()
+		})
 
 		// Comment Submit button
 		$(".comment-module .comment-button").on("click", function(e) {
@@ -518,6 +393,12 @@
 
 		// Voting buttons
 		$(".vote-button").on("click", function() { vote(this) })
+
+		// Check if convo is active
+		if ("{{is_active}}" == "False") {
+			// make the question opaque
+			$(".center-column-module").css("opacity", "0.5")
+		}
 
 
 				
@@ -588,9 +469,10 @@
 					
 					// append comment to DOM
 					var template = _.template($("#single-comment-template").html())
-					$(".comment-row").append(template({
+					$(".comment-row :last").after(template({
 						"user_name":response["user_name"],
 						"user_pic":response["user_pic"],
+						"id":response["user_id"],
 						"votes":0,
 						"body":body
 					})).hide().fadeIn(250)
@@ -601,7 +483,15 @@
 
 			complete:function() {
 				// check if this was the first comment. if so, fix viz
-				if ($(".no-comments-module").length > 0) $(".no-comments-module").fadeOut(100).remove()
+				if ($(".no-comments-module").length > 0) $(".comment-row :first").remove()
+				// animate stat container
+				var num_answers = parseInt($(".stat :eq(1)").text())
+				// Update stats container
+				var old_color = $(".stat :eq(1)").css("background-color")
+				$(".stat :eq(1)").animate({"background-color":"#E74C3C"}, 330, function() {
+					// Animate it red & change #
+					$(this).text(num_answers + 1).animate({"background-color":old_color}, 330)
+				})
 			}
 		});
 	};
@@ -658,30 +548,34 @@
 </script>
 
 <script type="text/template" id="single-comment-template">
-
-	<div class="row-fluid">
-		<div class="span1">
-			<div class="vote-container">
-				<div class="upvote">+ </div>
-				<div class="comment-vote"><%=votes%></div>
-				<div class="downvote">- </div>
+	<div class="center-column-module comment-row">
+		<div class="row-fluid">
+			<div class="span1">
+			
 			</div>
-		</div>
 
-		<div class="span2 question-column-left">
-			<div class="profile-pic-container">
-				<img src="<%=user_pic%>"/>
-			</div>
-			<div class="comment-user"><%=user_name%></div>
-		</div>
+			<div class="span2 question-column-left">
+				<div class="profile-pic-container">
+					<img src="<%=user_pic%>"/>
+				</div>
 
-		<div class="span8">
-			<div class="body-text">
-				<%=body%>
+				<div data-comment_id="<%=id%>" class="vote-container">
+					<div data-type="down" class="vote-button vote"><i class="icon-chevron-left"></i></div>
+					<div class="comment-vote vote"><%=votes%></div>
+					<div data-type="up" class="vote-button vote"><i class="icon-chevron-right"></i></div>
+
+				</div>					
 			</div>
+
+			<div class="span8">
+				<div class="body-text">
+					<%=body%>
+				</div>
+			</div>
+
+			<div class="question-subtext">Comment by <a href="/profile/<%=id%>"><%=user_name%></a></div>
 		</div>
 	</div>
-
 </script>
 
 {% endblock %}

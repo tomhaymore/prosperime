@@ -42,6 +42,10 @@ $right-question-column-width:25%
 	margin-left: 0px
 	width: $right-question-column-width
 
+#question-page-container
+	padding-top: 36px
+
+
 .profile-pic-container 
 	width: 75px
 	height: 75px
@@ -85,7 +89,7 @@ $right-question-column-width:25%
 	vertical-align: top
 
 .question-title
-	font-size: 2em
+	font-size: 1.6em
 	margin-bottom: 12px
 	line-height: 32px
 
@@ -93,11 +97,6 @@ $right-question-column-width:25%
 	margin-bottom: 6px
 	line-height: 26px
 
-.question-user-first-name
-	text-align: left
-
-.question-user-last-name
-	text-align: right
 
 .question-user-name
 	font-weight: bold
@@ -194,6 +193,14 @@ $right-question-column-width:25%
 .comment-user
 	text-align: right
 
+.no-comments-module 
+	text-align: center
+	margin-top: 18px
+
+	.call-out-text
+		font-size: 1.2em
+		line-height: 28px
+
 /* Right Column Styles */
 
 .right-column-module
@@ -205,3 +212,51 @@ $right-question-column-width:25%
 		color: #181818
 	line-height: 24px
 	margin-bottom: 10px
+
+
+/* Ask Question Page Extra Styles */
+.ask-header
+	font-size: 2.0em
+	margin-bottom: 16px
+	
+.form-module
+	padding-left: 24px
+	padding-right: 24px
+	padding-top: 12px
+	padding-bottom: 24px
+
+
+#ask-question-form 
+	#ask-form-title
+		width: 650px
+		height: 40px
+		line-height: 40px
+		font-size: 1.2em
+ 
+	.chzn-select
+		width: 400px
+
+	.control-group
+		margin-top: 12px
+		margin-bottom: 36px
+
+
+	textarea
+		resize: none
+		width: 650px
+		line-height: 24px
+		height: 80px
+
+	.submit-button
+		width: 115px
+		height: 45px
+		line-height: 45px
+		border-radius: 2px
+		text-align: center
+		background-color: rgba(39,174,96,1)
+		display: inline-block
+		margin: 0 auto
+		font-size: 1.2em
+		padding: 6px 6px
+		cursor: pointer
+
