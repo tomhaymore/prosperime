@@ -351,8 +351,6 @@ def api_add_comment(request):
 	conversation_id = -1
 	body = None
 
-	print "This is called"
-
 	# error checks:
 	if not request.is_ajax:
 		response["errors"].append("Not AJAX")
@@ -392,6 +390,61 @@ def api_add_comment(request):
 		response["result"] = "success"
 		response["user_name"] = request.user.profile.full_name()
 		response["user_pic"] = request.user.profile.default_profile_pic()
+
+	return HttpResponse(json.dumps(response))
+
+# Creates upvote or downvote for given comment on given conversation
+def api_vote_comment(request):
+
+	# instantiate vars
+	response = {
+		"result":None,
+		"errors":[]
+	}
+	conversation = None
+	conversation_id = -1
+	comment = None
+	comment_id = -1
+	value = 0
+
+	# error checks:
+	if not request.is_ajax:
+		response["errors"].append("Not AJAX")
+	if not request.POST:
+		response["errors"].append("Not POST")
+	try:
+		conversation_id = request.POST.get("conversation_id")
+		comment_id = request.POST.get("comment_id")
+		value = request.POST.get("value")
+	except:
+		response["errors"].append("Can't find params")
+	try:
+		conversation = Conversation.objects.get(id=conversation_id)
+		comment = Comment.objects.get(id=comment_id)
+	except:
+		response["errors"].append("Can't find Conversation id: " + str(conversation_id))
+
+	# if errors, respond early
+	if len(response["errors"]) > 0:
+		response["result"] = "failure"
+		return HttpResponse(json.dumps(response))
+
+	try:
+		v = Vote()
+		v.owner = request.user
+		v.comment = comment
+		v.conversation = conversation
+		v.value = value
+		v.save()
+
+	except:
+		response["errors"].append("Error creating Vote object")
+
+
+	if len(response["errors"]) > 0:
+		response["result"] = "failure"
+	else:
+		response["result"] = "success"
 
 	return HttpResponse(json.dumps(response))
 

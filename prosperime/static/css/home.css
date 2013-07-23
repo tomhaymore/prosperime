@@ -17,7 +17,41 @@
 #right-column {
   width: 200px; }
 
+#left-question-column {
+  margin-left: 0px;
+  width: 10%; }
+
+#center-question-column {
+  margin-left: 0px;
+  width: 65%; }
+
+#right-question-column {
+  margin-left: 0px;
+  width: 25%; }
+
+.profile-pic-container {
+  width: 75px;
+  height: 75px;
+  display: inline-block;
+  margin: 0 auto; }
+  .profile-pic-container img {
+    border-radius: 75px; }
+
 /* Left Column */
+.stat-container {
+  margin-bottom: 12px;
+  text-align: left; }
+
+.stat {
+  text-align: center;
+  color: #fffffe;
+  background-color: rgba(51, 51, 51, 0.8);
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border-radius: 24px;
+  line-height: 24px; }
+
 /* Main Content Styles */
 .single-question-module {
   margin-top: 24px;
@@ -43,7 +77,18 @@
   margin-bottom: 6px;
   line-height: 26px; }
 
+.question-user-first-name {
+  text-align: left; }
+
+.question-user-last-name {
+  text-align: right; }
+
+.question-user-name {
+  font-weight: bold;
+  margin-top: 6px; }
+
 .question-subtext {
+  margin-top: 12px;
   text-align: right; }
   .question-subtext a {
     text-decoration: none; }
@@ -60,11 +105,40 @@
   display: inline-block;
   margin-right: 16px;
   padding: 2px 2px;
-  cursor: pointer; }
+  cursor: pointer;
+  text-align: center; }
 
 .following {
   background-color: silver;
   cursor: default; }
+
+.vote-container {
+  border-radius: 2px;
+  line-height: 24px;
+  vertical-align: top;
+  text-align: center;
+  margin-top: 12px; }
+
+.vote {
+  display: inline-block;
+  margin: 0 auto; }
+  .vote i {
+    cursor: pointer;
+    transition: color; }
+
+.vote-button .icon-chevron-left:hover {
+  color: #e74c3c; }
+
+.vote-button .icon-chevron-right:hover {
+  color: #2ecc71; }
+
+.comment-vote {
+  width: 30px;
+  height: 20px;
+  line-height: 20px;
+  background-color: rgba(51, 51, 51, 0.8);
+  color: #fffffe;
+  border-radius: 2px; }
 
 .comment-module {
   margin-left: 17%;
@@ -94,6 +168,9 @@
     margin-right: 16px;
     padding: 2px 2px;
     cursor: pointer; }
+
+.comment-user {
+  text-align: right; }
 
 /* Right Column Styles */
 .right-column-module {

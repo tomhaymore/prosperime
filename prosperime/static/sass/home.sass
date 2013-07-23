@@ -8,6 +8,10 @@ $left-column-width: 75px
 $right-column-width: 200px
 $center-column-width: 1000px - $left-column-width - $right-column-width - 20
 
+$left-question-column-width:10%
+$center-question-column-width:65%
+$right-question-column-width:25%
+
 #search-container
 	margin-left: $left-column-width + 10
 	width: 630px
@@ -25,7 +29,43 @@ $center-column-width: 1000px - $left-column-width - $right-column-width - 20
 #right-column
 	width: $right-column-width
 
+#left-question-column
+	margin-left: 0px
+	width: $left-question-column-width
+
+#center-question-column
+	margin-left: 0px
+	width: $center-question-column-width
+
+
+#right-question-column
+	margin-left: 0px
+	width: $right-question-column-width
+
+.profile-pic-container 
+	width: 75px
+	height: 75px
+	display: inline-block
+	margin: 0 auto
+
+	img 
+		border-radius: 75px
+
 /* Left Column */
+.stat-container
+	margin-bottom: 12px
+	text-align: left
+
+.stat
+	text-align: center
+	color: #fffffe
+	background-color: $darkgray
+	display: inline-block
+	width: 24px
+	height: 24px
+	border-radius: 24px
+	line-height: 24px
+
 
 /* Main Content Styles */
 
@@ -53,7 +93,18 @@ $center-column-width: 1000px - $left-column-width - $right-column-width - 20
 	margin-bottom: 6px
 	line-height: 26px
 
+.question-user-first-name
+	text-align: left
+
+.question-user-last-name
+	text-align: right
+
+.question-user-name
+	font-weight: bold
+	margin-top: 6px
+
 .question-subtext 
+	margin-top: 12px
 	text-align: right
 	a 
 		text-decoration: none
@@ -71,10 +122,43 @@ $center-column-width: 1000px - $left-column-width - $right-column-width - 20
 	margin-right: 16px
 	padding: 2px 2px
 	cursor: pointer
+	text-align: center
 
 .following 
 	background-color: #C0C0C0
 	cursor: default
+
+
+.vote-container
+	border-radius: 2px
+	line-height: 24px
+	vertical-align: top
+	text-align: center
+	margin-top: 12px
+
+.vote
+	display: inline-block
+	margin: 0 auto
+
+	i
+		cursor: pointer
+		transition: color
+
+.vote-button .icon-chevron-left
+	&:hover
+		color: $button-red
+
+.vote-button .icon-chevron-right
+	&:hover
+		color: $button-green
+
+.comment-vote
+	width: 30px
+	height: 20px
+	line-height: 20px
+	background-color: $darkgray
+	color: #fffffe
+	border-radius: 2px
 
 .comment-module
 	margin-left: 17%
@@ -106,6 +190,9 @@ $center-column-width: 1000px - $left-column-width - $right-column-width - 20
 		margin-right: 16px
 		padding: 2px 2px
 		cursor: pointer
+
+.comment-user
+	text-align: right
 
 /* Right Column Styles */
 

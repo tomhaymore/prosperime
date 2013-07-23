@@ -44,6 +44,8 @@ urlpatterns = patterns('',
     url(r'^api/startConversation/$', 'social.views.api_start_conversation'),
     url(r'^api/followConversation/$', 'social.views.api_follow_conversation'),
     url(r'^api/addComment/$', 'social.views.api_add_comment'),
+    url(r'^api/voteComment/$', 'social.views.api_vote_comment'),
+
     # Recruiter Views
     url(r'^recruiters/$', 'social.views.recruiters'),
     url(r'^recruiters/thanks/$', 'social.views.recruiters_thanks'),

@@ -5,6 +5,7 @@
 
 <!-- CSS -->
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/home.css"/>
 
 <!-- JS -->
 	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
@@ -16,9 +17,9 @@
 	/* Main */
     body { color:#333; }
     #question-page-container { padding-top:36px; }
-	#left-column { width:15%; /* Bootstrap is acting weird on the span1 */ }
+/*	#left-column { width:15%;}
 	#center-column { margin-left:0px; width:63%; }
-	#right-column { margin-left:0px; width:22%;}
+	#right-column { margin-left:0px; width:22%;}*/
 
 
 	.body-text { margin-bottom:6px; line-height:26px; }
@@ -29,7 +30,7 @@
     .left-column-module {
     }
 
-    .stats-container {
+   /* .stats-container {
 		margin-top:48px;
 		margin-left:18px;
 		text-align: center;
@@ -50,7 +51,7 @@
     .stats-right { }
 
 
-
+*/
 	/* Right Column */
 	.right-column-module {
 		padding:8px 10px;
@@ -121,13 +122,6 @@
 	.question-subtext { text-align:right; }
 	.question-subtext a { text-decoration: none; }
 
-	.profile-pic-container {
-		width:75px;
-		height:75px;
-		display:inline-block;
-		margin-right:16px;
-		margin-bottom:16px;
-	}
 
 	.profile-pic-container img { border-radius:75px; }
 	.question-tags-container { margin-left: 90px; /* = pic_width + margin */ }
@@ -186,32 +180,8 @@
 	.no-comments-module { text-align:center; } 
 	.no-comments-call-out-text { font-size:1.2em; line-height:28px; }
 
-	.comment-votes {
-/*		text-align:center;
-		margin:0 auto;
-		width:36px;
-		height:24px;
-		line-height:24px;
-		background-color:rgba(231,76,60,1); 
-		margin-top:6px;
-		border-radius:2px;*/
-	}
 
-	.vote-container div {
-		width:24px;
-		height:24px;
-		border-radius:2px;
-		text-align:center;
-		line-height:24px;
-	}
 
-	.upvote {
-		background-color: rgba(39,174,96,1); font-size:1.2em; line-height:22px;
-	}
-
-	.downvote {
-		background-color:rgba(231,76,60,1); font-size:1.2em; line-height:22px;
-	}
 
 
 	.icon-container i {
@@ -261,14 +231,6 @@
 		font-size:1.1em;
 	}
 
-	.good-tag { background-color: rgba(52,152,219,0.7); }
-	.good-tag:hover { background-color: rgba(51,152,219,1); }
-
-	.bad-tag { background-color:rgba(231,76,60,0.7); }
-	.bad-tag:hover { background-color:rgba(231,76,60,1); }
-
-	.eh-tag { background-color: rgba(39,174,96,0.7); }
-	.eh-tag:hover { background-color: rgba(39,174,96,1); }
 
 	.tag {
 		border-radius:2px;
@@ -341,8 +303,8 @@
 <div id="question-page-container" class="row-fluid">
 
 	<!-- Left -->
-	<div id="left-column" class="span2">
-		<div class="left-column-module">
+	<div id="left-question-column" class="span2">
+		<!-- <div class="left-column-module">
 			<div class="stats-container">
 				<div class="row-fluid">
 					<div class="span6 stats-left">
@@ -358,54 +320,36 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div> -->
 	</div>
 	
 	<!-- Center -->
-	<div id="center-column" class="span7">
+	<div id="center-question-column" class="span7">
 		<div class="center-column-module">
 			<div class="row-fluid">
 
-		<!-- 		<div class="span12">
-					<div class="profile-pic-container">
-						<img src="{{question.user_pic}}" class="pull-left"/ >
-					</div>
-					<div class="question-title">{{question.title}}</div>
-					<div class="question-body">{{question.body}}</div>
-					<div class="question-tags-container">
-						{% for t in question.tags %}
-							{% if t.type == "Good" %}
-								<div class="tag good-tag">
-							{% elif t.type == "Bad" %}
-								<div class="tag bad-tag">
-							{% else %}
-								<div class="tag eh-tag">
-							{% endif %}
-								{{t.title}}</div>
-						{% endfor %}
-					</div>
-
-					<div class="question-subtext">
-						Question asked by <a href="/profile/{{question.user_id}}">{{question.user_name}}</a>
-					</div>
-				</div> -->
-
-
 				<div class="question-column-left">
 					<div class="profile-pic-container"><img src="{{question.user_pic}}" /></div>
-					{% if is_following %}
-						<div class="follow-button following" disabled>Following</div>
-					{% else %}
-						<div class="follow-button">Follow</div>
-					{% endif %}
+
+					<div class="question-user-name">{{question.user_name}}</div>
 				</div>
 
 				<div class="question-column-right">
 					<div class="question-title">{{question.title}}</div>
+					<div class="stat-container">
+						<div class="stat">{{stats.days_active}}</div> Days Active&nbsp;&nbsp;
+						<div class="stat">{{stats.num_answers}}</div> Answers&nbsp;&nbsp;
+						<div class="stat">{{stats.num_followers}}</div> Followers&nbsp;&nbsp;
+						{% if is_following %}
+							<div class="follow-button following" disabled>Following</div>
+						{% else %}
+							<div class="follow-button">Follow</div>
+						{% endif %}
+					</div>
 					<div class="question-body">{{question.body}}</div>
 
 					{% for t in question.tags %}
-						<div class="tag good-tag">{{t.name}}</div>
+						<div class="tag">{{t.name}}</div>
 					{% endfor %}
 
 					<div class="question-subtext">
@@ -454,18 +398,24 @@
 			{% for c in comments %}
 				<div class="row-fluid">
 					<div class="span1">
-						<div class="vote-container">
-							<div class="upvote">+ </div>
+						<!-- <div data-comment_id="{{c.id}}" class="vote-container">
+							<div data-type="up" class="upvote vote-button">+ </div>
 							<div class="comment-vote">{{c.votes}}</div>
-							<div class="downvote">- </div>
-						</div>
+							<div data-type="down" class="downvote vote-button">- </div>
+						</div> -->
 					</div>
 
 					<div class="span2 question-column-left">
 						<div class="profile-pic-container">
 							<img src="{{c.user_pic}}"/>
 						</div>
-						<div class="comment-user">{{c.user_name}}</div>
+
+						<div data-comment_id="{{c.id}}" class="vote-container">
+							<div data-type="down" class="vote-button vote"><i class="icon-chevron-left"></i></div>
+							<div class="comment-vote vote">{{c.votes}}</div>
+							<div data-type="up" class="vote-button vote"><i class="icon-chevron-right"></i></div>
+
+						</div>					
 					</div>
 
 					<div class="span8">
@@ -474,9 +424,11 @@
 						</div>
 
 						{% for t in c.tags %}
-							<div class="tag good-tag">{{t.name}}</div>
+							<div class="tag">{{t.name}}</div>
 						{% endfor %}
 					</div>
+
+					<div class="question-subtext">Comment by <a href="/profile/{{c.id}}">{{c.user_name}}</a></div>
 				</div>
 			{% endfor %}
 		</div>
@@ -484,12 +436,13 @@
 	</div>
 
 	<!-- Right --> 
-	<div id="right-column" class="span3">
+	<div id="right-question-column" class="span3">
 
 		<!-- Ask a Question -->
 		<div class="right-column-module">
-			<div class="v2-module-header">Ask a Question!</div>
-			<a href="/ask/" style="text-decoration:none; color:#333;"><div class="ask-button">Ask</div></a>
+			<p>Start a
+				<a href="/ask/" style="text-decoration:none; color:#333;"><div class="ask-button">Conversation</div></a>
+			</p>
 		</div>
 
 		<!-- Related Questions -->
@@ -523,7 +476,7 @@
 		<div class="right-column-module">
 			<div class="v2-module-header">Popular Tags</div>
 			{% for t in popular_tags %}
-				<div class="tag good-tag">{{t.name}}</div>
+				<div class="tag">{{t.name}}</div>
 			{% endfor %}
 		</div>
 		
@@ -545,78 +498,29 @@
 		if ("{{is_following}}" == "False")
 			$(".follow-button").on("click", follow)
 
-		// Active post comment button
-		// TODO: provide safeguards against commenting tons of times
-		$(".comment-module textarea").on("keypress", function(e) {
-			var comment_button = $(".comment-module .comment-button")
-			// If now empty, disable
-			if ($(this).val().length == 0 && !$(comment_button).hasClass("disabled")) $(comment_button).addClass("disabled")
-			// If now valid, enable
-			else if ($(this).val().length > 0 && $(comment_button).hasClass("disabled")) $(comment_button).removeClass("disabled")
+		// // Active post comment button
+		// // TODO: provide safeguards against commenting tons of times
+		// $(".comment-module textarea").on("keypress", function(e) {
+		// 	var comment_button = $(".comment-module .comment-button")
+		// 	// If now empty, disable
+		// 	if ($(this).val().length == 0 && !$(comment_button).hasClass("disabled")) $(comment_button).addClass("disabled")
+		// 	// If now valid, enable
+		// 	else if ($(this).val().length > 0 && $(comment_button).hasClass("disabled")) $(comment_button).removeClass("disabled")
 
-			// If "enter" && active, submit
-			// if (e.which == 13 && !$(comment_button).hasClass("disabled")) submitComment()
-		})
+		// 	// If "enter" && active, submit
+		// 	// if (e.which == 13 && !$(comment_button).hasClass("disabled")) submitComment()
+		// })
 
+		// Comment Submit button
 		$(".comment-module .comment-button").on("click", function(e) {
 			if (!$(this).hasClass("disabled")) submitComment()
 		});
 
-
-		// CSS CHANGES
-		// $(".topbar-inner").css("background-color", "#fffffe").css("width", "1100px")
-		// $(".topbar").css("background-color","#fffffe").css("border-bottom", "1px solid #f0f0f0")
-		// $(".topbar-nav li a").css("color", "#333")
-		// $(".log-container").html("<div class='logo'>myway<span class='blue'>Up</span></div>")
-
-		// Clicking on stars fills them in
-		$("i", ".icon-container")
-			.on("mouseenter", function(e) {
-				var index = $(e.currentTarget).data("index")
-				for (var j = 0; j < 5; j++) {
-					var star = $("i :eq(" + j + ")", ".icon-container")
-					if (j < index)
-						$(star).removeClass("icon-star-empty").addClass("icon-star").addClass("star-filled")
-					else
-						$(star).removeClass("icon-star").removeClass("star-filled").addClass("icon-star-empty")
-				};
-
-				var text;
-				switch(index) {
-					case 1:
-						text = "This place sucked. Hard."
-						break;
-					case 2:
-						text = "I wouldn't wish it upon my friend... Maybe my brother."
-						break;
-					case 3:
-						text = "Not bad, not amazing, but solid."
-						break;
-					case 4:
-						text = "I would do it again, and you should too."
-						break;
-					case 5:
-						text = "OMGPOP!"
-						break;
-				};
-				$("#feedback-text").text(text)
-			})
-			.on("mouseleave", function(e) {
-				$("i", ".icon-container").each(function() {
-					$(this).removeClass("icon-start").removeClass("star-filled").addClass("icon-star-empty")
-				})
-				$("#feedback-text").text("Hover over the stars")
-			})
-			.on("click", function(e) {
-				$(e.currentTarget)
-					.animate({"font-size":"2.5em", "line-height":"30px"}, "400", function() {
-						$(this).animate({"font-size":"2em", "line-height":"20px"}, "400")
-					})
-				$("i", ".icon-container").off("mouseenter").off("mouseleave")
+		// Voting buttons
+		$(".vote-button").on("click", function() { vote(this) })
 
 
-			})
-		
+				
 	});
 	
 </script>
@@ -647,11 +551,12 @@
 			},
 
 			complete:function() {
-				var num_followers = parseInt($(".stats-right div :first").text())
+				var num_followers = parseInt($(".stat :last").text())
 				// Update stats container
-				$(".stats-right div :first").animate({"background-color":"#E74C3C"}, 330, function() {
+				var old_color = $(".stat :last").css("background-color")
+				$(".stat :last").animate({"background-color":"#E74C3C"}, 330, function() {
 					// Animate it red & change #
-					$(this).text(num_followers + 1).animate({"background-color":"rgba(51,51,51,0.8)"}, 330)
+					$(this).text(num_followers + 1).animate({"background-color":old_color}, 330)
 				})
 			}
 		});
@@ -701,6 +606,44 @@
 		});
 	};
 
+
+	function vote(el) {
+
+		var comment_id = $(el).parent().data("comment_id")
+		var conversation_id = getConversationId();
+		var value = ($(el).data("type") == "up") ? 1 : -1;
+
+		// Post to DB
+		$.ajax({
+			type: "POST",
+			url: "/api/voteComment/",
+			data: {"conversation_id":conversation_id, "comment_id":comment_id, "value":value, "csrfmiddlewaretoken":"{{csrf_token}}"},
+			dataType:"json",
+
+			beforeSend: function() {
+
+
+			},
+
+			success:function(response) {
+				if (response["result"] == "success") {
+					console.log("success")
+
+					// update DOM
+					// TODO: animation here
+					var vote = $(el).next()
+					var previous = $(vote).text()
+					$(vote).text(parseInt(previous) + 1)
+					
+				} else console.log(response["errors"])
+			},
+
+			complete:function() {
+
+			}
+		});
+
+	};
 
 	// Does some URL chopping to get conversation id
 	function getConversationId() {
