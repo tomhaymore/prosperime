@@ -3,6 +3,7 @@
 ## from Django
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import m2m_changed
 
 ## from Prosperme
 from careers.models import SavedPath, GoalPosition, Position, IdealPosition
@@ -69,9 +70,35 @@ class Vote(models.Model):
 
 class Tag(models.Model):
 	name = models.CharField(max_length=450)
+	count = models.IntegerField(default=1)
 
 	def tag_count(self):
 		return len(Conversation.objects.filter(tags=self))
 
+	def url_name(self):
+		return self.name.replace('/\s+/g', '-').lower();
+
 	def __unicode__(self):
 		return self.name
+
+def update_tag_count(sender,instance,action,reverse,model,pk_set,using,**kwargs):
+	"""
+	listens for updates to tag, updates count
+	"""
+	# get list of tag ids
+	tag_ids = pk_set
+	# check for adding or removing
+	if action == "post_add":
+		# increase count for each tag
+		for i in tag_ids:
+			tag = Tag.objects.get(id=i)
+			tag.count += 1
+			tag.save()
+	elif action == "post_remove":
+		# decrease count for each tag
+		for i in tag_ids:
+			tag = Tag.objects.get(id=i)
+			tag.count -= 1
+			tag.save()
+
+m2m_changed.connect(update_tag_count, sender=Conversation.tags.through)
