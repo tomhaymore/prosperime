@@ -76,6 +76,7 @@ $(function(){
 			$(this.el).html(this.template({}));
 			// Declare local collection variable outside (scoping)
 			var collection = this.collection;
+			console.log(this.collection)
 			// Declare local DOM container outside (scoping)
 			var $questions = this.$el;
 
@@ -95,7 +96,7 @@ $(function(){
 	//---------------//
 	// ** Routers ** //
 	//---------------//
-	window.ConvoRouter = Backbone.Router.extend({
+	window.ConversationRouter = Backbone.Router.extend({
 
 		routes: {
 			"" : "default",
@@ -112,7 +113,6 @@ $(function(){
 
 			// Listen to filter button
 			$("#search-conversations-button").on("click", function(ev) {
-
 				var url = $.param({'query':$("input#search-conversations-input").val()});
 				window.App.navigate(url, {trigger:true})
 			})
@@ -143,7 +143,7 @@ $(function(){
 
 	});
 
-	window.App = new ConvoRouter;
+	window.App = new ConversationRouter;
 	Backbone.history.start();
 
 });

@@ -30,7 +30,7 @@
   width: 25%; }
 
 #question-page-container {
-  padding-top: 36px; }
+  padding-top: 24px; }
 
 .profile-pic-container {
   width: 75px;
@@ -50,15 +50,20 @@
   color: #fffffe;
   background-color: rgba(51, 51, 51, 0.8);
   display: inline-block;
-  width: 24px;
-  height: 24px;
-  border-radius: 24px;
-  line-height: 24px; }
+  width: 20px;
+  height: 20px;
+  border-radius: 20px;
+  line-height: 20px; }
 
 /* Main Content Styles */
+.body-text {
+  margin-bottom: 6px;
+  line-height: 26px; }
+
 .single-question-module {
   margin-top: 24px;
-  margin-bottom: 24px; }
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e0e0e0; }
 
 .question-column-left {
   display: inline-block;
@@ -71,13 +76,25 @@
   display: inline-block;
   vertical-align: top; }
 
+.question-questionPage-column-left {
+  text-align: center;
+  width: 15%;
+  display: inline-block;
+  vertical-align: top; }
+
+.question-questionPage-column-right {
+  width: 80%;
+  display: inline-block;
+  vertical-align: top; }
+
 .question-title {
   font-size: 1.6em;
   margin-bottom: 12px;
   line-height: 32px; }
 
 .question-body {
-  margin-bottom: 6px;
+  margin-top: 12px;
+  margin-bottom: 24px;
   line-height: 26px; }
 
 .question-user-name {
@@ -176,7 +193,21 @@
     font-size: 1.2em;
     line-height: 28px; }
 
+.center-question-column-module {
+  border-bottom: 1px solid #e0e0e0;
+  padding-left: 36px;
+  padding-right: 24px;
+  padding-top: 24px;
+  padding-bottom: 24px; }
+
 /* Right Column Styles */
+.right-question-column-module {
+  padding: 8px 10px;
+  padding-top: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  border-left: 1px solid #f0f0f0; }
+
 .right-column-module {
   margin-bottom: 10px; }
 
@@ -185,6 +216,25 @@
   font-color: #181818;
   line-height: 24px;
   margin-bottom: 10px; }
+
+.related-question {
+  margin-top: 6px; }
+  .related-question a {
+    text-decoration: none; }
+
+.followers-module p {
+  margin-top: 6px; }
+.followers-module .followers-profile-pic {
+  display: inline-block;
+  margin: 0;
+  width: 48px;
+  height: 48px;
+  margin-top: 6px; }
+  .followers-module .followers-profile-pic img {
+    border-radius: 48px; }
+.followers-module .followers-more-followers {
+  text-align: right;
+  margin-top: 6px; }
 
 /* Ask Question Page Extra Styles */
 .ask-header {

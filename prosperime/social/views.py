@@ -25,6 +25,7 @@ def welcome(request):
 		return HttpResponseRedirect('/home')
 	return render_to_response('welcome.html',context_instance=RequestContext(request))
 
+@login_required
 def home(request):
 
 	# check if user is logged in
@@ -63,7 +64,7 @@ def home(request):
 def ask(request):
 
 	data = {
-		"tags": Tag.objects.all().values("name", "id"),
+		"tags": Tag.objects.all().values("name", "id"), # needed for autocomplete in Form
 	}
 
 	return render_to_response("social/ask.html", data, context_instance=RequestContext(request))
@@ -73,10 +74,11 @@ def question(request, conversation_id):
 
 	## IF there's an error getting here, question_id will be -1, so redirect accordingly
 	if conversation_id == -1:
-		x = 5
-		# TODO: redirect to 404 here
+		render_to_response("/404.html/", {}, context_instance=RequestContext(request))
 
-	## THEN, check if INACTIVE 
+	# THEN, check if INACTIVE
+	# TODO: add inactive field to Conversation model
+	is_active = True 
 
 	# (1) Get Conversation 
 	conversation = Conversation.objects.get(id=conversation_id)
@@ -98,7 +100,7 @@ def question(request, conversation_id):
  			"user_pic":c.owner.profile.default_profile_pic(),
  			"body":c.body,
  			"id":c.id,
- 			"votes":Vote.objects.filter(comment=c).count()
+ 			"votes":Vote.objects.filter(comment=c).count() # TODO: before next rev, figure out how to calc votes
  		})
 
  	# (3) Get followers
@@ -111,15 +113,9 @@ def question(request, conversation_id):
 
  	# (5) Get related questions
  	## TODO: related_questions API
- 	related_questions = [
- 		{"name":"What can I do with my Math degree?", "id":7},
- 		{"name":"What is the biggest professional mistake you've ever made?", "id":8},
- 		{"name":"Are there any options out there for STS majors?", "id":9},
- 		{"name":"What is like to work in Management Consulting from Stanford?", "id":4},
- 		{"name":"What are the most important classes that you ever took? Why?", "id":5},
- 	]
-
- 	# (6) Check if following    (oh what up ternary operator in Python, you thought I'd forgotten about you)
+ 	related_questions = [{"name":c.name, "id":c.id} for c in Conversation.objects.all().exclude(id=conversation_id)[:5]]
+ 	
+ 	# (6) Check if following    (oh what up ternary operator, you thought I'd forgotten about you)
  	is_following = True if (request.user in conversation.followers.all()) else False
 
  	# (7) Get stats for conversation:
@@ -134,16 +130,16 @@ def question(request, conversation_id):
  	}
 
 	data = {
-		"is_active": False, # boolean
-		"is_following":is_following,
-		"question":question, # {"title", "body", "user_pic", "user_name", "tags = []"}
-		"stats": stats, # {"num_followers", "num_answers", "num_days_active"}
-		"comments":formatted_comments, # [ {"body", "user_name", "user_pic", "votes", "id"} ]
+		"is_active": is_active,                   # boolean
+		"is_following":is_following,              # boolean
+		"question":question,                      # {"title", "body", "user_pic", "user_name", "tags = []"}
+		"stats": stats,                           # {"num_followers", "num_answers", "num_days_active"}
+		"comments":formatted_comments,            # [ {"body", "user_name", "user_pic", "votes", "id"} ]
 		"user_pic":request.user.profile.default_profile_pic(), # = profile_pic of the viewer
-		"related_questions":related_questions,
-		"followers":followers,
-		"popular_tags":popular_tags, # [ {"title", "type", "id"} ]
-		"url":request.build_absolute_uri(),
+		"related_questions":related_questions,    # [ {"name", "id"} ]
+		"followers":followers,                    # [ {"name", "id", "pic"} ]
+		"popular_tags":popular_tags,              # [ {"title", "type", "id"} ]
+		"url":request.build_absolute_uri(),       # used for sending the link to people... could be done in JS as well
 	}
 
 
@@ -192,7 +188,17 @@ def api_conversation_search(request):
 	else:
 		convos = Conversation.objects.order_by("-created")[:10]
 				
-	convos_list = [{'name':c.name,'summary':c.summary,'no_answers':len(c.comments.all()),'tags':[{'id':t.id,'name':t.name} for t in c.tags],'comments':[{'id':comment.id,'body':comment.body,'owner_id':comment.owner.id,'owner_name':comment.owner.profile.full_name(),'owner_pic':comment.owner.profile.default_profile_pic()} for comment in c.comments]} for c in convos]
+	convos_list = [
+		{
+		'name':c.name,
+		'id':c.id,
+		'owner_name':c.owner.profile.full_name(),
+		'owner_pic':c.owner.profile.default_profile_pic(),
+		'summary':c.summary,
+		'no_answers':len(c.comments.all()),
+		'tags':[{'id':t.id,'name':t.name} for t in c.tags.all()],
+		'comments':[{'id':comment.id,'body':comment.body,'owner_id':comment.owner.id,'owner_name':comment.owner.profile.full_name(),'owner_pic':comment.owner.profile.default_profile_pic()} for comment in c.comments.all()]}
+	for c in convos]
 
 	response = convos_list
 	return HttpResponse(json.dumps(response))

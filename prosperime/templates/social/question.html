@@ -11,121 +11,6 @@
 	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
 
-
-    <style type="text/css">
-
-	/* Main */
-    body { color:#333; }
-    #question-page-container { padding-top:36px; }
-
-
-	.body-text { margin-bottom:6px; line-height:26px; }
-
-
-
-
-	/* Right Column */
-	.right-column-module {
-		padding:8px 10px;
-		padding-top:24px;
-		padding-bottom:24px;
-		border-bottom:1px solid #f0f0f0;
-		border-left:1px solid #f0f0f0;
-		min-height:50px;
-	}
-
-	.followers-profile-pic {
-		display:inline-block;
-		margin:0;
-		width:48px;
-		height:48px;
-		margin-top:6px;
-	}
-
-	.followers-profile-pic img { border-radius:48px; }
-	.followers-more-followers { text-align:right; margin-top:6px; }
-
-	.related-question { margin-top:6px; }
-	.related-question a { text-decoration: none; }
-
-
-	/* Center Column */
-	.center-column-module {
-		border-bottom:1px solid #e0e0e0;
-		border-right:1px solid #e0e0e0;
-		padding-left:36px;
-		padding-right:24px;
-		padding-top:24px;
-		padding-bottom:24px;
-	}
-
-	.question-column-left {
-		text-align:center;
-		width:15%;
-		display:inline-block;
-		vertical-align: top;
-	}
-	.question-column-right { width:80%; display:inline-block; vertical-align: top;}
-
-	.question-tags-container { margin-left: 90px; /* = pic_width + margin */ }
-
-	.follow-button {
-		width:100px;
-		height:25px;
-		line-height:25px;
-		background-color:#2ECC71;
-		border-radius:2px;
-		display:inline-block;
-		margin-right:16px;
-		padding:2px 2px;
-		cursor:pointer;
-	}
-
-	.following {
-		background-color:#C0C0C0; 
-		cursor:default;
-	}
-
-
-
-
-
-	.disabled {
-		background-color:#C0C0C0 !important; 
-		cursor:default !important;
-	}
-
-
-
-	.add-button {
-		width:20px;
-		height:20px;
-		line-height:18px;
-		border-radius:2px;
-		display:inline-block;
-		text-align:center;
-		margin-left:4px;
-		margin-right:8px;
-		cursor:pointer;
-		color:#fffffe;
-		background-color: rgba(51,51,51,0.2);
-		transition: background-color 0.5s;
-	}
-
-	.add-button:hover {
-		background-color:#2ECC71;
-	}
-
-
-	.v2-module-header {
-		font-weight:600;
-		font-size:1.1em;
-	}
-
-
-    </style>
-
-
 {% endblock %}
 
 {% block extramessage %} {% endblock %}
@@ -138,37 +23,21 @@
 
 	<!-- Left -->
 	<div id="left-question-column" class="span2">
-		<!-- <div class="left-column-module">
-			<div class="stats-container">
-				<div class="row-fluid">
-					<div class="span6 stats-left">
-						<div class="stat">Following</div>
-						<div class="stat">Answers</div>
-						<div class="stat">Days Active</div>
-					</div>
 
-					<div class="span5 stats-right">
-						<div>{{stats.num_followers}}</div>
-						<div>{{stats.num_answers}}</div>
-						<div>{{stats.days_active}}</div>
-					</div>
-				</div>
-			</div>
-		</div> -->
 	</div>
 	
 	<!-- Center -->
 	<div id="center-question-column" class="span7">
-		<div class="center-column-module">
+		<div class="center-question-column-module">
 			<div class="row-fluid">
 
-				<div class="question-column-left">
-					<div class="profile-pic-container"><img src="{{question.user_pic}}" /></div>
+				<div class="question-questionPage-column-left">
+					<div class="profile-pic-container"><img src="{{question.user_pic}}" title="{{question.user_name}}" /></div>
 
 					<div class="question-user-name">{{question.user_name}}</div>
 				</div>
 
-				<div class="question-column-right">
+				<div class="question-questionPage-column-right">
 					<div class="question-title">{{question.title}}</div>
 					<div class="stat-container">
 					
@@ -208,9 +77,9 @@
 						<div class="tag">{{t.name}}</div>
 					{% endfor %}
 
-					<div class="question-subtext">
+				<!-- 	<div class="question-subtext">
 						Question asked by <a href="/profile/{{question.user_id}}">{{question.user_name}}</a>
-					</div>
+					</div> -->
 				</div>
 			</div>
 
@@ -234,8 +103,8 @@
 			{% if not comments or comments|length == 0 %}
 				<div class="no-comments-module comment-row">
 					<div class="call-out-text">
-						Have a thought? Get this conversation started and help {{question.user_name}} out,
-						<br/> or ask one of your friends to answer. Drop them this link: <br/>
+						Have a thought? Get this conversation started and help {{question.user_name}} out!
+						<br/> Answer above, or ask one of your friends to answer. Drop them this link: <br/><br/>
 						<a>{{url}}</a>
 					</div>
 				</div>	
@@ -264,28 +133,26 @@
 
 
 		{% for c in comments %}
-		<div class="center-column-module comment-row">
+		<div class="center-question-column-module comment-row">
 			
 			<div class="row-fluid">
 				<div class="span1">
-					<!-- <div data-comment_id="{{c.id}}" class="vote-container">
-						<div data-type="up" class="upvote vote-button">+ </div>
-						<div class="comment-vote">{{c.votes}}</div>
-						<div data-type="down" class="downvote vote-button">- </div>
-					</div> -->
+
 				</div>
 
 				<div class="span2 question-column-left">
 					<div class="profile-pic-container">
 						<img src="{{c.user_pic}}"/>
 					</div>
+					<div class="question-user-name">{{c.user_name}}</div>
 
-					<div data-comment_id="{{c.id}}" class="vote-container">
+
+				<!-- 	<div data-comment_id="{{c.id}}" class="vote-container">
 						<div data-type="down" class="vote-button vote"><i class="icon-chevron-left"></i></div>
 						<div class="comment-vote vote">{{c.votes}}</div>
 						<div data-type="up" class="vote-button vote"><i class="icon-chevron-right"></i></div>
 
-					</div>					
+					</div>	 -->				
 				</div>
 
 				<div class="span8">
@@ -298,7 +165,7 @@
 					{% endfor %}
 				</div>
 
-				<div class="question-subtext">Comment by <a href="/profile/{{c.id}}">{{c.user_name}}</a></div>
+				<!-- <div class="question-subtext">Comment by <a href="/profile/{{c.id}}">{{c.user_name}}</a></div> -->
 			</div>
 		</div>
 		{% endfor %}
@@ -308,7 +175,7 @@
 	<div id="right-question-column" class="span3">
 
 		<!-- Ask a Question -->
-		<div class="right-column-module">
+		<div class="right-question-column-module">
 			<p>
 				<a href="/ask/" class="flat-button green-button">Start</a> a conversation
 			</p>
@@ -316,8 +183,8 @@
 
 		<!-- Related Questions -->
 		{% if related_questions|length > 0 %}
-		<div class="right-column-module">
-			<div class="v2-module-header">Related Questions: </div>
+		<div class="right-question-column-module">
+			<div class="module-header">Related Questions: </div>
 			{% for q in related_questions %}
 				<div class="related-question">
 					<a href="/question/{{q.id}}/">{{q.name}}</a>
@@ -327,13 +194,15 @@
 		{% endif %}
 
 		<!-- Followers -->
-		<div class="right-column-module">
-			<div class="v2-module-header">Following: </div>
+		<div class="right-question-column-module followers-module">
+			<div class="module-header">Following: </div>
 			<!-- Default to first 5 -->
 			{% for f in followers %}
 				{% if forloop.counter0 < 5 %}
 					<div class="followers-profile-pic">
-						<a href="profile/{{f.id}}"><img src="{{f.pic}}" title="{{f.name}}"/></a> <!-- TODO: Come back and fix this URL once profiles built -->
+						 <!-- TODO: Come back and fix this URL once profiles built -->
+<!-- 						<a href="profile/{{f.id}}"><img src="{{f.pic}}" title="{{f.name}}"/></a> -->
+						<img src="{{f.pic}}" title="{{f.name}}" />
 					</div>
 				{% endif %}
 			{% endfor %}
@@ -348,10 +217,11 @@
 		</div>
 
 		<!-- Popular Tags -->
-		<div class="right-column-module">
-			<div class="v2-module-header">Popular Tags</div>
+		<div class="right-question-column-module">
+			<div class="module-header">Popular Tags</div>
 			{% for t in popular_tags %}
-				<div class="tag">{{t.name}}</div>
+<!-- 			<div class="tag">{{t.name}}</div> -->
+				<p><a href="/home/#tag/{{t.id}}/" class="tag">{{t.name}}</a></p>
 			{% endfor %}
 		</div>
 		
@@ -439,6 +309,31 @@
 					// Animate it red & change #
 					$(this).text(num_followers + 1).animate({"background-color":old_color}, 330)
 				})
+				// Update followers container
+				if ($(".followers-profile-pic").length == 5) {
+					// already full queue, just increment number
+					// TODO: test this code
+					var current_num_followers = parseInt($(".followers-more-followers").text().match(/\d+/g)[0])
+					$(".followers-more-followers").text("and " + (current_num_followers + 1) + " more...")
+				} else {
+					// add photo to followers bar
+					var template = _.template($("#follower-photo-template").html())
+					// if currently no followers
+					if ($(".followers-profile-pic").length == 0) {
+						$(".followers-module").find("p").hide(250, function() { $(this).remove() });
+						$(".followers-module").append(template({
+							"user_name":"{{user.profile.full_name}}",
+							"pic":"{{user_pic}}"
+						})).hide().fadeIn(250)
+					}
+					// already followers, simply append
+					else {
+						$(".followers-profile-pic :last").after(template({
+							"user_name":"{{user.profile.full_name}}",
+							"pic":"{{user_pic}}"
+						})).hide().fadeIn(250)
+					}
+				}
 			}
 		});
 	};
@@ -547,8 +442,16 @@
 
 </script>
 
+<script type="text/template" id="follower-photo-template">
+
+	<div class="followers-profile-pic">
+		<img src="<%=pic%>" title="<%=user_name%>" />
+	</div>
+				
+</script>
+
 <script type="text/template" id="single-comment-template">
-	<div class="center-column-module comment-row">
+	<div class="center-question-column-module comment-row">
 		<div class="row-fluid">
 			<div class="span1">
 			
@@ -558,13 +461,14 @@
 				<div class="profile-pic-container">
 					<img src="<%=user_pic%>"/>
 				</div>
+				<div class="question-user-name"><%=user_name%></div>
 
-				<div data-comment_id="<%=id%>" class="vote-container">
-					<div data-type="down" class="vote-button vote"><i class="icon-chevron-left"></i></div>
-					<div class="comment-vote vote"><%=votes%></div>
-					<div data-type="up" class="vote-button vote"><i class="icon-chevron-right"></i></div>
+				<!-- // <div data-comment_id="<%=id%>" class="vote-container">
+				// 	<div data-type="down" class="vote-button vote"><i class="icon-chevron-left"></i></div>
+				// 	<div class="comment-vote vote"><%=votes%></div>
+				// 	<div data-type="up" class="vote-button vote"><i class="icon-chevron-right"></i></div>
 
-				</div>					
+				// </div>	-->				
 			</div>
 
 			<div class="span8">
@@ -573,7 +477,7 @@
 				</div>
 			</div>
 
-			<div class="question-subtext">Comment by <a href="/profile/<%=id%>"><%=user_name%></a></div>
+			<!-- // <div class="question-subtext">Comment by <a href="/profile/<%=id%>"><%=user_name%></a></div> -->
 		</div>
 	</div>
 </script>

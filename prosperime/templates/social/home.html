@@ -47,14 +47,14 @@
 	<div id="right-column" class="pull-left">
 
 		<!-- Ask a Question -->
-		<div class="right-column-module">
+		<div class="right-question-column-module">
 			<p>
 				<a href="/ask/" class="flat-button green-button">Start</a> a conversation
 			</p>
 		</div>
 	
 		<!-- Popular Tags -->
-		<div class="right-column-module">
+		<div class="right-question-column-module">
 			<p class="module-header">Popular Tags</p>
 			{% for t in popular_tags %}
 				<p><a href="/tags/{{t.id}}" class="tag">{{t.title}}</a></p>
@@ -83,28 +83,26 @@
 
 	<div class="single-question-module">
 		<div class="question-column-left">
-			<div class="profile-pic-container"><img src="<%=user_pic%>" /></div>
+			<div class="profile-pic-container"><img src="<%=owner_pic%>" /></div>
 		</div>
 
 		<div class="question-column-right">
-			<div class="question-title"><a href="/question/<%=id%>"><%=title%></a></div>
-			<div class="question-body"><%=body%></div>
+			<div class="question-title"><a href="/question/<%=id%>"><%=name%></a></div>
+			<div class="question-body"><%=summary%></div>
 			<% for (t in tags) { %>
-				<div class="tag tag-inline"><%=tags[t].title%></div>
+				<div class="tag tag-inline"><%=tags[t].name%></div>
 			<% } %>
 		</div>
 
 		<div class="question-subtext homepage-subtext">
 			<% 
-				if (comments.length == 0) %><a href="/question/<%=id%>">Be the first to answer</a><%
+				if (comments.length == 0) %><a href="/question/<%=id%>">Be the first to answer<%
 				else if (comments.length == 1) %><a href="/question/<%=id%>">See <%=comments.length%> answer <%
 				else %><a href="/question/<%=id%>">See <%=comments.length%> answers <%
-
 			%> 
-
 			</a>
 		</div>
-							
+		<br/>			
 	</div>
 
 </script>
