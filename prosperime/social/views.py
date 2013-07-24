@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 
 # ProsperMe
 from careers.models import SavedPath
-from social.models import Comment, Conversation, Vote, FollowConversation
+from social.models import Comment, Conversation, Vote, FollowConversation, Tag
 import utilities.helpers as helpers
 
 logger = logging.getLogger(__name__)
@@ -26,30 +26,13 @@ def home(request):
 
 	# check if user is logged in
 	if not request.user.is_authenticated():
-		return HttpResponseRedirect('/welcome')
+		return render_to_response('welcome.html',context_instance=RequestContext(request))
 
-	tags = [
-		{"title":"Great Hours", "id":7, "type":"Good"},
-		{"title":"What Perks", "id":7, "type":"Bad"},
-		{"title":"Crazy Hours", "id":7, "type":"Bad"},
-		{"title":"Strict Culture", "id":7, "type":"Eh"},
-		{"title":"Great Pay", "id":7, "type":"Good"},
-		{"title":"Great Cause", "id":7, "type":"Good"},
-		{"title":"Just a Paycheck", "id":7, "type":"Bad"},
-	]
-
-	filters = [
-		{"title":"Symbolic Systems", "id":7, "value":"major-7"},
-		{"title":"Mechanical Engineering", "id":7, "value":"major-7"},
-		{"title":"Banking", "id":7, "value":"major-7"},
-		{"title":"First Job", "id":7, "value":"major-7"},
-		{"title":"Internship", "id":7, "value":"major-7"},
-	]
+	popular_tags = Tag.objects.order_by("-count")[:10]
 
 	data = {
-		"most_recent":None, # [ {"user_pic", "title", "body", "tags[]", "comments[]", }]
-		"popular_tags":tags, # [ {"title", "type", "id"} ]
-		"filters":filters,
+		"most_recent": None, # [ {"user_pic", "title", "body", "tags[]", "comments[]", }]
+		"popular_tags": popular_tags
 	}
 
 

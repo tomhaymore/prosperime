@@ -8,9 +8,10 @@ admin.autodiscover()
 urlpatterns = patterns('',
     
     # Social Views
-    url(r'^$', 'social.views.welcome'),
+    url(r'^$', 'social.views.home'),
     url(r'^home/$', 'social.views.home'),
     url(r'^welcome/$','social.views.welcome'),
+    url(r'^tags/$', 'social.views.tags'),
 
     # Accounts Views
     url(r'^privacy/$','accounts.views.privacy'),
