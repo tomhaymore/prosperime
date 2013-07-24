@@ -22,13 +22,13 @@
   margin-top: 24px;
   margin-bottom: 24px; }
 
-.question-column-left {
+.question-column-left, .comment-column-left {
   display: inline-block;
   width: 75px;
   margin-right: 5px;
   vertical-align: top; }
 
-.question-column-right {
+.question-column-right, .comment-column-right {
   width: 550px;
   display: inline-block;
   vertical-align: top; }
@@ -43,12 +43,20 @@
   line-height: 26px; }
 
 .question-subtext {
-  text-align: right; }
-  .question-subtext a {
-    text-decoration: none; }
+  margin-top: 5px; }
 
 .question-tags-container {
   margin-left: 90px; }
+
+.comment-column-left {
+  width: 35px; }
+
+.comment-column-right {
+  width: 400px; }
+
+.comment-body {
+  font-size: 0.9em;
+  line-height: 1.1em; }
 
 .follow-button {
   width: 100px;

@@ -17,7 +17,6 @@ ul {
   clear: both; }
 
 #search-container {
-  margin-left: 10px;
   width: 630px;
   height: 50px; }
 
@@ -88,7 +87,8 @@ div.splash-container {
   font-size: 2.5em;
   font-family: "Helvetica Neue", Helvetica, "Lato";
   color: #253139;
-  margin-bottom: 15px; }
+  margin-bottom: 15px;
+  margin-top: 10px; }
 
 .main-sub-header {
   font-size: 1.2em;
@@ -218,20 +218,24 @@ div.footer {
   margin-bottom: 15px; }
 
 /* Picture Styles */
-.profile-pic-container {
+.profile-pic-container, .profile-pic-container-small {
   width: 75px;
   height: 75px;
   display: inline-block;
   margin-right: 16px;
   margin-bottom: 16px; }
-  .profile-pic-container img {
+  .profile-pic-container img, .profile-pic-container-small img {
     border-radius: 75px; }
+
+.profile-pic-container-small {
+  width: 35px;
+  height: 35px; }
 
 /* Tag Styles */
 .filter-tags {
   color: #181818; }
 
-.tag {
+.tag, .tag-inline {
   border-radius: 2px;
   padding: 4px 6px;
   margin-top: 4px;
@@ -242,8 +246,5 @@ div.footer {
   line-height: 14px;
   color: #181818; }
 
-.tag:hover {
+.tag:hover, .tag-inline:hover {
   text-decoration: none; }
-
-.tag-inline {
-  margin-left: 8px; }

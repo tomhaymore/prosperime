@@ -57,7 +57,7 @@
 		<div class="right-column-module">
 			<p class="module-header">Popular Tags</p>
 			{% for t in popular_tags %}
-				<p><a href="/tags/{{t.id}}" class="tag">{{t.title}}</a></p>
+				<p><a href="#tags/{{t.url_name}}" class="tag">{{t.name}}</a></p>
 			{% endfor %}
 		</div>
 		
@@ -89,20 +89,28 @@
 		<div class="question-column-right">
 			<div class="question-title"><a href="/question/<%=id%>"><%=name%></a></div>
 			<div class="question-body"><%=summary%></div>
+			<% for (c in comments) %>
+				<div class="comment-column-left">
+					<div class="profile-pic-container-small"><img src="<%=owner_pic%>" /></div>
+				</div>
+				<div class="comment-column-right">
+					<div class="comment-body"><%=body%></div>
+				</div>
 			<% for (t in tags) { %>
-				<div class="tag tag-inline"><%=tags[t].name%></div>
+				<div class="tag-inline"><%=tags[t].name%></div>
 			<% } %>
-		</div>
 
-		<div class="question-subtext homepage-subtext">
-			<% 
-				if (comments.length == 0) %><a href="/question/<%=id%>">Be the first to answer</a><%
-				else if (comments.length == 1) %><a href="/question/<%=id%>">See <%=comments.length%> answer <%
-				else %><a href="/question/<%=id%>">See <%=comments.length%> answers <%
+			<div class="question-subtext">
+				<% if (comments.length == 0) { %>
+					<a href="/question/<%=id%>">Be the first to answer</a>
+				<% } else if (comments.length == 1) { %>
+					<a href="/question/<%=id%>">See <%=comments.length%> answer 
+				<% } else { %>
+					<a href="/question/<%=id%>">See <%=comments.length%> answers 
+				<% } %> 
 
-			%> 
-
-			</a>
+				</a>
+			</div>
 		</div>
 							
 	</div>

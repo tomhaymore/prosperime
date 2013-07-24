@@ -18,7 +18,12 @@ $(function(){
 		},
 
 		url:function() {
-			var path = "/api/conversations/?query=" + this._meta['query'];
+			if (this.meta("tagName") != "undefined") {
+				var path = "/api/conversations/?tag=" + this._meta['tagName'];
+			} else {
+				var path = "/api/conversations/?query=" + this._meta['query'];	
+			}
+			
 			return path;
 		},
 
@@ -100,6 +105,7 @@ $(function(){
 		routes: {
 			"" : "default",
 			"search/:query" : "search",
+			"tags/:tagName" : "tags"
 		},
 
 		initialize: function() {
@@ -137,6 +143,16 @@ $(function(){
 				this.questions.meta("query","")
 			} else {
 				this.questions.meta("query",query)
+			}
+			this.questions.fetch();
+			this.questionsView.render();
+		},
+
+		tags: function(tagName) {
+			if (tagName == "undefined") {
+				this.questions.meta("tagName","")
+			} else {
+				this.questions.meta("tagName",tagName)
 			}
 			this.questions.fetch();
 			this.questionsView.render();

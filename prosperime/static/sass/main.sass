@@ -25,7 +25,6 @@ $right-column-width: 200px
 $center-column-width: 1000px - $left-column-width - $right-column-width - 20
 
 #search-container
-	margin-left: $left-column-width + 10
 	width: 630px
 	height: 50px
 
@@ -107,6 +106,7 @@ div.splash-container
 		family: "Helvetica Neue",Helvetica, "Lato"
 	color: $feature-page-header 
 	margin-bottom: 15px
+	margin-top: 10px
 
 .main-sub-header
 	font:
@@ -254,6 +254,11 @@ div.footer
 	img 
 		border-radius: 75px
 
+.profile-pic-container-small
+	@extend .profile-pic-container
+	width: 35px
+	height: 35px
+
 /* Tag Styles */
 
 .filter-tags
@@ -274,4 +279,4 @@ div.footer
 	text-decoration: none
 
 .tag-inline
-	margin-left: 8px
+	@extend .tag
