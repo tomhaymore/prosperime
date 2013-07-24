@@ -287,6 +287,32 @@ class Connection(models.Model):
     service = models.CharField(max_length=45)
     status = models.CharField(max_length=15,default="active")
 
+class Partner(models.Model):
+    name = models.CharField(max_length=450)
+    entities = models.ManyToManyField(Entity,through="PartnerEntities")
+    admins = models.ManyToManyField(User,through="PartnerAdmins")
+    account_level = models.CharField(max_length=45,default="basic")
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=15,default="active")
+
+    def __unicode__(self):
+        return self.name
+
+class PartnerAdmins(models.Model):
+    parner = models.ForeignKey(Partner,related_name="partner")
+    admin = models.ForeignKey(User,related_name="admin")
+    role = models.CharField(default="admin")
+    linked_on = models.DateTimeField(auto_now_add=True,null=True)
+    status = models.CharField(max_length=15,default="active")
+
+class PartnerEntities(models.Model):
+    parner = models.ForeignKey(Partner,related_name="partner")
+    entity = models.ForeignKey(Entity,related_name="entity")
+    role = models.CharField(default="admin")
+    linked_on = models.DateTimeField(auto_now_add=True,null=True)
+    status = models.CharField(max_length=15,default="active")
+
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
