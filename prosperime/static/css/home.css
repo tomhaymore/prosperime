@@ -2,6 +2,22 @@
 /* General Styles */
 /* Left Column */
 /* Main Content Styles */
+#search-conversations-input {
+  width: 425px; }
+
+.tt-hint {
+  width: 425px; }
+
+.tt-dropdown-menu {
+  background-color: #fffffe; }
+  .tt-dropdown-menu li {
+    padding-left: 5px;
+    padding-right: 5px; }
+  .tt-dropdown-menu li:hover {
+    background-color: #6fb6d4;
+    color: #fffffe;
+    cursor: pointer; }
+
 .single-question-module {
   margin-top: 24px;
   margin-bottom: 24px; }
