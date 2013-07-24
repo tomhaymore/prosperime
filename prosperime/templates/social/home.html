@@ -26,14 +26,14 @@
 
 	<!-- Search -->
 	<div id="search-container">
-		<input type="text" id="search-conversations-input" data-placeholder="Start typing" />
-		<a class="flat-button lightblue-button" id="search-conversations-button">Search</a>
+		<input type="text" id="search-conversations-input" class="flat-input" data-placeholder="Start typing" />
+		<a class="flat-button search-button lightblue-button" id="search-conversations-button">Search</a>
 	</div>
 
 	<!-- Left -->
-	<div id="left-column" class="pull-left">
+	<!-- <div id="left-column" class="pull-left">
 		<span style="visibility:hidden;">&nbsp;</span>
-	</div>
+	</div> -->
 	
 	<!-- Center -->
 	<div id="center-column" class="pull-left">
@@ -83,14 +83,14 @@
 
 	<div class="single-question-module">
 		<div class="question-column-left">
-			<div class="profile-pic-container"><img src="<%=user_pic%>" /></div>
+			<div class="profile-pic-container"><img src="<%=owner_pic%>" /></div>
 		</div>
 
 		<div class="question-column-right">
-			<div class="question-title"><a href="/question/<%=id%>"><%=title%></a></div>
-			<div class="question-body"><%=body%></div>
+			<div class="question-title"><a href="/question/<%=id%>"><%=name%></a></div>
+			<div class="question-body"><%=summary%></div>
 			<% for (t in tags) { %>
-				<div class="tag tag-inline"><%=tags[t].title%></div>
+				<div class="tag tag-inline"><%=tags[t].name%></div>
 			<% } %>
 		</div>
 

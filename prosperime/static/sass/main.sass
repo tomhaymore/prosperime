@@ -11,8 +11,6 @@ ul
 
 /* General styles */
 
-$lightblue: 6FB6D4
-
 .pull-left 
 	float: left
 
@@ -21,6 +19,27 @@ $lightblue: 6FB6D4
 
 .clear
 	clear: both
+
+$left-column-width: 0px
+$right-column-width: 200px
+$center-column-width: 1000px - $left-column-width - $right-column-width - 20
+
+#search-container
+	margin-left: $left-column-width + 10
+	width: 630px
+	height: 50px
+
+#left-column 
+	margin-right: 10px
+	width: $left-column-width
+
+#center-column
+	margin-right: 10px
+	width: $center-column-width
+	min-height: 200px
+
+#right-column
+	width: $right-column-width
 
 
 
@@ -62,7 +81,6 @@ ul#topbar-nav
 
 /* Main Container Styles */
 
-$feature-page-header: #253139
 
 div#content-container 
 	width: 1000px
@@ -99,13 +117,13 @@ div.splash-container
 /* Messages Container Styles */
 
 div#messages-container
-	background-color: rgba(61, 124, 204, 0.71)
+	background-color: $messages-background
 
 div#messages
 	width: 1000px
 	margin-left: auto
 	margin-right: auto
-	color: #fffffe
+	color: $white
 	padding: 5px
 
 div.message
@@ -116,6 +134,9 @@ div.message
 	p
 		font-size: 1.1em
 		opacity: 1.0
+
+ul.messages
+	list-decoration: none
 
 /* Button Styles */
 
@@ -138,6 +159,9 @@ div.message
 	-moz-transition: all 0.2s
 	-webkit-transition: all 0.2s
 	-o-transition: all 0.2s
+
+.search-button
+	vertical-align: top
 
 a.flat-button:hover
 	text-decoration: none
@@ -166,7 +190,7 @@ a.flat-button:hover
 
 .lightblue-button
 	background-color: $lightblue
-	color: #fffffe
+	color: $white
 
 .wide-button 
 	width: 150px

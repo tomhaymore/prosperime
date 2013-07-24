@@ -18,7 +18,7 @@ $(function(){
 		},
 
 		url:function() {
-			var path = "/api/conversations/" + this._meta['query'];
+			var path = "/api/conversations/?query=" + this._meta['query'];
 			return path;
 		},
 
@@ -99,7 +99,7 @@ $(function(){
 
 		routes: {
 			"" : "default",
-			":query" : "search",
+			"search/:query" : "search",
 		},
 
 		initialize: function() {
@@ -113,7 +113,8 @@ $(function(){
 			// Listen to filter button
 			$("#search-conversations-button").on("click", function(ev) {
 
-				var url = $.param({'query':$("input#search-conversations-input").val()});
+				// var url = $.param({'query':$("input#search-conversations-input").val()});
+				var url = "search/" + encodeURIComponent($("input#search-conversations-input").val())
 				window.App.navigate(url, {trigger:true})
 			})
 

@@ -52,7 +52,7 @@ def login(request):
 			if user is not None:
 				auth_login(request,user)
 				messages.success(request, 'You have successfully logged in.')
-				return HttpResponseRedirect('/majors/')
+				return HttpResponseRedirect('/')
 		
 	else:
 		form = AuthForm()

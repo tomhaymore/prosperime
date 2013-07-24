@@ -25,6 +25,7 @@ class Conversation(models.Model):
 	followers = models.ManyToManyField(User,related_name="followers",through="FollowConversation")
 	owner = models.ForeignKey(User,related_name="conversations")
 	tags = models.ManyToManyField("Tag",related_name="tags")
+	satus = models.CharField(max_length=45,default="inactive")
 	created = models.DateTimeField(auto_now_add=True, null=True)
 	updated = models.DateTimeField(auto_now=True, null=True)
 
@@ -71,3 +72,6 @@ class Tag(models.Model):
 
 	def tag_count(self):
 		return len(Conversation.objects.filter(tags=self))
+
+	def __unicode__(self):
+		return self.name

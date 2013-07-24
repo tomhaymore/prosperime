@@ -216,7 +216,7 @@ def api_conversation_search(request):
 	else:
 		convos = Conversation.objects.order_by("-created")[:10]
 				
-	convos_list = [{'name':c.name,'summary':c.summary,'no_answers':len(c.comments.all()),'tags':[{'id':t.id,'name':t.name} for t in c.tags],'comments':[{'id':comment.id,'body':comment.body,'owner_id':comment.owner.id,'owner_name':comment.owner.profile.full_name(),'owner_pic':comment.owner.profile.default_profile_pic()} for comment in c.comments]} for c in convos]
+	convos_list = [{'id':c.id,'name':c.name,'summary':c.summary,'owner_id':c.owner.id,'owner_name':c.owner.profile.full_name(),'owner_pic':c.owner.profile.default_profile_pic(),'no_comments':len(c.comments.all()),'tags':[{'id':t.id,'name':t.name} for t in c.tags.all()],'comments':[{'id':comment.id,'body':comment.body,'owner_id':comment.owner.id,'owner_name':comment.owner.profile.full_name(),'owner_pic':comment.owner.profile.default_profile_pic()} for comment in c.comments.all()]} for c in convos]
 
 	response = convos_list
 	return HttpResponse(json.dumps(response))

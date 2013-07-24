@@ -1,22 +1,5 @@
 /* Imports */
 /* General Styles */
-#search-container {
-  margin-left: 85px;
-  width: 630px;
-  height: 50px; }
-
-#left-column {
-  margin-right: 10px;
-  width: 75px; }
-
-#center-column {
-  margin-right: 10px;
-  width: 705px;
-  min-height: 200px; }
-
-#right-column {
-  width: 200px; }
-
 /* Left Column */
 /* Main Content Styles */
 .single-question-module {

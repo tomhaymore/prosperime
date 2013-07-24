@@ -16,6 +16,23 @@ ul {
 .clear {
   clear: both; }
 
+#search-container {
+  margin-left: 10px;
+  width: 630px;
+  height: 50px; }
+
+#left-column {
+  margin-right: 10px;
+  width: 0px; }
+
+#center-column {
+  margin-right: 10px;
+  width: 780px;
+  min-height: 200px; }
+
+#right-column {
+  width: 200px; }
+
 /* Header Styles */
 #topbar {
   -webkit-box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
@@ -98,6 +115,9 @@ div.message {
     font-size: 1.1em;
     opacity: 1; }
 
+ul.messages {
+  list-decoration: none; }
+
 /* Button Styles */
 .flat-button {
   display: inline-block;
@@ -117,6 +137,9 @@ div.message {
   -moz-transition: all 0.2s;
   -webkit-transition: all 0.2s;
   -o-transition: all 0.2s; }
+
+.search-button {
+  vertical-align: top; }
 
 a.flat-button:hover {
   text-decoration: none;
@@ -143,7 +166,7 @@ a.flat-button:hover {
   color: #fffffe; }
 
 .lightblue-button {
-  background-color: 6FB 6D 4;
+  background-color: #6fb6d4;
   color: #fffffe; }
 
 .wide-button {
