@@ -52,6 +52,20 @@ $comment-column-right-width: $comment-module-width - $comment-column-left-width 
 
 
 /* Left Column */
+.stat-container
+	margin-bottom: 12px
+	text-align: left
+
+.stat
+	text-align: center
+	color: #fffffe
+	background-color: $darkgray
+	display: inline-block
+	width: 20px
+	height: 20px
+	border-radius: 20px
+	line-height: 20px
+
 
 
 
@@ -64,6 +78,7 @@ $comment-column-right-width: $comment-module-width - $comment-column-left-width 
 .single-question-module 
 	margin-top: 24px
 	margin-bottom: 24px
+	border-bottom: 1px solid #e0e0e0
 
 .question-column-left 
 	display: inline-block 
@@ -103,8 +118,16 @@ $comment-column-right-width: $comment-module-width - $comment-column-left-width 
 	margin-top: 6px
 	
 
+
+
+.question-user-name
+	font-weight: bold
+	margin-top: 6px
+
 .question-subtext 
+
 	margin-top: 5px
+
 
 
 .question-tags-container
@@ -203,7 +226,6 @@ $comment-column-right-width: $comment-module-width - $comment-column-left-width 
 	&:hover
 		color: $button-green
 
-
 .no-comments-module 
 	text-align: center
 	margin-top: 18px
@@ -240,6 +262,7 @@ $comment-column-right-width: $comment-module-width - $comment-column-left-width 
 		margin-top: 6px
 
 	.followers-profile-pic
+
 		display: inline-block
 		margin: 0
 		width: 48px
@@ -299,4 +322,6 @@ $comment-column-right-width: $comment-module-width - $comment-column-left-width 
 		font-size: 1.2em
 		padding: 6px 6px
 		cursor: pointer
+
+
 

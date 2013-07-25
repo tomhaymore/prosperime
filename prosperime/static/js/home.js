@@ -81,7 +81,7 @@ $(function(){
 			$(this.el).html(this.template({}));
 			// Declare local collection variable outside (scoping)
 			var collection = this.collection;
-	
+
 			// Declare local DOM container outside (scoping)
 			var $questions = this.$el;
 
@@ -120,8 +120,6 @@ $(function(){
 			// Listen to filter button
 			$("#search-conversations-button").on("click", function(ev) {
 
-				// var url = $.param({'query':$("input#search-conversations-input").val()});
-				var url = "search/" + encodeURIComponent($("input#search-conversations-input").val())
 				window.App.navigate(url, {trigger:true})
 			})
 

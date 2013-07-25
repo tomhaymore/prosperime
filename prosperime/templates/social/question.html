@@ -52,6 +52,7 @@
 			{% for c in comments %}
 			<div class="comment-module">
 
+
 				<div class="comment-column-left">
 					<div class="profile-pic-container-small">
 						<img src="{{c.user_pic}}"/>
@@ -90,12 +91,15 @@
 					<p>This conversation isn't active yet, but you can get it started by adding a comment and getting it on the home page.</p>
 
 			{% endif %}
+
 			</div>
 		{% endif %}
+
 
 		<div class="comment-module">
 			<div class="comment-column-left">
 				<div class="profile-pic-container-small">
+
 					<img src="{{user_pic}}" />
 				</div>
 			</div>
@@ -106,12 +110,12 @@
 				</span>
 				<span class="clear"></span>
 			</div>
+
 		</div>
 
 		<div class="comment-module social-sharing">
 			<p>Get additional insight. Share the link with your friends and get their views.</p>
 		</div>
-
 
 		<!-- Comments -->
 		<!-- {% if is_active %} -->
@@ -129,6 +133,7 @@
 
 		<!-- Edge Case: inactive -->
 		<!-- {% else %}
+
 				{% if user.id == question.user_id %}
 				<div class="no-comments-module comment-row">
 					<div class="call-out-text">
@@ -146,6 +151,7 @@
 					</div>
 				</div>
 				{% endif %}
+
 		{% endif %} -->
 
 
@@ -193,11 +199,14 @@
 					{% endif %}
 				</div>
 			</div>
+
 		</div>
 
 		<!-- Related Questions -->
 		{% if related_questions|length > 0 %}
+
 		<div class="right-column-module">
+
 			<div class="module-header">Related Questions: </div>
 			{% for q in related_questions %}
 				<div class="related-question">
@@ -208,7 +217,10 @@
 		{% endif %}
 
 		<!-- Followers -->
+
 		<div class="right-column-module followers-module">
+
+
 			<div class="module-header">Following: </div>
 			<!-- Default to first 5 -->
 			{% for f in followers %}
@@ -226,12 +238,16 @@
 			{% endif %}
 
 			{% if followers|length == 0 %} 
+
 				<p>No followers yet</p>
+
 			{% endif %}
 		</div>
 
 		<!-- Popular Tags -->
+
 		<div class="right-column-module">
+
 			<div class="module-header">Popular Tags</div>
 			{% for t in popular_tags %}
 <!-- 			<div class="tag">{{t.name}}</div> -->
@@ -272,7 +288,7 @@
 		})
 
 		// Comment Submit button
-		$(".comment-module .comment-button").on("click", function(e) {
+		$("#comment-button").on("click", function(e) {
 			if (!$(this).hasClass("disabled")) submitComment()
 		});
 
@@ -379,7 +395,9 @@
 						"user_name":response["user_name"],
 						"user_pic":response["user_pic"],
 						"id":response["user_id"],
-						"timestamp":response["timestamp"],
+
+						"timestamp":response["created"],
+
 						"votes":0,
 						"body":body
 					})).hide().fadeIn(250)
@@ -456,6 +474,7 @@
 
 <script type="text/template" id="follower-photo-template">
 
+
 	<div class="followers-profile-pic">
 		<img src="<%=pic%>" title="<%=user_name%>" />
 	</div>
@@ -469,12 +488,14 @@
 				<img src="<%=user_pic%>"/>
 			</div>			
 
+
 				<!-- // <div data-comment_id="<%=id%>" class="vote-container">
 				// 	<div data-type="down" class="vote-button vote"><i class="icon-chevron-left"></i></div>
 				// 	<div class="comment-vote vote"><%=votes%></div>
 				// 	<div data-type="up" class="vote-button vote"><i class="icon-chevron-right"></i></div>
 
 				// </div>	-->				
+
 		</div>
 		<div class="comment-column-right">
 			<div class="body-text">
@@ -482,8 +503,9 @@
 			</div>
 			</div>
 			<div class="comment-subtext">
-				Posted <%=timestamp%> ago by <a href="/profile/<%=user_id%>"><%=user_name%></a>
+				Posted ago by <a href="/profile/<%=user_id%>"><%=user_name%></a>
 			</div>
+
 
 		</div>
 	</div>

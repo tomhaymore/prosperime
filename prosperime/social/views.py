@@ -192,7 +192,6 @@ def api_conversation_search(request):
 			} for comment in c.comments.all()]
 		} for c in convos]
 
-
 	response = convos_list
 	return HttpResponse(json.dumps(response))
 
@@ -390,10 +389,13 @@ def api_add_comment(request):
 	if len(response["errors"]) > 0:
 		response["result"] = "failure"
 	else:
+		# TODO get delta for time
+
 		response["result"] = "success"
 		response["user_name"] = request.user.profile.full_name()
 		response["user_pic"] = request.user.profile.default_profile_pic()
 		response["user_id"] = request.user.id
+		# response["timestamp"] = datetime.datetime.now() - c.created
 
 	return HttpResponse(json.dumps(response))
 

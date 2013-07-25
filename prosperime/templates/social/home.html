@@ -47,14 +47,14 @@
 	<div id="right-column" class="pull-left">
 
 		<!-- Ask a Question -->
-		<div class="right-column-module">
+		<div class="right-question-column-module">
 			<p>
 				<a href="/ask/" class="flat-button green-button">Start</a> a conversation
 			</p>
 		</div>
 	
 		<!-- Popular Tags -->
-		<div class="right-column-module">
+		<div class="right-question-column-module">
 			<p class="module-header">Popular Tags</p>
 			{% for t in popular_tags %}
 				<p><a href="#tags/{{t.url_name}}" class="tag">{{t.name}}</a></p>
@@ -89,6 +89,7 @@
 		<div class="question-column-right">
 			<div class="question-title"><a href="/question/<%=id%>"><%=name%></a></div>
 			<div class="question-body"><%=summary%></div>
+
 			<% for (c in comments) %>
 				<div class="comment-column-left">
 					<div class="profile-pic-container-small"><img src="<%=comments[c].owner_pic%>" /></div>
@@ -98,7 +99,9 @@
 				</div>
 			<% for (t in tags) { %>
 				<div class="tag-inline"><%=tags[t].name%></div>
+
 			<% } %>
+
 
 			<div class="question-subtext">
 				<% if (comments.length == 0) { %>
@@ -111,6 +114,7 @@
 
 				</a>
 			</div>
+
 
 		</div>
 		<br/>			
