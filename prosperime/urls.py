@@ -11,7 +11,8 @@ urlpatterns = patterns('',
     url(r'^$', 'social.views.home'),
     url(r'^home/$', 'social.views.home'),
     url(r'^welcome/$','social.views.welcome'),
-    url(r'^tags/$', 'social.views.tags'),
+    url(r'^question/(\d+)/$', 'social.views.question'),
+    url(r'^ask/$', 'social.views.ask'),
 
     # Accounts Views
     url(r'^privacy/$','accounts.views.privacy'),
@@ -40,10 +41,26 @@ urlpatterns = patterns('',
     # API
     url(r'^api/conversations/$', 'social.views.api_conversation_search'),
     url(r'^api/conversations_autocomplete/$', 'social.views.api_conversation_autocomplete'),
+    url(r'^api/startConversation/$', 'social.views.api_start_conversation'),
+    url(r'^api/followConversation/$', 'social.views.api_follow_conversation'),
+    url(r'^api/addComment/$', 'social.views.api_add_comment'),
+    url(r'^api/voteComment/$', 'social.views.api_vote_comment'),
 
     # Recruiter Views
     url(r'^recruiters/$', 'social.views.recruiters'),
     url(r'^recruiters/thanks/$', 'social.views.recruiters_thanks'),
+
+    # Social - AJAX
+    url(r'^social/saveComment/$', 'social.views.saveComment'),
+    url(r'^social/followThread/$', 'social.views.followThread'),
+    url(r'^social/unfollowThread/$', 'social.views.unfollowThread'),   
+    url(r'^social/updateVotes/$', 'social.views.updateVotes'),
+    url(r'^social/postComment/$', 'social.views.postComment'),
+
+
+
+
+
 
     url(r'^progress/$', 'careers.views.progress'), # Am I on Track?
     
@@ -63,8 +80,7 @@ urlpatterns = patterns('',
     # Social Views
     url(r'^thread/(\d+)/$', 'social.views.thread'),
     url(r'^thread/$', 'social.views.create_thread'),
-    url(r'^question/(\d+)/$', 'social.views.question'),
-    url(r'^ask/$', 'social.views.ask'),
+
 
     # url(r'^personalize/$','careers.views.personalize_careers_jobs'),
     url(r'^personalize/careers/$','careers.views.personalize_careers'),
@@ -133,15 +149,7 @@ urlpatterns = patterns('',
     url(r'^accounts/deleteItem/$', 'accounts.views.deleteItem'),
     url(r'^accounts/connect/$', 'accounts.views.connect'),
 
-    ## Social -- AJAX calls
-    url(r'^social/saveComment/$', 'social.views.saveComment'),
-    url(r'^social/followThread/$', 'social.views.followThread'),
-    url(r'^social/unfollowThread/$', 'social.views.unfollowThread'),   
-    url(r'^social/updateVotes/$', 'social.views.updateVotes'),
-    url(r'^social/postComment/$', 'social.views.postComment'),
-    url(r'^social/createThread/$', 'social.views.createThread'),
-
-
+  
 
 
 
