@@ -8,6 +8,14 @@ import math
 import datetime
 from datetime import timedelta
 
+def school_is_partner(email):
+    # get list of approved emails
+    emails = json.loads(f.open('partner_emails.json').read())
+    stub = email.split("@")[1]
+    if stub in emails:
+        return True
+    return False
+
 def _get_json(url):
         """ returns JSON file in Python-readable format from URL"""
         sys.stdout.write("fetching " + url + "\n")

@@ -53,6 +53,7 @@ def login(request):
 				auth_login(request,user)
 				messages.success(request, 'You have successfully logged in.')
 				return HttpResponseRedirect('/')
+
 		
 	else:
 		form = AuthForm()
