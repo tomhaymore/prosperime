@@ -9,6 +9,9 @@ a
 ul
 	list-decoration: none
 
+body
+	color: $main-font-color
+
 /* General styles */
 
 .pull-left 
@@ -31,20 +34,23 @@ $center-column-width: 1000px - $left-column-width - $right-column-width - 20
 #left-column 
 	margin-right: 10px
 	width: $left-column-width
+	float: left
 
 #center-column
 	margin-right: 10px
 	width: $center-column-width
 	min-height: 200px
+	float: left
 
 #right-column
 	width: $right-column-width
+	float: left
 
 
 
 /* Header Styles */
 
-$topbar-background: #253139
+$topbar-background: rgb(44,93,130)
 
 #topbar
 	-webkit-box-shadow: 0 1px 10px rgba(0,0,0,0.1)
@@ -114,6 +120,21 @@ div.splash-container
 		weight: bold
 	line-height: 1.4em
 
+.right-column-module
+	margin-bottom: 10px
+
+.module-header
+	font:
+		size: 18px
+		color: #181818
+	line-height: 24px
+	margin-bottom: 10px
+
+.right-column-module
+	a
+		display: inline-block
+		margin-left: 5px
+
 /* Messages Container Styles */
 
 div#messages-container
@@ -149,7 +170,7 @@ ul.messages
 	padding: 5px 10px 7px 10px
 	font:
 		size: 14px
-		weight: 500
+
 	text-align: center
 	background-color: #fffffe
 	border-radius: 2px
@@ -173,8 +194,9 @@ a.flat-button:hover
 	color: #fffffe
 
 .green-button
-	background-color: #339933
-	color: #fffffe
+	@extend .flat-button
+	background-color: $button-green
+	color: $white
 
 .inline-button
 	display: inline-block
@@ -186,9 +208,10 @@ a.flat-button:hover
 
 .blue-button 
 	background-color: rgb(41,98,152)
-	color: #fffffe
+	color: $white
 
 .lightblue-button
+	@extend .flat-button
 	background-color: $lightblue
 	color: $white
 
@@ -200,6 +223,11 @@ a.flat-button:hover
 	width: auto
 	font-size: 1.6em
 	padding: 6px 8px
+
+.disabled
+	background-color: $lightgray !important 
+	cursor: default !important
+
 	
 /* Footer Styles */
 
@@ -250,7 +278,8 @@ div.footer
 	height: 75px
 	display: inline-block
 	margin-right: 16px
-	margin-bottom: 16px
+	margin-bottom: 16px 
+
 	img 
 		border-radius: 75px
 
@@ -280,3 +309,22 @@ div.footer
 
 .tag-inline
 	@extend .tag
+
+.tag-inline:hover
+	@extend .tag:hover
+
+/* Stats styles */
+
+.stat-container
+	
+.stat-module
+	margin-bottom: 5px
+
+.stat
+	text-align: center
+	font-weight: 500
+	display: inline-block
+	width: 20px
+	height: 20px
+	border-radius: 2px
+	line-height: 20px

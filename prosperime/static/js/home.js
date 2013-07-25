@@ -81,6 +81,7 @@ $(function(){
 			$(this.el).html(this.template({}));
 			// Declare local collection variable outside (scoping)
 			var collection = this.collection;
+	
 			// Declare local DOM container outside (scoping)
 			var $questions = this.$el;
 
@@ -100,7 +101,7 @@ $(function(){
 	//---------------//
 	// ** Routers ** //
 	//---------------//
-	window.ConvoRouter = Backbone.Router.extend({
+	window.ConversationRouter = Backbone.Router.extend({
 
 		routes: {
 			"" : "default",
@@ -160,7 +161,7 @@ $(function(){
 
 	});
 
-	window.App = new ConvoRouter;
+	window.App = new ConversationRouter;
 	Backbone.history.start();
 
 });

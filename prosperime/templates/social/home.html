@@ -91,10 +91,10 @@
 			<div class="question-body"><%=summary%></div>
 			<% for (c in comments) %>
 				<div class="comment-column-left">
-					<div class="profile-pic-container-small"><img src="<%=owner_pic%>" /></div>
+					<div class="profile-pic-container-small"><img src="<%=comments[c].owner_pic%>" /></div>
 				</div>
 				<div class="comment-column-right">
-					<div class="comment-body"><%=body%></div>
+					<div class="comment-body"><%=comments[c].body%></div>
 				</div>
 			<% for (t in tags) { %>
 				<div class="tag-inline"><%=tags[t].name%></div>
@@ -111,8 +111,9 @@
 
 				</a>
 			</div>
+
 		</div>
-							
+		<br/>			
 	</div>
 
 </script>

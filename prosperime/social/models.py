@@ -7,6 +7,7 @@ from django.db.models.signals import m2m_changed
 
 ## from Prosperme
 from careers.models import SavedPath, GoalPosition, Position, IdealPosition
+from entities.models import Entity
 
 class Notification(models.Model):
 	target = models.ForeignKey(User,related_name='notifications')
@@ -43,8 +44,9 @@ class Comment(models.Model):
 	created = models.DateTimeField(auto_now_add=True, null=True)
 	updated = models.DateTimeField(auto_now=True, null=True)
 
-	def __unicode__(self):
-		return "Comment #" + str(self.index) + " on " + self.thread.name
+	# This will bug now, no Thread
+	# def __unicode__(self):
+	# 	return "Comment #" + str(self.index) + " on " + self.thread.name
 
 class FollowConversation(models.Model):
 	conversation = models.ForeignKey(Conversation)

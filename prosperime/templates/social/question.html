@@ -1,332 +1,15 @@
 
 {% extends "base_full.html" %}
-
+{% load humanize %}
 {% block head %}
 
 <!-- CSS -->
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/home.css"/>
 
 <!-- JS -->
 	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
-
-
-    <style type="text/css">
-
-	/* Main */
-    body { color:#333; }
-    #question-page-container { padding-top:36px; }
-	#left-column { width:15%; /* Bootstrap is acting weird on the span1 */ }
-	#center-column { margin-left:0px; width:63%; }
-	#right-column { margin-left:0px; width:22%;}
-
-
-	.body-text { margin-bottom:6px; line-height:26px; }
-
-
-    /* Left Column */
-
-    .left-column-module {
-    }
-
-    .stats-container {
-		margin-top:48px;
-		margin-left:18px;
-		text-align: center;
-    }
-
-    .stat {
-		padding:4px 4px;
-    }
-
-    .stats-left { text-align:right; }
-    .stats-right div {
-    	background-color: rgba(51,51,51,0.8);
-		color:#fffffe;
-		border:1px solid #fffffe;
-		border-radius:3px;
-		padding:4px 4px;
-    }
-    .stats-right { }
-
-
-
-	/* Right Column */
-	.right-column-module {
-		padding:8px 10px;
-		padding-top:24px;
-		padding-bottom:24px;
-		border-bottom:1px solid #f0f0f0;
-		border-left:1px solid #f0f0f0;
-		min-height:75px;
-	}
-
-	.followers-profile-pic {
-		display:inline-block;
-		margin:0;
-		width:48px;
-		height:48px;
-		margin-top:6px;
-	}
-
-	.followers-profile-pic img { border-radius:48px; }
-	.followers-more-followers { text-align:right; margin-top:6px; }
-
-	.related-question { margin-top:6px; }
-	.related-question a { text-decoration: none; }
-
-	.ask-button {
-		display:inline-block;
-		margin:0 auto;
-		background-color: #2ECC71;
-		width:75px;
-		height:20px;
-		padding:6px 8px;
-		margin-top:6px;
-		text-align:center;
-		font-size:1.2em;
-		line-height:20px;
-		border-radius:4px;
-		transition:font-weight 0.5s;
-	}
-
-	.ask-button:hover { font-weight:700; }
-
-
-	/* Center Column */
-	.center-column-module {
-		border-bottom:1px solid #e0e0e0;
-		border-right:1px solid #e0e0e0;
-		padding-left:36px;
-		padding-right:24px;
-		padding-top:24px;
-		padding-bottom:24px;
-	}
-
-	.question-column-left {
-		text-align:center;
-		width:15%;
-		display:inline-block;
-		vertical-align: top;
-	}
-	.question-column-right { width:80%; display:inline-block; vertical-align: top;}
-
-	.question-title {
-		font-size:2em;
-		margin-bottom:12px;
-	}
-
-	.question-body { margin-bottom:6px; line-height:26px; }
-	.question-subtext { text-align:right; }
-	.question-subtext a { text-decoration: none; }
-
-	.profile-pic-container {
-		width:75px;
-		height:75px;
-		display:inline-block;
-		margin-right:16px;
-		margin-bottom:16px;
-	}
-
-	.profile-pic-container img { border-radius:75px; }
-	.question-tags-container { margin-left: 90px; /* = pic_width + margin */ }
-
-	.follow-button {
-		width:100px;
-		height:25px;
-		line-height:25px;
-		background-color:#2ECC71;
-		border-radius:2px;
-		display:inline-block;
-		margin-right:16px;
-		padding:2px 2px;
-		cursor:pointer;
-	}
-
-	.following {
-		background-color:#C0C0C0; 
-		cursor:default;
-	}
-
-	.comment-module { margin-left:17%; width:80%; margin-top:32px;}
-	.comment-module img {
-		float:left;
-		display:inline-block;
-		width:50px;
-		height:50px;
-		border-radius:50px;
-		margin-right:36px;
-	}
-	.comment-module textarea {
-		width:80%;
-		height:50px;
-		resize:none;
-	}
-	.comment-module .comment-button {
-		text-align: center;
-		float:right;
-		margin-right:16px;
-		width:100px;
-		height:25px;
-		line-height:25px;
-		background-color:#2ECC71;
-		border-radius:2px;
-		display:inline-block;
-		margin-right:16px;
-		padding:2px 2px;
-		cursor:pointer;
-	}
-
-	.disabled {
-		background-color:#C0C0C0 !important; 
-		cursor:default !important;
-	}
-
-	.no-comments-module { text-align:center; } 
-	.no-comments-call-out-text { font-size:1.2em; line-height:28px; }
-
-	.comment-votes {
-/*		text-align:center;
-		margin:0 auto;
-		width:36px;
-		height:24px;
-		line-height:24px;
-		background-color:rgba(231,76,60,1); 
-		margin-top:6px;
-		border-radius:2px;*/
-	}
-
-	.vote-container div {
-		width:24px;
-		height:24px;
-		border-radius:2px;
-		text-align:center;
-		line-height:24px;
-	}
-
-	.upvote {
-		background-color: rgba(39,174,96,1); font-size:1.2em; line-height:22px;
-	}
-
-	.downvote {
-		background-color:rgba(231,76,60,1); font-size:1.2em; line-height:22px;
-	}
-
-
-	.icon-container i {
-		display:inline-block;
-		padding:2px;
-	}
-
-	.icon-container span {
-		display: inline-block;
-		margin-left:30px;
-	}
-
-	.star-filled {
-		color:#D35400;
-	}
-
-
-
-
-
-
-	.add-button {
-		width:20px;
-		height:20px;
-		line-height:18px;
-		border-radius:2px;
-		display:inline-block;
-		text-align:center;
-		margin-left:4px;
-		margin-right:8px;
-		cursor:pointer;
-		color:#fffffe;
-		background-color: rgba(51,51,51,0.2);
-		transition: background-color 0.5s;
-	}
-
-	.add-button:hover {
-		background-color:#2ECC71;
-	}
-
-	.review-job {
-		margin-top:6px;
-	}
-
-	.v2-module-header {
-		font-weight:600;
-		font-size:1.1em;
-	}
-
-	.good-tag { background-color: rgba(52,152,219,0.7); }
-	.good-tag:hover { background-color: rgba(51,152,219,1); }
-
-	.bad-tag { background-color:rgba(231,76,60,0.7); }
-	.bad-tag:hover { background-color:rgba(231,76,60,1); }
-
-	.eh-tag { background-color: rgba(39,174,96,0.7); }
-	.eh-tag:hover { background-color: rgba(39,174,96,1); }
-
-	.tag {
-		border-radius:2px;
-		padding:6px 8px;
-		margin-top:6px;
-		display:inline-block;
-		cursor:pointer;
-	}
-
-
-	.logo {
-		font-size:2.2em;
-		font-weight:bold;
-		line-height:35px;
-	}
-
-	.blue {
-		color:#3498DB;
-	}
-
-	.review {
-		border-bottom:1px solid #f0f0f0;
-		line-height:28px;
-		margin-top:16px;
-		padding-bottom:16px;
-	}
-
-	.review-header {
-		font-weight:600;
-	}
-
-
-
-
-
-	.review-rating {
-		font-size:2.0em;
-		font-weight:bold;
-		margin-top:12px;
-	}
-
-	.suggested-table {
-		width:100%;
-		margin-top:6px;
-	}
-
-	.suggested-table tr {
-		margin-top:6px;
-	}
-
-	.suggested-table tr td {
-		width:33%;
-		padding-left:12px;
-	}
-
-
-
-
-    </style>
-
+	<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
 
 {% endblock %}
 
@@ -336,193 +19,204 @@
 
 	
 <!-- Main -->
-<div id="question-page-container" class="row-fluid">
+<div id="content-container">
 
 	<!-- Left -->
-	<div id="left-column" class="span2">
-		<div class="left-column-module">
-			<div class="stats-container">
-				<div class="row-fluid">
-					<div class="span6 stats-left">
-						<div class="stat">Following</div>
-						<div class="stat">Answers</div>
-						<div class="stat">Days Active</div>
-					</div>
+	<div id="left-column">
 
-					<div class="span5 stats-right">
-						<div>{{stats.num_followers}}</div>
-						<div>{{stats.num_answers}}</div>
-						<div>{{stats.days_active}}</div>
-					</div>
-				</div>
-			</div>
-		</div>
 	</div>
 	
 	<!-- Center -->
-	<div id="center-column" class="span7">
-		<div class="center-column-module">
-			<div class="row-fluid">
+	<div id="center-column">
 
-		<!-- 		<div class="span12">
-					<div class="profile-pic-container">
-						<img src="{{question.user_pic}}" class="pull-left"/ >
+		<div class="question-column-left">
+			<div class="profile-pic-container"><img src="{{question.user_pic}}" title="{{question.user_name}}" /></div>
+
+			<div class="question-user-name">{{question.user_name}}</div>
+		</div>
+
+		<div class="question-column-right">
+			<div class="question-title">{{question.title}}</div>
+			<div class="question-body">{{question.body}}</div>
+
+			{% for t in question.tags %}
+				<a class="tag">{{t.name}}</a>
+			{% endfor %}
+
+		<!-- 	<div class="question-subtext">
+				Question asked by <a href="/profile/{{question.user_id}}">{{question.user_name}}</a>
+			</div> -->
+		<!-- </div> -->
+
+		{% if comments %}
+			{% for c in comments %}
+			<div class="comment-module">
+
+				<div class="comment-column-left">
+					<div class="profile-pic-container-small">
+						<img src="{{c.user_pic}}"/>
 					</div>
-					<div class="question-title">{{question.title}}</div>
-					<div class="question-body">{{question.body}}</div>
-					<div class="question-tags-container">
-						{% for t in question.tags %}
-							{% if t.type == "Good" %}
-								<div class="tag good-tag">
-							{% elif t.type == "Bad" %}
-								<div class="tag bad-tag">
-							{% else %}
-								<div class="tag eh-tag">
-							{% endif %}
-								{{t.title}}</div>
-						{% endfor %}
-					</div>
-
-					<div class="question-subtext">
-						Question asked by <a href="/profile/{{question.user_id}}">{{question.user_name}}</a>
-					</div>
-				</div> -->
+					
 
 
-				<div class="question-column-left">
-					<div class="profile-pic-container"><img src="{{question.user_pic}}" /></div>
-					{% if is_following %}
-						<div class="follow-button following" disabled>Following</div>
-					{% else %}
-						<div class="follow-button">Follow</div>
-					{% endif %}
+				<!-- 	<div data-comment_id="{{c.id}}" class="vote-container">
+						<div data-type="down" class="vote-button vote"><i class="icon-chevron-left"></i></div>
+						<div class="comment-vote vote">{{c.votes}}</div>
+						<div data-type="up" class="vote-button vote"><i class="icon-chevron-right"></i></div>
+
+					</div>	 -->				
 				</div>
 
-				<div class="question-column-right">
-					<div class="question-title">{{question.title}}</div>
-					<div class="question-body">{{question.body}}</div>
-					{% for t in question.tags %}
-						{% if t.type == "Good" %}
-							<div class="tag good-tag">
-						{% elif t.type == "Bad" %}
-							<div class="tag bad-tag">
-						{% else %}
-							<div class="tag eh-tag">
-						{% endif %}
-							{{t.title}}</div>
-					{% endfor %}
-
-					<div class="question-subtext">
-						Question asked by <a href="/profile/{{question.user_id}}">{{question.user_name}}</a>
+				<div class="comment-column-right">
+					<div class="body-text">
+						{{c.body}}
 					</div>
+
+					<div class="comment-subtext">
+						Posted {{c.created|naturaltime}} by {{c.user_name}}
+					</div>
+				</div>
+
+			</div>
+			{% endfor %}
+		{% else %}
+			<div class="comment-module call-out-text">
+			{% if is_active %}
+
+					<!-- <p>Have a thought? Get this conversation started and help {{question.user_name}} out!</p> -->
+
+			{% else %}
+
+					<p>This conversation isn't active yet, but you can get it started by adding a comment and getting it on the home page.</p>
+
+			{% endif %}
+			</div>
+		{% endif %}
+
+		<div class="comment-module">
+			<div class="comment-column-left">
+				<div class="profile-pic-container-small">
+					<img src="{{user_pic}}" />
 				</div>
 			</div>
-
-			<div class="row-fluid">
-				<div class="comment-module">
-					<img src="{{user_pic}}" />
-					<textarea maxlength="1000" placeholder="Add your answer..." ></textarea>    <!-- TODO: update max length of comment -->
-					<div class="comment-button disabled">Post Comment</div>
-				</div>
+			<div class="comment-column-right">
+				<textarea class="comment-textarea" placeholder="Add a comment" ></textarea>
+				<span class="pull-right">
+					<a id="comment-button" class="green-button disabled">Post</a>
+				</span>
+				<span class="clear"></span>
 			</div>
 		</div>
 
+		<div class="comment-module social-sharing">
+			<p>Get additional insight. Share the link with your friends and get their views.</p>
+		</div>
 
 
-		<!-- Answers -->
-		<div class="center-column-module">
-			
+		<!-- Comments -->
+		<!-- {% if is_active %} -->
 
-			{% if is_active %}
+			<!-- Edge Case: no comments && active -->
+			<!-- {% if not comments or comments|length == 0 %}
+				<div class="no-comments-module comment-row">
+					<div class="call-out-text">
+						Have a thought? Get this conversation started and help {{question.user_name}} out!
+						<br/> Answer above, or ask one of your friends to answer. Drop them this link: <br/><br/>
+						<a>{{url}}</a>
+					</div>
+				</div>	
+			{% endif %} -->
 
-				<!-- Edge Case: no comments && active -->
-				{% if not comments or comments|length == 0 %}
-					<div class="no-comments-module">
-						<div class="no-comments-call-out-text">
-							Have a thought? Get this conversation started and help {{question.user_name}} out,
-							<br/> or ask one of your friends to answer. Drop them this link: <br/>
-							<a>{{url}}</a>
-						</div>
-					</div>	
-				{% endif %}
-
-			<!-- Edge Case: inactive -->
-			{% else %}
-					<div class="no-comments-modele">
+		<!-- Edge Case: inactive -->
+		<!-- {% else %}
+				{% if user.id == question.user_id %}
+				<div class="no-comments-module comment-row">
+					<div class="call-out-text">
 						This conversation isn't active yet, but you can be the catalyst, <br/>
 						or ask one of your friends to answer. Drop them this link: <br/>
 						<a>{{url}}</a>
 					</div>
-			{% endif %}
-
-			{% for c in comments %}
-				<div class="row-fluid">
-
-					<div class="span1">
-						<div class="vote-container">
-							<div class="upvote">+ </div>
-							<div class="comment-vote">{{c.votes}}</div>
-							<div class="downvote">- </div>
-						</div>
-					</div>
-
-					<div class="span2 question-column-left">
-						<div class="profile-pic-container">
-							<img src="{{c.user_pic}}"/>
-						</div>
-						<div class="comment-user">{{c.user_name}}</div>
-					</div>
-
-					<div class="span8">
-						<div class="body-text">
-							{{c.body}}
-						</div>
-
-						{% for t in c.tags %}
-							{% if t.type == "Good" %}
-								<div class="tag good-tag">
-							{% elif t.type == "Bad" %}
-								<div class="tag bad-tag">
-							{% else %}
-								<div class="tag eh-tag">
-							{% endif %}
-									{{t.title}}
-								</div>
-						{% endfor %}
+				</div>
+				{% else %}
+				<div class="no-comments-module comment-row">
+					<div class="call-out-text">
+						This conversation isn't active yet, but you can be the catalyst, <br/>
+						or ask one of your friends to answer. Drop them this link: <br/>
+						<a>{{url}}</a>
 					</div>
 				</div>
-			{% endfor %}
+				{% endif %}
+		{% endif %} -->
+
+
 		</div>
-	
 	</div>
 
 	<!-- Right --> 
-	<div id="right-column" class="span3">
+	<div id="right-column">
 
 		<!-- Ask a Question -->
 		<div class="right-column-module">
-			<div class="v2-module-header">Ask a Question!</div>
-			<a href="/ask/" style="text-decoration:none; color:#333;"><div class="ask-button">Ask</div></a>
+			{% if is_following %}
+					<div id="follow-button" class="lightblue-button" disabled>Following</div>
+				{% else %}
+					<div id="follow-button" class="green-button">Follow</div>
+				{% endif %}
+		</div>
+		<div class="right-column-module">
+			<div class="module-header">Info </div>
+			<div class="stat-container">
+				
+				<div class="stat-module">
+					<span class="stat">{{stats.days_active}} </span>
+					{% if stats.days_active == 1 %}
+						Day Active
+					{% else %}
+						Days Active
+					{% endif %}
+				</div>
+				<div class="stat-module">
+					<span class="stat">{{stats.num_answers}}</span>
+					{% if stats.num_answers == 1 %}
+						Answer
+					{% else %}
+						Answers
+					{% endif %}
+
+				</div>
+				<div class="stat-module">
+					<span class="stat">{{stats.num_followers}}</span>
+					{% if stats.num_followers == 1 %}
+						Follower
+					{% else %}
+						Followers
+					{% endif %}
+				</div>
+			</div>
 		</div>
 
 		<!-- Related Questions -->
+		{% if related_questions|length > 0 %}
 		<div class="right-column-module">
-			<div class="v2-module-header">Related Questions: </div>
+			<div class="module-header">Related Questions: </div>
 			{% for q in related_questions %}
 				<div class="related-question">
-					<a href="/question/{{q.id}}">{{q.title}}</a>
+					<a href="/question/{{q.id}}/">{{q.name}}</a>
 				</div>
 			{% endfor %}
 		</div>
+		{% endif %}
 
 		<!-- Followers -->
-		<div class="right-column-module">
-			<div class="v2-module-header">Following: </div>
+		<div class="right-column-module followers-module">
+			<div class="module-header">Following: </div>
 			<!-- Default to first 5 -->
 			{% for f in followers %}
 				{% if forloop.counter0 < 5 %}
 					<div class="followers-profile-pic">
-						<a href="profile/{{f.id}}"><img src="{{f.pic}}" title="{{f.name}}"/></a> <!-- TODO: Come back and fix this URL once profiles built -->
+						 <!-- TODO: Come back and fix this URL once profiles built -->
+<!-- 						<a href="profile/{{f.id}}"><img src="{{f.pic}}" title="{{f.name}}"/></a> -->
+						<img src="{{f.pic}}" title="{{f.name}}" />
 					</div>
 				{% endif %}
 			{% endfor %}
@@ -530,26 +224,23 @@
 			{% if followers|length > 5 %}
 				<div class="followers-more-followers">and {{followers|length|add:-5}} more... </div>
 			{% endif %}
+
+			{% if followers|length == 0 %} 
+				<p>No followers yet</p>
+			{% endif %}
 		</div>
 
 		<!-- Popular Tags -->
 		<div class="right-column-module">
-			<div class="v2-module-header">Popular Tags</div>
+			<div class="module-header">Popular Tags</div>
 			{% for t in popular_tags %}
-				{% if t.type == "Good" %}
-					<div class="tag good-tag">
-				{% elif t.type == "Bad" %}
-					<div class="tag bad-tag">
-				{% else %}
-					<div class="tag eh-tag">
-				{% endif %}
-						{{t.title}}
-					</div>
-
+<!-- 			<div class="tag">{{t.name}}</div> -->
+				<p><a href="/home/#tag/{{t.id}}/" class="tag">{{t.name}}</a></p>
 			{% endfor %}
 		</div>
 		
 	</div>
+	<div class="clear"></div>
 </div>
 
 	
@@ -565,12 +256,12 @@
 	
 		// Activate follow button
 		if ("{{is_following}}" == "False")
-			$(".follow-button").on("click", follow)
+			$("#follow-button").on("click", follow)
 
 		// Active post comment button
 		// TODO: provide safeguards against commenting tons of times
 		$(".comment-module textarea").on("keypress", function(e) {
-			var comment_button = $(".comment-module .comment-button")
+			var comment_button = $("#comment-button")
 			// If now empty, disable
 			if ($(this).val().length == 0 && !$(comment_button).hasClass("disabled")) $(comment_button).addClass("disabled")
 			// If now valid, enable
@@ -580,94 +271,222 @@
 			// if (e.which == 13 && !$(comment_button).hasClass("disabled")) submitComment()
 		})
 
+		// Comment Submit button
 		$(".comment-module .comment-button").on("click", function(e) {
 			if (!$(this).hasClass("disabled")) submitComment()
 		});
 
+		// Voting buttons
+		$(".vote-button").on("click", function() { vote(this) })
 
-		// CSS CHANGES
-		// $(".topbar-inner").css("background-color", "#fffffe").css("width", "1100px")
-		// $(".topbar").css("background-color","#fffffe").css("border-bottom", "1px solid #f0f0f0")
-		// $(".topbar-nav li a").css("color", "#333")
-		// $(".log-container").html("<div class='logo'>myway<span class='blue'>Up</span></div>")
-
-		// Clicking on stars fills them in
-		$("i", ".icon-container")
-			.on("mouseenter", function(e) {
-				var index = $(e.currentTarget).data("index")
-				for (var j = 0; j < 5; j++) {
-					var star = $("i :eq(" + j + ")", ".icon-container")
-					if (j < index)
-						$(star).removeClass("icon-star-empty").addClass("icon-star").addClass("star-filled")
-					else
-						$(star).removeClass("icon-star").removeClass("star-filled").addClass("icon-star-empty")
-				};
-
-				var text;
-				switch(index) {
-					case 1:
-						text = "This place sucked. Hard."
-						break;
-					case 2:
-						text = "I wouldn't wish it upon my friend... Maybe my brother."
-						break;
-					case 3:
-						text = "Not bad, not amazing, but solid."
-						break;
-					case 4:
-						text = "I would do it again, and you should too."
-						break;
-					case 5:
-						text = "OMGPOP!"
-						break;
-				};
-				$("#feedback-text").text(text)
-			})
-			.on("mouseleave", function(e) {
-				$("i", ".icon-container").each(function() {
-					$(this).removeClass("icon-start").removeClass("star-filled").addClass("icon-star-empty")
-				})
-				$("#feedback-text").text("Hover over the stars")
-			})
-			.on("click", function(e) {
-				$(e.currentTarget)
-					.animate({"font-size":"2.5em", "line-height":"30px"}, "400", function() {
-						$(this).animate({"font-size":"2em", "line-height":"20px"}, "400")
-					})
-				$("i", ".icon-container").off("mouseenter").off("mouseleave")
+		// Check if convo is active
+		if ("{{is_active}}" == "False") {
+			// make the question opaque
+			$(".center-column-module").css("opacity", "0.5")
+		}
 
 
-			})
-		
+				
 	});
-	
-</script>
-
-<script type="text/javascript">
 
 	function follow(ev) {
-		$(ev.currentTarget).text("Following").addClass("following").off("click")
-		var num_followers = parseInt($(".stats-right div :first").text())
 
-		// Update stats container
-		$(".stats-right div :first").animate({"background-color":"#E74C3C"}, 330, function() {
-			// Animate it red & change #
-			$(this).text(num_followers + 1).animate({"background-color":"rgba(51,51,51,0.8)"}, 330)
-		})
+		var conversation_id = getConversationId();
+
+
+		// Post to DB
+		$.ajax({
+			type: "POST",
+			url: "/api/followConversation/",
+			data: {"conversation_id":conversation_id, "csrfmiddlewaretoken":"{{csrf_token}}"},
+			dataType:"json",
+
+			beforeSend: function() {
+				$(ev.currentTarget).text("Following").addClass("following").off("click")
+			},
+
+			success:function(response) {
+				if (response["result"] == "success") {
+					console.log("success")
+					
+				} else console.log(response["errors"])
+			},
+
+			complete:function() {
+				var num_followers = parseInt($(".stat :last").text())
+				// Update stats container
+				var old_color = $(".stat :last").css("background-color")
+				$(".stat :last").animate({"background-color":"#E74C3C"}, 330, function() {
+					// Animate it red & change #
+					$(this).text(num_followers + 1).animate({"background-color":old_color}, 330)
+				})
+				// Update followers container
+				if ($(".followers-profile-pic").length == 5) {
+					// already full queue, just increment number
+					// TODO: test this code
+					var current_num_followers = parseInt($(".followers-more-followers").text().match(/\d+/g)[0])
+					$(".followers-more-followers").text("and " + (current_num_followers + 1) + " more...")
+				} else {
+					// add photo to followers bar
+					var template = _.template($("#follower-photo-template").html())
+					// if currently no followers
+					if ($(".followers-profile-pic").length == 0) {
+						$(".followers-module").find("p").hide(250, function() { $(this).remove() });
+						$(".followers-module").append(template({
+							"user_name":"{{user.profile.full_name}}",
+							"pic":"{{user_pic}}"
+						})).hide().fadeIn(250)
+					}
+					// already followers, simply append
+					else {
+						$(".followers-profile-pic :last").after(template({
+							"user_name":"{{user.profile.full_name}}",
+							"pic":"{{user_pic}}"
+						})).hide().fadeIn(250)
+					}
+				}
+			}
+		});
 	};
 
 	function submitComment(ev) {
-		// clear textarea & disable button
-		$(".comment-module textarea").val("")
-		$(".comment-module .comment-button").addClass("disabled")
 
-		// TODO: post comment to DB, reflect change in the dom
+		var conversation_id = getConversationId();
+		var body = $(".comment-module").find("textarea").val()
+
+		// Post to DB
+		$.ajax({
+			type: "POST",
+			url: "/api/addComment/",
+			data: {"conversation_id":conversation_id, "body":body, "csrfmiddlewaretoken":"{{csrf_token}}"},
+			dataType:"json",
+
+			beforeSend: function() {
+
+				// clear textarea & disable button
+				$(".comment-module textarea").val("")
+				$(".comment-module .comment-button").addClass("disabled")
+				// flash button
+			},
+
+			success:function(response) {
+				if (response["result"] == "success") {
+					console.log("success")
+					
+					// append comment to DOM
+					var template = _.template($("#single-comment-template").html())
+					$(".comment-row :last").after(template({
+						"user_name":response["user_name"],
+						"user_pic":response["user_pic"],
+						"id":response["user_id"],
+						"timestamp":response["timestamp"],
+						"votes":0,
+						"body":body
+					})).hide().fadeIn(250)
+
+
+				} else console.log(response["errors"])
+			},
+
+			complete:function() {
+				// check if this was the first comment. if so, fix viz
+				if ($(".no-comments-module").length > 0) $(".comment-row :first").remove()
+				// animate stat container
+				var num_answers = parseInt($(".stat :eq(1)").text())
+				// Update stats container
+				var old_color = $(".stat :eq(1)").css("background-color")
+				$(".stat :eq(1)").animate({"background-color":"#E74C3C"}, 330, function() {
+					// Animate it red & change #
+					$(this).text(num_answers + 1).animate({"background-color":old_color}, 330)
+				})
+			}
+		});
+	};
+
+
+	function vote(el) {
+
+		var comment_id = $(el).parent().data("comment_id")
+		var conversation_id = getConversationId();
+		var value = ($(el).data("type") == "up") ? 1 : -1;
+
+		// Post to DB
+		$.ajax({
+			type: "POST",
+			url: "/api/voteComment/",
+			data: {"conversation_id":conversation_id, "comment_id":comment_id, "value":value, "csrfmiddlewaretoken":"{{csrf_token}}"},
+			dataType:"json",
+
+			beforeSend: function() {
+
+
+			},
+
+			success:function(response) {
+				if (response["result"] == "success") {
+					console.log("success")
+
+					// update DOM
+					// TODO: animation here
+					var vote = $(el).next()
+					var previous = $(vote).text()
+					$(vote).text(parseInt(previous) + 1)
+					
+				} else console.log(response["errors"])
+			},
+
+			complete:function() {
+
+			}
+		});
+
+	};
+
+	// Does some URL chopping to get conversation id
+	function getConversationId() {
+		var conversation_id = document.URL.substring(document.URL.indexOf("question/") + "question/".length)
+		if (conversation_id[conversation_id.length - 1] == "/") return conversation_id.substring(0, conversation_id.length - 1)
+		else return conversation_id
 	};
 
 
 
 
+</script>
 
+<script type="text/template" id="follower-photo-template">
+
+	<div class="followers-profile-pic">
+		<img src="<%=pic%>" title="<%=user_name%>" />
+	</div>
+				
+</script>
+
+<script type="text/template" id="single-comment-template">
+	<div class="comment-module">
+		<div class="comment-column-left">
+			<div class="profile-pic-container-small">
+				<img src="<%=user_pic%>"/>
+			</div>			
+
+				<!-- // <div data-comment_id="<%=id%>" class="vote-container">
+				// 	<div data-type="down" class="vote-button vote"><i class="icon-chevron-left"></i></div>
+				// 	<div class="comment-vote vote"><%=votes%></div>
+				// 	<div data-type="up" class="vote-button vote"><i class="icon-chevron-right"></i></div>
+
+				// </div>	-->				
+		</div>
+		<div class="comment-column-right">
+			<div class="body-text">
+				<%=body%>
+			</div>
+			</div>
+			<div class="comment-subtext">
+				Posted <%=timestamp%> ago by <a href="/profile/<%=user_id%>"><%=user_name%></a>
+			</div>
+
+		</div>
+	</div>
 </script>
 
 {% endblock %}

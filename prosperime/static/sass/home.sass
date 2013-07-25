@@ -4,7 +4,16 @@
 
 /* General Styles */
 
+$left-column-width: 0
+$right-column-width: 175px
+$center-column-width: $right-column-width - $left-column-width - 10
 
+$question-column-left-width: 75px
+$question-column-right-width: 720px - $question-column-left-width
+
+$comment-module-width: $question-column-right-width
+$comment-column-left-width: 35px
+$comment-column-right-width: $comment-module-width - $comment-column-left-width - 20px
 
 /* Left Column */
 
@@ -26,6 +35,30 @@
 		color: $white
 		cursor: pointer
 
+#left-question-column
+	margin-left: 0px
+	width: $left-column-width
+
+#center-question-column
+	margin-left: 0px
+	width: $center-column-width
+
+#right-question-column
+	margin-left: 0px
+	width: $right-column-width
+
+#question-page-container
+	padding-top: 24px
+
+
+/* Left Column */
+
+
+
+/* Main Content Styles */
+.body-text 
+	margin-bottom: 6px
+	line-height: 26px
 
 
 .single-question-module 
@@ -34,73 +67,79 @@
 
 .question-column-left 
 	display: inline-block 
-	width: 75px
-	margin-right: 5px
+	width: 110px
+	margin-right: 10px
 	vertical-align: top
 	
 .question-column-right 
-	width: 550px
+	width: $question-column-right-width
 	display: inline-block
 	vertical-align: top
 
+// Alternates for question page
+.question-questionPage-column-left
+	text-align: center
+	width: 15%
+	display: inline-block
+	vertical-align: top
+
+.question-questionPage-column-right
+	width: 80%
+	display: inline-block
+	vertical-align: top
+// END
+
 .question-title
-	font-size: 2em
+	font-size: 1.6em
 	margin-bottom: 12px
 	line-height: 32px
 
 .question-body 
-	margin-bottom: 6px
-	line-height: 26px
+	margin-top: 12px
+	margin-bottom: 12px
+
+.question-user-name
+	font-weight: normal
+	margin-top: 6px
+	
 
 .question-subtext 
 	margin-top: 5px
+
 
 .question-tags-container
 	margin-left: 90px
 
 .comment-column-left
 	@extend .question-column-left
-	width: 35px
+	width: $comment-column-left-width
 
 .comment-column-right
 	@extend .question-column-right
-	width: 400px
+	width: $comment-column-right-width
 
 .comment-body
 	font-size: 0.9em
 	line-height: 1.1em
 
-.follow-button 
-	width: 100px
-	height: 25px
-	line-height: 25px
-	background-color: #2ECC71
-	border-radius: 2px 
-	display: inline-block
-	margin-right: 16px
-	padding: 2px 2px
-	cursor: pointer
+.comment-subtext
+	font-size: 0.8em
+	line-height: 1.0em
+	text-align: right
 
-.following 
-	background-color: #C0C0C0
-	cursor: default
+
+.comment-vote
+	width: 30px
+	height: 20px
+	line-height: 20px
+	background-color: $darkgray
+	color: #fffffe
+	border-radius: 2px
 
 .comment-module
-	margin-left: 17%
-	width: 80%
+	/* margin-left: 85px*/
+	width: $comment-module-width
 	margin-top: 32px
-	img 
-		float: left
-		display: inline-block
-		width: 50px
-		height: 50px
-		border-radius: 50px
-		margin-right: 36px
-	
-	textarea
-		width: 80%
-		height: 50px
-		resize: none
 
 	.comment-button 
 		text-align: center
@@ -116,14 +155,148 @@
 		padding: 2px 2px
 		cursor: pointer
 
+.comment-textarea
+	width: $comment-column-right-width - 10
+	height: 20px
+	resize: none
+
+.comment-user
+	text-align: right
+
+.follow-button 
+	width: 100px
+	height: 25px
+	line-height: 25px
+	background-color: #2ECC71
+	border-radius: 2px 
+	display: inline-block
+	margin-right: 16px
+	padding: 2px 2px
+	cursor: pointer
+	text-align: center
+
+.following 
+	background-color: $lightgray
+	cursor: default
+
+
+.vote-container
+	border-radius: 2px
+	line-height: 24px
+	vertical-align: top
+	text-align: center
+	margin-top: 12px
+
+.vote
+	display: inline-block
+	margin: 0 auto
+
+	i
+		cursor: pointer
+		transition: color
+
+.vote-button .icon-chevron-left
+	&:hover
+		color: $button-red
+
+.vote-button .icon-chevron-right
+	&:hover
+		color: $button-green
+
+
+.no-comments-module 
+	text-align: center
+	margin-top: 18px
+
+.call-out-text
+	background-color: $lightblue
+	border-radius: 1px
+	color: $white
+
+.center-question-column-module
+	border-bottom: 1px solid #e0e0e0
+	padding-left: 36px
+	padding-right: 24px
+	padding-top: 24px
+	padding-bottom: 24px
+
+
 /* Right Column Styles */
 
-.right-column-module
-	margin-bottom: 10px
+.right-question-column-module
+	padding: 8px 10px
+	padding-top: 24px
+	padding-bottom: 12px	
 
-.module-header
-	font:
-		size: 18px
-		color: #181818
-	line-height: 24px
-	margin-bottom: 10px
+.related-question 
+	margin-top: 6px
+	
+	a
+		text-decoration: none
+
+.followers-module
+
+	p
+		margin-top: 6px
+
+	.followers-profile-pic
+		display: inline-block
+		margin: 0
+		width: 48px
+		height: 48px
+		margin-top: 6px
+
+		img
+			border-radius: 48px
+
+	.followers-more-followers
+		text-align: right
+		margin-top: 6px
+
+
+/* Ask Question Page Extra Styles */
+.ask-header
+	font-size: 2.0em
+	margin-bottom: 16px
+	
+.form-module
+	padding-left: 24px
+	padding-right: 24px
+	padding-top: 12px
+	padding-bottom: 24px
+
+
+#ask-question-form 
+	#ask-form-title
+		width: 650px
+		height: 40px
+		line-height: 40px
+		font-size: 1.2em
+ 
+	.chzn-select
+		width: 400px
+
+	.control-group
+		margin-top: 12px
+		margin-bottom: 36px
+
+
+	textarea
+		resize: none
+		width: 650px
+		line-height: 24px
+		height: 80px
+
+	.submit-button
+		width: 115px
+		height: 45px
+		line-height: 45px
+		border-radius: 2px
+		text-align: center
+		background-color: rgba(39,174,96,1)
+		display: inline-block
+		margin: 0 auto
+		font-size: 1.2em
+		padding: 6px 6px
+		cursor: pointer
+
