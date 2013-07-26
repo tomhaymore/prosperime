@@ -120,6 +120,9 @@ $(function(){
 			// Listen to filter button
 			$("#search-conversations-button").on("click", function(ev) {
 
+				// var url = $.param({'query':$("input#search-conversations-input").val()});
+				var url = "search/" + encodeURIComponent($("input#search-conversations-input").val())
+
 				window.App.navigate(url, {trigger:true})
 			})
 
