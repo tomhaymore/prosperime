@@ -56,8 +56,8 @@ body {
   margin-left: auto;
   margin-right: auto;
   background-image: none;
-  padding-top: 15px;
-  padding-bottom: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
   min-height: 40px; }
 
 img#main-logo {
@@ -242,6 +242,25 @@ div.footer {
 .form-nav {
   margin-top: 15px;
   margin-bottom: 15px; }
+
+.form-left-column {
+  max-width: 625px;
+  margin-right: 45px;
+  float: left; }
+
+.form-right-column {
+  width: 300px;
+  float: left; }
+
+.form-help {
+  width: 300px;
+  margin-top: 25px;
+  position: fixed;
+  display: none;
+  background-color: #6fb6d4;
+  color: #fffffe;
+  padding: 5px;
+  border-radius: 2px; }
 
 /* Picture Styles */
 .profile-pic-container, .profile-pic-container-small {

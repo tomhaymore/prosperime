@@ -52,12 +52,8 @@ def login(request):
 			if user is not None:
 				auth_login(request,user)
 				messages.success(request, 'You have successfully logged in.')
-<<<<<<< HEAD
 				return HttpResponseRedirect('/')
 
-=======
-				return HttpResponseRedirect('/home/')
->>>>>>> 6ec5a8a07821c224202f47f6da1cf3a94df001bc
 		
 	else:
 		form = AuthForm()

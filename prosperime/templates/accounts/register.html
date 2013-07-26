@@ -1,7 +1,7 @@
 {% extends "base_full.html" %}
 
 {% block head %}
-
+<script type="text/javascript" src="{{ STATIC_URL }}js/accounts.js"></script>
 	
 {% endblock %}
 
@@ -12,29 +12,33 @@
 	<a id="linkedin_authenticate" class="flat-button lightblue-button" href="/account/authorize/" title="Quick and easy registration with LinkedIn">Register with LinkedIn</a> 
 </div>
 <p></p>
-<div id="register-form-container">
+<div id="register-form-container" class="form-left-column">
 <form action="" method="post" name="finish_login">
 	{% csrf_token %}
 
-		<p><label for="id_full_name">Full Name:</label>
+		<p class="form-input-container"><label for="id_full_name">Full Name:</label>
 			{{form.full_name.errors}}
 			<input type="text" name="full_name" id="id_full_name" /></p>
-		<p><label for="id_username">Email:</label>
+		<p class="form-input-container"><label for="id_username">Email:</label>
 			{{form.username.errors}}
 			<input type="text" name="username" id="id_username" /></p>
-		<p><label for="id_location">Location:</label>
+		<p class="form-input-container"><label for="id_location">Location:</label>
 			{{form.location.errors}}
 			<input type="text" name="location" id="id_location" /></p>
 		
-		<p><label for="id_password">Password:</label>
+		<p class="form-input-container"><label for="id_password">Password:</label>
 			{{form.password.errors}}
 			<input type="password" name="password" id="id_password" /></p>
-		<p><label for="id_confirm_password">Confirm Password:</label>
+		<p class="form-input-container"><label for="id_confirm_password">Confirm Password:</label>
 			{{form.confirm_password.errors}}
 			<input type="password" name="confirm_password" id="id_confirm_password" /></p>
-		<p><input class="pull-left" type="checkbox" name="terms" id="id_terms" />
+		<p class="form-input-container"><input class="pull-left" type="checkbox" name="terms" id="id_terms" />
 			<label class="left-spacer pull-left" for="id_terms">&nbsp;I have read and understand the <a href='/terms'>Terms of Service</a> and <a href='/privacy'>Privacy Policy</a>.</label><div class="clear"></div>
 			{{form.terms.errors}}
+		</p>
+		<p class="form-input-container"><input class="pull-left" type="checkbox" name="notification" id="id_notification" />
+			<label class="left-spacer pull-left" for="id_notification">&nbsp;Please keep me updated on changes and improvements to ProsperMe.</label><div class="clear"></div>
+			{{form.notification.errors}}
 		</p>
 	</ul>
 	<fieldset>
@@ -42,6 +46,22 @@
 	</fieldset>
 </form>
 </div>
+<div class="form-right-column">
+	<div class="form-help" data-target="id_full_name">
+		Include your first and last name. This will help potential friends and contacts identify and connect with you.
+	</div>
+	<div class="form-help" data-target="id_username">
+		Be sure to you use an email address from a college or university. This is how we verify where you went to school and keep ProsperMe safe and trusted.
+	</div>
+	<!-- <div class="form-help" data-target="id_terms">
+		These terms help you and ProsperMe respect each others rights and privacy.
+	</div>
+	<div class="form-help" data-target="id_notification">
+		Let's stay in touch
+	</div> -->
+
+</div>
+<div class="clear"></div>
 </div>
 {% endblock %}
 

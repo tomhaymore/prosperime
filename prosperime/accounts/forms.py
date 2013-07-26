@@ -53,7 +53,8 @@ class RegisterForm(forms.Form):
 	confirm_password = forms.CharField(widget=forms.PasswordInput,label="Confirm Password")
 	terms = forms.BooleanField(required=True,
 								label=mark_safe("I have read and understand the <a href='/terms'>Terms of Service</a> and <a href='/privacy'>Privacy Policy</a>."),
-								error_messages={'required':'You must agree to the Terms of Service and Privacy Policy to use Prospr.me.'})
+								error_messages={'required':'You must agree to the Terms of Service and Privacy Policy to use ProsperMe.'})
+	notification = forms.BooleanField(required=False,label=mark_safe("Please keep me updated on changes and improvements to ProsperMe."))
 
 	def clean_username(self):
 		username = self.cleaned_data['username']
