@@ -457,67 +457,42 @@ def api_vote_comment(request):
 
 # Starts a new conversation (AJAX)
 def api_start_conversation(request):
-
+	from social.forms import ConversationForm
 	response = {
 		"errors":[],
 		"result":None,
 	}
 
-	# check that ajax
-	if not request.is_ajax:
-		response["errors"].append("Not an AJAX request")
-	# check that POST
-	if not request.POST:
-		response["errors"].append("Not a POST request")
-	# check for params
-	try:
-		title = request.POST.get("title")
-		body = request.POST.get("body")
-		tag_ids = request.POST.getlist("tags[]")
-	except:
-		response["errors"].append("Missing data from template.")
-	
-	# If there were errors, respond before creating object
-	if len(response["errors"]) > 0:
-		response["result"] = "failure"
+	# check that ajax and post
+	if not request.is_ajax or not request.POST:
+		response["errors"].append("Something went wrong with our connection, please try again.")
 		return HttpResponse(json.dumps(response))
 
-
-	# try to create the new conversation
-	conversation_id = -1
-	c = None
-	try:
+	# load form
+	form = ConversationForm(request.POST)
+	# validate form
+	if form.is_valid():
+		# create new conversation
 		c = Conversation()
-		c.name = title
-		c.summary = body
+		c.name = form.cleaned_data['name']
+		c.summary = form.cleaned_data['summary']
 		c.owner = request.user
 		c.save()
-		conversation_id = c.id
-	except:
-		response["errors"].append("Failed instantiating Conversation")
-
-	# now add tags
-	try:
-		# convert unicode to ints
-		tag_ids = [int(t) for t in tag_ids]
-		# get tags from ids
-		tags = Tag.objects.filter(id__in=tag_ids)
-		for t in tags:
+		# add tags
+		for t in form.cleaned_data['tags']:
 			c.tags.add(t)
 		c.save()
-
-	except:
-		response["errors"].append("Failed to add Tags to new Conversation")
-
-	# check for any final errors
-	if len(response["errors"]) > 0:
-		response["result"] = "failure"
-	# return the id of the recently created conversation
-	else:
+		# add flags
 		response["result"] = "success"
-		response["conversation_id"] = conversation_id
+		response["conversation_id"] = c.id
+		return HttpResponse(json.dumps(response))
+	else:
+		# dump form errors	
+		response['errors'] = form.errors
+		response['result'] = 'failure'
+		return HttpResponse(json.dumps(response))	
 
-	return HttpResponse(json.dumps(response))
+
 
 def saveComment(request):
 
