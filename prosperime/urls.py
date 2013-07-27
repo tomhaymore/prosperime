@@ -46,9 +46,10 @@ urlpatterns = patterns('',
     url(r'^api/addComment/$', 'social.views.api_add_comment'),
     url(r'^api/voteComment/$', 'social.views.api_vote_comment'),
 
-    # Recruiter Views
-    url(r'^recruiters/$', 'social.views.recruiters'),
-    url(r'^recruiters/thanks/$', 'social.views.recruiters_thanks'),
+    # Partner Views
+    url(r'^employers/$', 'social.views.recruiters'),
+    url(r'^employers/thanks/$', 'social.views.recruiters_thanks'),
+    url(r'^partners/', 'social.views.partners'),
 
     # Social - AJAX
     url(r'^social/saveComment/$', 'social.views.saveComment'),

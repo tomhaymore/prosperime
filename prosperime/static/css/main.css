@@ -33,6 +33,10 @@ body {
 .clear {
   clear: both; }
 
+.half {
+  float: left;
+  width: 50%; }
+
 #search-container {
   width: 630px;
   height: 50px; }
@@ -91,7 +95,8 @@ div#content-container {
   margin-left: auto;
   margin-top: 15px;
   min-height: 500px;
-  padding: 5px 0 5px 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
   background-color: white; }
 
 div#background-container {
@@ -109,6 +114,12 @@ div.splash-container {
   color: #253139;
   margin-bottom: 25px;
   margin-top: 10px; }
+
+.feature-page-subheader {
+  font-size: 1.7em;
+  font-family: "Helvetica Neue", Helvetica, "Lato";
+  color: #253139;
+  margin-bottom: 10px; }
 
 .main-sub-header {
   font-size: 1.2em;
@@ -152,7 +163,7 @@ ul.messages {
   list-decoration: none; }
 
 /* Button Styles */
-.flat-button, .green-button, .submit-button, .lightblue-button {
+.flat-button, .green-button, .submit-button, .blue-button, .blue-button-showcase, .lightblue-button {
   display: inline-block;
   vertical-align: middle;
   width: auto;
@@ -173,11 +184,11 @@ ul.messages {
 .search-button {
   vertical-align: top; }
 
-a.flat-button:hover, a.green-button:hover, a.submit-button:hover, a.lightblue-button:hover {
+a.flat-button:hover, a.green-button:hover, a.submit-button:hover, a.blue-button:hover, a.blue-button-showcase:hover, a.lightblue-button:hover {
   text-decoration: none;
   color: white; }
 
-.flat-button a:hover, .green-button a:hover, .submit-button a:hover, .lightblue-button a:hover {
+.flat-button a:hover, .green-button a:hover, .submit-button a:hover, .blue-button a:hover, .blue-button-showcase a:hover, .lightblue-button a:hover {
   text-decoration: none;
   color: #fffffe; }
 
@@ -197,9 +208,14 @@ a.flat-button:hover, a.green-button:hover, a.submit-button:hover, a.lightblue-bu
   line-height: 12px;
   font-size: 12px; }
 
-.blue-button {
+.blue-button, .blue-button-showcase {
   background-color: #296298;
   color: #fffffe; }
+
+.blue-button-showcase {
+  width: 325px;
+  font-size: 20px;
+  line-height: 36px; }
 
 .lightblue-button {
   background-color: #6fb6d4;
@@ -335,3 +351,25 @@ div.footer {
   height: 20px;
   border-radius: 2px;
   line-height: 20px; }
+
+/* Partner Styles */
+.partner-info {
+  margin-bottom: 12px;
+  text-align: left;
+  padding-top: 12px;
+  line-height: 26px;
+  font-size: 18px;
+  font-family: Helvetica, Arial;
+  font-weight: 300; }
+
+.promo-header {
+  font-size: 20px;
+  font-weigth: 500; }
+
+.promo-text {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 30px; }
+
+.promo-left, .promo-right {
+  width: 450px; }

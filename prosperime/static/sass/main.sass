@@ -34,6 +34,10 @@ body
 .clear
 	clear: both
 
+.half
+	float: left
+	width: 50%
+
 $left-column-width: 0px
 $right-column-width: 200px
 $center-column-width: 1000px - $left-column-width - $right-column-width - 20
@@ -105,7 +109,9 @@ div#content-container
 		left: auto
 		top: 15px
 	min-height: 500px
-	padding: 5px 0 5px 0
+	padding:
+		top: 5px 
+		bottom: 5px
 	background-color: #fff
 
 div#background-container
@@ -124,6 +130,13 @@ div.splash-container
 	color: $feature-page-header 
 	margin-bottom: 25px
 	margin-top: 10px
+
+.feature-page-subheader
+	font:
+		size: 1.7em
+		family: "Helvetica Neue", Helvetica, "Lato"
+	color: $feature-page-header
+	margin-bottom: 10px
 
 .main-sub-header
 	font:
@@ -223,8 +236,15 @@ a.flat-button:hover
 	font-size: 12px
 
 .blue-button 
+	@extend .flat-button
 	background-color: rgb(41,98,152)
 	color: $white
+
+.blue-button-showcase
+	@extend .blue-button
+	width: 325px
+	font-size: 20px
+	line-height: 36px
 
 .lightblue-button
 	@extend .flat-button
@@ -381,3 +401,49 @@ div.footer
 	height: 20px
 	border-radius: 2px
 	line-height: 20px
+
+/* Partner Styles */
+
+.partner-info
+	margin-bottom: 12px
+	text-align: left
+	padding-top: 12px
+	line-height: 26px
+	font:
+		size: 18px
+		family: Helvetica, Arial
+		weight: 300
+
+.promo-header
+	font-size: 20px
+	font-weigth: 500
+
+.promo-text
+	margin-top: 10px
+	font-size: 14px
+	line-height: 30px
+
+.promo-left, .promo-right
+	width: 450px
+
+//.promo-container
+//	border-left:
+//		style: solid
+//		color: $lightgray
+//		width: 1px
+//	border-right:
+//		style: solid
+//		color: $lightgray
+//		width: 1px
+	
+
+//.promo-module
+//	padding:
+//		left: 25px
+//		right: 25px
+//		top: 25px
+//		bottom: 25px
+//	border-top:
+//		style: solid
+//		color: $lightgray
+//		width: 1px

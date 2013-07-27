@@ -2,31 +2,95 @@
 
 {% block head %}
 
-<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/contact.css" />
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/welcome.css" />
 
+	<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Source+Sans+Pro|Signika+Negative|Bitter|Volkhov">
 
+{% endblock %}
+
+<!-- Messages -->
+{% block message %}
 {% endblock %}
 
 {% block content %}
 
-<div id="content-container" class="main-container">
-		
+<div id="content-container" class="promo-container">
 
-
-
-	<!-- Contact -->
-	<div>
-		<p class="feature-page-header">Partner with ProsprMe</div>
-
-		<div class="content">
-			<div>
-				<p>Interested in partnering with ProsprMe? Our career exploration tools are free for students and we offer a free portal to career services offices at colleges and universities. With this portal, you can keep track of your alumni, guide and advise your students, and give potential employers more information about what kinds of jobs your student body is interested in.
+		<div class="splash-module-left pull-left" style="margin-top:75px;margin-bottom:75px;">
+			<div class="pull-left">
+				<p class="splash-message-header">Stay connected to alumni</p>
+				<p class="splash-message-header">Easily track and guide students</p>
+				<p class="splash-submessage no-hover">
+					<form method="POST">
+						{% csrf_token %}
+						<input type="text" class="flat-input" name="email" id="email-input" style="width:275px;" placeholder="Enter your email address" />
+						<input type="submit" style="vertical-align:top;" value="Get More Info" id="get-more-info-button" class="flat-button green-button">
+						<!-- <a id="get-more-info-button" class="green-button">Get More Info</a> -->
+						{{form.email.errors}}
+					</form>
 			</div>
-			<div>
-				<p>If you interested, please contact as at <a href="mailto:partners@prospr.me">partners@prospr.me</a>. We'll get back to you within 24 hours.
+			<div class="pull-left">
+				<img src="/static/img/schools_splash_head.png" class="promo-splash-img" />
 			</div>
+			<div class="clear"></div>
 		</div>
+		<div class="clear"></div>
+
+	<div class="promo-module">
+		<div class="promo-left pull-left">
+			<img src="/static/img/schools_splash_1.png" class="promo-splash-img" />
+		</div>
+		<div class="promo-right pull-left">
+			<p class="promo-header">
+				Stay connected to alumni
+			</p>
+			<p class="promo-text">
+				ProsperMe gives schools a lifetime connection to their alumni and makes it easy to connect them with current students and monitor their progress through their careers.
+			</p>
+		</div>
+		<div class="clear"></div>
 	</div>
 
-</div>
+	<div class="promo-module">
+		<div class="promo-left pull-left">
+			<p class="promo-header">
+				Easily track and guide students
+			</p>
+			<p class="promo-text">
+				With ProsperMe, schools can keep track of their students career plans and advise them from anywhere, anytime. Be part of the conversation students, alumni and other professionals are having every day about their careers.
+			</p>
+		</div>
+		<div class="promo-right pull-left">
+			<img src="/static/img/schools_splash_2.png" class="promo-splash-img" />
+		</div>
+		<div class="clear"></div>
+	</div>
+
+	<div class="promo-module">
+		<div class="promo-left pull-left">
+			<img src="/static/img/schools_splash_3.png" class="promo-splash-img" />
+		</div>
+		<div class="promo-right pull-left">
+			<p class="promo-header">
+				Insights and advanced reporting
+			</p>
+			<p class="promo-text">
+				Go beyond email surveys and spreadsheets. Get on-demand reporting that tells you where your alumni are and how they got there, down to the level of majors and salaries.
+			</p>
+		</div>
+		<div class="clear"></div>
+	</div>
+
 {% endblock %}
+
+{% block promo %}
+
+
+{% endblock %}
+
+{% block templates %}
+
+{% endblock %}
+
+
+

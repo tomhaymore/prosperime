@@ -26,7 +26,6 @@ def welcome(request):
 		return HttpResponseRedirect('/home')
 	return render_to_response('welcome.html',context_instance=RequestContext(request))
 
-@login_required
 def home(request):
 
 	# check if user is logged in
@@ -578,6 +577,9 @@ def thread(request, thread_id):
 
 
 	return render_to_response("social/thread.html",data,context_instance=RequestContext(request))
+
+def partners(request):
+	return render_to_response("partners.html",context_instance=RequestContext(request))
 
 ## DEPRECATED: keep around for now for code review
 def create_thread(request):
