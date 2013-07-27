@@ -8,7 +8,17 @@ a {
   cursor: pointer; }
 
 ul {
-  list-decoration: none; }
+  list-style: none;
+  margin-left: 0px; }
+
+li {
+  line-height: 1.4em;
+  margin-top: 5px;
+  margin-bottom: 5px; }
+
+label {
+  font-weight: 500;
+  font-size: 16px; }
 
 body {
   color: #333333; }
@@ -97,7 +107,7 @@ div.splash-container {
   font-size: 2.5em;
   font-family: "Helvetica Neue", Helvetica, "Lato";
   color: #253139;
-  margin-bottom: 15px;
+  margin-bottom: 25px;
   margin-top: 10px; }
 
 .main-sub-header {
@@ -142,7 +152,7 @@ ul.messages {
   list-decoration: none; }
 
 /* Button Styles */
-.flat-button, .green-button, .lightblue-button {
+.flat-button, .green-button, .submit-button, .lightblue-button {
   display: inline-block;
   vertical-align: middle;
   width: auto;
@@ -163,15 +173,19 @@ ul.messages {
 .search-button {
   vertical-align: top; }
 
-a.flat-button:hover, a.green-button:hover, a.lightblue-button:hover {
+a.flat-button:hover, a.green-button:hover, a.submit-button:hover, a.lightblue-button:hover {
   text-decoration: none;
   color: white; }
 
-.flat-button a:hover, .green-button a:hover, .lightblue-button a:hover {
+.flat-button a:hover, .green-button a:hover, .submit-button a:hover, .lightblue-button a:hover {
   text-decoration: none;
   color: #fffffe; }
 
 .green-button {
+  background-color: #339933;
+  color: #fffffe; }
+
+.submit-button {
   background-color: #339933;
   color: #fffffe; }
 
@@ -232,12 +246,21 @@ div.footer {
   padding-top: 10px; }
 
 /* Form Styles */
-.flat-input {
+.flat-input, .flat-input-wide, .flat-textarea, .flat-textarea-wide {
   border-radius: 0px;
   width: 275px;
-  font-size: 18px;
+  font-size: 14px;
   height: 24px;
   color: rgba(51, 51, 51, 0.8); }
+
+.flat-input-wide {
+  width: 450px; }
+
+.flat-textarea, .flat-textarea-wide {
+  height: 48px; }
+
+.flat-textarea-wide {
+  width: 450px; }
 
 .form-nav {
   margin-top: 15px;
@@ -245,12 +268,18 @@ div.footer {
 
 .form-left-column {
   max-width: 625px;
-  margin-right: 45px;
+  margin-right: 65px;
   float: left; }
 
 .form-right-column {
-  width: 300px;
+  min-width: 300px;
+  max-width: 350px;
   float: left; }
+
+.form-instructions {
+  padding: 5px;
+  background-color: rgba(44, 93, 130, 0.3);
+  border-radius: 2px; }
 
 .form-help {
   width: 300px;

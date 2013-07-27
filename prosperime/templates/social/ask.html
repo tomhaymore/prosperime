@@ -21,48 +21,68 @@
 
 	
 <!-- Main -->
-<div id="question-page-container" class="row-fluid">
-
-	<!-- Left -->
-	<div class="span2">
-		
-	</div>
+<div id="content-container">
 	
+	<div class="feature-page-header">Start a Conversation</div>
+
 	<!-- Center -->
-	<div class="span8">
-		<div class="form-module" style="text-align:center;">
+	<div id="ask-form-container" class="form-left-column">
 
-			<div class="ask-header">Start a Conversation</div>
 
-			<form id="ask-question-form">
-				<div class="control-group"> <!-- TODO: add maxlength attributes to these -->
-					<input id="ask-form-title" type="text" name="title" placeholder="Question Title" maxlength="200" autofocus />
-					<label>Keep the title of your question short and to the point. Something like: <br/>
-						<i>What are the most important skills to develop in college for an aspiring management consultant?</i>
-					</label>
+<!-- 		<div class="form-module" style="text-align:center;"> -->
+
+			
+
+			<!-- <div class="question-column-left">
+				<div class="profile-pic-container">
+					<img src="{{user.profile.default_profile_pic}}" title="{{user.profile.full_name}}" />
 				</div>
+			</div> -->
+<!-- 			<div class="question-column-right"> -->
+				<form id="ask-question-form">
+					<div class="errors">
 
-				<div class="control-group">
-					<textarea title="body" placeholder="Your question here"></textarea>
-					<label>Here, dive into the specifics that are relevant to you and your question. Describe your background, skills, and interests. Even more importantly, detail your goals and where you hope to be in the future.</label>
-				</div>
+					</div>
+					<p class="form-input-container"> <!-- TODO: add maxlength attributes to these -->
+						<label for="id_name">Title</label>
+						<input class="flat-input-wide" id="id_name" type="text" name="name" placeholder="What's your question?" maxlength="200" autofocus />
+						
+					</p>
 
-				<div class="control-group">	
-					<select class="chzn-select" multiple data-placeholder="Tags">
-						{% for t in tags %}
-							<option value="{{t.id}}">{{t.name}}</option>
-						{% endfor %}
-					</select>	
-					<label>Add all tags that are relevant to this question--tags help other people like you find this question, and it helps potential answerers get you the knowledge that you need!</label>
-				</div>	
+					<p class="form-input-container">
+						<label for="id_body">Summary</label>
+						<textarea class="flat-textarea-wide" id="id_body" title="body" placeholder="Give some background"></textarea>
+					</p>
 
-				<div class="submit-button disabled">Post Question</div>
-		</div>
+					<p class="form-input-container">
+						<label for="id_tags">Tags</label>
+						<select class="chzn-select flat-input-wide" id="id_tags" multiple data-placeholder="Tags">
+							{% for t in tags %}
+								<option value="{{t.id}}">{{t.name}}</option>
+							{% endfor %}
+						</select>	
+					</p>	
+
+					<a class="submit-button disabled">Post</a>
+				</form>
+			<!-- </div> -->
+		<!-- </div> -->
 	</div>
 
 	<!-- Right --> 
-	<div class="span2">
-		
+	<div class="form-right-column" style="margin-top:20px;">
+		<div class="form-instructions">
+			<div class="module-header">Quick Tips</div>
+				<ul>
+					<li>Keep your title  short and to the point.</li>
+					<li>In the summary include relevant specifics.</li>
+					<li>Describe your background, skills, interests when relevant.</li>
+					<li>Detail your goals and preferences.</li>
+					<li>Tags help other users find (and answer) your qeustions.</li>
+					<li>Include easy-to-remember categories like majors, schools, careers.</li>
+				</ul>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -79,18 +99,18 @@
 		$(".chzn-select").chosen();
 
 		// Listen for valid form
-		$(document).on("keypress", checkForm).on("click", checkForm);
+		$("input,textarea").on("keyup",checkForm);
 
 		// Click on form
-		$(".submit-button").on("click", submitForm)
+		$(".submit-button").on("click", submitForm);
 	});
 
 
 	function checkForm(ev) {
 		// See if form is valid
 		// Currently, no minimum # of tags requirement
-		// TODO: any sort of validation
-		if($("#ask-form-title").val().length != 0 && $("#ask-question-form textarea").val().length != 0) {
+		// TODO: any sort of validation`
+		if($("#id_name").val().length != 0 && $("#id_body").val().length != 0) {
 			// form is valid
 			if ($(".disabled").length > 0) 
 				$(".submit-button").removeClass("disabled")
@@ -106,29 +126,31 @@
 		// Don't allow if disabled
 		if ($(ev.currentTarget).hasClass("disabled")) return false;
 
-		var title = $("#ask-question-form").find("input :first").val(),
-			body = $("#ask-question-form").find("textarea").val(),
-			tag_ids = $("#ask-question-form").find("select").val(),
+		var name = $("#id_name").val(),
+			summary = $("#id_body").val(),
+			tag_ids = $("#id_tags").val(),
 			conversation_id;
 
-		console.log(tag_ids)
+		console.log(tag_ids);
 		
 		// TODO: AJAX to DB
 		$.ajax({
 			type: "POST",
 			url: "/api/startConversation/",
-			data: {"title":title, "body":body, "tags":tag_ids, "csrfmiddlewaretoken":"{{csrf_token}}"},
+			data: {"name":name, "summary":summary, "tags":tag_ids, "csrfmiddlewaretoken":"{{csrf_token}}"},
 			dataType:"json",
 			beforeSend: function() {
 
 			},
 			success:function(response) {
 				if (response["result"] == "success") {
-					console.log("success")
-					conversation_id = response["conversation_id"]
-					formSuccess(conversation_id)
+					console.log("success");
+					conversation_id = response["conversation_id"];
+					formSuccess(conversation_id);
 
-				} else console.log(response["errors"])
+				} else {
+					$(".errors").html(response['errors']);
+				}
 			},
 			complete:function() {
 			}

@@ -20,7 +20,15 @@
 // });
 
 $(function() {
-  setTimeout(function() {
-    $("ul.messages li.success").remove();
-  },5000)
+  // listen for rollovers on form elements for showig info
+	$(".form-input-container").focus(function() {
+		var yOffset = $(this).offset().top
+		var labelId = $(this).find("input").attr("id");
+		$(".form-help[data-target='"+labelId+"']").show().offset({top:yOffset})
+
+	});
+	$(".form-input-container").blur(function() {
+		var labelId = $(this).find("input").attr("id");
+		$(".form-help[data-target='"+labelId+"']").hide();
+	});
 });

@@ -248,25 +248,8 @@
   height: 40px;
   line-height: 40px;
   font-size: 1.2em; }
-#ask-question-form .chzn-select {
-  width: 400px; }
 #ask-question-form .control-group {
   margin-top: 12px;
   margin-bottom: 36px; }
 #ask-question-form textarea {
-  resize: none;
-  width: 650px;
-  line-height: 24px;
-  height: 80px; }
-#ask-question-form .submit-button {
-  width: 115px;
-  height: 45px;
-  line-height: 45px;
-  border-radius: 2px;
-  text-align: center;
-  background-color: #27ae60;
-  display: inline-block;
-  margin: 0 auto;
-  font-size: 1.2em;
-  padding: 6px 6px;
-  cursor: pointer; }
+  resize: none; }
