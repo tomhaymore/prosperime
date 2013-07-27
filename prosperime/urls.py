@@ -52,7 +52,7 @@ urlpatterns = patterns('',
 
     # Social - AJAX
     url(r'^social/saveComment/$', 'social.views.saveComment'),
-    url(r'^social/followThread/$', 'social.views.followThread'),
+    # url(r'^social/followThread/$', 'social.views.followThread'),
     url(r'^social/unfollowThread/$', 'social.views.unfollowThread'),   
     url(r'^social/updateVotes/$', 'social.views.updateVotes'),
     url(r'^social/postComment/$', 'social.views.postComment'),
