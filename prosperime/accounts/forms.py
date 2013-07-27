@@ -127,7 +127,7 @@ class AddEducationForm(forms.Form):
 
 class AddExperienceForm(forms.Form):
 	title = forms.CharField(label="Title")
-	description = forms.CharField(label="Descrption",required=False)
+	description = forms.CharField(label="Description",required=False)
 	entity = forms.CharField(label="Organization")
 	start_date = forms.DateField(label="Start date",input_formats=date_formats,required=False)
 	end_date = forms.DateField(label="End date",input_formats=date_formats,required=False)
