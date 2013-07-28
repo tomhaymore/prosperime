@@ -97,25 +97,23 @@
 			<% } %>
 
 
-			<% for (c in comments) %>
+			<% if (comments.length > 0) %>
 				<div class="comment-column-left">
-					<div class="profile-pic-container-small"><img src="<%=comments[c].owner_pic%>" /></div>
+					<div class="profile-pic-container-small"><img src="<%=comments[0].owner_pic%>" /></div>
 				</div>
 				<div class="comment-column-right">
-					<div class="comment-body"><%=comments[c].body%></div>
+					<div class="comment-body"><%=comments[0].body%></div>
 				</div>
 			
-
 			<div class="question-subtext">
 				<% if (comments.length == 0) { %>
 					<a href="/question/<%=id%>">Be the first to answer</a>
 				<% } else if (comments.length == 1) { %>
-					<a href="/question/<%=id%>">See <%=comments.length%> answer 
+					<a href="/question/<%=id%>">Add your own answer</a>
 				<% } else { %>
-					<a href="/question/<%=id%>">See <%=comments.length%> answers 
+					<a href="/question/<%=id%>">See all <%=comments.length%> answers </a>
 				<% } %> 
 
-				</a>
 			</div>
 
 
