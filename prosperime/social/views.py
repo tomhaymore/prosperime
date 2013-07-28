@@ -118,7 +118,7 @@ def question(request, conversation_id):
 
  	# (4) Get popular tags
  	## TODO: popular_tags API
- 	popular_tags = Tag.objects.all()[:8].values("name", "id")
+ 	popular_tags = Tag.objects.order_by("-count")[:10]
 
  	# (5) Get related questions
  	## TODO: related_questions API

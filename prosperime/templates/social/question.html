@@ -251,7 +251,7 @@
 			<div class="module-header">Popular Tags</div>
 			{% for t in popular_tags %}
 <!-- 			<div class="tag">{{t.name}}</div> -->
-				<p><a href="/home/#tag/{{t.id}}/" class="tag">{{t.name}}</a></p>
+				<p><a href="/tags/{{t.url_name}}/" class="tag">{{t.name}}</a></p>
 			{% endfor %}
 		</div>
 		
