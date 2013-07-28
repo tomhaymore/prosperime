@@ -50,7 +50,7 @@
 
 		{% if comments %}
 			{% for c in comments %}
-			<div class="comment-module">
+			<div class="comment-module comment-row">
 
 
 				<div class="comment-column-left">
@@ -387,14 +387,14 @@
 
 			success:function(response) {
 				if (response["result"] == "success") {
-					console.log("success")
 					
 					// append comment to DOM
 					var template = _.template($("#single-comment-template").html())
 					$(".comment-row :last").after(template({
 						"user_name":response["user_name"],
 						"user_pic":response["user_pic"],
-						"id":response["user_id"],
+						"id":response["id"],
+						"user_id":response["user_id"],
 
 						"timestamp":response["created"],
 
