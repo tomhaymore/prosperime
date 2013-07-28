@@ -31,4 +31,13 @@ $(function() {
 		var labelId = $(this).find("input").attr("id");
 		$(".form-help[data-target='"+labelId+"']").hide();
 	});
+
+	$("#search-conversations-button").on("click", function(ev) {
+
+				// var url = $.param({'query':$("input#search-conversations-input").val()});
+				var url = "search/" + encodeURIComponent($("input#search-conversations-input").val()) + "/"
+
+				window.location = url;
+				// window.App.navigate(url, {trigger:true})
+			});
 });

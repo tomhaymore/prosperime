@@ -48,6 +48,33 @@ def home(request):
 
 	return render_to_response("social/home.html", data, context_instance=RequestContext(request))
 
+@login_required
+def search(request):
+	popular_tags = Tag.objects.order_by("-count")[:10]
+
+	data = {
+		"popular_tags": popular_tags
+	}
+
+	return render_to_response("social/search.html", data, context_instance=RequestContext(request))
+
+@login_required
+def tags(request,tag_name):
+	# get popular tags
+	popular_tags = Tag.objects.order_by("-count")[:10]	
+
+	# get tag
+	tag = Tag.objects.get(url_name=tag_name)
+
+	questions = Conversation.objects.filter(tags=tag)
+
+	data = {
+		"tag": tag,
+		"questions": questions,
+		"popular_tags": popular_tags
+	}
+
+	return render_to_response("social/tags.html", data, context_instance=RequestContext(request))
 
 @login_required
 def ask(request):
@@ -180,7 +207,8 @@ def api_conversation_search(request):
 		'no_comments':len(c.comments.all()),
 		'tags':[{
 			'id':t.id,
-			'name':t.name
+			'name':t.name,
+			'url_name':t.url_name
 			} for t in c.tags.all()],
 		'comments':[{
 			'id':comment.id,

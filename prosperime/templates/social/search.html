@@ -12,7 +12,7 @@
 <!-- JS -->
 	<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>
-	<script type="text/javascript" src="{{ STATIC_URL }}js/home.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/search.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/typeahead.min.js"></script>
 
 {% endblock %}
@@ -38,7 +38,7 @@
 	<!-- Center -->
 	<div id="center-column" class="pull-left">
 		
-		<div class="feature-page-header">Conversations: <span class="filter-tags">Most Recent</span></div>
+		<div class="feature-page-header">Search Results</div>
 
 		<div id="questions-list-container"></div>
 	</div>
@@ -106,6 +106,7 @@
 				</div>
 			
 
+
 			<div class="question-subtext">
 				<% if (comments.length == 0) { %>
 					<a href="/question/<%=id%>">Be the first to answer</a>
@@ -123,6 +124,12 @@
 		<br/>			
 	</div>
 
+</script>
+
+<script type="text/template" id="no-results-template">
+	<div class="no-results-container">
+		<p>No conversations for <span class="query"><%= query %></span>. You can <a href="/ask">start one</a> right now.</p>
+	</div>
 </script>
 
 {% endblock %}

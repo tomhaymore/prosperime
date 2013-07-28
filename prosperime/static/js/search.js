@@ -18,11 +18,7 @@ $(function(){
 		},
 
 		url:function() {
-			if (this.meta("tagName") != "undefined") {
-				var path = "/api/conversations/?tag=" + this._meta['tagName'];
-			} else {
-				var path = "/api/conversations/?query=" + this._meta['query'];	
-			}
+			path = "/api/conversations/?query=" + this._meta['query'];	
 			
 			return path;
 		},
@@ -105,8 +101,7 @@ $(function(){
 
 		routes: {
 			"" : "default",
-			"search/:query" : "search",
-			"tags/:tagName" : "tags"
+			":query" : "search"
 		},
 
 		initialize: function() {
@@ -121,11 +116,11 @@ $(function(){
 			$("#search-conversations-button").on("click", function(ev) {
 
 				// var url = $.param({'query':$("input#search-conversations-input").val()});
-				var url = "search/" + encodeURIComponent($("input#search-conversations-input").val()) + "/"
+				var url = encodeURIComponent($("input#search-conversations-input").val())
 
-				window.location = url;
-				// window.App.navigate(url, {trigger:true})
-			});
+				// window.location = url;
+				window.App.navigate(url, {trigger:true})
+			})
 
 			// Set collection, view
 			// window.questions = new Questions()
@@ -134,7 +129,7 @@ $(function(){
 		},
 
 		default: function() {
-			console.log('default');
+			console.log('Default view');
 			this.questions.meta("query","");
 
 			this.questions.fetch();
@@ -142,26 +137,30 @@ $(function(){
 		},
 
 		search: function(query) {
+			console.log("Search view:", query);
+
 			if (query == "undefined") {
 				this.questions.meta("query","")
 			} else {
 				this.questions.meta("query",query)
+				console.log(this.questions.url());
 			}
 			this.questions.fetch();
 			this.questionsView.render();
-		},
-
-		tags: function(tagName) {
-			if (tagName == "undefined") {
-				this.questions.meta("tagName","")
-			} else {
-				this.questions.meta("tagName",tagName)
+			// check for null
+			if (this.questions.length == 0) {
+				showNoResults(query);
 			}
-			this.questions.fetch();
-			this.questionsView.render();
 		}
 
 	});
+
+	var showNoResults = function(query) {
+
+		var msg = _.template($("#no-results-template").html())
+		
+		$("#center-column").append(msg({'query':query}))
+	};
 
 	window.App = new ConversationRouter;
 	Backbone.history.start();

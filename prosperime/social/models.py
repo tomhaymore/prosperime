@@ -3,11 +3,13 @@
 ## from Django
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import m2m_changed
+from django.db.models.signals import m2m_changed, post_save
+ 
 
 ## from Prosperme
 from careers.models import SavedPath, GoalPosition, Position, IdealPosition
 from entities.models import Entity
+from utilities.helpers import slugify
 
 class Notification(models.Model):
 	target = models.ForeignKey(User,related_name='notifications')
@@ -71,14 +73,17 @@ class Vote(models.Model):
 			return "Down vote by " + self.owner.username + " on " + self.comment
 
 class Tag(models.Model):
+	def get_url_name(self):
+		return slugify(self.name)
+
 	name = models.CharField(max_length=450)
 	count = models.IntegerField(default=1)
+	url_name = models.SlugField(max_length=450,default=get_url_name)
 
 	def tag_count(self):
 		return len(Conversation.objects.filter(tags=self))
 
-	def url_name(self):
-		return self.name.replace('/\s+/g', '-').lower();
+	
 
 	def __unicode__(self):
 		return self.name
@@ -103,4 +108,13 @@ def update_tag_count(sender,instance,action,reverse,model,pk_set,using,**kwargs)
 			tag.count -= 1
 			tag.save()
 
+def update_tag_url_name(sender,instance,**kwargs):
+    """
+    listens for addition of a tag, updates url_name
+    """
+	# set url name
+    instance.set_url_name()
+   
+
 m2m_changed.connect(update_tag_count, sender=Conversation.tags.through)
+# post_save.connect(update_tag_url_name, sender=Tag)

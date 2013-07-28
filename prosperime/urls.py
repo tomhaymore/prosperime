@@ -13,6 +13,8 @@ urlpatterns = patterns('',
     url(r'^welcome/$','social.views.welcome'),
     url(r'^question/(\d+)/$', 'social.views.question'),
     url(r'^ask/$', 'social.views.ask'),
+    url(r'^search/$', 'social.views.search'),
+    url(r'^tags/(\w+)/$', 'social.views.tags'),
 
     # Accounts Views
     url(r'^privacy/$','accounts.views.privacy'),
@@ -79,8 +81,8 @@ urlpatterns = patterns('',
     url(r'^personalize/$','accounts.views.personalize'),
 
     # Social Views
-    url(r'^thread/(\d+)/$', 'social.views.thread'),
-    url(r'^thread/$', 'social.views.create_thread'),
+    # url(r'^thread/(\d+)/$', 'social.views.thread'),
+    # url(r'^thread/$', 'social.views.create_thread'),
 
 
     # url(r'^personalize/$','careers.views.personalize_careers_jobs'),
@@ -97,7 +99,7 @@ urlpatterns = patterns('',
     url(r'^discover/career/(\d+)/orgs/$', 'careers.views.discover_career_orgs'),
     url(r'^discover/career/(\d+)/positions/$', 'careers.views.discover_career_positions'),
     # url(r'^discover/position/(\d+)/$','careers.views.discover_position'),
-    url(r'^search/','entities.views.search'),
+    # url(r'^search/','entities.views.search'),
     url(r'^companies/','entities.views.companies'),
     url(r'^filters/','entities.views.filters'),
     url(r'^pathfilters/','entities.views.path_filters'),

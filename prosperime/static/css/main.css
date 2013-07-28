@@ -4,7 +4,7 @@
 /* Button colors */
 /* Element styles */
 a {
-  color: #253139;
+  color: #2c5c82;
   cursor: pointer; }
 
 ul {
@@ -109,7 +109,7 @@ div.splash-container {
   height: 100%; }
 
 .feature-page-header {
-  font-size: 2.5em;
+  font-size: 2.3em;
   font-family: "Helvetica Neue", Helvetica, "Lato";
   color: #253139;
   margin-bottom: 25px;
