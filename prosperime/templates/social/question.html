@@ -6,10 +6,12 @@
 <!-- CSS -->
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/home.css"/>
+	<link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.1.1/basic/jquery.qtip.min.css"/>
 
 <!-- JS -->
 	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
+	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.1.1/basic/jquery.qtip.min.js"></script>
 
 {% endblock %}
 
@@ -21,6 +23,12 @@
 <!-- Main -->
 <div id="content-container">
 
+	<!-- Search -->
+	<div id="search-container">
+		<input type="text" id="search-conversations-input" class="flat-input" data-placeholder="Start typing" />
+		<a class="flat-button search-button lightblue-button" id="search-conversations-button">Search</a>
+	</div>
+
 	<!-- Left -->
 	<div id="left-column">
 
@@ -29,72 +37,74 @@
 	<!-- Center -->
 	<div id="center-column">
 
-		<div class="question-column-left">
-			<div class="profile-pic-container"><img src="{{question.user_pic}}" title="{{question.user_name}}" /></div>
+		
+		
+			<div class="question-column-left">
+				<div class="profile-pic-container"><img src="{{question.user_pic}}" title="{{question.user_name}}" /></div>
 
-			<div class="question-user-name">{{question.user_name}}</div>
-		</div>
-
-		<div class="question-column-right">
-			<div class="question-title">{{question.title}}</div>
-			<div class="question-body">{{question.body}}</div>
-
-			{% for t in question.tags %}
-				<a class="tag">{{t.name}}</a>
-			{% endfor %}
-
-		<!-- 	<div class="question-subtext">
-				Question asked by <a href="/profile/{{question.user_id}}">{{question.user_name}}</a>
-			</div> -->
-		<!-- </div> -->
-
-		{% if comments %}
-			{% for c in comments %}
-			<div class="comment-module comment-row">
-
-
-				<div class="comment-column-left">
-					<div class="profile-pic-container-small">
-						<img src="{{c.user_pic}}"/>
-					</div>
-					
-
-
-				<!-- 	<div data-comment_id="{{c.id}}" class="vote-container">
-						<div data-type="down" class="vote-button vote"><i class="icon-chevron-left"></i></div>
-						<div class="comment-vote vote">{{c.votes}}</div>
-						<div data-type="up" class="vote-button vote"><i class="icon-chevron-right"></i></div>
-
-					</div>	 -->				
-				</div>
-
-				<div class="comment-column-right">
-					<div class="body-text">
-						{{c.body}}
-					</div>
-
-					<div class="comment-subtext">
-						Posted {{c.created|naturaltime}} by {{c.user_name}}
-					</div>
-				</div>
-
+				<div class="question-user-name">{{question.user_name}}</div>
 			</div>
-			{% endfor %}
-		{% else %}
-			<div class="comment-module call-out-text">
-			{% if is_active %}
 
-					<!-- <p>Have a thought? Get this conversation started and help {{question.user_name}} out!</p> -->
+			<div class="question-column-right">
+				<div class="question-title">{{question.title}}</div>
+				<div class="question-body">{{question.body}}</div>
 
+				{% for t in question.tags %}
+					<a class="tag">{{t.name}}</a>
+				{% endfor %}
+
+			<!-- 	<div class="question-subtext">
+					Question asked by <a href="/profile/{{question.user_id}}">{{question.user_name}}</a>
+				</div> -->
+			<!-- </div> -->
+
+			{% if comments %}
+				{% for c in comments %}
+				<div class="comment-module comment-row">
+
+
+					<div class="comment-column-left">
+						<div class="profile-pic-container-small">
+							<img src="{{c.user_pic}}"/>
+						</div>
+						
+
+
+					<!-- 	<div data-comment_id="{{c.id}}" class="vote-container">
+							<div data-type="down" class="vote-button vote"><i class="icon-chevron-left"></i></div>
+							<div class="comment-vote vote">{{c.votes}}</div>
+							<div data-type="up" class="vote-button vote"><i class="icon-chevron-right"></i></div>
+
+						</div>	 -->				
+					</div>
+
+					<div class="comment-column-right">
+						<div class="body-text">
+							{{c.body}}
+						</div>
+
+						<div class="comment-subtext">
+							Posted {{c.created|naturaltime}} by {{c.user_name}}
+						</div>
+					</div>
+
+				</div>
+				{% endfor %}
 			{% else %}
+				<div class="comment-module call-out-text">
+				{% if is_active %}
 
-					<p>This conversation isn't active yet, but you can get it started by adding a comment and getting it on the home page.</p>
+						<!-- <p>Have a thought? Get this conversation started and help {{question.user_name}} out!</p> -->
 
+				{% else %}
+
+						<p>This conversation isn't active yet, but you can get it started by adding a comment and getting it on the home page.</p>
+
+				{% endif %}
+
+				</div>
 			{% endif %}
-
-			</div>
-		{% endif %}
-
+		
 
 		<div class="comment-module">
 			<div class="comment-column-left">
@@ -160,7 +170,13 @@
 
 	<!-- Right --> 
 	<div id="right-column">
-
+		{% if is_active %}
+			<div class="right-column-module">
+				<span class="red-button nonclickable">Inactive</span>
+				<p>This question is <strong>inactive</strong>. Help activate it by answering it or getting it more followers.</p>
+				<p class="note">What does this mean?</p>
+			</div>	
+		{% endif %}
 		<!-- Ask a Question -->
 		<div class="right-column-module">
 			{% if is_following %}
@@ -269,6 +285,19 @@
 	
 	$(function() {
 
+		$(".note").qtip({
+			content: {
+				text: "Inactive questions do not show up in search results or on the front page"
+			},
+			position: {
+		        my: 'bottom center', 
+		        at: 'top center'
+		    },
+		    style: {
+		    	def: false	
+		    }
+			
+		});
 	
 		// Activate follow button
 		if ("{{is_following}}" == "False")

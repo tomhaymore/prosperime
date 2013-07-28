@@ -12,7 +12,7 @@
 
 #center-question-column {
   margin-left: 0px;
-  width: 705px; }
+  width: 695px; }
 
 #right-question-column {
   margin-left: 0px;
@@ -52,7 +52,7 @@
   vertical-align: top; }
 
 .question-column-right, .comment-column-right {
-  width: 610px;
+  width: 600px;
   display: inline-block;
   vertical-align: top; }
 
@@ -94,7 +94,7 @@
   width: 35px; }
 
 .comment-column-right {
-  width: 555px;
+  width: 545px;
   vertical-align: middle; }
 
 .comment-body {
@@ -116,7 +116,7 @@
 
 .comment-module {
   /* margin-left: 85px */
-  width: 610px;
+  width: 600px;
   margin-top: 32px; }
   .comment-module .comment-button {
     text-align: center;
@@ -133,7 +133,7 @@
     cursor: pointer; }
 
 .comment-textarea {
-  width: 545px;
+  width: 535px;
   height: 20px;
   resize: none; }
 
