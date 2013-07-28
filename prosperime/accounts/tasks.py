@@ -1,31 +1,21 @@
+# Python
+import logging
+
+# Django
 from celery import task
+
+# Prosperime
 from lilib import LIConnections, LIProfile
 import accounts.cblib as cblib
 from careers.careerlib import CareerMapBase
 ## somewhat useful for celery debugging
 # from celery.contrib import rdb
 
+logger = logging.getLogger(__name__)
+
 @task()
 def add(x,y):
 	return x + y
-
-# class ProcessLIProfile(Task):
-
-# 	def run(self,user_id,acct_id,**kwargs):
-
-# 		# call LI parser object
-# 		li_parser = LIProfile()
-
-# 		li_parser.process_profile(user_id,acct_id)
-
-# class ProcessLIConnections(Task):
-
-# 	def run(self,user_id,acct_id,**kwargs):
-
-# 		# call LI parser object
-# 		li_cxn_parser = LIConnections(user_id,acct_id)
-
-# 		li_cxn_parser.process_connections()
 
 @task()
 def process_li_connections(user_id,acct_id,**kwargs):
@@ -51,6 +41,13 @@ def match_position(pos):
 def process_cb_people():
 	cb = cblib.CBPeople()
 	cb.parse_people()
+
+@task()
+def send_welcome_email(user):
+	import accounts.emaillib as emaillib
+	welcome = emaillib.WelcomeEmail(user)
+	welcome.send_email()
+	logger.info("sent welcome email to user: "+user.email)
 
 # tasks.register(ProcessLIProfile)
 # tasks.register(ProcessLIConnections)
