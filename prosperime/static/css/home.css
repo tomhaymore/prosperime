@@ -8,15 +8,15 @@
 /* Main Content Styles */
 #left-question-column {
   margin-left: 0px;
-  width: 0; }
+  width: 0px; }
 
 #center-question-column {
   margin-left: 0px;
-  width: 165px; }
+  width: 705px; }
 
 #right-question-column {
   margin-left: 0px;
-  width: 175px; }
+  width: 275px; }
 
 #question-page-container {
   padding-top: 24px; }
@@ -47,12 +47,12 @@
 
 .question-column-left, .comment-column-left {
   display: inline-block;
-  width: 110px;
+  width: 75px;
   margin-right: 10px;
   vertical-align: top; }
 
 .question-column-right, .comment-column-right {
-  width: 645px;
+  width: 610px;
   display: inline-block;
   vertical-align: top; }
 
@@ -94,7 +94,8 @@
   width: 35px; }
 
 .comment-column-right {
-  width: 590px; }
+  width: 555px;
+  vertical-align: middle; }
 
 .comment-body {
   font-size: 0.9em;
@@ -115,7 +116,7 @@
 
 .comment-module {
   /* margin-left: 85px */
-  width: 645px;
+  width: 610px;
   margin-top: 32px; }
   .comment-module .comment-button {
     text-align: center;
@@ -132,7 +133,7 @@
     cursor: pointer; }
 
 .comment-textarea {
-  width: 580px;
+  width: 545px;
   height: 20px;
   resize: none; }
 

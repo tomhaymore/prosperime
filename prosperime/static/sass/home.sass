@@ -1,19 +1,11 @@
 /* Imports */
 
 @import "colors"
+@import "layout"
 
 /* General Styles */
 
-$left-column-width: 0
-$right-column-width: 175px
-$center-column-width: $right-column-width - $left-column-width - 10
 
-$question-column-left-width: 75px
-$question-column-right-width: 720px - $question-column-left-width
-
-$comment-module-width: $question-column-right-width
-$comment-column-left-width: 35px
-$comment-column-right-width: $comment-module-width - $comment-column-left-width - 20px
 
 /* Left Column */
 
@@ -67,7 +59,7 @@ $comment-column-right-width: $comment-module-width - $comment-column-left-width 
 
 .question-column-left 
 	display: inline-block 
-	width: 110px
+	width: $question-column-left-width
 	margin-right: 10px
 	vertical-align: top
 	
@@ -125,6 +117,7 @@ $comment-column-right-width: $comment-module-width - $comment-column-left-width 
 .comment-column-right
 	@extend .question-column-right
 	width: $comment-column-right-width
+	vertical-align: middle
 
 .comment-body
 	font-size: 0.9em

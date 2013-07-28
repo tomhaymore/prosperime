@@ -1,4 +1,5 @@
 @import "colors"
+@import "layout"
 
 /* Element styles */
 
@@ -37,10 +38,6 @@ body
 .half
 	float: left
 	width: 50%
-
-$left-column-width: 0px
-$right-column-width: 200px
-$center-column-width: 1000px - $left-column-width - $right-column-width - 20
 
 #search-container
 	width: 630px
@@ -131,6 +128,18 @@ div.splash-container
 	margin-bottom: 25px
 	margin-top: 10px
 
+.feature-nav-header
+	font:
+		size: 1.8em
+		family: "Helvetica Neue", Helvetica, "Lato"
+	color: $darkgray
+	margin-bottom: 25px
+	margin-top: 10px
+	margin-right: 10px
+	display: inline-block
+	.selected
+		color: $selected-header
+
 .feature-page-subheader
 	font:
 		size: 1.7em
@@ -189,7 +198,7 @@ ul.messages
 	display: inline-block
 	vertical-align: middle
 	width: auto
-	line-height: 24px
+	line-height: 22px
 	min-width: 16px
 	padding: 5px 10px 7px 10px
 	font:
@@ -362,6 +371,10 @@ div.footer
 	height: 35px
 
 /* Tag Styles */
+
+.tags-container
+	margin-top: 10px
+	margin-bottom: 10px
 
 .filter-tags
 	color: #181818
