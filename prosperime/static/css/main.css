@@ -34,12 +34,12 @@ body {
 
 #center-column {
   margin-right: 10px;
-  width: 780px;
+  width: 755px;
   min-height: 200px;
   float: left; }
 
 #right-column {
-  width: 200px;
+  width: 225px;
   float: left; }
 
 /* Header Styles */
@@ -111,8 +111,11 @@ div.splash-container {
 .module-header {
   font-size: 18px;
   font-color: #181818;
+  font-line-height: 26px;
   line-height: 24px;
   margin-bottom: 10px; }
+  .module-header a {
+    text-decoration: none; }
 
 .right-column-module a {
   display: inline-block;
@@ -249,7 +252,8 @@ div.footer {
   height: 75px;
   display: inline-block;
   margin-right: 16px;
-  margin-bottom: 16px; }
+  margin-bottom: 16px;
+  vertical-align: top; }
   .profile-pic-container img, .profile-pic-container-small img {
     border-radius: 75px; }
 

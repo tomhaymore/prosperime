@@ -14,7 +14,9 @@ urlpatterns = patterns('',
     url(r'^question/(\d+)/$', 'social.views.question'),
     url(r'^ask/$', 'social.views.ask'),
 
+
     # Accounts Views
+    url(r'^profile/(\d+)/$', 'accounts.views.profile'),
     url(r'^privacy/$','accounts.views.privacy'),
     url(r'^terms/$','accounts.views.terms'),
     url(r'^copyright/$','accounts.views.copyright'),
@@ -156,7 +158,7 @@ urlpatterns = patterns('',
     url(r'^decisions/', 'careers.views.getDecisions'),
     url(r'^login/','accounts.views.login'),
     
-    url(r'^profile/(\d+)/$', 'accounts.views.profile'),
+    url(r'^profile_old/(\d+)/$', 'accounts.views.profile_old'),
     url(r'^profile/org/(\d+)/$','entities.views.profile_org'),
     url(r'^account/register','accounts.views.register'),
     url(r'^account/authorize','accounts.views.linkedin_authorize'),

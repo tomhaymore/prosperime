@@ -227,8 +227,7 @@
 				{% if forloop.counter0 < 5 %}
 					<div class="followers-profile-pic">
 						 <!-- TODO: Come back and fix this URL once profiles built -->
-<!-- 						<a href="profile/{{f.id}}"><img src="{{f.pic}}" title="{{f.name}}"/></a> -->
-						<img src="{{f.pic}}" title="{{f.name}}" />
+						<a href="/profile/{{f.id}}"><img src="{{f.pic}}" title="{{f.name}}"/></a>
 					</div>
 				{% endif %}
 			{% endfor %}

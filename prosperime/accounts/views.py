@@ -30,10 +30,42 @@ from careers.models import SavedPath, CareerDecision, Position, SavedPosition, S
 from entities.models import Entity, Region
 from accounts.tasks import process_li_profile, process_li_connections
 from accounts.forms import FinishAuthForm, AuthForm, RegisterForm
+from social.models import Conversation, FollowConversation, Comment
 import utilities.helpers as helpers
 
 logger = logging.getLogger(__name__)
 critical_logger = logging.getLogger("benchmarks")
+
+
+@login_required
+def profile(request, user_id):
+	# get user
+	user = User.objects.get(id=user_id)
+
+	# TODO: optimize this query
+		# because user follows their own conversations, just filter single QuerySet
+	# following & started conversations
+	conversations = FollowConversation.objects.filter(user=user).select_related("conversation")
+	followed_conversations = [{"name":f.conversation.name, "summary":f.conversation.summary, "id":f.conversation.id, "stats":{"num_followers":f.conversation.followers.count(), "num_answers":f.conversation.comments.count()}} for f in conversations.exclude(conversation__owner=user)]
+	started_conversations = [{"name":f.conversation.name, "summary": f.conversation.summary, "id":f.conversation.id, "stats":{"num_followers":f.conversation.followers.count(), "num_answers":f.conversation.comments.count()}} for f in conversations.filter(conversation__owner=user)]
+
+	# connections
+	connections = user.profile.connections.all().distinct()
+	num_connections = len(connections)
+	connections = [{"pic":p.default_profile_pic(), "name":p.full_name(), "id":p.user.id} for p in connections[:4]] # limit to 4 pics for now
+
+	data = {
+		"profile_pic":user.profile.default_profile_pic(),
+		"own_profile":(user.id == request.user.id),
+		"user_name":user.profile.full_name(),
+		"positions":json.dumps(_prepare_positions_for_timeline(user.positions.all())),
+		"connections":connections, 
+		"num_connections":num_connections,
+		"followed_conversations":followed_conversations,
+		"started_conversations":started_conversations
+	}
+
+	return render_to_response("social/profile.html", data, context_instance=RequestContext(request))
 
 
 def login(request):
@@ -52,12 +84,9 @@ def login(request):
 			if user is not None:
 				auth_login(request,user)
 				messages.success(request, 'You have successfully logged in.')
-<<<<<<< HEAD
-				return HttpResponseRedirect('/')
+				# return HttpResponseRedirect('/')
 
-=======
 				return HttpResponseRedirect('/home/')
->>>>>>> 6ec5a8a07821c224202f47f6da1cf3a94df001bc
 		
 	else:
 		form = AuthForm()
@@ -721,7 +750,7 @@ def random_profile(request):
 
 # View for invidiual profiles
 @login_required
-def profile(request, user_id):
+def profile_old(request, user_id):
 
 	user = User.objects.get(id=user_id)
 	if user.profile.status == "dormant":
@@ -1315,9 +1344,6 @@ def _prepare_positions_for_timeline(positions):
 	formatted_positions = []
 	current = None
 
-	if len(positions)  == 0:
-		start_date = None
-		total_time = None
 
 	# Process each position
 	for pos in positions:
@@ -1335,16 +1361,10 @@ def _prepare_positions_for_timeline(positions):
 			else:
 				formatted_pos['end_date'] = helpers._format_date(pos.end_date)
 			formatted_pos['start_date'] = helpers._format_date(pos.start_date)
-			formatted_pos['description'] = pos.description
+			# formatted_pos['description'] = pos.description
 
-			# domains = pos.entity.domains.all()
-			# if domains:
-			# 	pos.domain = domains[0].name
-			# else:
-			# 	pos.domain = None
-
-			formatted_pos['co_name'] = pos.entity.name
 			# pos.pic = pos.entity.default_logo()
+			formatted_pos['co_name'] = pos.entity.name
 
 
 
@@ -1353,9 +1373,16 @@ def _prepare_positions_for_timeline(positions):
 				formatted_pos['type'] = 'internship'
 				formatted_pos['title'] = pos.title
 
+
 			# Educations
 			elif pos.type == 'education' or pos.title == 'Student':
 				formatted_pos['type'] = 'education'
+				if pos.degree is not None:
+					formatted_pos['degree'] = pos.degree
+				if pos.field is not None:
+					formatted_pos['field'] = pos.field
+				formatted_pos['school'] = pos.entity.name
+
 				if pos.degree is not None and pos.field is not None:
 					formatted_pos['title'] = pos.degree + ", " + pos.field
 				elif pos.degree is not None:
@@ -1369,6 +1396,7 @@ def _prepare_positions_for_timeline(positions):
 			else:
 				formatted_pos['title'] = pos.title
 				formatted_pos['type'] = 'org'
+
 				if pos.current:
 					current = pos
 
