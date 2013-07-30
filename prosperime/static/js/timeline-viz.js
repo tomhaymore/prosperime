@@ -152,12 +152,7 @@ var Timeline = (function() {
             // hide textBox
             $(textBox).fadeOut(200).css("left", "-500px").css("top", textBox_offset_top + "px").show()
             // show form 
-            var existing_data = {
-                "title":$(".timeline-position-position", this).text(),
-                "co_name":$(".timeline-position-entity", this).text(),
-                "dates":$(".timeline-position-dates", this).text()
-            }
-            renderEditForm(position, existing_data) // code in [profile.html]
+            renderEditForm(position) // code in [profile.html]
         })
 
     };
@@ -209,6 +204,13 @@ var Timeline = (function() {
 
         editPosition: function(index) {
 
+        },
+
+        addPosition: function(position) {
+            positions.push(position)
+            console.log(positions[0])
+            console.log(position)
+            createNode(position, positions.length - 1)
         },
     }
 }());

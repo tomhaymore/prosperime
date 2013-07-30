@@ -1,0 +1,380 @@
+
+{% extends "base_full.html" %}
+{% load humanize %}
+{% block head %}
+
+<!-- CSS -->
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/home.css"/>
+
+<!-- JS -->
+	<script type="text/javascript" src="{{ STATIC_URL }}js/helpers.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/raphael-min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/timeline-viz.js"></script>
+
+	<style type="text/css">
+
+		.timeline-position {
+			position:absolute;
+			border-radius:2px;
+			box-sizing:border-box;
+			text-align:center;
+			/*border:3px solid #6fb6d4;*/
+			padding:4px 4px;
+			color:#68696b;
+			font-size:1em;
+			line-height:18px;
+	
+		} 
+
+		#timeline-edit-container {
+			min-height:75px;
+			margin-bottom:25px;
+		}
+
+
+		#upload-profile-pic-form input[type="file"] {
+			position:absolute;
+			left:-500px;
+		}
+
+		.tab-conversation-container {
+			margin-top: 24px;
+			margin-bottom: 24px;
+			border-bottom: 1px solid #c0c0c0;
+		}
+
+		.tab-conversation-col-left {
+			display: inline-block;
+			width: 80%;
+		}
+
+		.tab-conversation-col-right {
+			display: inline-block;
+			width: 15%;
+			vertical-align: top;
+			text-align:center;
+			background-color: #6fb6d4;
+			border-radius: 2px;
+			padding:4px 4px;
+			cursor: pointer;
+		}
+
+		.profile-add-button {
+			background-color:#c0c0c0;
+			border-radius:2px;
+			margin-top:15px;
+			padding:0px 8px;
+			text-align: center;
+		}
+
+		.add-position-prompt {
+			text-align:center;
+		}
+
+		.add-position-prompt .tag {
+			font-size:1em;
+			padding: 6px 8px;
+			vertical-align: middle;
+			margin:0 auto;
+			margin-top:12px;
+		}
+
+
+
+
+
+	</style>
+
+{% endblock %}
+
+{% block extramessage %} {% endblock %}
+
+{% block content %}
+
+	
+<!-- Main -->
+<div id="content-container">
+
+	<!-- Left (Nothing) -->
+	<div id="left-column"></div>
+	
+	<!-- Center -->
+	<div id="center-column">
+		<div class="feature-page-header">{{user_name}}</div>
+
+		<form id="upload-profile-pic-form" method="post" enctype="multipart/form-data" action='ajaximage.php'>
+			<input type="file" name="photoimg" id="photoimg" />
+		</form>
+
+		<div class="row-fluid">
+			<div id="Profile-profile-pic-container" class="profile-pic-container">
+				<img src="{{profile_pic}}" />
+				<div class="flat-button profile-add-button">Add</div>
+			</div>
+			<div id="profile-timeline-container"><!--Timeline--></div>
+		</div>
+
+
+
+		<div class="row-fluid">
+			<div id="timeline-edit-container"></div>
+		</div>
+
+		<div class="row-fluid tab-container">
+			<ul class="nav nav-tabs" style="margin-bottom:0px;">
+			  <li class="active">
+			    <a href="#started-convos-tab" data-toggle="tab">Started Conversations</a>
+			  </li>
+			  <li><a href="#followed-convos-tab" data-toggle="tab">Followed Conversations</a></li>
+			</ul>
+
+			<div class="tab-content">
+
+				<div class="tab-pane active" id="started-convos-tab">
+					{% for s in started_conversations %}
+						<div class="tab-conversation-container">
+							<div class="tab-conversation-col-left">
+								<div class="module-header"><a href="/question/{{s.id}}">{{s.name}}</a></div>
+								<div class="stat-container">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									<span class="stat">{{s.stats.num_followers}}</span> Followers &nbsp;&nbsp;&nbsp;<span class="stat">{{s.stats.num_answers}}</span> Answers
+								</div>
+							</div>
+							<div class="tab-conversation-col-right">Ask friends to answer</div>
+						</div>
+
+					{% endfor %}
+				</div>
+				
+				<div class="tab-pane" id="followed-convos-tab">
+					{% for f in followed_conversations %}
+						<div class="tab-conversation-container">
+							<div class="tab-conversation-col-left">
+								<div class="module-header"><a href="/question/{{f.id}}">{{f.name}}</a></div>
+								<div class="stat-container">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									<span class="stat">{{f.stats.num_followers}}</span> Followers &nbsp;&nbsp;&nbsp;<span class="stat">{{f.stats.num_answers}}</span> Answers
+								</div>
+							</div>
+							<div class="tab-conversation-col-right">Ask friends to answer</div>
+						</div>
+
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<!-- Right --> 
+	<div id="right-column">
+
+
+		<!-- Followers -->
+		<div class="right-column-module followers-module">
+
+
+			<div class="right-question-column-module">
+				<p>
+					<a href="/ask/" class="flat-button green-button">Start</a> a conversation
+				</p>
+			</div>
+
+			<div class="module-header">Connections: </div>
+			<!-- Default to first 5 -->
+			{% for c in connections %}
+				<div class="followers-profile-pic">
+					<a href="/profile/{{c.id}}"><img src="{{c.pic}}" title="{{c.name}}" /></a>
+				</div>
+			{% endfor %}
+
+			{% if num_connections > 5 %}
+				<div class="followers-more-followers">and {{num_connections|add:-5}} more... </div>
+			{% endif %}
+
+			{% if connections|length == 0 %} 
+
+				<p>No connections yet</p>
+
+			{% endif %}
+		</div>
+
+		<!-- Popular Tags -->
+
+		<div class="right-column-module">
+
+		</div>
+		
+	</div>
+	<div class="clear"></div>
+</div>
+
+	
+{% endblock %}
+
+{% block templates %}
+
+<!-- V3 Script -->
+<script type="text/javascript">
+	
+	$(function() {
+		var timeline_data = {{positions|safe}},
+			permissions = "r"
+
+		if ("{{own_profile}}" == "True")
+			permissions += "w"
+
+		var timeline_data = {{positions|safe}}
+		Timeline.init(timeline_data, "profile-timeline-container", 550, 125, "timeline-edit-container", permissions.split(""))
+		Timeline.construct()
+
+		$(".profile-add-button").on("click", renderAddForm1)
+	});
+
+	
+
+	var renderEditForm = function(position) {
+		// gray out tabs to focus on form
+		$(".tab-container").animate({"opacity":0.5}, "200")
+
+		if (position.type == "education") {
+			// "Degree" in "Field" at "Entity" Grad Date: "mm/yyyy"
+			var template = _.template($("#timeline-edit-education-template").html());
+
+			$("#timeline-edit-container").empty().append(template({
+				type: position.type,
+				id: position.id,
+				degree: ("degree" in position) ? position.degree : "B.A.",
+				field: ("field" in position) ? position.field : "Field",
+				school: ("school" in position) ? position.school : "School",
+				grad_date: ("end_date" in position) ? position.end_date : "MM/YY" // TODO: check this
+			})).animate({"opacity":1}, "250")
+
+		} else {
+			// "title" at "entity" from "MM/YYYY" to "MM/YYYY"
+			var template = _.template($("#timeline-edit-org-template").html());
+
+			$("#timeline-edit-container").empty().append(template({
+				type: position.type,
+				id: position.id,
+				title: ("title" in position) ? position.title : "Title",
+				co_name: ("co_name" in position) ? position.co_name : "Company",
+				start_date: ("start_date" in position) ? position.start_date: "MM/YY",
+				end_date: ("end_date" in position) ? position.end_date : "MM/YY"
+			})).animate({"opacity":1}, "250")
+		}
+	};
+
+	var editPosition = function() {
+		// hide container
+		$(".input-container").animate({"opacity":0}, 250)
+		// normalize tabs
+		$(".tab-container").animate({"opacity":1}, 200)
+		// check for changes
+		var changes_made = false,
+			new_position = ($(".input-container input :last").val() == -1) ? true : false;
+
+		if (!new_position) {
+			$(".input-container input").each(function() {
+				if (!changes_made && $(this).val() != $(this).attr("placeholder"))
+					changes_made = true; 
+			})
+		}
+
+		// submit to DB (AJAX)s if changes made or a new position (id == -1)
+		if (changes_made || new_position) {
+			// TODO: incorporate Thomas' old on_track code
+			console.log("submit changed position to DB")
+
+			var position = {
+				"title":($(".input-container").find("input[name='title']").length == 0) ? null : $(".input-container").find("input[name='title']").val(),
+				"id":($(".input-container").find("input[name='id']").length == 0) ? null : $(".input-container").find("input[name='id']").val(),
+				"type":$(".input-container").data("type"),
+				"co_name":($(".input-container").find("input[name='co_name']").length == 0) ? null : $(".input-container").find("input[name='co_name']").val(),
+				"school":($(".input-container").find("input[name='school']").length == 0) ? null : $(".input-container").find("input[name='school']").val(),
+				"degree":($(".input-container").find("input[name='degree']").length == 0) ? null : $(".input-container").find("input[name='degree']").val(),
+				"field":($(".input-container").find("input[name='field']").length == 0) ? null : $(".input-container").find("input[name='field']").val(),
+				"start_date":($(".input-container").find("input[name='start_date']").length == 0) ? null : $(".input-container").find("input[name='start_date']").val(),
+				"end_date":($(".input-container").find("input[name='end_date']").length == 0) ? null : $(".input-container").find("input[name='end_date']").val(),
+			}
+
+			
+		} 
+
+		// TODO: put this in callback
+		if (new_position)
+			Timeline.addPosition(position)
+		else
+			Timeline.editPosition(position)
+
+	};
+
+	var renderAddForm1 = function() {
+		var template = _.template($("#add-position-first-template").html())
+		$("#timeline-edit-container").empty().append(template()).hide().fadeIn(200)
+	};
+	
+	var renderAddForm2 = function(type) {
+		position = {"type":type, "id":-1}
+		renderEditForm(position)
+	};
+
+
+</script>
+
+<script type="text/template" id="add-position-first-template">
+	
+	<div class="add-position-prompt">
+		<div>Select what best describes this position: </div>
+		<div class="flat-button tag" onclick="renderAddForm2('education')">Education</div>
+		<div class="flat-button tag" onclick="renderAddForm2('org')">Job</div>
+		<div class="flat-button tag" onclick="renderAddForm2('internship')">Internship</div>
+	</div>
+
+</script>
+
+<script type="text/template" id="timeline-edit-org-template">
+	
+	<div class="input-container" data-type="<%=type%>">
+		<p>Edit Position: </p>
+		<input type="text" placeholder="<%=title%>" name="title" value="<%=title%>" class="input-medium" />
+		 at <input type="text" placeholder="<%=co_name%>" name="co_name" value="<%=co_name%>" class="input-medium" />
+		 From: <input type="text" placeholder="<%=start_date%>" name="start_date" value="<%=start_date%>" class="input-small" maxlength="5" />
+		 To: <input type="text" placeholder="<%=end_date%>" name="end_date" value="<%=end_date%>" class="input-small" maxlength="5" />
+		 <input type="hidden" name="id" value="<%=id%>" /> 
+		<div class="submit-button flat-button green-button" onclick="editPosition()" style="vertical-align:top;">Done</div>
+	</div>
+
+
+</script>
+
+<script type="text/template" id="timeline-edit-education-template">
+
+	<div class="input-container" data-type="<%=type%>">
+		<p>Edit Education: </p>
+		<input type='text' placeholder='<%=degree%>' name="degree" value="<%=degree%>" class='input-small'/>
+		 in <input type='text' placeholder='<%=field%>' name="field" value="<%=field%>" class='input-medium'/>
+		 at <input type='text' placeholder='<%=school%>' name="school" value="<%=school%>" class='input-medium'/>
+		Grad Year: <input type="text" placeholder="<%=grad_date%>" name="end_date" value="<%=grad_date%>" class="input-small" />
+		<input type="hidden" name="id" value="<%=id%>" /> 
+		<div class="submit-button flat-button green-button" onclick="editPosition()" style="vertical-align:top;">Done</div>
+
+	</div>
+
+</script>
+
+<script type="text/template" id="timeline-position-template">
+
+	<div class="timeline-position">
+
+		<div class="timeline-position-position"><%=title%></div>
+		<div class="timeline-position-entity"><%=co_name%></div>
+		<div class="timeline-position-dates"><%=start_date%> - <%=end_date%></div>
+
+	</div>
+
+</script>
+
+
+{% endblock %}
