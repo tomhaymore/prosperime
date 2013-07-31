@@ -6,6 +6,8 @@
 <!-- CSS -->
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/home.css"/>
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
+
 
 <!-- JS -->
 	<script type="text/javascript" src="{{ STATIC_URL }}js/helpers.js"></script>
@@ -30,8 +32,9 @@
 		} 
 
 		#timeline-edit-container {
-			min-height:75px;
-			margin-bottom:25px;
+			min-height: 65px;
+			margin-bottom: 18px;
+			padding-top: 18px;
 		}
 
 
@@ -62,6 +65,11 @@
 			cursor: pointer;
 		}
 
+		.inline-stat-container {
+			margin-top: 18px;
+			margin-bottom: 18px;
+		}
+
 		.profile-add-button {
 			background-color:#c0c0c0;
 			border-radius:2px;
@@ -82,7 +90,55 @@
 			margin-top:12px;
 		}
 
+		.settings-container {
+			display:none;
+		}
 
+		.settings-complete {
+			transition: color 0.05s;
+		}
+		.settings-complete:hover {
+			color: #339933;
+		}
+
+		.settings-list {
+			width: 100%;
+			height: 100%;
+			border-top:1px solid #c0c0c0;
+			padding:12px 18px;
+			min-height: 75px;
+		}
+
+		.settings-list div {
+			margin-top: 12px;
+			margin-left: 24px;
+		}
+
+		.settings-list i {
+			cursor:pointer;
+			margin-right:26px;
+			transition: font-size 0.05s;
+		}
+
+		.settings-list i:hover {
+			font-size: 1.1em;
+		}
+
+		.slide-container {
+			min-height: 300px;
+		}
+
+		.settings-icon-container {
+			margin-top: 12px; 
+			width: 90px;
+			border-radius: 4px;
+			cursor: pointer;
+			background-color: #f0f0f0;
+			height: 25px;
+			line-height: 25px;
+		}
+
+		#profile-timeline-container { width: 650px; }
 
 
 
@@ -105,25 +161,40 @@
 	<div id="center-column">
 		<div class="feature-page-header">{{user_name}}</div>
 
-		<form id="upload-profile-pic-form" method="post" enctype="multipart/form-data" action='ajaximage.php'>
+<!-- 		<form id="upload-profile-pic-form" method="post" enctype="multipart/form-data" action='ajaximage.php'>
 			<input type="file" name="photoimg" id="photoimg" />
-		</form>
+		</form> -->
 
+		
 		<div class="row-fluid">
 			<div id="Profile-profile-pic-container" class="profile-pic-container">
 				<img src="{{profile_pic}}" />
-				<div class="flat-button profile-add-button">Add</div>
+				<div class="settings-icon-container">Settings <i class="icon-cog icon-large" title="Settings"></i></div>
 			</div>
-			<div id="profile-timeline-container"><!--Timeline--></div>
+
+
+
+			<!-- SVG Timeline -->
+			<div id="profile-timeline-container"></div>
 		</div>
 
 
-
+		<!-- Inline Edit Container -->
 		<div class="row-fluid">
 			<div id="timeline-edit-container"></div>
 		</div>
 
-		<div class="row-fluid tab-container">
+		<!-- Settings -->
+		<div class="row-fluid settings-container slide-container">
+			<div class="module-header">Settings &nbsp;&nbsp;&nbsp; <i class="icon-ok icon-large settings-complete" data-setting="return"></i></div>
+
+			<div class="settings-list">
+				<div><i class="icon-pencil icon-large" data-setting="addPosition"> </i>Add to your professional timeline</div>
+			</div>
+		</div>
+
+		<!-- Conversations List(s) -->
+		<div class="row-fluid tab-container slide-container">
 			<ul class="nav nav-tabs" style="margin-bottom:0px;">
 			  <li class="active">
 			    <a href="#started-convos-tab" data-toggle="tab">Started Conversations</a>
@@ -138,7 +209,7 @@
 						<div class="tab-conversation-container">
 							<div class="tab-conversation-col-left">
 								<div class="module-header"><a href="/question/{{s.id}}">{{s.name}}</a></div>
-								<div class="stat-container">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<div class="inline-stat-container">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 									<span class="stat">{{s.stats.num_followers}}</span> Followers &nbsp;&nbsp;&nbsp;<span class="stat">{{s.stats.num_answers}}</span> Answers
 								</div>
 							</div>
@@ -153,7 +224,7 @@
 						<div class="tab-conversation-container">
 							<div class="tab-conversation-col-left">
 								<div class="module-header"><a href="/question/{{f.id}}">{{f.name}}</a></div>
-								<div class="stat-container">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<div class="inline-stat-container">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 									<span class="stat">{{f.stats.num_followers}}</span> Followers &nbsp;&nbsp;&nbsp;<span class="stat">{{f.stats.num_answers}}</span> Answers
 								</div>
 							</div>
@@ -219,20 +290,36 @@
 <script type="text/javascript">
 	
 	$(function() {
+
+		// set data, defaults
 		var timeline_data = {{positions|safe}},
 			permissions = "r"
 
-		if ("{{own_profile}}" == "True")
-			permissions += "w"
+		// if own profile, set write permissions for timeline
+		if ("{{own_profile}}" == "True") permissions += "w"
 
-		var timeline_data = {{positions|safe}}
-		Timeline.init(timeline_data, "profile-timeline-container", 550, 125, "timeline-edit-container", permissions.split(""))
+		// construct Timeline
+		Timeline.init(timeline_data, "profile-timeline-container", 650, 125, "timeline-edit-container", permissions.split(""))
 		Timeline.construct()
 
-		$(".profile-add-button").on("click", renderAddForm1)
+		// handler on 'settings' button
+		$(".settings-icon-container").on("click", renderSettings)
+		// set handlers within 'settings container'
+		$(".settings-container i").on("click", setSetting)
 	});
 
-	
+
+
+	// essentially a router for setting click events
+		// looks up in local dictionary, calls appopriate handler
+	var setSetting = function(ev) {
+		var setting_map = {
+			"addPosition":renderAddForm1,
+			"return":hideSettings,
+		}
+		var setting = $(ev.currentTarget).data("setting")
+		setting_map[setting]()
+	};
 
 	var renderEditForm = function(position) {
 		// gray out tabs to focus on form
@@ -245,10 +332,11 @@
 			$("#timeline-edit-container").empty().append(template({
 				type: position.type,
 				id: position.id,
-				degree: ("degree" in position) ? position.degree : "B.A.",
-				field: ("field" in position) ? position.field : "Field",
-				school: ("school" in position) ? position.school : "School",
-				grad_date: ("end_date" in position) ? position.end_date : "MM/YY" // TODO: check this
+				degree: ("degree" in position) ? position.degree : null,
+				field: ("field" in position) ? position.field : null,
+				school: ("school" in position) ? position.school : null,
+				start_date: ("start_date" in position) ? position.start_date : null,
+				end_date: ("end_date" in position) ? position.end_date : null // TODO: check this
 			})).animate({"opacity":1}, "250")
 
 		} else {
@@ -258,15 +346,18 @@
 			$("#timeline-edit-container").empty().append(template({
 				type: position.type,
 				id: position.id,
-				title: ("title" in position) ? position.title : "Title",
-				co_name: ("co_name" in position) ? position.co_name : "Company",
-				start_date: ("start_date" in position) ? position.start_date: "MM/YY",
-				end_date: ("end_date" in position) ? position.end_date : "MM/YY"
+				title: ("title" in position) ? position.title : null,
+				co_name: ("co_name" in position) ? position.co_name : null,
+				start_date: ("start_date" in position) ? position.start_date: null,
+				end_date: ("end_date" in position) ? position.end_date : null
 			})).animate({"opacity":1}, "250")
 		}
 	};
 
 	var editPosition = function() {
+		// return timeline to normal
+		Timeline.normalize()
+
 		// hide container
 		$(".input-container").animate({"opacity":0}, 250)
 		// normalize tabs
@@ -275,12 +366,14 @@
 		var changes_made = false,
 			new_position = ($(".input-container input :last").val() == -1) ? true : false;
 
+		// logic: if it isn't a new position, and some change has been made besides deleting a field, then save it
 		if (!new_position) {
 			$(".input-container input").each(function() {
-				if (!changes_made && $(this).val() != $(this).attr("placeholder"))
+				if (!changes_made && $(this).val() != $(this).data("original") && $(this).val != "")
 					changes_made = true; 
 			})
-		}
+		};
+
 
 		// submit to DB (AJAX)s if changes made or a new position (id == -1)
 		if (changes_made || new_position) {
@@ -299,15 +392,44 @@
 				"end_date":($(".input-container").find("input[name='end_date']").length == 0) ? null : $(".input-container").find("input[name='end_date']").val(),
 			}
 
-			
+
+			if(simpleValidation(position)) {
+				console.log("validated")
+				// Validate form data via API
+				if (position.type == "org") position.type = "position" // make sure API compliant
+				position["csrfmiddlewaretoken"] = "{{csrf_token}}"
+				$.post('/careers/addProgressDetails/', position, function(data) {
+					console.log(data);
+					if (data["result"] == "success") {
+						console.log("success")
+						// // Add to DST
+						// path.push({
+						// 	"type":"position",
+						// 	"title":data.data.title,
+						// 	"entity":data.data.entity,
+						// 	"start_date":data.data.start_date,
+						// 	"end_date":data.data.end_date,
+						// 	"display_text":data.data.title + " at " + data.data.entity
+						// });
+						// // console.log(path);
+						// // rerenderProgressBar(path)
+						// if (path.length == 1) createUserPathBar(path)
+						// addPositionToExistingPath(path)
+					} else {
+						// display error
+						console.log('failure');
+						console.log(data.errors);
+					}
+				},'json');
+
+				// TODO: put this in callback
+				if (new_position)
+					Timeline.addPosition(position)
+				else
+					Timeline.editPosition(position)
+
+			} else { console.log ("won't fly") }
 		} 
-
-		// TODO: put this in callback
-		if (new_position)
-			Timeline.addPosition(position)
-		else
-			Timeline.editPosition(position)
-
 	};
 
 	var renderAddForm1 = function() {
@@ -318,6 +440,54 @@
 	var renderAddForm2 = function(type) {
 		position = {"type":type, "id":-1}
 		renderEditForm(position)
+	};
+
+	var renderSettings = function(ev) {
+		// if already displayed, hide setting
+		if ($(".settings-container").css("display") != "none") return false;
+		// hide 'settings' icon
+		$(".settings-icon-container").animate({"opacity":0}, 250)
+		// slide out tab container
+		$(".tab-container").css("position","relative").animate({"left":"-5000px"}, 250, function() {
+			// reset properties of tab container
+			$(this).css("display","none").css("position", "static").css("left","")
+			// fade in settings container
+			$(".settings-container").css("opacity", "0").css("display","block").animate({"opacity":1}, 250, function() {
+				// console.log(this)
+			})
+		});
+	};
+
+	var hideSettings = function(ev) {
+		// if settings already hidden, do nothing
+		if ($(".settings-container").css("display") == "none") return false;
+
+		// show 'settings' icon
+		$(".settings-icon-container").animate({"opacity":1}, 250)
+
+		// slide out settings container
+		$(".settings-container").css("position","relative").animate({"left":"-500px"}, 250, function () {
+			// readjust settings container
+			// console.log(this)
+			$(this).css("display","none").css("position","static").css("left", "")
+			// console.log(this)
+			// fade in tabs container
+			$(".tab-container").css("opacity", "0").css("display","block").animate({"opacity":1}, 250)
+		});
+	};
+
+	// Simple client-side pre AJAX validation... currently just checks to make sure 
+		// not completely blank 
+		// TODO: improve this
+	var simpleValidation = function(position) {
+		var valid_props = 0;
+
+		for (key in position)
+			if (key != "id" && key != "type")
+				if (position[key] != "" && position[key] != null) valid_props += 1
+		
+
+		return valid_props
 	};
 
 
@@ -337,13 +507,12 @@
 <script type="text/template" id="timeline-edit-org-template">
 	
 	<div class="input-container" data-type="<%=type%>">
-		<p>Edit Position: </p>
-		<input type="text" placeholder="<%=title%>" name="title" value="<%=title%>" class="input-medium" />
-		 at <input type="text" placeholder="<%=co_name%>" name="co_name" value="<%=co_name%>" class="input-medium" />
-		 From: <input type="text" placeholder="<%=start_date%>" name="start_date" value="<%=start_date%>" class="input-small" maxlength="5" />
-		 To: <input type="text" placeholder="<%=end_date%>" name="end_date" value="<%=end_date%>" class="input-small" maxlength="5" />
-		 <input type="hidden" name="id" value="<%=id%>" /> 
-		<div class="submit-button flat-button green-button" onclick="editPosition()" style="vertical-align:top;">Done</div>
+		<input type="text" placeholder="Product Manager" name="title" value="<%=title%>" data-original="<%=title%>" class="input-large" />
+		 at <input type="text" placeholder="Apple" name="co_name" value="<%=co_name%>" data-original="<%=co_name%>" class="input-large" />
+		 From: <input type="text" placeholder="09/11" name="start_date" value="<%=start_date%>" data-original="<%=start_date%>" class="input-extra-small" maxlength="5" />
+		 To: <input type="text" placeholder="09/12" name="end_date" value="<%=end_date%>" data-original="<%=end_date%>" class="input-extra-small" maxlength="5" />
+		 <input type="hidden" name="id" value="<%=id%>" data-original="<%=id%>" /> 
+		<div class="submit-button flat-button green-button" onclick="editPosition()" style="vertical-align:top;"> Done </div>
 	</div>
 
 
@@ -352,13 +521,13 @@
 <script type="text/template" id="timeline-edit-education-template">
 
 	<div class="input-container" data-type="<%=type%>">
-		<p>Edit Education: </p>
-		<input type='text' placeholder='<%=degree%>' name="degree" value="<%=degree%>" class='input-small'/>
-		 in <input type='text' placeholder='<%=field%>' name="field" value="<%=field%>" class='input-medium'/>
-		 at <input type='text' placeholder='<%=school%>' name="school" value="<%=school%>" class='input-medium'/>
-		Grad Year: <input type="text" placeholder="<%=grad_date%>" name="end_date" value="<%=grad_date%>" class="input-small" />
-		<input type="hidden" name="id" value="<%=id%>" /> 
-		<div class="submit-button flat-button green-button" onclick="editPosition()" style="vertical-align:top;">Done</div>
+		<input type='text' placeholder='B.A.' name="degree" value="<%=degree%>" data-original="<%=degree%>" class='input-small input-extra-small'/>
+		 in <input type='text' placeholder='Economics' name="field" value="<%=field%>" data-original="<%=field%>" class='input-medium'/>
+		 at <input type='text' placeholder='Stanford University' name="school" value="<%=school%>" data-original="<%=school%>" class='input-medium'/>
+		Start: <input type="text" placeholder="08/08" name="start_date" value="<%=start_date%>" data-original="<%=start_date%>" class="input-extra-small" />
+		End: <input type="text" placeholder="6/12" name="end_date" value="<%=end_date%>" data-original="<%=end_date%>" class="input-extra-small" />
+		<input type="hidden" name="id" value="<%=id%>" data-original="<%=id%>" /> 
+		<div class="submit-button flat-button green-button" onclick="editPosition()" style="vertical-align:top;"> Done </div>
 
 	</div>
 
@@ -373,6 +542,14 @@
 		<div class="timeline-position-dates"><%=start_date%> - <%=end_date%></div>
 
 	</div>
+
+</script>
+
+<script type="text/template" id="timeline-position-fragment-template">
+
+	<div class="timeline-position-position"><%=title%></div>
+	<div class="timeline-position-entity"><%=co_name%></div>
+	<div class="timeline-position-dates"><%=start_date%> - <%=end_date%></div>
 
 </script>
 

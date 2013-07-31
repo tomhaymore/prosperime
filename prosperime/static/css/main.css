@@ -23,6 +23,9 @@ body {
 .clear {
   clear: both; }
 
+.input-extra-small {
+  width: 40px; }
+
 #search-container {
   width: 630px;
   height: 50px; }
@@ -111,8 +114,7 @@ div.splash-container {
 .module-header {
   font-size: 18px;
   font-color: #181818;
-  font-line-height: 26px;
-  line-height: 24px;
+  line-height: 28px;
   margin-bottom: 10px; }
   .module-header a {
     text-decoration: none; }
