@@ -32,6 +32,7 @@ from accounts.tasks import process_li_profile, process_li_connections
 from accounts.forms import FinishAuthForm, AuthForm, RegisterForm
 from social.models import Conversation, FollowConversation, Comment
 import utilities.helpers as helpers
+import careers.careerlib as careerlib
 
 logger = logging.getLogger(__name__)
 critical_logger = logging.getLogger("benchmarks")
@@ -920,6 +921,134 @@ def profile_org(request, org_id):
 ### JSON/AJAX Methods ###
 #########################
 
+def save_position(request):
+	response = {}
+	if not request.POST or not request.is_ajax:
+		response.update({"errors":["incorrect request type"], "result":"failure"})
+		return HttpResponse(json.dumps(response))
+
+	position = request.POST.position
+	if position.id == -1:
+		# new position
+		print "New Position"
+		new_position = Position()
+
+	else:
+		print "Edit existing Position"
+		old_position = Position.objects.get(id=position.id)
+
+
+
+	return HttpResponse(json.dumps(response))
+
+
+
+
+def validate_position(request):
+	# initialize response
+	response = {}
+	# return error if not ajax or post
+	if not request.is_ajax or not request.POST:
+		response['result'] = 'failure'
+		response['errors'] = 'invalid request type'
+		return HttpResponse(json.dumps(response))
+
+	if request.POST:
+		from careers.forms import AddProgressDetailsForm
+		# bind form
+		form = AddProgressDetailsForm(request.POST)
+		# validate form
+		if form.is_valid():
+			# init carerlib
+			mapper = careerlib.EdMapper()
+
+			# Education
+			if form.cleaned_data['type'] == "education":
+				# set up initial data
+				response['data'] = {
+					'grad_year':form.cleaned_data['end_date'].year	
+				}
+				# see if we can map degree
+				idealdegree = mapper.match_degree(form.cleaned_data['degree'] + form.cleaned_data['field'])
+				if idealdegree:
+					# there is a match, add ideal id to path generation
+					response['result'] = 'success'
+					response['data']['degree'] = idealdegree.title
+					response['data']['field'] = None
+					response['data']['ideal_id'] = idealdegree.id
+					
+				else:
+					# no match, still return data but don't update 
+					response['result'] = 'success'
+					response['errors'] = 'missing ideal id'
+					response['data']['degree'] = form.cleaned_data['degree']
+					response['data']['field'] = form.cleaned_data['field']
+				
+				# see if we can match entity
+				entity = Entity.objects.filter(name__icontains=form.cleaned_data['entity'],subtype="ed-institution").annotate(pop=Count("positions__id")).order_by("-pop")
+				if entity.exists():
+					# there is a match
+					response['data']['entity'] = entity[0].name
+					response['data']['entity_id'] = entity[0].id
+				else:
+					# no match, return same text string as entered
+					response['data']['entity'] = form.cleaned_data['entity']
+				# return JSON response
+				return HttpResponse(json.dumps(response))
+
+			# Position
+			elif form.cleaned_data['type'] == "org" or form.cleaned_data["type"] == "internship":
+				# set up initial data
+				response['data'] = {
+					'start_date':form.cleaned_data['start_date'].year,
+					'end_date':form.cleaned_data['end_date'].year
+				}
+				# see if we can map position
+				pos = Object()
+				pos.title = form.cleaned_data['title']
+				pos.type = "position"
+				# pos.entity = None
+				idealpos = mapper.return_ideal_from_position(pos)
+				if idealpos:
+					response['result'] = "success"
+					response['data']['title'] = idealpos.title
+					response['data']['ideal_id'] = idealpos.id
+				else:
+					response['result'] = 'success'
+					response['errors'] = 'missing ideal id'
+					response['data']['title'] = form.cleaned_data['title']
+				# see if we can find entity
+				entity = Entity.objects.filter(name__icontains=form.cleaned_data['entity']).annotate(pop=Count("positions__id")).order_by("-pop")
+				if entity.exists():
+					# there is a match
+					response['data']['entity'] = entity[0].name
+					response['data']['entity_id'] = entity[0].id
+				else:
+					# no match, return same text string as entered
+					response['data']['entity'] = form.cleaned_data['entity']
+				return HttpResponse(json.dumps(response))
+		else:
+			# return error
+			response['result'] = "failure"
+			response['errors'] = form.errors
+			return HttpResponse(json.dumps(response))
+
+
+def upload_profile_pic(request):
+	response = {}
+
+
+	if not request.POST or not request.is_ajax:
+		response.update({"errors":["Incorrect request type."], "result":"failure"})
+		return HttpResponse(json.dumps(response))
+
+	print request.POST
+	## THOMAS: there should be a file object in here that is the the file uploaded on the client
+
+	response.update({"result":"success"})
+
+	return HttpResponse(json.dumps(response))
+
 
 # Adds a connection between the requesting user and the profile
 #	currently being viewed
@@ -1338,12 +1467,11 @@ def _ideal_position_to_json(position):
 #	information needed for timeline creation
 def _prepare_positions_for_timeline(positions):
 
+
 	if len(positions) == 0:
 		return [], None, None, None, None
 
 	formatted_positions = []
-	current = None
-
 
 	# Process each position
 	for pos in positions:
@@ -1367,12 +1495,10 @@ def _prepare_positions_for_timeline(positions):
 			formatted_pos['co_name'] = pos.entity.name
 
 
-
 			# Internships
 			if 'ntern' in pos.title and 'nternational' not in pos.title or "Summer" in pos.title:
 				formatted_pos['type'] = 'internship'
 				formatted_pos['title'] = pos.title
-
 
 			# Educations
 			elif pos.type == 'education' or pos.title == 'Student':
@@ -1397,9 +1523,6 @@ def _prepare_positions_for_timeline(positions):
 				formatted_pos['title'] = pos.title
 				formatted_pos['type'] = 'org'
 
-				if pos.current:
-					current = pos
-
 			formatted_positions.append(formatted_pos)
 	
 	
@@ -1410,7 +1533,7 @@ def _prepare_positions_for_timeline(positions):
 	total_time = helpers._months_from_now_json(start_date)
 	end_date = helpers._format_date(datetime.now())
 
-	return formatted_positions, start_date, end_date, total_time, current
+	return formatted_positions, start_date, end_date, total_time
 
 
 #################

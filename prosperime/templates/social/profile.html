@@ -37,12 +37,6 @@
 			padding-top: 18px;
 		}
 
-
-		#upload-profile-pic-form input[type="file"] {
-			position:absolute;
-			left:-500px;
-		}
-
 		.tab-conversation-container {
 			margin-top: 24px;
 			margin-bottom: 24px;
@@ -133,15 +127,23 @@
 			width: 90px;
 			border-radius: 4px;
 			cursor: pointer;
-			background-color: #f0f0f0;
+			background-color: #c8c8c8;
 			height: 25px;
 			line-height: 25px;
+			text-align:center;
+			margin: 0 auto;
 		}
 
 		#profile-timeline-container { width: 650px; }
 
-
-
+		#upload-profile-pic-form { display: inline; float: right; margin-bottom: 0px; }
+		#upload-profile-pic-form input { line-height: 10px; }
+		.submit-button { 
+			background-color: #27AE60;
+			vertical-align: bottom;
+			line-height: 24px;
+		}
+	
 	</style>
 
 {% endblock %}
@@ -160,19 +162,11 @@
 	<!-- Center -->
 	<div id="center-column">
 		<div class="feature-page-header">{{user_name}}</div>
-
-<!-- 		<form id="upload-profile-pic-form" method="post" enctype="multipart/form-data" action='ajaximage.php'>
-			<input type="file" name="photoimg" id="photoimg" />
-		</form> -->
-
 		
 		<div class="row-fluid">
 			<div id="Profile-profile-pic-container" class="profile-pic-container">
 				<img src="{{profile_pic}}" />
-				<div class="settings-icon-container">Settings <i class="icon-cog icon-large" title="Settings"></i></div>
 			</div>
-
-
 
 			<!-- SVG Timeline -->
 			<div id="profile-timeline-container"></div>
@@ -185,13 +179,16 @@
 		</div>
 
 		<!-- Settings -->
+		{% if own_profile %}
 		<div class="row-fluid settings-container slide-container">
 			<div class="module-header">Settings &nbsp;&nbsp;&nbsp; <i class="icon-ok icon-large settings-complete" data-setting="return"></i></div>
 
 			<div class="settings-list">
 				<div><i class="icon-pencil icon-large" data-setting="addPosition"> </i>Add to your professional timeline</div>
+				<div><i class="icon-pencil icon-large" data-setting="uploadPic"> </i>Upload a new profile picture</div>
 			</div>
 		</div>
+		{% endif %}
 
 		<!-- Conversations List(s) -->
 		<div class="row-fluid tab-container slide-container">
@@ -215,8 +212,10 @@
 							</div>
 							<div class="tab-conversation-col-right">Ask friends to answer</div>
 						</div>
-
 					{% endfor %}
+					{% if started_conversations|length == 0 %}
+						<br/><br/><br/><p>&nbsp;&nbsp;&nbsp;{{user_name}} hasn't started any conversations yet</p>
+					{% endif %}
 				</div>
 				
 				<div class="tab-pane" id="followed-convos-tab">
@@ -230,8 +229,10 @@
 							</div>
 							<div class="tab-conversation-col-right">Ask friends to answer</div>
 						</div>
-
 					{% endfor %}
+					{% if followed_conversations|length == 0 %}
+						<br/><br/><br/><p>&nbsp;&nbsp;&nbsp;{{user_name}} hasn't followed any conversations yet</p>
+					{% endif %}
 				</div>
 			</div>
 		</div>
@@ -251,7 +252,7 @@
 					<a href="/ask/" class="flat-button green-button">Start</a> a conversation
 				</p>
 			</div>
-
+				
 			<div class="module-header">Connections: </div>
 			<!-- Default to first 5 -->
 			{% for c in connections %}
@@ -269,6 +270,13 @@
 				<p>No connections yet</p>
 
 			{% endif %}
+
+			{% if own_profile %}
+			<div class="right-question-column-module">
+					<div class="settings-icon-container">Settings <i class="icon-cog icon-large" title="Settings"></i></div>
+			</div>
+			{% endif %}
+
 		</div>
 
 		<!-- Popular Tags -->
@@ -313,12 +321,13 @@
 	// essentially a router for setting click events
 		// looks up in local dictionary, calls appopriate handler
 	var setSetting = function(ev) {
-		var setting_map = {
+		var settings_router = {
 			"addPosition":renderAddForm1,
 			"return":hideSettings,
+			"uploadPic":renderUploadForm,
 		}
 		var setting = $(ev.currentTarget).data("setting")
-		setting_map[setting]()
+		settings_router[setting](ev)
 	};
 
 	var renderEditForm = function(position) {
@@ -380,47 +389,64 @@
 			// TODO: incorporate Thomas' old on_track code
 			console.log("submit changed position to DB")
 
-			var position = {
-				"title":($(".input-container").find("input[name='title']").length == 0) ? null : $(".input-container").find("input[name='title']").val(),
-				"id":($(".input-container").find("input[name='id']").length == 0) ? null : $(".input-container").find("input[name='id']").val(),
-				"type":$(".input-container").data("type"),
-				"co_name":($(".input-container").find("input[name='co_name']").length == 0) ? null : $(".input-container").find("input[name='co_name']").val(),
-				"school":($(".input-container").find("input[name='school']").length == 0) ? null : $(".input-container").find("input[name='school']").val(),
-				"degree":($(".input-container").find("input[name='degree']").length == 0) ? null : $(".input-container").find("input[name='degree']").val(),
-				"field":($(".input-container").find("input[name='field']").length == 0) ? null : $(".input-container").find("input[name='field']").val(),
-				"start_date":($(".input-container").find("input[name='start_date']").length == 0) ? null : $(".input-container").find("input[name='start_date']").val(),
-				"end_date":($(".input-container").find("input[name='end_date']").length == 0) ? null : $(".input-container").find("input[name='end_date']").val(),
-			}
-
+			var position = createPositionObject()
 
 			if(simpleValidation(position)) {
 				console.log("validated")
-				// Validate form data via API
-				if (position.type == "org") position.type = "position" // make sure API compliant
-				position["csrfmiddlewaretoken"] = "{{csrf_token}}"
-				$.post('/careers/addProgressDetails/', position, function(data) {
-					console.log(data);
-					if (data["result"] == "success") {
-						console.log("success")
-						// // Add to DST
-						// path.push({
-						// 	"type":"position",
-						// 	"title":data.data.title,
-						// 	"entity":data.data.entity,
-						// 	"start_date":data.data.start_date,
-						// 	"end_date":data.data.end_date,
-						// 	"display_text":data.data.title + " at " + data.data.entity
-						// });
-						// // console.log(path);
-						// // rerenderProgressBar(path)
-						// if (path.length == 1) createUserPathBar(path)
-						// addPositionToExistingPath(path)
-					} else {
-						// display error
-						console.log('failure');
-						console.log(data.errors);
+
+				// helper to rename form data for old On_Track API
+				position = readyForDjangoForm(position)
+
+				// Validate Position
+				$.ajax({
+					type: "POST",
+					url: "/accounts/validatePosition/",
+					data: position,
+					dataType:"json",
+
+					beforeSend: function() { },
+
+					success:function(response) {
+						if (response["result"] == "success") {
+							
+							var cleaned_position = response.data
+							console.log("success: ", cleaned_position)
+							
+						} else console.log(response["errors"])
+					},
+
+					complete:function() {
+					
+					
 					}
-				},'json');
+				});
+
+				// // Validate form data via API
+				// $.post('/accounts/validatePosition/', position, function(data) {
+				// 	console.log(data);
+				// 	if (data["result"] == "success") {
+
+						
+
+				// 		// // Add to DST
+				// 		// path.push({
+				// 		// 	"type":"position",
+				// 		// 	"title":data.data.title,
+				// 		// 	"entity":data.data.entity,
+				// 		// 	"start_date":data.data.start_date,
+				// 		// 	"end_date":data.data.end_date,
+				// 		// 	"display_text":data.data.title + " at " + data.data.entity
+				// 		// });
+				// 		// // console.log(path);
+				// 		// // rerenderProgressBar(path)
+				// 		// if (path.length == 1) createUserPathBar(path)
+				// 		// addPositionToExistingPath(path)
+				// 	} else {
+				// 		// display error
+				// 		console.log('failure');
+				// 		console.log(data.errors);
+				// 	}
+				// },'json');
 
 				// TODO: put this in callback
 				if (new_position)
@@ -432,7 +458,85 @@
 		} 
 	};
 
+	// Creates a Position obj to send to DB from From
+	var createPositionObject = function () {
+		// check the form for applicable values, if not applicable, value=null
+		var position = {
+			"title":($(".input-container").find("input[name='title']").length == 0) ? null : $(".input-container").find("input[name='title']").val(),
+			"id":($(".input-container").find("input[name='id']").length == 0) ? null : $(".input-container").find("input[name='id']").val(),
+			"type":$(".input-container").data("type"),
+			"co_name":($(".input-container").find("input[name='co_name']").length == 0) ? null : $(".input-container").find("input[name='co_name']").val(),
+			"school":($(".input-container").find("input[name='school']").length == 0) ? null : $(".input-container").find("input[name='school']").val(),
+			"degree":($(".input-container").find("input[name='degree']").length == 0) ? null : $(".input-container").find("input[name='degree']").val(),
+			"field":($(".input-container").find("input[name='field']").length == 0) ? null : $(".input-container").find("input[name='field']").val(),
+			"start_date":($(".input-container").find("input[name='start_date']").length == 0) ? null : $(".input-container").find("input[name='start_date']").val(),
+			"end_date":($(".input-container").find("input[name='end_date']").length == 0) ? null : $(".input-container").find("input[name='end_date']").val(),
+		}
+		return position;
+	};
+
+	// Takes care of bookkeeping to mesh with old on_track form API
+	var readyForDjangoForm = function(position) { 
+		if (position.school != null) position.entity = position.school
+		else position.entity = position.co_name 
+		position["csrfmiddlewaretoken"] = "{{csrf_token}}"
+		return position
+	};
+
+	var renderUploadForm = function(ev) {
+		if ($("#upload-profile-pic-form").length > 0) {
+			hideUploadForm()
+			return false;
+		}
+
+		var template = _.template($("#upload-profile-pic-template").html())
+		$(ev.currentTarget).parent().append(template())
+		$("#upload-profile-pic-form").css("opacity", "0").animate({"opacity":1}, 250)
+
+		// add handler to submit button
+		$("#upload-profile-pic-form .form-submit").on("click", function(e) {
+			e.preventDefault()
+
+		    var formData = new FormData($("#upload-profile-pic-form")[0]);
+		    console.log(formData)
+		    $.ajax({
+		        url: "/accounts/uploadProfilePic/",  
+		        type: "POST",
+		        // xhr: function() {  // custom xhr
+		        //     var myXhr = $.ajaxSettings.xhr();
+		        //     if(myXhr.upload){ // check if upload property exists
+		        //         myXhr.upload.addEventListener('progress',progressHandlingFunction, false); // for handling the progress of the upload
+		        //     }
+		        //     return myXhr;
+		        // },
+		        //Ajax events
+		        // beforeSend: beforeSendHandler,
+		        success: function(response) {
+		        	console.log(response)
+		       	},
+		        // error: errorHandler,
+		        // Form data
+		        data: formData,
+		        //Options to tell JQuery not to process data or worry about content-type
+		        cache: false,
+		        contentType: false,
+		        processData: false
+		    });
+		})
+	};
+
+	var hideUploadForm = function() {
+		$("#upload-profile-pic-form").animate({"opacity":0}, 250, function() { $(this).remove() })
+	};
+
 	var renderAddForm1 = function() {
+		if ($(".add-position-prompt").length > 0) {
+			$("#timeline-edit-container").animate({"opacity":0}, 250, function () {
+				$(this).empty().css("opacity", 1)
+			})
+			return false;
+		}
+
 		var template = _.template($("#add-position-first-template").html())
 		$("#timeline-edit-container").empty().append(template()).hide().fadeIn(200)
 	};
@@ -507,10 +611,10 @@
 <script type="text/template" id="timeline-edit-org-template">
 	
 	<div class="input-container" data-type="<%=type%>">
-		<input type="text" placeholder="Product Manager" name="title" value="<%=title%>" data-original="<%=title%>" class="input-large" />
-		 at <input type="text" placeholder="Apple" name="co_name" value="<%=co_name%>" data-original="<%=co_name%>" class="input-large" />
-		 From: <input type="text" placeholder="09/11" name="start_date" value="<%=start_date%>" data-original="<%=start_date%>" class="input-extra-small" maxlength="5" />
-		 To: <input type="text" placeholder="09/12" name="end_date" value="<%=end_date%>" data-original="<%=end_date%>" class="input-extra-small" maxlength="5" />
+		<input type="text" placeholder="Title" name="title" value="<%=title%>" data-original="<%=title%>" class="input-large" />
+		 at <input type="text" placeholder="Company" name="co_name" value="<%=co_name%>" data-original="<%=co_name%>" class="input-large" />
+		 From: <input type="text" placeholder="MM/YY" name="start_date" value="<%=start_date%>" data-original="<%=start_date%>" class="input-extra-small" maxlength="5" />
+		 To: <input type="text" placeholder="MM/YY" name="end_date" value="<%=end_date%>" data-original="<%=end_date%>" class="input-extra-small" maxlength="5" />
 		 <input type="hidden" name="id" value="<%=id%>" data-original="<%=id%>" /> 
 		<div class="submit-button flat-button green-button" onclick="editPosition()" style="vertical-align:top;"> Done </div>
 	</div>
@@ -522,10 +626,10 @@
 
 	<div class="input-container" data-type="<%=type%>">
 		<input type='text' placeholder='B.A.' name="degree" value="<%=degree%>" data-original="<%=degree%>" class='input-small input-extra-small'/>
-		 in <input type='text' placeholder='Economics' name="field" value="<%=field%>" data-original="<%=field%>" class='input-medium'/>
-		 at <input type='text' placeholder='Stanford University' name="school" value="<%=school%>" data-original="<%=school%>" class='input-medium'/>
-		Start: <input type="text" placeholder="08/08" name="start_date" value="<%=start_date%>" data-original="<%=start_date%>" class="input-extra-small" />
-		End: <input type="text" placeholder="6/12" name="end_date" value="<%=end_date%>" data-original="<%=end_date%>" class="input-extra-small" />
+		 in <input type='text' placeholder='Major' name="field" value="<%=field%>" data-original="<%=field%>" class='input-medium'/>
+		 at <input type='text' placeholder='University' name="school" value="<%=school%>" data-original="<%=school%>" class='input-medium'/>
+		Start: <input type="text" placeholder="MM/YY" name="start_date" value="<%=start_date%>" data-original="<%=start_date%>" class="input-extra-small" />
+		End: <input type="text" placeholder="MM/YY" name="end_date" value="<%=end_date%>" data-original="<%=end_date%>" class="input-extra-small" />
 		<input type="hidden" name="id" value="<%=id%>" data-original="<%=id%>" /> 
 		<div class="submit-button flat-button green-button" onclick="editPosition()" style="vertical-align:top;"> Done </div>
 
@@ -553,5 +657,14 @@
 
 </script>
 
+<script type="text/template" id="upload-profile-pic-template">
+
+	<form id="upload-profile-pic-form" enctype="multipart/form-data">
+		{% csrf_token %}
+		<input type="file" name="pic" id="pic" />
+		<div class="form-submit flat-button submit-button">Upload</div>
+	</form>
+
+</script>
 
 {% endblock %}

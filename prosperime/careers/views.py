@@ -608,18 +608,18 @@ def progress(request):
 
 	return render_to_response("careers/on_track.html", data, context_instance=RequestContext(request))
 
-
+# DEPRECATED: new code in Accounts.views
 def add_progress_detail(request):
 	# initialize response
 	response = {}
 	# return error if not ajax or post
 	if not request.is_ajax or not request.POST:
-		response['re sult'] = 'failure'
+		response['result'] = 'failure'
 		response['errors'] = 'invalid request type'
 		return HttpResponse(json.dumps(response))
+
 	if request.POST:
 		from careers.forms import AddProgressDetailsForm
-		print 'hola'
 		# bind form
 		form = AddProgressDetailsForm(request.POST)
 		# validate form
@@ -627,7 +627,7 @@ def add_progress_detail(request):
 			# init carerlib
 			mapper = careerlib.EdMapper()
 
-			# check for type of detail being added
+			# Education
 			if form.cleaned_data['type'] == "education":
 				# set up initial data
 				response['data'] = {
@@ -659,6 +659,8 @@ def add_progress_detail(request):
 					response['data']['entity'] = form.cleaned_data['entity']
 				# return JSON response
 				return HttpResponse(json.dumps(response))
+
+			# Position
 			elif form.cleaned_data['type'] == "position":
 				# set up initial data
 				response['data'] = {

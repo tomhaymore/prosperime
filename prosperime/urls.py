@@ -149,8 +149,11 @@ urlpatterns = patterns('',
     url(r'^accounts/updateProfile/$', 'accounts.views.updateProfile'),
     url(r'^accounts/addToProfile/$','accounts.views.add_to_profile'),
     url(r'^accounts/deleteItem/$', 'accounts.views.deleteItem'),
-    url(r'^accounts/connect/$', 'accounts.views.connect'),
+    url(r'^accounts/connect/$', 'accounts.views.connect'),                           # will be used
 
+    url(r'^accounts/uploadProfilePic/$', 'accounts.views.upload_profile_pic'),       # in use
+    url(r'^accounts/validatePosition/$', 'accounts.views.validate_position'),        # in use
+    url(r'^accounts/savePosition/$', 'accounts.views.save_position'),
   
 
 

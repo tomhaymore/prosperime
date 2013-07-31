@@ -52,12 +52,11 @@
 							
                 			{% if user.is_authenticated %}
 		             	
-		             			<li>
-		                			<a href="/">Home</a>
-		                		</li>
-		                		<li>
-		                			<a href="/account/logout/">Logout</a>
-		                		</li>
+		             			<li><a href="/">Home</a></li>
+
+		                		<li><a href="/profile/{{user.id}}">Profile</a></li>
+
+		                		<li><a href="/account/logout/">Logout</a></li>
 	                		{% else %}
 								<li>
 									<a href="/account/login">Login</a>

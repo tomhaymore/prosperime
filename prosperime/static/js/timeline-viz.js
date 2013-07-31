@@ -43,7 +43,7 @@ var Timeline = (function() {
 
     function createLine() {
         // line attributes
-        var line_attr = {"stroke-width":1, "stroke-linecap":"round", "opacity":.8, "stroke":"#c0c0c0"}
+        var line_attr = {"stroke-width":1, "stroke-linecap":"round", "opacity":.8, "stroke":"#777"}
         // create line
         var timeline = paper.path("M" + offset + "," + midline + " L" + (w - offset) + "," + midline).attr(line_attr)
     };
@@ -67,7 +67,6 @@ var Timeline = (function() {
             .attr(outer_dot_attr)
             .data("index", index)
             .mouseover(nodeMouseover)
-            // .mouseout(nodeMouseout)
 
     
         // create & hide mouseover node
@@ -87,6 +86,9 @@ var Timeline = (function() {
         if (permissions.indexOf("w") != -1) {
             hidden_node.click(function(ev) { animateToEdit(ev, index) })
             hidden_text.click(function(ev) { animateToEdit(ev, index) })
+        } else {
+            // needed for read-only profiles
+            outer_node.mouseout(nodeMouseout)
         }
 
         // set id on outer_node for hover event, hover_node for hover event
