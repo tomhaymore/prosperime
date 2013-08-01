@@ -143,6 +143,12 @@
 			vertical-align: bottom;
 			line-height: 24px;
 		}
+
+		.input-error {
+			border: 1px solid #e74c3c !important;
+		}
+
+		.error-text { color: #e74c3c; }
 	
 	</style>
 
@@ -364,13 +370,9 @@
 	};
 
 	var editPosition = function() {
-		// return timeline to normal
-		Timeline.normalize()
+		// remove pre-existing errors
+		scrubErrors()
 
-		// hide container
-		$(".input-container").animate({"opacity":0}, 250)
-		// normalize tabs
-		$(".tab-container").animate({"opacity":1}, 200)
 		// check for changes
 		var changes_made = false,
 			new_position = ($(".input-container input :last").val() == -1) ? true : false;
@@ -388,7 +390,8 @@
 			// Create a dict of values from form
 			var position = createPositionObject() 
 			// Put through simple client-side validation
-			if(simpleValidation(position)) {
+			var errors = simpleValidation(position)
+			if(Object.keys(errors).length == 0) {
 				// helper to rename form data for old On_Track API
 				position = readyForDjangoForm(position)
 				// Validation Position via API    [ ** AJAX ** ]
@@ -397,7 +400,16 @@
 					url: "/accounts/validatePosition/",
 					data: position,
 					dataType:"json",
-					beforeSend: function() { console.log("Submit new or changed Position to DB for validation") },
+					beforeSend: function() {
+						// return timeline to normal
+						Timeline.normalize()
+
+						// hide container
+						$(".input-container").animate({"opacity":0}, 250)
+						// normalize tabs
+						$(".tab-container").animate({"opacity":1}, 200)
+						console.log("Submit new or changed Position to DB for validation")
+					},
 					success:function(response) {
 						if (response["result"] == "success") {
 							var cleaned_position = response.data
@@ -407,7 +419,9 @@
 						} else console.log(response["errors"])
 					},
 				});
-			}
+			} else
+				// display validation errors
+				renderErrors(errors)
 		} 
 	};
 
@@ -556,19 +570,71 @@
 		});
 	};
 
-	// Simple client-side pre AJAX validation... currently just checks to make sure 
-		// not completely blank 
+	// Simple client-side pre AJAX validation.
 		// TODO: improve this
 	var simpleValidation = function(position) {
-		var valid_props = 0;
+		var errors = {};
+		var exception_list = (position.type == "education") ? ["co_name", "title", "id", "end_date"] : ["school", "field", "degree", "id", "end_date"];
+		for (key in position) {
+			// end date is not required, other values are hidden
+			if (exception_list.indexOf(key) == -1) {
+				// check for blank values
+				if (position[key] == "" || position[key] == null) errors[key] = ["Field cannot be blank"]
+			}
+		}
 
-		for (key in position)
-			if (key != "id" && key != "type")
-				if (position[key] != "" && position[key] != null) valid_props += 1
-		
+		// ensure date matches format MM/YY (or M/YY)
+		var date_regex = /[0-1]*[0-9]\/[0-9][0-9]/
+		if (date_regex.exec(position.start_date) == null)
+			("start_date" in errors) ? errors["start_date"].push("Date does not fit format MM/YY") : errors["start_date"] = ["Date does not fit format MM/YY"]
 
-		return valid_props
+		// if they entered an end_date, check it
+		if (position["end_date"] != "" && position["end_date"] != null)
+			if (date_regex.exec(position.end_date) == null && position.end_date != "Current")
+				errors["end_date"] = ["Date does not fit format MM/YY"]
+
+		// ensure dates have "MM" format
+		if (position.start_date.split("/")[0].length == 1) position.start_date = "0" + position.start_date
+		if (position.end_date.split("/")[0].length == 1) position.end_date = "0" + position.end_date
+
+		// check that the start_date <= end_date
+		if (date_to_int(position.end_date) < date_to_int(position.start_date)) 
+			("end_date" in errors) ? errors["end_date"].push("End date is after the start date!") : errors["end_date"] = ["End date is after the start date!"]
+
+		// ensure months are legit
+		if (!is_a_month(position.start_date.substring(0,2)))
+			("start_date" in errors) ? errors["start_date"].push("Start month isn't a month!") : errors["start_date"] = ["Start month isn't a month!"]
+		if (!is_a_month(position.end_date.substring(0,2)))
+			("end_date" in errors) ? errors["end_date"].push("End month isn't a month!") : errors["end_date"] = ["End month isn't a month!"]
+
+		console.log("Errors", errors)
+		return errors
 	};
+
+	var renderErrors = function(errors) {
+		var error_text = []
+		for (e in errors) {
+			$("#timeline-edit-container input[name='" + e +"']").addClass("input-error")
+			console.log("Error: ", errors[e])
+			error_text.push(errors[e])
+		};
+		var template = _.template($("#errors-template").html())
+		$("#timeline-edit-container").append(template({"errors":error_text}))
+	};
+
+	// Cleans form of previous errors
+	var scrubErrors = function() {
+		$(".input-error").each(function() {
+			// TODO: add animation
+			$(this).removeClass("input-error")
+		});
+
+		$(".error-text").each(function() {
+			// $(this).animate({"opacity":0}, 200, function() { $(this).remove() })
+			$(this).remove()
+		})
+
+	};	
 
 
 </script>
@@ -587,8 +653,8 @@
 <script type="text/template" id="timeline-edit-org-template">
 	
 	<div class="input-container" data-type="<%=type%>">
-		<input type="text" placeholder="Title" name="title" value="<%=title%>" data-original="<%=title%>" class="input-large" />
-		 at <input type="text" placeholder="Company" name="co_name" value="<%=co_name%>" data-original="<%=co_name%>" class="input-large" />
+		<input type="text" placeholder="Title" name="title" value="<%=title%>" data-original="<%=title%>" class="input-large" maxlength="150" />
+		 at <input type="text" placeholder="Company" name="co_name" value="<%=co_name%>" data-original="<%=co_name%>" class="input-large" maxlength="450" />
 		 From: <input type="text" placeholder="MM/YY" name="start_date" value="<%=start_date%>" data-original="<%=start_date%>" class="input-extra-small" maxlength="5" />
 		 To: <input type="text" placeholder="MM/YY" name="end_date" value="<%=end_date%>" data-original="<%=end_date%>" class="input-extra-small" maxlength="5" />
 		 <input type="hidden" name="id" value="<%=id%>" data-original="<%=id%>" /> 
@@ -601,11 +667,11 @@
 <script type="text/template" id="timeline-edit-education-template">
 
 	<div class="input-container" data-type="<%=type%>">
-		<input type='text' placeholder='B.A.' name="degree" value="<%=degree%>" data-original="<%=degree%>" class='input-small input-extra-small'/>
-		 in <input type='text' placeholder='Major' name="field" value="<%=field%>" data-original="<%=field%>" class='input-medium'/>
-		 at <input type='text' placeholder='University' name="school" value="<%=school%>" data-original="<%=school%>" class='input-medium'/>
-		Start: <input type="text" placeholder="MM/YY" name="start_date" value="<%=start_date%>" data-original="<%=start_date%>" class="input-extra-small" />
-		End: <input type="text" placeholder="MM/YY" name="end_date" value="<%=end_date%>" data-original="<%=end_date%>" class="input-extra-small" />
+		<input type='text' placeholder='B.A.' name="degree" value="<%=degree%>" data-original="<%=degree%>" class='input-small input-extra-small' maxlength="450" />
+		 in <input type='text' placeholder='Major' name="field" value="<%=field%>" data-original="<%=field%>" class='input-medium' maxlength="450" />
+		 at <input type='text' placeholder='University' name="school" value="<%=school%>" data-original="<%=school%>" class='input-medium' maxlength="450" />
+		Start: <input type="text" placeholder="MM/YY" name="start_date" value="<%=start_date%>" data-original="<%=start_date%>" class="input-extra-small" maxlength="5" />
+		End: <input type="text" placeholder="MM/YY" name="end_date" value="<%=end_date%>" data-original="<%=end_date%>" class="input-extra-small" maxlength="5" />
 		<input type="hidden" name="id" value="<%=id%>" data-original="<%=id%>" /> 
 		<div class="submit-button flat-button green-button" onclick="editPosition()" style="vertical-align:top;"> Done </div>
 
@@ -640,6 +706,14 @@
 		<input type="file" name="pic" id="pic" />
 		<div class="form-submit flat-button submit-button">Upload</div>
 	</form>
+
+</script>
+
+<script type="text/template" id="errors-template">
+
+	<% for (index in errors) { %>
+		<p class="error-text"><%=errors[index].join(", ")%></p>
+	<% } %>
 
 </script>
 

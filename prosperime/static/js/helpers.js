@@ -69,3 +69,24 @@ function months_difference (mo1, yr1, mo2, yr2, compress, round) {
 	}
 	return diff;
 };
+
+
+// date validation methods
+	// currently, only format supported is "MM/YY"
+function date_to_int(date) {
+
+	return parseInt(date.substring(3) + date.substring(0,2))
+}
+
+function is_a_month(mo) {
+	return (parseInt(mo) <= 12 && parseInt(mo) > 0)
+}
+
+
+
+
+
+
+
+
+
