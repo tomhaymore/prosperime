@@ -1,39 +1,17 @@
 /* Imports */
 
 @import "colors"
+@import "layout"
 
 /* General Styles */
 
-$left-column-width: 0
-$right-column-width: 175px
-$center-column-width: $right-column-width - $left-column-width - 10
 
-$question-column-left-width: 75px
-$question-column-right-width: 720px - $question-column-left-width
-
-$comment-module-width: $question-column-right-width
-$comment-column-left-width: 35px
-$comment-column-right-width: $comment-module-width - $comment-column-left-width - 20px
 
 /* Left Column */
 
 /* Main Content Styles */
 
-#search-conversations-input
-	width: 425px
 
-.tt-hint
-	width: 425px
-
-.tt-dropdown-menu
-	background-color: $white
-	li
-		padding-left: 5px
-		padding-right: 5px
-	li:hover
-		background-color: $lightblue
-		color: $white
-		cursor: pointer
 
 #left-question-column
 	margin-left: 0px
@@ -78,11 +56,10 @@ $comment-column-right-width: $comment-module-width - $comment-column-left-width 
 .single-question-module 
 	margin-top: 24px
 	margin-bottom: 24px
-	border-bottom: 1px solid #e0e0e0
 
 .question-column-left 
 	display: inline-block 
-	width: 110px
+	width: $question-column-left-width
 	margin-right: 10px
 	vertical-align: top
 	
@@ -140,6 +117,7 @@ $comment-column-right-width: $comment-module-width - $comment-column-left-width 
 .comment-column-right
 	@extend .question-column-right
 	width: $comment-column-right-width
+	vertical-align: middle
 
 .comment-body
 	font-size: 0.9em
@@ -202,7 +180,6 @@ $comment-column-right-width: $comment-module-width - $comment-column-left-width 
 	background-color: $lightgray
 	cursor: default
 
-
 .vote-container
 	border-radius: 2px
 	line-height: 24px
@@ -242,6 +219,102 @@ $comment-column-right-width: $comment-module-width - $comment-column-left-width 
 	padding-top: 24px
 	padding-bottom: 24px
 
+
+.advisor-container
+	padding: 5px
+	width: $comment-module-width / 2 - 20
+	margin-right: 10px
+	float: left
+	border-radius: 1px
+	transition: all 0.5s
+	cursor: pointer
+
+.advisor-container:hover
+	
+	a.advisor-ask
+		opacity: 1
+
+	.advisor-pic-container
+		
+		background-image: url('/static/img/ask.png')
+
+
+	.advisor-pic-container img
+		opacity: 0
+
+.advisor-pic-container
+	background-position: center
+	background-repeat: no-repeat
+	float: left
+	width: 45px
+	height: 45px
+	display: inline-block
+	margin-right: 16px
+	margin-bottom: 16px 
+	border-radius: 45px
+	transition: all .5s
+	img 
+		border-radius: 45px
+		transition: opacity .2s
+
+.advisor-info-container
+	float: left
+	p
+		font-size: 14px
+		line-height: 16px
+		margin-bottom: 3px
+
+ul.advisor-educations 
+	margin:
+		top: 5px
+		bottom: 5px
+		left: 0px
+		right: 0px
+	list-decoration: none
+	li
+		margin-right: 10px
+		display: inline-block
+		padding: 3px 5px 3px 5px
+		font-size: 12px
+		line-height: 22px
+		background-color: $lightblue
+
+a.advisor-ask
+	background-color: $darkblue
+	color: $white
+	display: inline-block
+	position: relative
+	left: 210px
+	float: left
+	top: -30px
+	padding: 5px
+	width: 65px
+	text-align: center
+	opacity: 0
+	transition: opacity .5s
+
+a.advisor-ask:hover
+	text-decoration: none
+
+#advisor-modal-inner
+	font-size: 12px
+	padding: 5px
+
+#advisor-modal-inner label
+	margin-top: 5px
+	margin-bottom: 5px
+	font-size: 13px
+
+#id_advisor-message-subject
+	width: 100%
+
+#id_advisor-message-body
+	resize: none
+	width: 100%
+	height: 84px
+
+#ask-advisor-button
+	color: $white
 
 /* Right Column Styles */
 
@@ -297,31 +370,14 @@ $comment-column-right-width: $comment-module-width - $comment-column-left-width 
 		font-size: 1.2em
  
 	.chzn-select
-		width: 400px
 
 	.control-group
 		margin-top: 12px
 		margin-bottom: 36px
 
-
 	textarea
 		resize: none
-		width: 650px
-		line-height: 24px
-		height: 80px
 
-	.submit-button
-		width: 115px
-		height: 45px
-		line-height: 45px
-		border-radius: 2px
-		text-align: center
-		background-color: rgba(39,174,96,1)
-		display: inline-block
-		margin: 0 auto
-		font-size: 1.2em
-		padding: 6px 6px
-		cursor: pointer
 
 /* Profile Page Extra Styles */
 #profile-timeline-container
@@ -334,4 +390,26 @@ $comment-column-right-width: $comment-module-width - $comment-column-left-width 
 	padding-top: 42px
 
 
+/* Search Styles */
 
+#search-conversations-input
+	width: 425px
+
+.tt-hint
+	width: 425px
+
+.tt-dropdown-menu
+	background-color: $white
+	li
+		padding-left: 5px
+		padding-right: 5px
+	li:hover
+		background-color: $lightblue
+		color: $white
+		cursor: pointer
+
+.no-results-container
+	font-size: 18px
+
+.query
+	font-style: italic

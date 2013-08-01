@@ -13,6 +13,8 @@ urlpatterns = patterns('',
     url(r'^welcome/$','social.views.welcome'),
     url(r'^question/(\d+)/$', 'social.views.question'),
     url(r'^ask/$', 'social.views.ask'),
+    url(r'^search/$', 'social.views.search'),
+    url(r'^tags/(\w+)/$', 'social.views.tags'),
 
 
     # Accounts Views
@@ -47,14 +49,16 @@ urlpatterns = patterns('',
     url(r'^api/followConversation/$', 'social.views.api_follow_conversation'),
     url(r'^api/addComment/$', 'social.views.api_add_comment'),
     url(r'^api/voteComment/$', 'social.views.api_vote_comment'),
+    url(r'^api/askAdvisor/$', 'social.views.api_ask_advisor'),
 
-    # Recruiter Views
-    url(r'^recruiters/$', 'social.views.recruiters'),
-    url(r'^recruiters/thanks/$', 'social.views.recruiters_thanks'),
+    # Partner Views
+    url(r'^employers/$', 'social.views.recruiters'),
+    url(r'^employers/thanks/$', 'social.views.recruiters_thanks'),
+    url(r'^partners/', 'social.views.partners'),
 
     # Social - AJAX
     url(r'^social/saveComment/$', 'social.views.saveComment'),
-    url(r'^social/followThread/$', 'social.views.followThread'),
+    # url(r'^social/followThread/$', 'social.views.followThread'),
     url(r'^social/unfollowThread/$', 'social.views.unfollowThread'),   
     url(r'^social/updateVotes/$', 'social.views.updateVotes'),
     url(r'^social/postComment/$', 'social.views.postComment'),
@@ -80,8 +84,8 @@ urlpatterns = patterns('',
     url(r'^personalize/$','accounts.views.personalize'),
 
     # Social Views
-    url(r'^thread/(\d+)/$', 'social.views.thread'),
-    url(r'^thread/$', 'social.views.create_thread'),
+    # url(r'^thread/(\d+)/$', 'social.views.thread'),
+    # url(r'^thread/$', 'social.views.create_thread'),
 
 
     # url(r'^personalize/$','careers.views.personalize_careers_jobs'),
@@ -98,7 +102,7 @@ urlpatterns = patterns('',
     url(r'^discover/career/(\d+)/orgs/$', 'careers.views.discover_career_orgs'),
     url(r'^discover/career/(\d+)/positions/$', 'careers.views.discover_career_positions'),
     # url(r'^discover/position/(\d+)/$','careers.views.discover_position'),
-    url(r'^search/','entities.views.search'),
+    # url(r'^search/','entities.views.search'),
     url(r'^companies/','entities.views.companies'),
     url(r'^filters/','entities.views.filters'),
     url(r'^pathfilters/','entities.views.path_filters'),

@@ -31,7 +31,7 @@ from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from accounts.models import Account, Profile, Picture, Connection
 from careers.models import SavedPath, CareerDecision, Position, SavedPosition, SavedCareer, GoalPosition, IdealPosition
 from entities.models import Entity, Region
-from accounts.tasks import process_li_profile, process_li_connections
+from accounts.tasks import process_li_profile, process_li_connections, send_welcome_email
 from accounts.forms import FinishAuthForm, AuthForm, RegisterForm
 from social.models import Conversation, FollowConversation, Comment
 import utilities.helpers as helpers
@@ -88,9 +88,9 @@ def login(request):
 			if user is not None:
 				auth_login(request,user)
 				messages.success(request, 'You have successfully logged in.')
-				# return HttpResponseRedirect('/')
+				return HttpResponseRedirect('/')
 
-				return HttpResponseRedirect('/home/')
+
 		
 	else:
 		form = AuthForm()
@@ -305,9 +305,7 @@ def finish_registration_old(request):
 	user.save()	
 	
 	# send welcome email
-	welcome = emaillib.WelcomeEmail(user)
-	welcome.send_email()
-	logger.info("sent welcome email to user: "+linkedin_user_info['emailAddress'])
+	send_welcome_email.delay(user)
 	
 	# check to see if user provided a headline
 	if 'headline' in linkedin_user_info:

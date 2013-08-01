@@ -53,7 +53,8 @@ class RegisterForm(forms.Form):
 	confirm_password = forms.CharField(widget=forms.PasswordInput,label="Confirm Password")
 	terms = forms.BooleanField(required=True,
 								label=mark_safe("I have read and understand the <a href='/terms'>Terms of Service</a> and <a href='/privacy'>Privacy Policy</a>."),
-								error_messages={'required':'You must agree to the Terms of Service and Privacy Policy to use Prospr.me.'})
+								error_messages={'required':'You must agree to the Terms of Service and Privacy Policy to use ProsperMe.'})
+	notification = forms.BooleanField(required=False,label=mark_safe("Please keep me updated on changes and improvements to ProsperMe."))
 
 	def clean_username(self):
 		username = self.cleaned_data['username']
@@ -126,7 +127,7 @@ class AddEducationForm(forms.Form):
 
 class AddExperienceForm(forms.Form):
 	title = forms.CharField(label="Title")
-	description = forms.CharField(label="Descrption",required=False)
+	description = forms.CharField(label="Description",required=False)
 	entity = forms.CharField(label="Organization")
 	start_date = forms.DateField(label="Start date",input_formats=date_formats,required=False)
 	end_date = forms.DateField(label="End date",input_formats=date_formats,required=False)

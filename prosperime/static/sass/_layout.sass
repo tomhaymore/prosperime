@@ -1,0 +1,15 @@
+$left-column-width: 0px
+$right-column-width: 275px
+$center-column-width: 1000px - $left-column-width - $right-column-width - 30
+
+$question-column-left-width: 75px
+$question-column-right-width: $center-column-width - $question-column-left-width - 20
+
+$comment-module-width: $question-column-right-width
+$comment-column-left-width: 35px
+$comment-column-right-width: $comment-module-width - $comment-column-left-width - 20
+
+@mixin smallshadow
+	-moz-box-shadow:    0px 0px 1px 2px #ccc
+	-webkit-box-shadow: 0px 0px 1px 2px #ccc
+	box-shadow:         0px 0px 1px 2px #ccc

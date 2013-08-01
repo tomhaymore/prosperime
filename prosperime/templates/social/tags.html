@@ -12,7 +12,6 @@
 <!-- JS -->
 	<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/backbone.js"></script>
-	<script type="text/javascript" src="{{ STATIC_URL }}js/home.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/typeahead.min.js"></script>
 
 {% endblock %}
@@ -38,9 +37,50 @@
 	<!-- Center -->
 	<div id="center-column" class="pull-left">
 		
-		<div class="feature-page-header">Conversations: <span class="filter-tags">Most Recent</span></div>
+		<div class="feature-page-header">Conversations Tagged: <span class="filter-tags">{{tag.name}}</span></div>
 
-		<div id="questions-list-container"></div>
+		<div id="questions-list-container">
+			{% for q in questions %}
+				<div class="single-question-module">
+					<div class="question-column-left">
+						<div class="profile-pic-container"><img src="{{q.owner.profile.default_profile_pic}}" /></div>
+					</div>
+
+					<div class="question-column-right">
+						<div class="question-title"><a href="/question/{{q.id}}">{{q.name}}</a></div>
+						<div class="question-body">{{q.summary}}</div>
+						
+						{% for t in q.tags.all %}
+							<div class="tags-container">
+								<a class="tag-inline" href="/tags/{{t.url_name}}">{{t.name}}</a>
+							</div>
+						{% endfor %}
+
+						{% for c in q.comments.all %}
+						<div class="comment-column-left">
+							<div class="profile-pic-container-small"><img src="{{c.owner.profile.default_profile_pic}}" /></div>
+						</div>
+						<div class="comment-column-right">
+							<div class="comment-body">{{c.body}}</div>
+						</div>
+						{% endfor %}
+						
+						<div class="question-subtext">
+							{% if not q.comments.all %}
+								<a href="/question/{{q.id}}">Be the first to answer</a>
+							{% elif q.comments|length == 1 %}
+								<a href="/question/{{q.id}}">See {{q.comments|length}} answer</a> 
+							{% else %}
+								<a href="/question/{{q.id}}">See {{q.comments|length}} answers</a>
+							{% endif %}
+						</div>
+
+
+					</div>
+
+				</div>
+				{% endfor %}
+		</div>
 	</div>
 
 	<!-- Right --> 
@@ -70,58 +110,6 @@
 
 {% block templates %}
 
-<script type="text/template" id="question-list-template">
-
-	
-	<div id="questions-list">
-
-	</div>
-
-</script>
-
-<script type="text/template" id="question-template">
-
-	<div class="single-question-module">
-		<div class="question-column-left">
-			<div class="profile-pic-container"><img src="<%=owner_pic%>" /></div>
-		</div>
-
-		<div class="question-column-right">
-			<div class="question-title"><a href="/question/<%=id%>"><%=name%></a></div>
-			<div class="question-body"><%=summary%></div>
-
-			<% for (t in tags) { %>
-				<div class="tags-container">
-					<a class="tag-inline" href="/tags/<%=tags[t].url_name%>"><%=tags[t].name%></a>
-				</div>
-			<% } %>
-
-
-			<% if (comments.length > 0) %>
-				<div class="comment-column-left">
-					<div class="profile-pic-container-small"><img src="<%=comments[0].owner_pic%>" /></div>
-				</div>
-				<div class="comment-column-right">
-					<div class="comment-body"><%=comments[0].body%></div>
-				</div>
-			
-			<div class="question-subtext">
-				<% if (comments.length == 0) { %>
-					<a href="/question/<%=id%>">Be the first to answer</a>
-				<% } else if (comments.length == 1) { %>
-					<a href="/question/<%=id%>">Add your own answer</a>
-				<% } else { %>
-					<a href="/question/<%=id%>">See all <%=comments.length%> answers </a>
-				<% } %> 
-
-			</div>
-
-
-		</div>
-		<br/>			
-	</div>
-
-</script>
 
 {% endblock %}
 

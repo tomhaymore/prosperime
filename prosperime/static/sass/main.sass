@@ -1,4 +1,5 @@
 @import "colors"
+@import "layout"
 
 /* Element styles */
 
@@ -7,10 +8,29 @@ a
 	cursor: pointer
 
 ul
-	list-decoration: none
+	list-style: none
+	margin-left: 0px
+
+li
+	line-height: 1.4em
+	margin:
+		top: 5px
+		bottom: 5px
+
+label
+	font-weight: 500
+	font-size: 16px
 
 body
 	color: $main-font-color
+
+.grayscale
+	filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0 3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale")
+	filter: gray
+	-webkit-filter: grayscale( 100% )
+
+img.inactive
+	@extend .grayscale
 
 
 /* General styles */
@@ -24,13 +44,15 @@ body
 .clear
 	clear: both
 
+.half
+	float: left
+	width: 50%
+
 // augmenting bootstrap form styles
 .input-extra-small
 	width: 40px
 
-$left-column-width: 0px
-$right-column-width: 225px
-$center-column-width: 1000px - $left-column-width - $right-column-width - 20
+
 
 #search-container
 	width: 630px
@@ -42,7 +64,7 @@ $center-column-width: 1000px - $left-column-width - $right-column-width - 20
 	float: left
 
 #center-column
-	margin-right: 10px
+	margin-right: 20px
 	width: $center-column-width
 	min-height: 200px
 	float: left
@@ -51,11 +73,13 @@ $center-column-width: 1000px - $left-column-width - $right-column-width - 20
 	width: $right-column-width
 	float: left
 
-
+.note
+	font-size: 12px
+	color: $link
 
 /* Header Styles */
 
-$topbar-background: rgb(44,93,130)
+
 
 #topbar
 	-webkit-box-shadow: 0 1px 10px rgba(0,0,0,0.1)
@@ -71,8 +95,8 @@ $topbar-background: rgb(44,93,130)
 	margin-left: auto
 	margin-right: auto
 	background-image: none
-	padding-top: 15px
-	padding-bottom: 10px
+	padding-top: 5px
+	padding-bottom: 5px
 	min-height: 40px
 
 img#main-logo
@@ -99,7 +123,9 @@ div#content-container
 		left: auto
 		top: 15px
 	min-height: 500px
-	padding: 5px 0 5px 0
+	padding:
+		top: 5px 
+		bottom: 5px
 	background-color: #fff
 
 div#background-container
@@ -113,11 +139,30 @@ div.splash-container
 
 .feature-page-header
 	font:
-		size: 2.5em
+		size: 2.3em
 		family: "Helvetica Neue",Helvetica, "Lato"
 	color: $feature-page-header 
-	margin-bottom: 15px
+	margin-bottom: 25px
 	margin-top: 10px
+
+.feature-nav-header
+	font:
+		size: 1.8em
+		family: "Helvetica Neue", Helvetica, "Lato"
+	color: $darkgray
+	margin-bottom: 25px
+	margin-top: 10px
+	margin-right: 10px
+	display: inline-block
+	.selected
+		color: $selected-nav-header
+
+.feature-page-subheader
+	font:
+		size: 1.7em
+		family: "Helvetica Neue", Helvetica, "Lato"
+	color: $feature-page-header
+	margin-bottom: 10px
 
 .main-sub-header
 	font:
@@ -173,14 +218,14 @@ ul.messages
 	display: inline-block
 	vertical-align: middle
 	width: auto
-	line-height: 24px
+	line-height: 22px
 	min-width: 16px
 	padding: 5px 10px 7px 10px
 	font:
 		size: 14px
 
 	text-align: center
-	background-color: #fffffe
+	background-color: $white
 	border-radius: 2px
 	border: none
 	cursor: pointer
@@ -188,6 +233,9 @@ ul.messages
 	-moz-transition: all 0.2s
 	-webkit-transition: all 0.2s
 	-o-transition: all 0.2s
+	:hover
+		text-decoration: none
+		color: $white
 
 .search-button
 	vertical-align: top
@@ -201,11 +249,23 @@ a.flat-button:hover
 	text-decoration: none
 	color: #fffffe
 
+.red-button
+	@extend .flat-button
+	background-color: $button-red
+	color: $white
+
 .green-button
 	@extend .flat-button
 	background-color: $button-green
 	color: $white
 
+.submit-button
+	@extend .flat-button
+	background-color: $button-green
+	color: $white
+
+.nonclickable
+	cursor: default
 
 .inline-button
 	display: inline-block
@@ -216,13 +276,31 @@ a.flat-button:hover
 	font-size: 12px
 
 .blue-button 
+	@extend .flat-button
 	background-color: rgb(41,98,152)
 	color: $white
+
+.blue-button-showcase
+	@extend .blue-button
+	width: 325px
+	font-size: 20px
+	line-height: 36px
 
 .lightblue-button
 	@extend .flat-button
 	background-color: $lightblue
 	color: $white
+
+.medblue-button
+	@extend .flat-button
+	background-color: $medblue
+	color: $white
+
+.li-button
+	@extend .lightblue-button
+
+.fb-button
+	@extend .medblue-button
 
 .wide-button 
 	width: 150px
@@ -237,7 +315,9 @@ a.flat-button:hover
 	background-color: $lightgray !important 
 	cursor: default !important
 
-	
+.modal-close-button
+	@extend .flat-button
+
 /* Footer Styles */
 
 
@@ -272,13 +352,50 @@ div.footer
 .flat-input 
 	border-radius: 0px
 	width: 275px
-	font-size: 18px
+	font-size: 14px
 	height: 24px
-	color: rgba(51,51,51,0.8)
+	color: $darkgray
+
+.flat-input-wide
+	@extend .flat-input
+	width: 450px
+
+.flat-textarea
+	@extend .flat-input
+	height: 48px
+
+.flat-textarea-wide
+	@extend .flat-textarea
+	width: 450px
 
 .form-nav 
 	margin-top: 15px
 	margin-bottom: 15px
+
+.form-left-column
+	max-width: 625px
+	margin-right: 65px
+	float: left
+
+.form-right-column
+	min-width: 300px
+	max-width: 350px
+	float: left
+
+.form-instructions
+	padding: 5px
+	background-color: $lightestbackground
+	border-radius: 2px
+
+.form-help
+	width: 300px
+	margin-top: 25px
+	position: fixed
+	display: none
+	background-color: $lightblue
+	color: $white
+	padding: 5px
+	border-radius: 2px
 
 /* Picture Styles */
 
@@ -299,6 +416,10 @@ div.footer
 	height: 35px
 
 /* Tag Styles */
+
+.tags-container
+	margin-top: 10px
+	margin-bottom: 10px
 
 .filter-tags
 	color: #181818
@@ -325,8 +446,6 @@ div.footer
 
 /* Stats styles */
 
-.stat-container
-	
 .stat-module
 	margin-bottom: 5px
 
@@ -338,3 +457,70 @@ div.footer
 	height: 20px
 	border-radius: 2px
 	line-height: 20px
+
+/* Partner Styles */
+
+.partner-info
+	margin-bottom: 12px
+	text-align: left
+	padding-top: 12px
+	line-height: 26px
+	font:
+		size: 18px
+		family: Helvetica, Arial
+		weight: 300
+
+.promo-header
+	font-size: 20px
+	font-weigth: 500
+
+.promo-text
+	margin-top: 10px
+	font-size: 14px
+	line-height: 30px
+
+.promo-left, .promo-right
+	width: 450px
+
+//.promo-container
+//	border-left:
+//		style: solid
+//		color: $lightgray
+//		width: 1px
+//	border-right:
+//		style: solid
+//		color: $lightgray
+//		width: 1px
+	
+
+//.promo-module
+//	padding:
+//		left: 25px
+//		right: 25px
+//		top: 25px
+//		bottom: 25px
+//	border-top:
+//		style: solid
+//		color: $lightgray
+//		width: 1px
+
+/* Qtip Styles */
+
+.qtip
+	background-color: $qtipbackground
+	font-size: 12px
+	border-color: $topbar-background
+
+/* Modal Styles */
+
+.ui-dialog-titlebar
+	display: none
+
+.ui-widget-overlay
+	position: fixed
+
+
+.ui-dialog .ui-dialog-buttonpane button
+	@extend .modal-close-button
+	margin: 0
+	font-size: 12px

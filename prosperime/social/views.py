@@ -26,7 +26,6 @@ def welcome(request):
 		return HttpResponseRedirect('/home')
 	return render_to_response('welcome.html',context_instance=RequestContext(request))
 
-@login_required
 def home(request):
 
 	# check if user is logged in
@@ -49,6 +48,33 @@ def home(request):
 
 	return render_to_response("social/home.html", data, context_instance=RequestContext(request))
 
+@login_required
+def search(request):
+	popular_tags = Tag.objects.order_by("-count")[:10]
+
+	data = {
+		"popular_tags": popular_tags
+	}
+
+	return render_to_response("social/search.html", data, context_instance=RequestContext(request))
+
+@login_required
+def tags(request,tag_name):
+	# get popular tags
+	popular_tags = Tag.objects.order_by("-count")[:10]	
+
+	# get tag
+	tag = Tag.objects.get(url_name=tag_name)
+
+	questions = Conversation.objects.filter(tags=tag)
+
+	data = {
+		"tag": tag,
+		"questions": questions,
+		"popular_tags": popular_tags
+	}
+
+	return render_to_response("social/tags.html", data, context_instance=RequestContext(request))
 
 @login_required
 def ask(request):
@@ -78,7 +104,8 @@ def question(request, conversation_id):
  		"user_pic":conversation.owner.profile.default_profile_pic(),
  		"user_name":conversation.owner.profile.full_name(),
  		"tags":conversation.tags.all(),
- 		"user_id":conversation.owner.id
+ 		"user_id":conversation.owner.id,
+ 		"id":conversation.id
  	}
 
  	# (2) Get comments
@@ -92,7 +119,7 @@ def question(request, conversation_id):
 
  	# (4) Get popular tags
  	## TODO: popular_tags API
- 	popular_tags = Tag.objects.all()[:8].values("name", "id")
+ 	popular_tags = Tag.objects.order_by("-count")[:10]
 
  	# (5) Get related questions
  	## TODO: related_questions API
@@ -112,6 +139,14 @@ def question(request, conversation_id):
  		"days_active": days_active
  	}
 
+ 	advisors = [
+	 	{'id':1,'alumni':'true','school':'Stanford University','school_id':1234,'name':'Alexander Hamilton','position':'Product Manager at Google','pic':'/media/pictures/anon.jpg','educations':[{'degree':'PhD'}],'methods':'all'},
+	 	{'id':1,'alumni':'false','school':None,'school_id':None,'name':'Alexander Hamilton','position':'Product Manager at Google','pic':'/media/pictures/anon.jpg','educations':[{'degree':'PhD'}],'methods':'em'},
+	 	{'id':1,'alumni':'true','school':'Stanford University','school_id':1234,'name':'Alexander Hamilton','position':'Product Manager at Google','pic':'/media/pictures/anon.jpg','educations':[{'degree':'PhD'}],'methods':'li+fb'},
+	 	{'id':1,'alumni':'false','school':None,'school_id':None,'name':'Alexander Hamilton','position':'Product Manager at Google','pic':'/media/pictures/anon.jpg','educations':[{'degree':'PhD'}],'methods':'li'},
+	 	{'id':1,'alumni':'true','school':'Stanford University','school_id':1234,'name':'Alexander Hamilton','position':'Product Manager at Google','pic':'/media/pictures/anon.jpg','educations':[{'degree':'PhD'}],'methods':'fb'}
+	 ]
+
 	data = {
 		"is_active": is_active,                   # boolean
 		"is_following":is_following,              # boolean
@@ -123,6 +158,7 @@ def question(request, conversation_id):
 		"followers":followers,                    # [ {"name", "id", "pic"} ]
 		"popular_tags":popular_tags,              # [ {"title", "type", "id"} ]
 		"url":request.build_absolute_uri(),       # used for sending the link to people... could be done in JS as well
+		"advisors":advisors
 	}
 
 
@@ -181,7 +217,8 @@ def api_conversation_search(request):
 		'no_comments':len(c.comments.all()),
 		'tags':[{
 			'id':t.id,
-			'name':t.name
+			'name':t.name,
+			'url_name':t.url_name
 			} for t in c.tags.all()],
 		'comments':[{
 			'id':comment.id,
@@ -457,65 +494,72 @@ def api_vote_comment(request):
 
 # Starts a new conversation (AJAX)
 def api_start_conversation(request):
-
+	from social.forms import ConversationForm
 	response = {
 		"errors":[],
 		"result":None,
 	}
 
-	# check that ajax
-	if not request.is_ajax:
-		response["errors"].append("Not an AJAX request")
-	# check that POST
-	if not request.POST:
-		response["errors"].append("Not a POST request")
-	# check for params
-	try:
-		title = request.POST.get("title")
-		body = request.POST.get("body")
-		tag_ids = request.POST.getlist("tags[]")
-	except:
-		response["errors"].append("Missing data from template.")
-	
-	# If there were errors, respond before creating object
-	if len(response["errors"]) > 0:
-		response["result"] = "failure"
+	# check that ajax and post
+	if not request.is_ajax or not request.POST:
+		response["errors"].append("Something went wrong with our connection, please try again.")
 		return HttpResponse(json.dumps(response))
 
-
-	# try to create the new conversation
-	conversation_id = -1
-	c = None
-	try:
+	# load form
+	form = ConversationForm(request.POST)
+	# validate form
+	if form.is_valid():
+		# create new conversation
 		c = Conversation()
-		c.name = title
-		c.summary = body
+		c.name = form.cleaned_data['name']
+		c.summary = form.cleaned_data['summary']
 		c.owner = request.user
 		c.save()
-		conversation_id = c.id
-	except:
-		response["errors"].append("Failed instantiating Conversation")
-
-	# now add tags
-	try:
-		# convert unicode to ints
-		tag_ids = [int(t) for t in tag_ids]
-		# get tags from ids
-		tags = Tag.objects.filter(id__in=tag_ids)
-		for t in tags:
+		# add tags
+		for t in form.cleaned_data['tags']:
 			c.tags.add(t)
 		c.save()
-
-	except:
-		response["errors"].append("Failed to add Tags to new Conversation")
-
-	# check for any final errors
-	if len(response["errors"]) > 0:
-		response["result"] = "failure"
-	# return the id of the recently created conversation
-	else:
+		# add flags
 		response["result"] = "success"
-		response["conversation_id"] = conversation_id
+		response["conversation_id"] = c.id
+		return HttpResponse(json.dumps(response))
+	else:
+		# dump form errors	
+		response['errors'] = form.errors
+		response['result'] = 'failure'
+		return HttpResponse(json.dumps(response))	
+
+def api_ask_advisor(request):
+	response = {}
+	from social.forms import AskAdvisorForm
+	from social.models import AdvisorRequest
+	from social.tasks import send_advisor_request
+	if request.POST:
+		# load form
+		form = AskAdvisorForm(request.POST)
+		# validate form
+
+		if form.is_valid():
+			# create new request
+			r = AdvisorRequest()
+			r.user = request.user
+			r.advisor = form.cleaned_data['advisor']
+			r.subject = form.cleaned_data['subject']
+			r.body = form.cleaned_data['body']
+			r.question = form.cleaned_data['question']
+			r.method = form.cleaned_data['method']
+			r.save()
+			# fire off connection
+			task_id = send_advisor_request.delay(r)
+			# register response
+
+			response['result'] = 'success'
+		else:
+			response['errors'] = form.errors
+			response['result'] = 'failure'
+	else:
+		response['errors'] = 'wrong format'
+		response['result'] = 'failure'
 
 	return HttpResponse(json.dumps(response))
 
@@ -603,6 +647,9 @@ def thread(request, thread_id):
 
 
 	return render_to_response("social/thread.html",data,context_instance=RequestContext(request))
+
+def partners(request):
+	return render_to_response("partners.html",context_instance=RequestContext(request))
 
 ## DEPRECATED: keep around for now for code review
 def create_thread(request):

@@ -14,12 +14,15 @@
   margin-left: auto;
   width: 1000px; }
 
-.splash-module {
+.splash-module, .splash-module-left {
   padding: 0;
   margin-right: auto;
   margin-left: auto;
   width: 1000px;
   text-align: center; }
+
+.splash-module-left {
+  text-align: left; }
 
 .splash-submodule {
   width: 475px;
