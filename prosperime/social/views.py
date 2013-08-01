@@ -104,7 +104,8 @@ def question(request, conversation_id):
  		"user_pic":conversation.owner.profile.default_profile_pic(),
  		"user_name":conversation.owner.profile.full_name(),
  		"tags":conversation.tags.all(),
- 		"user_id":conversation.owner.id
+ 		"user_id":conversation.owner.id,
+ 		"id":conversation.id
  	}
 
  	# (2) Get comments
@@ -138,6 +139,14 @@ def question(request, conversation_id):
  		"days_active": days_active
  	}
 
+ 	advisors = [
+	 	{'id':1,'alumni':'true','school':'Stanford University','school_id':1234,'name':'Alexander Hamilton','position':'Product Manager at Google','pic':'/media/pictures/anon.jpg','educations':[{'degree':'PhD'}],'methods':'all'},
+	 	{'id':1,'alumni':'false','school':None,'school_id':None,'name':'Alexander Hamilton','position':'Product Manager at Google','pic':'/media/pictures/anon.jpg','educations':[{'degree':'PhD'}],'methods':'em'},
+	 	{'id':1,'alumni':'true','school':'Stanford University','school_id':1234,'name':'Alexander Hamilton','position':'Product Manager at Google','pic':'/media/pictures/anon.jpg','educations':[{'degree':'PhD'}],'methods':'li+fb'},
+	 	{'id':1,'alumni':'false','school':None,'school_id':None,'name':'Alexander Hamilton','position':'Product Manager at Google','pic':'/media/pictures/anon.jpg','educations':[{'degree':'PhD'}],'methods':'li'},
+	 	{'id':1,'alumni':'true','school':'Stanford University','school_id':1234,'name':'Alexander Hamilton','position':'Product Manager at Google','pic':'/media/pictures/anon.jpg','educations':[{'degree':'PhD'}],'methods':'fb'}
+	 ]
+
 	data = {
 		"is_active": is_active,                   # boolean
 		"is_following":is_following,              # boolean
@@ -149,6 +158,7 @@ def question(request, conversation_id):
 		"followers":followers,                    # [ {"name", "id", "pic"} ]
 		"popular_tags":popular_tags,              # [ {"title", "type", "id"} ]
 		"url":request.build_absolute_uri(),       # used for sending the link to people... could be done in JS as well
+		"advisors":advisors
 	}
 
 
@@ -519,7 +529,39 @@ def api_start_conversation(request):
 		response['result'] = 'failure'
 		return HttpResponse(json.dumps(response))	
 
+def api_ask_advisor(request):
+	response = {}
+	from social.forms import AskAdvisorForm
+	from social.models import AdvisorRequest
+	from social.tasks import send_advisor_request
+	if request.POST:
+		# load form
+		form = AskAdvisorForm(request.POST)
+		# validate form
 
+		if form.is_valid():
+			# create new request
+			r = AdvisorRequest()
+			r.user = request.user
+			r.advisor = form.cleaned_data['advisor']
+			r.subject = form.cleaned_data['subject']
+			r.body = form.cleaned_data['body']
+			r.question = form.cleaned_data['question']
+			r.method = form.cleaned_data['method']
+			r.save()
+			# fire off connection
+			task_id = send_advisor_request.delay(r)
+			# register response
+
+			response['result'] = 'success'
+		else:
+			response['errors'] = form.errors
+			response['result'] = 'failure'
+	else:
+		response['errors'] = 'wrong format'
+		response['result'] = 'failure'
+
+	return HttpResponse(json.dumps(response))
 
 def saveComment(request):
 
