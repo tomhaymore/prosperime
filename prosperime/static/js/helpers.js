@@ -57,3 +57,15 @@ function clearPaper(paper){
     var paperDom = paper.canvas;
     paperDom.parentNode.removeChild(paperDom);
 }
+
+function months_difference (mo1, yr1, mo2, yr2, compress, round) {
+	var diff = 12 * (yr2 - yr1);
+	diff += (mo2 - mo1);
+
+	if(compress) {
+		diff = diff / 2
+		if (round == "upper") diff = Math.ceil(diff)
+		if (round == "lower") diff = Math.floor(diff)
+	}
+	return diff;
+};

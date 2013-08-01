@@ -8,6 +8,7 @@ import json
 import os
 import logging
 import random
+import time
 
 # from django.contrib.auth.decorators import  _required
 from django.contrib.auth import authenticate, logout as auth_logout, login as auth_login
@@ -18,6 +19,8 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.utils import simplejson
+from django.db.models import Count, Q, fields
+
 
 from django.contrib import messages
 from lilib import LIProfile
@@ -30,10 +33,43 @@ from careers.models import SavedPath, CareerDecision, Position, SavedPosition, S
 from entities.models import Entity, Region
 from accounts.tasks import process_li_profile, process_li_connections, send_welcome_email
 from accounts.forms import FinishAuthForm, AuthForm, RegisterForm
+from social.models import Conversation, FollowConversation, Comment
 import utilities.helpers as helpers
+import careers.careerlib as careerlib
 
 logger = logging.getLogger(__name__)
 critical_logger = logging.getLogger("benchmarks")
+
+
+@login_required
+def profile(request, user_id):
+	# get user
+	user = User.objects.get(id=user_id)
+
+	# TODO: optimize this query
+		# because user follows their own conversations, just filter single QuerySet
+	# following & started conversations
+	conversations = FollowConversation.objects.filter(user=user).select_related("conversation")
+	followed_conversations = [{"name":f.conversation.name, "summary":f.conversation.summary, "id":f.conversation.id, "stats":{"num_followers":f.conversation.followers.count(), "num_answers":f.conversation.comments.count()}} for f in conversations.exclude(conversation__owner=user)]
+	started_conversations = [{"name":f.conversation.name, "summary": f.conversation.summary, "id":f.conversation.id, "stats":{"num_followers":f.conversation.followers.count(), "num_answers":f.conversation.comments.count()}} for f in conversations.filter(conversation__owner=user)]
+
+	# connections
+	connections = user.profile.connections.all().distinct()
+	num_connections = len(connections)
+	connections = [{"pic":p.default_profile_pic(), "name":p.full_name(), "id":p.user.id} for p in connections[:4]] # limit to 4 pics for now
+
+	data = {
+		"profile_pic":user.profile.default_profile_pic(),
+		"own_profile":(user.id == request.user.id),
+		"user_name":user.profile.full_name(),
+		"positions":json.dumps(_prepare_positions_for_timeline(user.positions.all())),
+		"connections":connections, 
+		"num_connections":num_connections,
+		"followed_conversations":followed_conversations,
+		"started_conversations":started_conversations
+	}
+
+	return render_to_response("social/profile.html", data, context_instance=RequestContext(request))
 
 
 def login(request):
@@ -53,6 +89,7 @@ def login(request):
 				auth_login(request,user)
 				messages.success(request, 'You have successfully logged in.')
 				return HttpResponseRedirect('/')
+
 
 		
 	else:
@@ -715,7 +752,7 @@ def random_profile(request):
 
 # View for invidiual profiles
 @login_required
-def profile(request, user_id):
+def profile_old(request, user_id):
 
 	user = User.objects.get(id=user_id)
 	if user.profile.status == "dormant":
@@ -884,6 +921,155 @@ def profile_org(request, org_id):
 #########################
 ### JSON/AJAX Methods ###
 #########################
+
+def save_position(request):
+	response = {}
+	if not request.POST or not request.is_ajax:
+		response.update({"errors":["incorrect request type"], "result":"failure"})
+		return HttpResponse(json.dumps(response))
+
+	# position = request.POST.position
+	# if position.id == -1:
+	# 	# new position
+	# 	print "New Position"
+	# 	new_p = Position()
+	# 	new_p.person = request.user
+	# 	new_p.title = position.title
+	# 	new_p.type = position.type
+	# 	new_p.start_date = _convert_string_to_datetime(position.start_date)
+	# 	new_p.end_date = _convert_string_to_datetime(position.end_date)
+
+
+	# 	if position.type == "education":
+
+	# 		new_p.field = position.field
+	# 		new_p.degree = position.field
+
+	# 	try:
+	# 		entity = Entity.objects.get(name)
+	# 		new_p.entity = entity
+	# 	except:
+	# 		# create a new entity...
+	# 		entity = Entity()
+
+	# 	# map to ideal
+
+	# else:
+	# 	print "Edit existing Position"
+	# 	old_position = Position.objects.get(id=position.id)
+	# 	changes = _diff_models(old_position)
+
+	response.update({"result":"success", "pos_id":"7"})
+
+	return HttpResponse(json.dumps(response))
+
+
+
+
+def validate_position(request):
+	# initialize response
+	response = {}
+	# return error if not ajax or post
+	if not request.is_ajax or not request.POST:
+		response['result'] = 'failure'
+		response['errors'] = 'invalid request type'
+		return HttpResponse(json.dumps(response))
+
+	if request.POST:
+		from careers.forms import AddProgressDetailsForm
+		# bind form
+		form = AddProgressDetailsForm(request.POST)
+		# validate form
+		if form.is_valid():
+			# init carerlib
+			mapper = careerlib.EdMapper()
+
+			# Education
+			if form.cleaned_data['type'] == "education":
+				# set up initial data
+				response['data'] = {
+					'grad_year':form.cleaned_data['end_date'].year	
+				}
+				# see if we can map degree
+				idealdegree = mapper.match_degree(form.cleaned_data['degree'] + form.cleaned_data['field'])
+				if idealdegree:
+					# there is a match, add ideal id to path generation
+					response['result'] = 'success'
+					response['data']['degree'] = idealdegree.title
+					response['data']['field'] = None
+					response['data']['ideal_id'] = idealdegree.id
+					
+				else:
+					# no match, still return data but don't update 
+					response['result'] = 'success'
+					response['errors'] = 'missing ideal id'
+					response['data']['degree'] = form.cleaned_data['degree']
+					response['data']['field'] = form.cleaned_data['field']
+				
+				# see if we can match entity
+				entity = Entity.objects.filter(name__icontains=form.cleaned_data['entity'],subtype="ed-institution").annotate(pop=Count("positions__id")).order_by("-pop")
+				if entity.exists():
+					# there is a match
+					response['data']['entity'] = entity[0].name
+					response['data']['entity_id'] = entity[0].id
+				else:
+					# no match, return same text string as entered
+					response['data']['entity'] = form.cleaned_data['entity']
+				# return JSON response
+				return HttpResponse(json.dumps(response))
+
+			# Position
+			elif form.cleaned_data['type'] == "org" or form.cleaned_data["type"] == "internship":
+				# set up initial data
+				response['data'] = {
+					'start_date':form.cleaned_data['start_date'].year,
+					'end_date':form.cleaned_data['end_date'].year
+				}
+				# see if we can map position
+				pos = Position() ## THOMAS -- this was "Object()"... I changed it b/c it wouldn't work
+				pos.title = form.cleaned_data['title']
+				pos.type = "position"
+				# pos.entity = None
+				idealpos = mapper.return_ideal_from_position(pos)
+				if idealpos:
+					response['result'] = "success"
+					response['data']['title'] = idealpos.title
+					response['data']['ideal_id'] = idealpos.id
+				else:
+					response['result'] = 'success'
+					response['errors'] = 'missing ideal id'
+					response['data']['title'] = form.cleaned_data['title']
+				# see if we can find entity
+				entity = Entity.objects.filter(name__icontains=form.cleaned_data['entity']).annotate(pop=Count("positions__id")).order_by("-pop")
+				if entity.exists():
+					# there is a match
+					response['data']['entity'] = entity[0].name
+					response['data']['entity_id'] = entity[0].id
+				else:
+					# no match, return same text string as entered
+					response['data']['entity'] = form.cleaned_data['entity']
+				return HttpResponse(json.dumps(response))
+		else:
+			# return error
+			response['result'] = "failure"
+			response['errors'] = form.errors
+			return HttpResponse(json.dumps(response))
+
+
+def upload_profile_pic(request):
+	response = {}
+
+
+	if not request.POST or not request.is_ajax:
+		response.update({"errors":["Incorrect request type."], "result":"failure"})
+		return HttpResponse(json.dumps(response))
+
+	print request.POST
+	## THOMAS: there should be a file object in here that is the the file uploaded on the client
+
+	response.update({"result":"success"})
+
+	return HttpResponse(json.dumps(response))
 
 
 # Adds a connection between the requesting user and the profile
@@ -1167,6 +1353,24 @@ def updateProfile(request):
 ##  Helpers  ##
 ###############
 
+# From SO, returns dict of diff fields between models
+def _diff_models(model1, model2, excludes = []):
+    changes = {}
+    for field in model1._meta.fields:
+        if not (isinstance(field, (fields.AutoField, fields.related.RelatedField)) 
+                or field.name in excludes):
+            if field.value_from_object(model1) != field.value_from_object(model2):
+                changes[field.verbose_name] = (field.value_from_object(model1),
+                                                   field.value_from_object(model2))
+    return changes
+
+def _convert_string_to_datetime(string):
+	# TODO: validate input string "MM/YY"
+
+	time_struct = time.strptime(string, "%m/%y")
+	dt = datetime.fromtimestamp(time.mktime(time_struct))
+	return dt
+
 def _test_career_prompt():
 
 
@@ -1303,15 +1507,11 @@ def _ideal_position_to_json(position):
 #	information needed for timeline creation
 def _prepare_positions_for_timeline(positions):
 
+
 	if len(positions) == 0:
 		return [], None, None, None, None
 
 	formatted_positions = []
-	current = None
-
-	if len(positions)  == 0:
-		start_date = None
-		total_time = None
 
 	# Process each position
 	for pos in positions:
@@ -1329,17 +1529,10 @@ def _prepare_positions_for_timeline(positions):
 			else:
 				formatted_pos['end_date'] = helpers._format_date(pos.end_date)
 			formatted_pos['start_date'] = helpers._format_date(pos.start_date)
-			formatted_pos['description'] = pos.description
+			# formatted_pos['description'] = pos.description
 
-			# domains = pos.entity.domains.all()
-			# if domains:
-			# 	pos.domain = domains[0].name
-			# else:
-			# 	pos.domain = None
-
-			formatted_pos['co_name'] = pos.entity.name
 			# pos.pic = pos.entity.default_logo()
-
+			formatted_pos['co_name'] = pos.entity.name
 
 
 			# Internships
@@ -1350,6 +1543,12 @@ def _prepare_positions_for_timeline(positions):
 			# Educations
 			elif pos.type == 'education' or pos.title == 'Student':
 				formatted_pos['type'] = 'education'
+				if pos.degree is not None:
+					formatted_pos['degree'] = pos.degree
+				if pos.field is not None:
+					formatted_pos['field'] = pos.field
+				formatted_pos['school'] = pos.entity.name
+
 				if pos.degree is not None and pos.field is not None:
 					formatted_pos['title'] = pos.degree + ", " + pos.field
 				elif pos.degree is not None:
@@ -1363,8 +1562,6 @@ def _prepare_positions_for_timeline(positions):
 			else:
 				formatted_pos['title'] = pos.title
 				formatted_pos['type'] = 'org'
-				if pos.current:
-					current = pos
 
 			formatted_positions.append(formatted_pos)
 	
@@ -1376,7 +1573,7 @@ def _prepare_positions_for_timeline(positions):
 	total_time = helpers._months_from_now_json(start_date)
 	end_date = helpers._format_date(datetime.now())
 
-	return formatted_positions, start_date, end_date, total_time, current
+	return formatted_positions, start_date, end_date, total_time
 
 
 #################

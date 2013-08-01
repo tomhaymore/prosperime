@@ -42,6 +42,9 @@ body {
   float: left;
   width: 50%; }
 
+.input-extra-small {
+  width: 40px; }
+
 #search-container {
   width: 630px;
   height: 50px; }
@@ -152,8 +155,10 @@ div.splash-container {
 .module-header {
   font-size: 18px;
   font-color: #181818;
-  line-height: 24px;
+  line-height: 28px;
   margin-bottom: 10px; }
+  .module-header a {
+    text-decoration: none; }
 
 .right-column-module a {
   display: inline-block;
@@ -219,11 +224,11 @@ a.flat-button:hover, a.red-button:hover, a.green-button:hover, a.submit-button:h
   color: #fffffe; }
 
 .green-button {
-  background-color: #339933;
+  background-color: #27ae60;
   color: #fffffe; }
 
 .submit-button {
-  background-color: #339933;
+  background-color: #27ae60;
   color: #fffffe; }
 
 .nonclickable {
@@ -346,7 +351,8 @@ div.footer {
   height: 75px;
   display: inline-block;
   margin-right: 16px;
-  margin-bottom: 16px; }
+  margin-bottom: 16px;
+  vertical-align: top; }
   .profile-pic-container img, .profile-pic-container-small img {
     border-radius: 75px; }
 

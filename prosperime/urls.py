@@ -16,7 +16,9 @@ urlpatterns = patterns('',
     url(r'^search/$', 'social.views.search'),
     url(r'^tags/(\w+)/$', 'social.views.tags'),
 
+
     # Accounts Views
+    url(r'^profile/(\d+)/$', 'accounts.views.profile'),
     url(r'^privacy/$','accounts.views.privacy'),
     url(r'^terms/$','accounts.views.terms'),
     url(r'^copyright/$','accounts.views.copyright'),
@@ -151,8 +153,11 @@ urlpatterns = patterns('',
     url(r'^accounts/updateProfile/$', 'accounts.views.updateProfile'),
     url(r'^accounts/addToProfile/$','accounts.views.add_to_profile'),
     url(r'^accounts/deleteItem/$', 'accounts.views.deleteItem'),
-    url(r'^accounts/connect/$', 'accounts.views.connect'),
+    url(r'^accounts/connect/$', 'accounts.views.connect'),                           # will be used
 
+    url(r'^accounts/uploadProfilePic/$', 'accounts.views.upload_profile_pic'),       # in use
+    url(r'^accounts/validatePosition/$', 'accounts.views.validate_position'),        # in use
+    url(r'^accounts/savePosition/$', 'accounts.views.save_position'),
   
 
 
@@ -160,7 +165,7 @@ urlpatterns = patterns('',
     url(r'^decisions/', 'careers.views.getDecisions'),
     url(r'^login/','accounts.views.login'),
     
-    url(r'^profile/(\d+)/$', 'accounts.views.profile'),
+    url(r'^profile_old/(\d+)/$', 'accounts.views.profile_old'),
     url(r'^profile/org/(\d+)/$','entities.views.profile_org'),
     url(r'^account/register','accounts.views.register'),
     url(r'^account/authorize','accounts.views.linkedin_authorize'),
