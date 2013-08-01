@@ -815,7 +815,7 @@ class LIBase():
 class LIProfile(LIBase):
 	
 	# set scope
-	scope = 'r_fullprofile+r_emailaddress+r_network'
+	scope = 'r_fullprofile+r_emailaddress+r_network+w_messages'
 	# set callback
 	callback = settings.LI_CALLBACK
 
