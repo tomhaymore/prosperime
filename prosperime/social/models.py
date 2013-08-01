@@ -88,6 +88,18 @@ class Tag(models.Model):
 	def __unicode__(self):
 		return self.name
 
+class AdvisorRequest(models.Model):
+
+	user = models.ForeignKey(User,related_name="user")
+	advisor = models.ForeignKey(User,related_name="advisor")
+	question = models.ForeignKey(Conversation,related_name="question")
+	method = models.CharField(max_length=45)
+	subject = models.TextField()
+	body = models.TextField()
+	status = models.CharField(max_length=45,default="active")
+	created = models.DateTimeField(auto_now_add=True, null=True)
+	updated = models.DateTimeField(auto_now=True, null=True)
+
 def update_tag_count(sender,instance,action,reverse,model,pk_set,using,**kwargs):
 	"""
 	listens for updates to tag, updates count
