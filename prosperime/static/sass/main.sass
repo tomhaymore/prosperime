@@ -215,7 +215,7 @@ ul.messages
 		size: 14px
 
 	text-align: center
-	background-color: #fffffe
+	background-color: $white
 	border-radius: 2px
 	border: none
 	cursor: pointer
@@ -225,7 +225,7 @@ ul.messages
 	-o-transition: all 0.2s
 	:hover
 		text-decoration: none
-		color: #fffffe
+		color: $white
 
 .search-button
 	vertical-align: top
@@ -281,6 +281,17 @@ a.flat-button:hover
 	background-color: $lightblue
 	color: $white
 
+.medblue-button
+	@extend .flat-button
+	background-color: $medblue
+	color: $white
+
+.li-button
+	@extend .lightblue-button
+
+.fb-button
+	@extend .medblue-button
+
 .wide-button 
 	width: 150px
 
@@ -294,7 +305,9 @@ a.flat-button:hover
 	background-color: $lightgray !important 
 	cursor: default !important
 
-	
+.modal-close-button
+	@extend .flat-button
+
 /* Footer Styles */
 
 
@@ -422,8 +435,6 @@ div.footer
 
 /* Stats styles */
 
-.stat-container
-	
 .stat-module
 	margin-bottom: 5px
 
@@ -488,3 +499,17 @@ div.footer
 	background-color: $qtipbackground
 	font-size: 12px
 	border-color: $topbar-background
+
+/* Modal Styles */
+
+.ui-dialog-titlebar
+	display: none
+
+.ui-widget-overlay
+	position: fixed
+
+
+.ui-dialog .ui-dialog-buttonpane button
+	@extend .modal-close-button
+	margin: 0
+	font-size: 12px

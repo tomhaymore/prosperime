@@ -183,7 +183,7 @@ ul.messages {
   list-decoration: none; }
 
 /* Button Styles */
-.flat-button, .red-button, .green-button, .submit-button, .blue-button, .blue-button-showcase, .lightblue-button {
+.flat-button, .red-button, .green-button, .submit-button, .blue-button, .blue-button-showcase, .lightblue-button, .li-button, .medblue-button, .fb-button, .modal-close-button, .ui-dialog .ui-dialog-buttonpane button {
   display: inline-block;
   vertical-align: middle;
   width: auto;
@@ -206,11 +206,11 @@ ul.messages {
 .search-button {
   vertical-align: top; }
 
-a.flat-button:hover, a.red-button:hover, a.green-button:hover, a.submit-button:hover, a.blue-button:hover, a.blue-button-showcase:hover, a.lightblue-button:hover {
+a.flat-button:hover, a.red-button:hover, a.green-button:hover, a.submit-button:hover, a.blue-button:hover, a.blue-button-showcase:hover, a.lightblue-button:hover, a.li-button:hover, a.medblue-button:hover, a.fb-button:hover, a.modal-close-button:hover {
   text-decoration: none;
   color: white; }
 
-.flat-button a:hover, .red-button a:hover, .green-button a:hover, .submit-button a:hover, .blue-button a:hover, .blue-button-showcase a:hover, .lightblue-button a:hover {
+.flat-button a:hover, .red-button a:hover, .green-button a:hover, .submit-button a:hover, .blue-button a:hover, .blue-button-showcase a:hover, .lightblue-button a:hover, .li-button a:hover, .medblue-button a:hover, .fb-button a:hover, .modal-close-button a:hover, .ui-dialog .ui-dialog-buttonpane button a:hover {
   text-decoration: none;
   color: #fffffe; }
 
@@ -246,8 +246,12 @@ a.flat-button:hover, a.red-button:hover, a.green-button:hover, a.submit-button:h
   font-size: 20px;
   line-height: 36px; }
 
-.lightblue-button {
+.lightblue-button, .li-button {
   background-color: #6fb6d4;
+  color: #fffffe; }
+
+.medblue-button, .fb-button {
+  background-color: #3b67b2;
   color: #fffffe; }
 
 .wide-button {
@@ -412,3 +416,14 @@ div.footer {
   background-color: #accbe2;
   font-size: 12px;
   border-color: #2c5d82; }
+
+/* Modal Styles */
+.ui-dialog-titlebar {
+  display: none; }
+
+.ui-widget-overlay {
+  position: fixed; }
+
+.ui-dialog .ui-dialog-buttonpane button {
+  margin: 0;
+  font-size: 12px; }

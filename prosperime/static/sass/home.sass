@@ -220,6 +220,102 @@
 	padding-bottom: 24px
 
 
+.advisor-container
+	padding: 5px
+	width: $comment-module-width / 2 - 20
+	margin-right: 10px
+	float: left
+	border-radius: 1px
+	transition: all 0.5s
+	cursor: pointer
+
+.advisor-container:hover
+	
+	a.advisor-ask
+		opacity: 1
+
+	.advisor-pic-container
+		
+		background-image: url('/static/img/ask.png')
+
+
+	.advisor-pic-container img
+		opacity: 0
+
+.advisor-pic-container
+	background-position: center
+	background-repeat: no-repeat
+	float: left
+	width: 45px
+	height: 45px
+	display: inline-block
+	margin-right: 16px
+	margin-bottom: 16px 
+	border-radius: 45px
+	transition: all .5s
+	img 
+		border-radius: 45px
+		transition: opacity .2s
+
+.advisor-info-container
+	float: left
+	p
+		font-size: 14px
+		line-height: 16px
+		margin-bottom: 3px
+
+ul.advisor-educations 
+	margin:
+		top: 5px
+		bottom: 5px
+		left: 0px
+		right: 0px
+	list-decoration: none
+	li
+		margin-right: 10px
+		display: inline-block
+		padding: 3px 5px 3px 5px
+		font-size: 12px
+		line-height: 22px
+		background-color: $lightblue
+
+a.advisor-ask
+	background-color: $darkblue
+	color: $white
+	display: inline-block
+	position: relative
+	left: 210px
+	float: left
+	top: -30px
+	padding: 5px
+	width: 65px
+	text-align: center
+	opacity: 0
+	transition: opacity .5s
+
+a.advisor-ask:hover
+	text-decoration: none
+
+#advisor-modal-inner
+	font-size: 12px
+	padding: 5px
+
+#advisor-modal-inner label
+	margin-top: 5px
+	margin-bottom: 5px
+	font-size: 13px
+
+#id_advisor-message-subject
+	width: 100%
+
+#id_advisor-message-body
+	resize: none
+	width: 100%
+	height: 84px
+
+#ask-advisor-button
+	color: $white
+
 /* Right Column Styles */
 
 .right-question-column-module
