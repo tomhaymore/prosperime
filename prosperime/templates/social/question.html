@@ -11,6 +11,7 @@
 <!-- JS -->
 	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.ui.dialog.js"></script>
 	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.1.1/basic/jquery.qtip.min.js"></script>
 
 {% endblock %}
@@ -123,9 +124,9 @@
 
 		</div>
 
-		<div class="comment-module social-sharing">
+		<!-- <div class="comment-module social-sharing">
 			<p>Get additional insight. Share the link with your friends and get their views.</p>
-		</div>
+		</div> -->
 
 		<!-- Comments -->
 		<!-- {% if is_active %} -->
@@ -163,14 +164,39 @@
 				{% endif %}
 
 		{% endif %} -->
-
-
+		{% if advisors %}
+			<div class="comment-module">
+				<p>Need more insight? Ask one of the experts below to share their advice.</p>
+				{% for a in advisors %}
+					<div class="advisor-container" data-methods="{{a.methods}}" data-id="{{a.id}}" data-name="{{a.name}}" data-position="{{a.position}}" data-pic="{{a.pic}}" data-alumni="{{a.alumni}}">
+						<div class="advisor-pic-container">
+							<img src="{{a.pic}}" />
+						</div>
+						<div class="advisor-info-container">
+							<p>{{a.name}}</p>
+							<p>{{a.position}}</p>
+							{% if a.educations %}
+							<ul class="advisor-educations">
+								{% for e in a.educations %}
+								<li>{{e.degree}}</li>
+								{% endfor %}
+							</ul>
+							{% endif %}
+						</div>
+						<div class="clear"></div>
+						
+					</div>
+					
+				{% endfor %}
+				<div class="clear"></div>
+			</div>
+		{% endif %}
 		</div>
 	</div>
 
 	<!-- Right --> 
 	<div id="right-column">
-		{% if is_active %}
+		{% if not is_active %}
 			<div class="right-column-module">
 				<span class="red-button nonclickable">Inactive</span>
 				<p>This question is <strong>inactive</strong>. Help activate it by answering it or getting it more followers.</p>
@@ -275,16 +301,32 @@
 	<div class="clear"></div>
 </div>
 
-	
+<div id="advisor-modal" style="display:none;">
+
+</div>	
 {% endblock %}
 
 {% block templates %}
 
 <!-- V3 Script -->
 <script type="text/javascript">
-	
-	$(function() {
 
+	$(function() {
+		// close modal button
+		$(document).on("click","#modal-close-button",function() {
+			$("#advisor-modal").dialog("close");
+		});
+
+		// close modal when clicking outside it
+		$(document).on("click",".ui-widget-overlay",function() {
+			$("#advisor-modal").dialog("close");
+		});
+
+		// set variables
+		var user_id = {{user.id|safe}}
+		var question_id = {{question.id|safe}}
+		var question_title = "{{question.title}}"
+		// add qtip explanation for inactive questions
 		$(".note").qtip({
 			content: {
 				text: "Inactive questions do not show up in search results or on the front page"
@@ -299,6 +341,110 @@
 			
 		});
 	
+		// 
+
+		$(".advisor-container").click(function() {
+			console.log("advisor click");
+			// get variables
+			var name = $(this).data("name"),
+				position = $(this).data("position"),
+				pic = $(this).data("pic"),
+				methods = $(this).data("methods"),
+				id = $(this).data("id"),
+				alumni = $(this).data("alumni"),
+				school = $(this).data("school");
+			if (alumni) {
+				var message_body = "I'm a fellow alum of " + school + " and would love your help in sharing your career insight. Could you take a few minutes to answer this question on Emplore: "+question_title;
+			} else {
+				var message_body = "I'd love your help in sharing your career insight. Could you take a few minutes to answer this question on Emplore: "+question_title;
+			}
+			// render template
+			var advisorTemplate = _.template($("#advisor-modal-template").html());
+			var renderedContent = advisorTemplate({
+				'name':name,
+				'position':position,
+				'pic':pic,
+				'methods':methods,
+				'id':id,
+				'alumni':alumni,
+				'school':school,
+				'question_title':question_title,
+				'message_body':message_body});
+			// trigger modal
+			$("#advisor-modal").dialog({
+				height: 440,
+				width: 500,
+				resizable: false,
+				draggable: false,
+				modal: true
+				// buttons: {
+				// 	'Close': function() {
+				// 		$("#advisor-modal").dialog('close');
+				// 	}
+				// }
+				}).html(renderedContent);
+		});
+
+		// function for actually pinging the advisor
+
+		$(document).on("click","#ask-advisor-button",function() {
+			var data = {
+				'advisor': $(this).data('a-id'),
+				'user': user_id,
+				'question': question_id,
+				'method': $(this).data('method'),
+				'subject': $("#id_advisor-message-subject").val(),
+				'body': $("#id_advisor-message-body").val()
+			};
+			console.log(data);
+			askAdvisor(data);
+		});
+
+
+
+
+
+		function askAdvisor(data) {
+			$.ajax({
+				type: "POST",
+				url: "/api/askAdvisor/",
+				data: {
+					"advisor":data['advisor'], 
+					"user":data['user'], 
+					"question":data['question'], 
+					"method":data['method'],
+					"subject":data['subject'],
+					"body":data['body'],
+					"csrfmiddlewaretoken":"{{csrf_token}}"},
+				dataType:"json",
+
+				beforeSend: function() {
+					
+				},
+				success: function(response) {
+					console.log(response);
+					if (response["result"] == "success") {
+						// tell user ask was successful
+						var successMsgTemplate = _.template($("#advisor-success-template").html());
+						var renderedContent = successMsgTemplate()
+						$("#advisor-modal").html(renderedContent)
+						// remove modal after 2 seconds
+						setTimeout(function() {
+							$("#advisor-modal").dialog("close");
+						},2000)
+					} else {
+						$("#advisor-modal-errors").html(response["errors"]);
+						console.log(response["errors"]);
+					}
+				},
+				complete: function() {
+					
+					
+				},
+
+			})
+		};
+
 		// Activate follow button
 		if ("{{is_following}}" == "False")
 			$("#follow-button").on("click", follow)
@@ -540,4 +686,59 @@
 	</div>
 </script>
 
+<script type="text/template" id="advisor-modal-template">
+	<% 
+
+	%>
+	<div id="advisor-modal-inner">
+		<p class="module-header">Ask an advisor</p>
+		<div class="advisor-pic-container">
+			<img src="<%= pic %>" />
+		</div>
+		<div class="advisor-info-container">
+			<p><%= name %></p>
+			<p><%= position %></p>
+		</div>
+		<div class="clear"></div>
+		<div class="advisor-message-container">
+			<div id="advisor-modal-errors"></div>
+			<label for="id_advisor-message-subject">Subject:</label>
+			<input class="flat-input" id="id_advisor-message-subject" name="advisor-message-subject" value="Please share your advice on Emplore" />
+			<label for="id_advisor-message-body">Body:</label>
+			<textarea class="flat-textarea" id="id_advisor-message-body" name="advisor-message-body"><%= message_body %>
+			</textarea>
+			<p class="note">A link to the question and a short note about ProsperMe will be added to your message.</p>
+			
+		</div>
+		<div class="advisor-options">
+			<ul class="advisor-options-list pull-right">
+			<% if (methods == "all") { %>
+				<li><a class="blue-button" id="ask-advisor-button" data-a-id="<%= id %>" data-method="li">Send</a> or <a id="modal-close-button">cancel</a></li>
+			<% } else if (methods.indexOf("em") > -1) { %>
+				<li><a class="blue-button" id="ask-advisor-button" data-a-id="<%= id %>" data-method="li">Send</a> or <a id="modal-close-button">cancel</a></li>
+			<% } else if (methods.indexOf("li") > -1) { %> 
+				<li><a id="ask-advisor-button" class="li-button" data-a-id="<%= id %>" data-method="li">Ask through LinkedIn</a> or <a id="modal-close-button">cancel</a></li>
+			<% } else if (methods.indexOf("fb") > -1) { %>
+				<li><a id="ask-advisor-button" class="fb-button" data-a-id="<%= id %>" data-method="fb">Ask through Facebook</a> or <a id="modal-close-button">cancel</a></li>
+			<% } else { %>
+
+			<% } %>
+			</ul>
+			<div class="clear"></div>
+		</div>
+					
+	</div>
+</script>
+
+<script type="text/template" id="advisor-message-tempalte">
+	
+</script>
+
+<script type="text/template" id="advisor-success-template">
+	<div id="advisor-modal-inner">
+		<div>
+			Your request has been sent successfully. We'll let you know as soon as they answer.
+		</div>
+	</div>
+</script>
 {% endblock %}
