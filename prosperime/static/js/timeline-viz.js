@@ -7,7 +7,8 @@ var Timeline = (function() {
 
     // Constants
     var offset = 50,
-        textBox_offset_top = 150;
+        textBox_offset_top = 125,
+        midline_offset = 35;
 
     // Instance Variables
     var positions = [],
@@ -36,28 +37,43 @@ var Timeline = (function() {
         // check for new 'x'
         // if it fits, center div
         var half_box = $(textBox).width() / 2
-        var x = (old_x - half_box > offset) ? old_x - half_box : old_x;
-        x = (old_x + half_box > w) ? old_x - half_box : x;
+        // var x = (old_x - half_box > offset) ? old_x - half_box : old_x; // ** TODO **
+        var x = (old_x + half_box > w) ? old_x - half_box : x;
+        x = old_x - half_box
         $(textBox).attr("data-x", x)
     };
 
     function createLine() {
         // line attributes
-        var line_attr = {"stroke-width":1, "stroke-linecap":"round", "opacity":.8, "stroke":"#777"}
+        var line_attr = {"stroke-width":1, "stroke-linecap":"round", "opacity":.8, "stroke":"#777"},
+            label_attr = {"font-family": "Helvetica", "font-size":"14pt", "stroke":"none", "fill":"#333"},
+            label_offset = 28;
         // create line
         var timeline = paper.path("M" + offset + "," + midline + " L" + (w - offset) + "," + midline).attr(line_attr)
+
+        var end_chevron = paper.path(
+            "M" + (w - offset - 5) + ", " + (midline - 5) + 
+            " L" + (w - offset + 5) + ", " + (midline) +
+            " L" + (w - offset - 5) + ", " + (midline + 5) + " z"
+            ).attr({"stroke":"#999", "fill":"#bbb"})
+
+        var start_date = paper.text(offset, midline + label_offset, timeline_start).attr(label_attr)
+        var end_date = paper.text(w - offset, midline + label_offset, "Present").attr(label_attr)
     };
 
     function createNode(position, index) {
         // local attributes
-        var color = "rgb(111,182,212)",
+        var color = setColor(position.type),
             outer_r = 10,
             inner_r = 2,
             outer_dot_attr = {'stroke-width':'2', 'stroke':color, 'fill':color, 'fill-opacity':'.8' },
             inner_dot_attr = {'stroke-width':'1', 'stroke':color, 'fill':color},
-            hidden_dot_attr = {'stroke-width':'1', 'stroke':"#27AE60", 'fill':"#27AE60", cursor:"pointer" },
-            hidden_text_attr = {"cursor": "pointer", "font-family":"Helvetica", "font-size":"12pt", "stroke":"none", "fill":"#ECF0F1"};
-           
+            // hidden_dot_attr = {'stroke-width':'1', 'stroke':"#27AE60", 'fill':"#27AE60", cursor:"pointer" },
+            // hidden_text_attr = {"cursor": "pointer", "font-family":"Helvetica", "font-size":"12pt", "stroke":"none", "fill":"#ECF0F1"};
+            hidden_dot_attr = {'stroke-width':'1', 'stroke':"#c0c0c0", 'fill':"#ECF0F1", cursor:"pointer" },
+            hidden_text_attr = {"cursor": "pointer", "font-family":"Helvetica", "font-size":"12pt", "font-weight":"bold", "stroke":"none", "fill":"#27AE60"};
+
+
         // calculate 'x' value for nodes
         var months_difference = monthsDifference(timeline_start, position.start_date)
         var x = (months_difference * month_offset) + offset
@@ -115,8 +131,9 @@ var Timeline = (function() {
 
         // if it fits, center div
         var half_box = $(".timeline-position :last").width() / 2
-        x = (x - half_box > offset) ? x - half_box : x;
+        // x = (x - half_box > offset) ? x - half_box : x;  
         x = (x + half_box > w) ? x - half_box : x;
+        x = x - half_box
 
         // reposition offscreen // *NOTE* data must be set as attributes for needed selector to work
         $(".timeline-position :last")
@@ -175,15 +192,18 @@ var Timeline = (function() {
     // triggered on hover node (green SVG circle)
     function nodeMouseout(e) {
         // make sure moused completely out
-        if (e.toElement.tagName == "circle" || e.toElement.tagName == "tspan")
-            return false;
+        if (e.toElement.tagName == "tspan" || e.relatedTarget.tagName == "tspan")
+            if (e.toElement.childNodes[0].data == "Edit") // TODO: fix this, it's flimsy
+                return false;
 
         // move box back offscreen
         $(".timeline-position[data-index='" + this.data("index") + "']").fadeOut(100).css("left", "-500px").show().removeClass("onscreen")
 
         // hide hover node & text
         if (permissions.indexOf("w") != -1 ) {
-            this.animate({"r":12}, "150", function() { this.hide() });
+            this.animate({"r":12}, "150", function() { 
+                this.hide()
+            });
             paper.getById(this.data("hidden_text_id")).hide()
         } else {
             this.animate({"r":12}, 250)
@@ -202,6 +222,21 @@ var Timeline = (function() {
             renderEditForm(positions[index]) // code in [profile.html]
         })
 
+    };
+
+    function setColor(type) {
+        switch(type) {
+            case "education":
+                return'#bf3330';
+                break;
+            case "internship":
+                return "#ffc340";
+                break;
+
+            default:
+                return "rgb(111,182,212)"
+                break;
+        }
     };
 
     function monthsDifference(d1, d2) {
@@ -226,13 +261,13 @@ var Timeline = (function() {
             });
             // set instance vars
             permissions = _permissions
-            timeline_start = data[1]
-            timeline_end = data[2]
+            timeline_start = (data[1]) ? data[1] : "n/a"
+            timeline_end = (data[2]) ? data[2] : "n/a"
             $el = container
             w = container_width
             h = container_height
             $form = form_container
-            midline = h - 25
+            midline = h - midline_offset
             month_offset = Math.floor((w - (offset * 2)) / data[3])
 
             // create and store paper
@@ -254,7 +289,6 @@ var Timeline = (function() {
             for (p in positions) {
                 if (edited_position.id == positions[p].id) {
                     positions[p] = edited_position
-                    console.log(positions[p])
                     updateNode(edited_position, p)
                     break;
                 }
@@ -263,8 +297,18 @@ var Timeline = (function() {
 
         addPosition: function(position) {
             positions.push(position)
-            console.log(positions[0])
-            console.log(position)
+            if (position.type == "education") {
+                if (position.degree.length > 1 && position.field.length > 1)
+                    position.title = position.degree + " in " + position.field
+                else if (position.degree.length > 1)
+                    position.title = position.degree
+                else if (position.field.length > 1)
+                    position.title = position.field
+                else
+                    position.title = "Student"
+
+                position.co_name = position.school
+            }
             createNode(position, positions.length - 1)
         },
 

@@ -32,9 +32,9 @@
 		} 
 
 		#timeline-edit-container {
-			min-height: 65px;
+			min-height:50px;
 			margin-bottom: 18px;
-			padding-top: 18px;
+			padding-top: 8px;
 		}
 
 		.tab-conversation-container {
@@ -307,7 +307,7 @@
 		if ("{{own_profile}}" == "True") permissions += "w"
 
 		// construct Timeline
-		Timeline.init(timeline_data, "profile-timeline-container", 650, 125, "timeline-edit-container", permissions.split(""))
+		Timeline.init(timeline_data, "profile-timeline-container", 650, 115, "timeline-edit-container", permissions.split(""))
 		Timeline.construct()
 
 		// handler on 'settings' button
@@ -375,7 +375,7 @@
 		var changes_made = false,
 			new_position = ($(".input-container input :last").val() == -1) ? true : false;
 
-		// logic: if it isn't a new position, and some change has been made besides deleting a field, then save it
+		// only care about A) new positions or B) some data has been changed on existing pos
 		if (!new_position) {
 			$(".input-container input").each(function() {
 				if (!changes_made && $(this).val() != $(this).data("original") && $(this).val != "")
@@ -383,79 +383,55 @@
 			})
 		};
 
-
 		// submit to DB (AJAX)s if changes made or a new position (id == -1)
 		if (changes_made || new_position) {
-			// TODO: incorporate Thomas' old on_track code
-			console.log("submit changed position to DB")
-
-			var position = createPositionObject()
-
+			// Create a dict of values from form
+			var position = createPositionObject() 
+			// Put through simple client-side validation
 			if(simpleValidation(position)) {
-				console.log("validated")
-
 				// helper to rename form data for old On_Track API
 				position = readyForDjangoForm(position)
-
-				// Validate Position
+				// Validation Position via API    [ ** AJAX ** ]
 				$.ajax({
 					type: "POST",
 					url: "/accounts/validatePosition/",
 					data: position,
 					dataType:"json",
-
-					beforeSend: function() { },
-
+					beforeSend: function() { console.log("Submit new or changed Position to DB for validation") },
 					success:function(response) {
 						if (response["result"] == "success") {
-							
 							var cleaned_position = response.data
 							console.log("success: ", cleaned_position)
-							
+							savePosition(cleaned_position, position)
+										
 						} else console.log(response["errors"])
 					},
-
-					complete:function() {
-					
-					
-					}
 				});
-
-				// // Validate form data via API
-				// $.post('/accounts/validatePosition/', position, function(data) {
-				// 	console.log(data);
-				// 	if (data["result"] == "success") {
-
-						
-
-				// 		// // Add to DST
-				// 		// path.push({
-				// 		// 	"type":"position",
-				// 		// 	"title":data.data.title,
-				// 		// 	"entity":data.data.entity,
-				// 		// 	"start_date":data.data.start_date,
-				// 		// 	"end_date":data.data.end_date,
-				// 		// 	"display_text":data.data.title + " at " + data.data.entity
-				// 		// });
-				// 		// // console.log(path);
-				// 		// // rerenderProgressBar(path)
-				// 		// if (path.length == 1) createUserPathBar(path)
-				// 		// addPositionToExistingPath(path)
-				// 	} else {
-				// 		// display error
-				// 		console.log('failure');
-				// 		console.log(data.errors);
-				// 	}
-				// },'json');
-
-				// TODO: put this in callback
-				if (new_position)
-					Timeline.addPosition(position)
-				else
-					Timeline.editPosition(position)
-
-			} else { console.log ("won't fly") }
+			}
 		} 
+	};
+
+	var savePosition = function(cleaned_position, position) {
+		// TODO: cleaning isn't really working
+			// currently using the original position enterred rather than returned DATA
+		$.ajax({
+			type: "POST",
+			url: "/accounts/savePosition/",
+			data: position,
+			dataType:"json",
+
+			success:function(response) {
+				if (response["result"] == "success") {
+					console.log("Position successfully saved to DB")
+
+					// delete CSRF token
+					delete position["csrfmiddlewaretoken"]
+					// update Timeline
+					if (position.id == -1) Timeline.addPosition(position)
+					else Timeline.editPosition(position)			
+				} else console.log(response["errors"])
+			},
+		});		
 	};
 
 	// Creates a Position obj to send to DB from From

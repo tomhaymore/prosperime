@@ -8,6 +8,7 @@ import json
 import os
 import logging
 import random
+import time
 
 # from django.contrib.auth.decorators import  _required
 from django.contrib.auth import authenticate, logout as auth_logout, login as auth_login
@@ -18,6 +19,8 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.utils import simplejson
+from django.db.models import Count, Q, fields
+
 
 from django.contrib import messages
 from lilib import LIProfile
@@ -927,17 +930,38 @@ def save_position(request):
 		response.update({"errors":["incorrect request type"], "result":"failure"})
 		return HttpResponse(json.dumps(response))
 
-	position = request.POST.position
-	if position.id == -1:
-		# new position
-		print "New Position"
-		new_position = Position()
+	# position = request.POST.position
+	# if position.id == -1:
+	# 	# new position
+	# 	print "New Position"
+	# 	new_p = Position()
+	# 	new_p.person = request.user
+	# 	new_p.title = position.title
+	# 	new_p.type = position.type
+	# 	new_p.start_date = _convert_string_to_datetime(position.start_date)
+	# 	new_p.end_date = _convert_string_to_datetime(position.end_date)
 
-	else:
-		print "Edit existing Position"
-		old_position = Position.objects.get(id=position.id)
 
+	# 	if position.type == "education":
 
+	# 		new_p.field = position.field
+	# 		new_p.degree = position.field
+
+	# 	try:
+	# 		entity = Entity.objects.get(name)
+	# 		new_p.entity = entity
+	# 	except:
+	# 		# create a new entity...
+	# 		entity = Entity()
+
+	# 	# map to ideal
+
+	# else:
+	# 	print "Edit existing Position"
+	# 	old_position = Position.objects.get(id=position.id)
+	# 	changes = _diff_models(old_position)
+
+	response.update({"result":"success", "pos_id":"7"})
 
 	return HttpResponse(json.dumps(response))
 
@@ -1004,7 +1028,7 @@ def validate_position(request):
 					'end_date':form.cleaned_data['end_date'].year
 				}
 				# see if we can map position
-				pos = Object()
+				pos = Position() ## THOMAS -- this was "Object()"... I changed it b/c it wouldn't work
 				pos.title = form.cleaned_data['title']
 				pos.type = "position"
 				# pos.entity = None
@@ -1330,6 +1354,24 @@ def updateProfile(request):
 ###############
 ##  Helpers  ##
 ###############
+
+# From SO, returns dict of diff fields between models
+def _diff_models(model1, model2, excludes = []):
+    changes = {}
+    for field in model1._meta.fields:
+        if not (isinstance(field, (fields.AutoField, fields.related.RelatedField)) 
+                or field.name in excludes):
+            if field.value_from_object(model1) != field.value_from_object(model2):
+                changes[field.verbose_name] = (field.value_from_object(model1),
+                                                   field.value_from_object(model2))
+    return changes
+
+def _convert_string_to_datetime(string):
+	# TODO: validate input string "MM/YY"
+
+	time_struct = time.strptime(string, "%m/%y")
+	dt = datetime.fromtimestamp(time.mktime(time_struct))
+	return dt
 
 def _test_career_prompt():
 
