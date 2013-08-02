@@ -195,7 +195,7 @@ def register(request):
 				auth_login(request,user)
 
 			# send to personalization
-			return HttpResponseRedirect('/majors/')
+			return HttpResponseRedirect('/')
 	else:
 		form = RegisterForm()
 
@@ -504,7 +504,7 @@ def finish_registration(request):
 
 			#return HttpResponseRedirect('/account/success')
 			if 'next' not in request.session:
-				return HttpResponseRedirect('/majors/')
+				return HttpResponseRedirect('/')
 			else:
 				return HttpResponseRedirect(request.session['next'])
 	else:
