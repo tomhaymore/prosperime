@@ -7,7 +7,8 @@
 	var router = {
 		"home":["question-list-template", "question-template"],
 		"profile":["add-position-first-template", "timeline-edit-org-template", "timeline-edit-education-template", "timeline-position-template", "timeline-position-fragment-template", "upload-profile-pic-template", "errors-template"],
-		"question":["follower-photo-template", "single-comment-template", "advisor-modal-template", "advisor-message-template", "advisor-success-template"]
+		"question":["follower-photo-template", "single-comment-template", "advisor-modal-template", "advisor-message-template", "advisor-success-template"],
+		"search":["no-results-template", "question-list-template", "question-template"]
 	}
 
 </script>
@@ -25,7 +26,9 @@
 
 	<div class="single-question-module">
 		<div class="question-column-left">
-			<div class="profile-pic-container"><img src="<%=owner_pic%>" /></div>
+			<div class="profile-pic-container">
+				<a href="/profile/<%=owner_id%>/"><img src="<%=owner_pic%>" /><a/>
+			</div>
 		</div>
 
 		<div class="question-column-right">
@@ -41,7 +44,9 @@
 
 			<% if (comments.length > 0) %>
 				<div class="comment-column-left">
-					<div class="profile-pic-container-small"><img src="<%=comments[0].owner_pic%>" /></div>
+					<div class="profile-pic-container-small">
+						<a href="/profile/<%=comments[0].owner_id%>"><img src="<%=comments[0].owner_pic%>" /></a>
+					</div>
 				</div>
 				<div class="comment-column-right">
 					<div class="comment-body"><%=comments[0].body%></div>
@@ -159,7 +164,7 @@
 
 
 	<div class="followers-profile-pic">
-		<img src="<%=pic%>" title="<%=user_name%>" />
+		<a href="/profile/<%=id%>/"><img src="<%=pic%>" title="<%=user_name%>" /></a>
 	</div>
 				
 </script>
@@ -168,7 +173,7 @@
 	<div class="comment-module">
 		<div class="comment-column-left">
 			<div class="profile-pic-container-small">
-				<img src="<%=user_pic%>"/>
+				<a href="/profile/<%=user_id%>"><img src="<%=user_pic%>"/></a>
 			</div>			
 
 
@@ -247,5 +252,14 @@
 		<div>
 			Your request has been sent successfully. We will let you know as soon as they answer.
 		</div>
+	</div>
+</script>
+
+<!-- ****** -->
+<!-- Search -->
+<!-- ****** -->
+<script type="text/template" id="no-results-template">
+	<div class="no-results-container">
+		<p>No conversations for <span class="query"><%= query %></span>. You can <a href="/ask">start one</a> right now.</p>
 	</div>
 </script>

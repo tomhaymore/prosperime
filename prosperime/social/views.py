@@ -103,6 +103,7 @@ def question(request, conversation_id):
  		"body":conversation.summary,
  		"user_pic":conversation.owner.profile.default_profile_pic(),
  		"user_name":conversation.owner.profile.full_name(),
+ 		"user_id":conversation.owner.id,
  		"tags":conversation.tags.all(),
  		"user_id":conversation.owner.id,
  		"id":conversation.id
@@ -110,7 +111,7 @@ def question(request, conversation_id):
 
  	# (2) Get comments
  	comments = Comment.objects.filter(conversation=conversation).select_related("owner")
- 	formatted_comments = [{"user_name":c.owner.profile.full_name(),"user_pic":c.owner.profile.default_profile_pic(),"body":c.body,"id":c.id,"votes":Vote.objects.filter(comment=c).count(),"created":c.created} for c in comments]
+ 	formatted_comments = [{"user_name":c.owner.profile.full_name(), "user_id":c.owner.id, "user_pic":c.owner.profile.default_profile_pic(),"body":c.body,"id":c.id,"votes":Vote.objects.filter(comment=c).count(),"created":c.created} for c in comments]
  	
 
  	# (3) Get followers

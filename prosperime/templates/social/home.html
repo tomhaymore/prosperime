@@ -70,58 +70,7 @@
 
 {% block templates %}
 
-<script type="text/template" id="question-list-template">
 
-	
-	<div id="questions-list">
-
-	</div>
-
-</script>
-
-<script type="text/template" id="question-template">
-
-	<div class="single-question-module">
-		<div class="question-column-left">
-			<div class="profile-pic-container"><img src="<%=owner_pic%>" /></div>
-		</div>
-
-		<div class="question-column-right">
-			<div class="question-title"><a href="/question/<%=id%>"><%=name%></a></div>
-			<div class="question-body"><%=summary%></div>
-
-			<% for (t in tags) { %>
-				<div class="tags-container">
-					<a class="tag-inline" href="/tags/<%=tags[t].url_name%>"><%=tags[t].name%></a>
-				</div>
-			<% } %>
-
-
-			<% if (comments.length > 0) %>
-				<div class="comment-column-left">
-					<div class="profile-pic-container-small"><img src="<%=comments[0].owner_pic%>" /></div>
-				</div>
-				<div class="comment-column-right">
-					<div class="comment-body"><%=comments[0].body%></div>
-				</div>
-			
-			<div class="question-subtext">
-				<% if (comments.length == 0) { %>
-					<a href="/question/<%=id%>">Be the first to answer</a>
-				<% } else if (comments.length == 1) { %>
-					<a href="/question/<%=id%>">Add your own answer</a>
-				<% } else { %>
-					<a href="/question/<%=id%>">See all <%=comments.length%> answers </a>
-				<% } %> 
-
-			</div>
-
-
-		</div>
-		<br/>			
-	</div>
-
-</script>
 
 {% endblock %}
 

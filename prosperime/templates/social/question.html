@@ -41,7 +41,9 @@
 		
 		
 			<div class="question-column-left">
-				<div class="profile-pic-container"><img src="{{question.user_pic}}" title="{{question.user_name}}" /></div>
+				<div class="profile-pic-container">
+					<a href="/profile/{{question.user_id}}/"><img src="{{question.user_pic}}" title="{{question.user_name}}" /></a>
+				</div>
 
 				<div class="question-user-name">{{question.user_name}}</div>
 			</div>
@@ -63,10 +65,9 @@
 				{% for c in comments %}
 				<div class="comment-module comment-row">
 
-
 					<div class="comment-column-left">
 						<div class="profile-pic-container-small">
-							<img src="{{c.user_pic}}"/>
+							<a href="/profile/{{c.user_id}}/"><img src="{{c.user_pic}}"/></a>
 						</div>
 						
 
@@ -111,7 +112,7 @@
 			<div class="comment-column-left">
 				<div class="profile-pic-container-small">
 
-					<img src="{{user_pic}}" />
+					<a href="/profile/{{user.id}}/"><img src="{{user_pic}}" /></a>
 				</div>
 			</div>
 			<div class="comment-column-right">

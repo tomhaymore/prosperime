@@ -21,7 +21,7 @@ label {
   font-size: 16px; }
 
 html {
-  height: 100%; }
+  min-height: 100%; }
 
 body {
   color: #333333;
