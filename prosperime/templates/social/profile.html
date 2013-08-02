@@ -18,137 +18,7 @@
 
 	<style type="text/css">
 
-		.timeline-position {
-			position:absolute;
-			border-radius:2px;
-			box-sizing:border-box;
-			text-align:center;
-			/*border:3px solid #6fb6d4;*/
-			padding:4px 4px;
-			color:#68696b;
-			font-size:1em;
-			line-height:18px;
-	
-		} 
 
-		#timeline-edit-container {
-			min-height:50px;
-			margin-bottom: 18px;
-			padding-top: 8px;
-		}
-
-		.tab-conversation-container {
-			margin-top: 24px;
-			margin-bottom: 24px;
-			border-bottom: 1px solid #c0c0c0;
-		}
-
-		.tab-conversation-col-left {
-			display: inline-block;
-			width: 80%;
-		}
-
-		.tab-conversation-col-right {
-			display: inline-block;
-			width: 15%;
-			vertical-align: top;
-			text-align:center;
-			background-color: #6fb6d4;
-			border-radius: 2px;
-			padding:4px 4px;
-			cursor: pointer;
-		}
-
-		.inline-stat-container {
-			margin-top: 18px;
-			margin-bottom: 18px;
-		}
-
-		.profile-add-button {
-			background-color:#c0c0c0;
-			border-radius:2px;
-			margin-top:15px;
-			padding:0px 8px;
-			text-align: center;
-		}
-
-		.add-position-prompt {
-			text-align:center;
-		}
-
-		.add-position-prompt .tag {
-			font-size:1em;
-			padding: 6px 8px;
-			vertical-align: middle;
-			margin:0 auto;
-			margin-top:12px;
-		}
-
-		.settings-container {
-			display:none;
-		}
-
-		.settings-complete {
-			transition: color 0.05s;
-		}
-		.settings-complete:hover {
-			color: #339933;
-		}
-
-		.settings-list {
-			width: 100%;
-			height: 100%;
-			border-top:1px solid #c0c0c0;
-			padding:12px 18px;
-			min-height: 75px;
-		}
-
-		.settings-list div {
-			margin-top: 12px;
-			margin-left: 24px;
-		}
-
-		.settings-list i {
-			cursor:pointer;
-			margin-right:26px;
-			transition: font-size 0.05s;
-		}
-
-		.settings-list i:hover {
-			font-size: 1.1em;
-		}
-
-		.slide-container {
-			min-height: 300px;
-		}
-
-		.settings-icon-container {
-			margin-top: 12px; 
-			width: 90px;
-			border-radius: 4px;
-			cursor: pointer;
-			background-color: #c8c8c8;
-			height: 25px;
-			line-height: 25px;
-			text-align:center;
-			margin: 0 auto;
-		}
-
-		#profile-timeline-container { width: 650px; }
-
-		#upload-profile-pic-form { display: inline; float: right; margin-bottom: 0px; }
-		#upload-profile-pic-form input { line-height: 10px; }
-		.submit-button { 
-			background-color: #27AE60;
-			vertical-align: bottom;
-			line-height: 24px;
-		}
-
-		.input-error {
-			border: 1px solid #e74c3c !important;
-		}
-
-		.error-text { color: #e74c3c; }
 	
 	</style>
 
@@ -313,7 +183,8 @@
 		if ("{{own_profile}}" == "True") permissions += "w"
 
 		// construct Timeline
-		Timeline.init(timeline_data, "profile-timeline-container", 650, 115, "timeline-edit-container", permissions.split(""))
+		var w = parseInt($("#profile-timeline-container").css("width"))
+		Timeline.init(timeline_data, "profile-timeline-container", w, 115, "timeline-edit-container", permissions.split(""))
 		Timeline.construct()
 
 		// handler on 'settings' button
@@ -370,6 +241,7 @@
 	};
 
 	var editPosition = function() {
+		console.log('h')
 		// remove pre-existing errors
 		scrubErrors()
 
@@ -604,7 +476,7 @@
 		// ensure months are legit
 		if (!is_a_month(position.start_date.substring(0,2)))
 			("start_date" in errors) ? errors["start_date"].push("Start month isn't a month!") : errors["start_date"] = ["Start month isn't a month!"]
-		if (!is_a_month(position.end_date.substring(0,2)))
+		if (!is_a_month(position.end_date.substring(0,2)) && position.end_date != "Current")
 			("end_date" in errors) ? errors["end_date"].push("End month isn't a month!") : errors["end_date"] = ["End month isn't a month!"]
 
 		console.log("Errors", errors)
@@ -655,8 +527,8 @@
 	<div class="input-container" data-type="<%=type%>">
 		<input type="text" placeholder="Title" name="title" value="<%=title%>" data-original="<%=title%>" class="input-large" maxlength="150" />
 		 at <input type="text" placeholder="Company" name="co_name" value="<%=co_name%>" data-original="<%=co_name%>" class="input-large" maxlength="450" />
-		 From: <input type="text" placeholder="MM/YY" name="start_date" value="<%=start_date%>" data-original="<%=start_date%>" class="input-extra-small" maxlength="5" />
-		 To: <input type="text" placeholder="MM/YY" name="end_date" value="<%=end_date%>" data-original="<%=end_date%>" class="input-extra-small" maxlength="5" />
+		 From: <input type="text" placeholder="mm/yy" name="start_date" value="<%=start_date%>" data-original="<%=start_date%>" class="input-extra-small" maxlength="5" />
+		 To: <input type="text" placeholder="mm/yy" name="end_date" value="<%=end_date%>" data-original="<%=end_date%>" class="input-extra-small" maxlength="5" />
 		 <input type="hidden" name="id" value="<%=id%>" data-original="<%=id%>" /> 
 		<div class="submit-button flat-button green-button" onclick="editPosition()" style="vertical-align:top;"> Done </div>
 	</div>
@@ -670,8 +542,8 @@
 		<input type='text' placeholder='B.A.' name="degree" value="<%=degree%>" data-original="<%=degree%>" class='input-small input-extra-small' maxlength="450" />
 		 in <input type='text' placeholder='Major' name="field" value="<%=field%>" data-original="<%=field%>" class='input-medium' maxlength="450" />
 		 at <input type='text' placeholder='University' name="school" value="<%=school%>" data-original="<%=school%>" class='input-medium' maxlength="450" />
-		Start: <input type="text" placeholder="MM/YY" name="start_date" value="<%=start_date%>" data-original="<%=start_date%>" class="input-extra-small" maxlength="5" />
-		End: <input type="text" placeholder="MM/YY" name="end_date" value="<%=end_date%>" data-original="<%=end_date%>" class="input-extra-small" maxlength="5" />
+		Start: <input type="text" placeholder="mm/yy" name="start_date" value="<%=start_date%>" data-original="<%=start_date%>" class="input-extra-small" maxlength="5" />
+		End: <input type="text" placeholder="mm/yy" name="end_date" value="<%=end_date%>" data-original="<%=end_date%>" class="input-extra-small" maxlength="5" />
 		<input type="hidden" name="id" value="<%=id%>" data-original="<%=id%>" /> 
 		<div class="submit-button flat-button green-button" onclick="editPosition()" style="vertical-align:top;"> Done </div>
 

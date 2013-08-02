@@ -22,8 +22,47 @@ var Timeline = (function() {
         midline,
         permissions,
         hidden_nodes = [],
+        start_date_label,
         $el;
 
+    // Main methods //
+    function resizeTimeline() {
+        // change start_date label
+        start_date_label.attr("text", timeline_start)
+        // reset the month_offset
+        month_offset = Math.floor((w - (offset * 2)) / monthsDifference(timeline_start, timeline_end))
+
+        // iterate through all nodes, move node, hiddenNode, hiddenText, change x value of textBox
+        for (index in hidden_nodes) {
+            var hidden_node = paper.getById(hidden_nodes[index])
+            var outer_node = paper.getById(hidden_node.data("outer_node_id"))
+            var hidden_text = paper.getById(hidden_node.data("hidden_text_id"))
+            var textBox = $(".timeline-position[data-node-id='" + hidden_nodes[index] +"']")
+
+            // get new 'x' value
+            var months_difference = monthsDifference(timeline_start, positions[outer_node.data("index")].start_date)
+            var x = (months_difference * month_offset) + offset
+
+            // x values on each node, hidden_text
+            hidden_node.animate({"cx":x}, "150")
+            outer_node.animate({"cx":x}, "150")
+            hidden_text.animate({"x":x}, "150")
+
+            // update textbox
+            var half_box = $(textBox).width() / 2
+            x = (x + half_box > w) ? x - half_box : x;
+            x = x - half_box
+            $(textBox).attr("data-x", x)
+        }
+    };
+
+    function checkTimelineBounds(new_start_date) {
+        // check if new start date < previous timeline_start
+        if (dateToInt(new_start_date) < dateToInt(timeline_start)) {
+            timeline_start = new_start_date
+            resizeTimeline()
+        }
+    };
 
     function updateNode(position, index) {
         // get textBox in question
@@ -57,7 +96,7 @@ var Timeline = (function() {
             " L" + (w - offset - 5) + ", " + (midline + 5) + " z"
             ).attr({"stroke":"#999", "fill":"#bbb"})
 
-        var start_date = paper.text(offset, midline + label_offset, timeline_start).attr(label_attr)
+        start_date_label = paper.text(offset, midline + label_offset, timeline_start).attr(label_attr)
         var end_date = paper.text(w - offset, midline + label_offset, "Present").attr(label_attr)
     };
 
@@ -65,14 +104,9 @@ var Timeline = (function() {
         // local attributes
         var color = setColor(position.type),
             outer_r = 10,
-            inner_r = 2,
             outer_dot_attr = {'stroke-width':'2', 'stroke':color, 'fill':color, 'fill-opacity':'.8' },
-            inner_dot_attr = {'stroke-width':'1', 'stroke':color, 'fill':color},
-            // hidden_dot_attr = {'stroke-width':'1', 'stroke':"#27AE60", 'fill':"#27AE60", cursor:"pointer" },
-            // hidden_text_attr = {"cursor": "pointer", "font-family":"Helvetica", "font-size":"12pt", "stroke":"none", "fill":"#ECF0F1"};
             hidden_dot_attr = {'stroke-width':'1', 'stroke':"#c0c0c0", 'fill':"#ECF0F1", cursor:"pointer" },
             hidden_text_attr = {"cursor": "pointer", "font-family":"Helvetica", "font-size":"12pt", "font-weight":"bold", "stroke":"none", "fill":"#27AE60"};
-
 
         // calculate 'x' value for nodes
         var months_difference = monthsDifference(timeline_start, position.start_date)
@@ -84,7 +118,6 @@ var Timeline = (function() {
             .data("index", index)
             .mouseover(nodeMouseover)
 
-    
         // create & hide mouseover node
         var hidden_node = paper.circle(x, midline, outer_r)
             .attr(hidden_dot_attr)
@@ -96,7 +129,6 @@ var Timeline = (function() {
         var hidden_text = paper.text(x, midline, "Edit")
             .attr(hidden_text_attr)
             .hide()
-            // TODO: add mouseout to text as well (for fast transitions)
 
         // only allow editing given proper permission
         if (permissions.indexOf("w") != -1) {
@@ -111,13 +143,10 @@ var Timeline = (function() {
         outer_node.data("hidden_node_id", hidden_node.id)
         outer_node.data("hidden_text_id", hidden_text.id)
         hidden_node.data("hidden_text_id", hidden_text.id)
+        hidden_node.data("outer_node_id", outer_node.id)
 
         // append hidden_node_id to g
         hidden_nodes.push(hidden_node.id)
-         
-        // // create inner node (purely aesthetic)
-        // var inner_node = paper.circle(x, midline, inner_r)
-        //     .attr(inner_dot_attr)
 
         // create text box, positioned offscreen
         createTextBox(position, index, x, hidden_node.id)
@@ -162,6 +191,11 @@ var Timeline = (function() {
             }   
         };
     };
+
+
+    //////////////
+    // Handlers //
+    //////////////
 
     // triggered on SVG circles (=this)
     function nodeMouseover(e) {
@@ -224,6 +258,10 @@ var Timeline = (function() {
 
     };
 
+    /////////////
+    // Helpers //
+    /////////////
+
     function setColor(type) {
         switch(type) {
             case "education":
@@ -232,13 +270,13 @@ var Timeline = (function() {
             case "internship":
                 return "#ffc340";
                 break;
-
             default:
                 return "rgb(111,182,212)"
                 break;
         }
     };
 
+    // copy of method from js/helpers, returns months between two dates of format "MM/YY" as int
     function monthsDifference(d1, d2) {
         var m1 = parseInt(d1.substring(0,2)),
             y1 = parseInt(d1.substring(3)),
@@ -248,6 +286,10 @@ var Timeline = (function() {
         return Math.round(diff);
     }; 
 
+    // copy of function in js/helpers, converts date of format "MM/YY" to int for comparison
+    function dateToInt(date) {
+        return parseInt(date.substring(3) + date.substring(0,2))
+    };
 
     /**********/
     /* Public */
@@ -278,17 +320,19 @@ var Timeline = (function() {
             // create line
             createLine()
             // create positions & text boxes
-            for (p in positions) {
+            for (p in positions) 
                 createNode(positions[p], p)
-            }
-
         },
 
         editPosition: function(edited_position) {
-            // grab edited position
+            // find position in local array
             for (p in positions) {
                 if (edited_position.id == positions[p].id) {
+                    // set position to new data
                     positions[p] = edited_position
+                    // check that new position doesn't break timeline, resize if so
+                    checkTimelineBounds(edited_position.start_date)
+                    // update the specific node
                     updateNode(edited_position, p)
                     break;
                 }
@@ -296,7 +340,11 @@ var Timeline = (function() {
         },
 
         addPosition: function(position) {
+            // add position to local array
             positions.push(position)
+            // checks that new position dates don't break timeline, resizes if so
+            checkTimelineBounds(position.start_date)
+
             if (position.type == "education") {
                 if (position.degree.length > 1 && position.field.length > 1)
                     position.title = position.degree + " in " + position.field
@@ -309,6 +357,7 @@ var Timeline = (function() {
 
                 position.co_name = position.school
             }
+            // create new node for position
             createNode(position, positions.length - 1)
         },
 
