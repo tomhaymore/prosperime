@@ -16,11 +16,6 @@
 	<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/timeline-viz.js"></script>
 
-	<style type="text/css">
-
-
-	
-	</style>
 
 {% endblock %}
 
@@ -54,25 +49,15 @@
 			<div id="timeline-edit-container"></div>
 		</div>
 
-		<!-- Settings -->
-		{% if own_profile %}
-		<div class="row-fluid settings-container slide-container">
-			<div class="module-header">Settings &nbsp;&nbsp;&nbsp; <i class="icon-ok icon-large settings-complete" data-setting="return"></i></div>
-
-			<div class="settings-list">
-				<div><i class="icon-pencil icon-large" data-setting="addPosition"> </i>Add to your professional timeline</div>
-				<div><i class="icon-pencil icon-large" data-setting="uploadPic"> </i>Upload a new profile picture</div>
-			</div>
-		</div>
-		{% endif %}
 
 		<!-- Conversations List(s) -->
 		<div class="row-fluid tab-container slide-container">
 			<ul class="nav nav-tabs" style="margin-bottom:0px;">
-			  <li class="active">
-			    <a href="#started-convos-tab" data-toggle="tab">Started Conversations</a>
-			  </li>
-			  <li><a href="#followed-convos-tab" data-toggle="tab">Followed Conversations</a></li>
+				<li class="active"><a href="#started-convos-tab" data-toggle="tab">Started Conversations</a></li>
+				<li><a href="#followed-convos-tab" data-toggle="tab">Followed Conversations</a></li>
+				{% if own_profile %}
+			 		<li><a href="#settings-tab" data-toggle="tab">Settings</a></li>
+				{% endif %}
 			</ul>
 
 			<div class="tab-content">
@@ -82,11 +67,15 @@
 						<div class="tab-conversation-container">
 							<div class="tab-conversation-col-left">
 								<div class="module-header"><a href="/question/{{s.id}}">{{s.name}}</a></div>
-								<div class="inline-stat-container">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-									<span class="stat">{{s.stats.num_followers}}</span> Followers &nbsp;&nbsp;&nbsp;<span class="stat">{{s.stats.num_answers}}</span> Answers
+							</div>
+
+							<div class="tab-conversation-col-right">
+								<div class="flat-button blue-button">Ask friends to answer</div>
+								<div class="Profile-stat-container">
+									<div class="Profile-single-stat-container"><span class="stat">{{s.stats.num_followers}}</span> Followers</div>
+									<div class="Profile-single-stat-container"><span class="stat">{{s.stats.num_answers}}</span> Answers</div>
 								</div>
 							</div>
-							<div class="tab-conversation-col-right">Ask friends to answer</div>
 						</div>
 					{% endfor %}
 					{% if started_conversations|length == 0 %}
@@ -99,17 +88,31 @@
 						<div class="tab-conversation-container">
 							<div class="tab-conversation-col-left">
 								<div class="module-header"><a href="/question/{{f.id}}">{{f.name}}</a></div>
-								<div class="inline-stat-container">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-									<span class="stat">{{f.stats.num_followers}}</span> Followers &nbsp;&nbsp;&nbsp;<span class="stat">{{f.stats.num_answers}}</span> Answers
-								</div>
 							</div>
-							<div class="tab-conversation-col-right">Ask friends to answer</div>
+							<div class="tab-conversation-col-right">
+								<div class="flat-button blue-button">Ask friends to answer</div>
+								<div class="Profile-stat-container">
+									<div class="Profile-single-stat-container"><span class="stat">{{f.stats.num_followers}}</span> Followers</div>
+									<div class="Profile-single-stat-container"><span class="stat">{{f.stats.num_answers}}</span> Answers</div>
+								</div>
+							</div>						
 						</div>
 					{% endfor %}
 					{% if followed_conversations|length == 0 %}
 						<br/><br/><br/><p>&nbsp;&nbsp;&nbsp;{{user_name}} hasn't followed any conversations yet</p>
 					{% endif %}
 				</div>
+
+				{% if own_profile %}
+				<div class="tab-pane settings-container" id="settings-tab">
+					<!-- <div class="row-fluid settings-container slide-container"> -->
+
+					<div class="settings-list">
+						<div><i class="icon-pencil icon-large" data-setting="addPosition"> </i>Add to your professional timeline</div>
+						<div><i class="icon-pencil icon-large" data-setting="uploadPic"> </i>Upload a new profile picture</div>
+					</div>
+				</div>
+				{% endif %}
 			</div>
 		</div>
 
@@ -128,30 +131,31 @@
 					<a href="/ask/" class="flat-button green-button">Start</a> a conversation
 				</p>
 			</div>
-				
-			<div class="module-header">Connections: </div>
-			<!-- Default to first 5 -->
-			{% for c in connections %}
-				<div class="followers-profile-pic">
-					<a href="/profile/{{c.id}}"><img src="{{c.pic}}" title="{{c.name}}" /></a>
-				</div>
-			{% endfor %}
+				<!-- Connections (not currently in use) -->
+	
+			<!-- 	<div class="right-question-column-module">
+					<div class="module-header">Connections: </div>
+					{% for c in connections %}
+						<div class="followers-profile-pic">
+							<a href="/profile/{{c.id}}"><img src="{{c.pic}}" title="{{c.name}}" /></a>
+						</div>
+					{% endfor %}
 
-			{% if num_connections > 5 %}
-				<div class="followers-more-followers">and {{num_connections|add:-5}} more... </div>
-			{% endif %}
+					{% if num_connections > 5 %}
+						<div class="followers-more-followers">and {{num_connections|add:-5}} more... </div>
+					{% endif %}
 
-			{% if connections|length == 0 %} 
+					{% if connections|length == 0 %} 
 
-				<p>No connections yet</p>
+						<p>No connections yet</p>
 
-			{% endif %}
+					{% endif %} -->
 
-			{% if own_profile %}
+			<!-- {% if own_profile %}
 			<div class="right-question-column-module">
 					<div class="settings-icon-container">Settings <i class="icon-cog icon-large" title="Settings"></i></div>
 			</div>
-			{% endif %}
+			{% endif %} -->
 
 		</div>
 
@@ -188,7 +192,7 @@
 		Timeline.construct()
 
 		// handler on 'settings' button
-		$(".settings-icon-container").on("click", renderSettings)
+		// $(".settings-icon-container").on("click", renderSettings)
 		// set handlers within 'settings container'
 		$(".settings-container i").on("click", setSetting)
 	});
@@ -241,7 +245,6 @@
 	};
 
 	var editPosition = function() {
-		console.log('h')
 		// remove pre-existing errors
 		scrubErrors()
 
@@ -275,7 +278,6 @@
 					beforeSend: function() {
 						// return timeline to normal
 						Timeline.normalize()
-
 						// hide container
 						$(".input-container").animate({"opacity":0}, 250)
 						// normalize tabs
@@ -294,7 +296,7 @@
 			} else
 				// display validation errors
 				renderErrors(errors)
-		} 
+		} else cancelPosition()
 	};
 
 	var savePosition = function(cleaned_position, position) {
@@ -318,6 +320,17 @@
 				} else console.log(response["errors"])
 			},
 		});		
+	};
+
+	var cancelPosition = function() {
+		// return timeline to normal
+		Timeline.normalize()
+		// hide container
+		$(".input-container").animate({"opacity":0}, 250)
+		// normalize tabs
+		$(".tab-container").animate({"opacity":1}, 200)
+		// clear previous errors
+		scrubErrors()
 	};
 
 	// Creates a Position obj to send to DB from From
@@ -511,82 +524,6 @@
 
 </script>
 
-<script type="text/template" id="add-position-first-template">
-	
-	<div class="add-position-prompt">
-		<div>Select what best describes this position: </div>
-		<div class="flat-button tag" onclick="renderAddForm2('education')">Education</div>
-		<div class="flat-button tag" onclick="renderAddForm2('org')">Job</div>
-		<div class="flat-button tag" onclick="renderAddForm2('internship')">Internship</div>
-	</div>
 
-</script>
-
-<script type="text/template" id="timeline-edit-org-template">
-	
-	<div class="input-container" data-type="<%=type%>">
-		<input type="text" placeholder="Title" name="title" value="<%=title%>" data-original="<%=title%>" class="input-large" maxlength="150" />
-		 at <input type="text" placeholder="Company" name="co_name" value="<%=co_name%>" data-original="<%=co_name%>" class="input-large" maxlength="450" />
-		 From: <input type="text" placeholder="mm/yy" name="start_date" value="<%=start_date%>" data-original="<%=start_date%>" class="input-extra-small" maxlength="5" />
-		 To: <input type="text" placeholder="mm/yy" name="end_date" value="<%=end_date%>" data-original="<%=end_date%>" class="input-extra-small" maxlength="5" />
-		 <input type="hidden" name="id" value="<%=id%>" data-original="<%=id%>" /> 
-		<div class="submit-button flat-button green-button" onclick="editPosition()" style="vertical-align:top;"> Done </div>
-	</div>
-
-
-</script>
-
-<script type="text/template" id="timeline-edit-education-template">
-
-	<div class="input-container" data-type="<%=type%>">
-		<input type='text' placeholder='B.A.' name="degree" value="<%=degree%>" data-original="<%=degree%>" class='input-small input-extra-small' maxlength="450" />
-		 in <input type='text' placeholder='Major' name="field" value="<%=field%>" data-original="<%=field%>" class='input-medium' maxlength="450" />
-		 at <input type='text' placeholder='University' name="school" value="<%=school%>" data-original="<%=school%>" class='input-medium' maxlength="450" />
-		Start: <input type="text" placeholder="mm/yy" name="start_date" value="<%=start_date%>" data-original="<%=start_date%>" class="input-extra-small" maxlength="5" />
-		End: <input type="text" placeholder="mm/yy" name="end_date" value="<%=end_date%>" data-original="<%=end_date%>" class="input-extra-small" maxlength="5" />
-		<input type="hidden" name="id" value="<%=id%>" data-original="<%=id%>" /> 
-		<div class="submit-button flat-button green-button" onclick="editPosition()" style="vertical-align:top;"> Done </div>
-
-	</div>
-
-</script>
-
-<script type="text/template" id="timeline-position-template">
-
-	<div class="timeline-position">
-
-		<div class="timeline-position-position"><%=title%></div>
-		<div class="timeline-position-entity"><%=co_name%></div>
-		<div class="timeline-position-dates"><%=start_date%> - <%=end_date%></div>
-
-	</div>
-
-</script>
-
-<script type="text/template" id="timeline-position-fragment-template">
-
-	<div class="timeline-position-position"><%=title%></div>
-	<div class="timeline-position-entity"><%=co_name%></div>
-	<div class="timeline-position-dates"><%=start_date%> - <%=end_date%></div>
-
-</script>
-
-<script type="text/template" id="upload-profile-pic-template">
-
-	<form id="upload-profile-pic-form" enctype="multipart/form-data">
-		{% csrf_token %}
-		<input type="file" name="pic" id="pic" />
-		<div class="form-submit flat-button submit-button">Upload</div>
-	</form>
-
-</script>
-
-<script type="text/template" id="errors-template">
-
-	<% for (index in errors) { %>
-		<p class="error-text"><%=errors[index].join(", ")%></p>
-	<% } %>
-
-</script>
 
 {% endblock %}

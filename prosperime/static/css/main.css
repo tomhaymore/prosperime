@@ -49,6 +49,9 @@ body {
 .input-extra-small {
   width: 40px; }
 
+.input-medium-large {
+  width: 190px; }
+
 #search-container {
   width: 630px;
   height: 50px; }

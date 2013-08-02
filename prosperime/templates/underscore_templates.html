@@ -85,12 +85,13 @@
 <script type="text/template" id="timeline-edit-org-template">
 	
 	<div class="input-container" data-type="<%=type%>">
-		<input type="text" placeholder="Title" name="title" value="<%=title%>" data-original="<%=title%>" class="input-large" maxlength="150" />
-		 at <input type="text" placeholder="Company" name="co_name" value="<%=co_name%>" data-original="<%=co_name%>" class="input-large" maxlength="450" />
+		<input type="text" placeholder="Title" name="title" value="<%=title%>" data-original="<%=title%>" class="input-medium-large" maxlength="150" />
+		 at <input type="text" placeholder="Company" name="co_name" value="<%=co_name%>" data-original="<%=co_name%>" class="input-medium-large" maxlength="450" />
 		 From: <input type="text" placeholder="mm/yy" name="start_date" value="<%=start_date%>" data-original="<%=start_date%>" class="input-extra-small" maxlength="5" />
 		 To: <input type="text" placeholder="mm/yy" name="end_date" value="<%=end_date%>" data-original="<%=end_date%>" class="input-extra-small" maxlength="5" />
 		 <input type="hidden" name="id" value="<%=id%>" data-original="<%=id%>" /> 
 		<div class="submit-button flat-button green-button" onclick="editPosition()" style="vertical-align:top;"> Done </div>
+		<div class="cancel-button flat-button red-button" onclick="cancelPosition()" style="vertical-align:top;padding-top:7px;"> Cancel </div>
 	</div>
 
 
@@ -106,7 +107,7 @@
 		End: <input type="text" placeholder="mm/yy" name="end_date" value="<%=end_date%>" data-original="<%=end_date%>" class="input-extra-small" maxlength="5" />
 		<input type="hidden" name="id" value="<%=id%>" data-original="<%=id%>" /> 
 		<div class="submit-button flat-button green-button" onclick="editPosition()" style="vertical-align:top;"> Done </div>
-
+		<div class="cancel-button flat-button red-button" onclick="cancelPosition()" style="vertical-align:top;padding-top:7px;"> Cancel </div>
 	</div>
 
 </script>
