@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <!-- open graph tags -->
-<meta property="og:title" content="ProsperMe: Get trusted advice from classmates and alumni">
+<meta property="og:title" content="Emplore: Get trusted advice from classmates and alumni">
 <meta property="og:description" content="A trusted platform for sharing career advice among alumni">
 <!-- Favicon -->
 <link href="{{ STATIC_URL }}img/favicon.ico" rel="icon" />
@@ -33,50 +33,39 @@
 {% block head %} {% endblock %}
 <head> 
 	<title>
-		{% block title %}ProsperMe: Find the Right Path for You {% endblock %}
+		{% block title %}Emplore: Find the Right Path for You {% endblock %}
 	</title>
 </head>
 
 <body>
-
-		<div id="topbar">
-
-			<div id="topbar-inner">
-
-					<div id="logo-container" class="pull-left">
-
-						<a href="/"><img id="main-logo" src="{{STATIC_URL}}img/default_logo.png" /></a>	
-					</div>
-
-					<div class="pull-right">
-						<ul id="topbar-nav" class="pull-right">
-							
-                			{% if user.is_authenticated %}
-		             	
-		             			<li><a href="/">Home</a></li>
-
-		                		<li><a href="/profile/{{user.id}}">Profile</a></li>
-
-		                		<li><a href="/account/logout/">Logout</a></li>
-	                		{% else %}
-								<li>
-									<a href="/account/login">Login</a>
-								</li>
-								<li>
-									<a href="/partners/">Schools &amp; Companies</a>
-								</li>
-	                		{% endif %}
-						</ul>
-						<div class="clear"></div>
-					</div>
-					
-					<div class="clear"></div>
-			
+	<div id="topbar">
+		<div id="topbar-inner">
+			<div id="logo-container" class="pull-left">
+				<a href="/"><img id="main-logo" src="{{STATIC_URL}}img/default_logo.png" /></a>	
 			</div>
+
+			<div class="pull-right">
+				<ul id="topbar-nav" class="pull-right">
+					
+        			{% if user.is_authenticated %}
+    	
+             			<li><a href="/">Home</a></li>
+                		<li><a href="/profile/{{user.id}}">Profile</a></li>
+                		<li><a href="/account/logout/">Logout</a></li>
+
+            		{% else %}
+						<li><a href="/account/login">Login</a></li>
+						<li><a href="/partners/">Schools &amp; Companies</a></li>
+            		{% endif %}
+				</ul>
+				<div class="clear"></div>
+			</div>				
+			<div class="clear"></div>			
 		</div>
+	</div>
         
-     <div id="background-container">
-		 <div id="messages-container">
+    <div id="background-container">
+		<div id="messages-container">
 			{% block message %} 
 				{% if messages %}
 					<div id="messages">
@@ -89,28 +78,25 @@
 				{% endif %}
 			{% endblock %}
 
-
 			{% block extramessage %}  {% endblock %}
-
 		</div>
 
 	   
 	    <div class="splash-container">
-	   
 	      	{% block content %} {% endblock %}
+	    <div>
 
-	      	<div>
-		        	{% block promo %} {% endblock %}		        
-		    </div>
-	    </div>
+		{% block promo %} {% endblock %}		        
 	</div>
-    
+
 {% block templates %}
 {% endblock %}
 
 {% block footer %}
 	{% include "footer.html" %}
+	{% include "underscore_templates.html" %}
 {% endblock %}
+
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
@@ -124,5 +110,6 @@
   })();
 
 </script>
+	
 </body>
 </html>
