@@ -4,12 +4,18 @@
 <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/personalize.css" />
 <!-- <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/typeahead.min.css" />
 <script type="text/javascript" src="{{ STATIC_URL }}js/typeahead.min.js"></script> -->
-
+<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/personalize.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.form.min.js"></script>
 <script type="text/css">
 
 </script>
+
+<style type="text/css">
+.circle {
+	background-image:url({{ user.profile.default_profile_pic|safe }});
+}
+</style>
 {% endblock %}
 
 {% block extramessage %}
@@ -25,7 +31,8 @@
 
 	<div id="profile-pic-container" class="pull-left">
 		<!-- <div class="center profile-subheader" >You</div> -->
-		<div id="profile-pic" class="circle">
+		
+		<div id="profile-pic" class="circle" style="">
 		</div>
 		<!-- <div id="profile-pic-caption" class="center" style="display:none;">
 			Add a picture
@@ -38,6 +45,7 @@
 	<div id="personalize-form-container" class="pull-left">
 		<div class="personalize-module" data-info="education">
 			<p class="form-header">Education</p>
+			<div class="errors"></div>
 			<ul id="personalize-educations" class="personalize-list">
 			{% if educations %}
 				
@@ -71,6 +79,7 @@
 		</div>
 		<div class="personalize-module" data-info="experience">
 			<p class="form-header">Experience</p>
+			<div class="errors"></div>
 			<ul id="personalize-positions" class="personalize-list">
 			{% if positions %}
 				
@@ -91,9 +100,10 @@
 		<div class="personalize-module" data-info="geography">
 			<p class="form-header">Geography</p>
 			<label for="id_geography">Where would you like to live?</label>
+			<div class="errors"></div>
 			<ul id="personalize-geo" class="personalize-list">
 				{% for g in geographies %}
-					<li>{{g.name}}</li>
+					<li data-type="geo" data-id="{{g.id}}">{{g.name}} <a data-type="geo" data-id="{{g.id}}" class="remove-x-button">del</a></li>
 				{% endfor %}
 			</ul>
 			<input placeholder="Enter a region, city, or state" id="id_geography" name="geography" type="text" class="flat-input" data-autocomplete="geography"/> <a class="blue-button search-button" id="add-geo">Add</a>
@@ -102,9 +112,10 @@
 		<div class="personalize-module" data-info="goals">
 			<p class="form-header">Goals</p>
 			<label for="id_goal">What would you like to do?</label>
+			<div class="errors"></div>
 			<ul id="personalize-goals" class="personalize-list">
 				{% for g in goals %}
-					<li>{{g.title}}</li>
+					<li data-type="goal" data-id="{{g.id}}">{{g.position__title}} <a data-type="goal" data-id="{{g.id}}" class="remove-x-button">del</a>
 				{% endfor %}
 			</ul>
 			<input placeholder="Enter a job or career" id="id_goal" name="goal" type="text" class="flat-input" data-autocomplete="goal" /> <a class="blue-button search-button" id="add-goal">Add</a>
@@ -257,7 +268,7 @@ $(function() {
 		function() {
 			
 			var module = $(this).data('info');
-			console.log("div[data-info='"+module+"']");
+			
 			$(".personalize-info-module").hide();
 			$("div[data-info='"+module+"']").show();
 		},
@@ -394,8 +405,9 @@ $(function() {
 			// add to profile
 			$.post('/accounts/addToProfile/',post_data,function(data) {
 				if (data['result'] == "success") {
-					var block = "<li>"+data['geo']+"</li>";
-					$("ul#personalize-geo").append(block);
+					var block = _.template($("#geo-template"));
+					// var block = "<li>"+data['geo']+"</li>";
+					$("ul#personalize-geo").append(block({"geo":data["geo"]}));
 					geo.val(geo_placeholder);
 				};
 			},'json');
@@ -423,8 +435,8 @@ $(function() {
 			// add to profile
 			$.post('/accounts/addToProfile/',post_data,function(data) {
 				if (data['result'] == "success") {
-					var block = "<li>"+data['goal']+"</li>";
-					$("ul#personalize-goals").append(block);
+					var block = _.template($("#goal-template"));
+					$("ul#personalize-goals").append(block({'goal':data['goal'],'id':data['id']}));
 					goal.val(goal_placeholder);
 				};
 			},'json');
@@ -482,6 +494,40 @@ $(function() {
 		});
 	})
 
+	$(document).on("click",".remove-x-button",function() {
+		// get type and id
+		var id = $(this).data('id');
+		var type = $(this).data('type');
+		console.log(id,type);
+		removePersonalization(type,id);
+
+	});
+
+	var removePersonalization = function(type,id) {
+		// construct post data
+		var postData = {
+			'type': type,
+			'id': id,
+			'user_id': {{user.id}}
+		}
+		// hit api
+		$.ajax({
+			type: "POST",
+			url: '/accounts/removeFromProfile/',
+			data: postData,
+			dataType: "json",
+			success: function(data) {
+				if (data['result'] == 'success') {
+					// remove list item
+					$("li[data-type='"+type+"',data-id='"+id+"']").remove();
+				} else {
+					$("li[data-type='"+type+"',data-id='"+id+"']").closest("div.errors").append(data['errors']);
+				}
+			}
+		});
+			
+	}
+
 	// $("#personalize-form-container").find("input").change( function() {
 		
 	// 	clearTimeout(timer);
@@ -493,7 +539,19 @@ $(function() {
 	// 	},1000);
 	// })
 
-})
+});
+</script>
+<script type="text/template" id="goal-template">
+
+	<li><%= goal %><a data-type="goal" data-id="<%= id %>" class="remove-x-button">del</a></li>
 
 </script>
+
+<script type="text/template" id="geo-template">
+
+	<li><%= geo %><a data-type="goal" data-id="<%= geo %>" class="remove-x-button">del</a></li>
+
+</script>
+
+
 {% endblock %}

@@ -293,6 +293,18 @@ input.form-error {
 	margin-bottom:10px;
 }
 
+.personalize-list li .remove-x-button {
+	visibility: hidden;
+}
+
+.personalize-list li:hover .remove-x-button {
+	visibility: visible;
+}
+
+.remove-x-button {
+	margin-left: 15px;
+}
+
 .personalize-module {
 	margin-bottom:30px;
 }
@@ -302,7 +314,6 @@ input.form-error {
 	width:80px;
 	height:80px;
 	border-radius:40px;
-	background-image:url('/media/pictures/anon_small.jpg');
 	background-position:50% 50%;
     background-repeat:no-repeat; 
 }
