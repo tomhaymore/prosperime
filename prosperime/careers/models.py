@@ -252,6 +252,9 @@ class GoalPosition(models.Model):
 	created = models.DateTimeField(auto_now_add=True, null=True)
 	updated = models.DateTimeField(auto_now=True, null=True)
 
+	def __unicode__(self):
+		return self.position.title
+
 class SavedPath(models.Model):
 
 	title = models.CharField(max_length=50, null=True)
