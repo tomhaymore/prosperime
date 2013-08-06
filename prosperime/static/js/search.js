@@ -19,7 +19,6 @@ $(function(){
 
 		url:function() {
 			path = "/api/conversations/?query=" + this._meta['query'];	
-			
 			return path;
 		},
 
@@ -52,7 +51,6 @@ $(function(){
 		},
 
 		render: function() {
-
 			var renderedContent = this.template(this.model.toJSON());
 			$(this.el).html(renderedContent);
 			return this;
@@ -68,11 +66,16 @@ $(function(){
 		template: _.template($('#question-list-template').html()),
 
 		initialize: function() {
-			_.bindAll(this,'render');
+			_.bindAll(this,'render', 'showNoResults');
 			this.collection.bind('reset',this.render);
 		},
 
 		render: function() {
+			// if no results, show 
+			if (this.collection.length == 0) {
+				this.showNoResults(this.collection._meta["query"]);
+				return false;
+			}
 			// Don't pass anything to this template
 			$(this.el).html(this.template({}));
 			// Declare local collection variable outside (scoping)
@@ -90,7 +93,12 @@ $(function(){
 				$questions.append(view.render().el);
 			});
 			return this;
-		}
+		},
+
+		showNoResults: function(query) {
+			var msg = _.template($("#no-results-template").html())
+			$("#center-column").append(msg({'query':query}))
+		},	
 	});
 
 
@@ -106,24 +114,6 @@ $(function(){
 
 		initialize: function() {
 
-			$("input#search-conversations-input").typeahead({
-		    	name:'conversations',
-		    	remote:'/api/conversations_autocomplete/?q=%QUERY',
-		    	limit: 5
-		    });
-
-			// Listen to filter button
-			$("#search-conversations-button").on("click", function(ev) {
-
-				// var url = $.param({'query':$("input#search-conversations-input").val()});
-				var url = encodeURIComponent($("input#search-conversations-input").val())
-
-				// window.location = url;
-				window.App.navigate(url, {trigger:true})
-			})
-
-			// Set collection, view
-			// window.questions = new Questions()
 			this.questions = window.questions;
 			this.questionsView = new QuestionListView({collection:this.questions});
 		},
@@ -131,7 +121,6 @@ $(function(){
 		default: function() {
 			console.log('Default view');
 			this.questions.meta("query","");
-
 			this.questions.fetch();
 			this.questionsView.render();
 		},
@@ -147,20 +136,9 @@ $(function(){
 			}
 			this.questions.fetch();
 			this.questionsView.render();
-			// check for null
-			if (this.questions.length == 0) {
-				showNoResults(query);
-			}
 		}
 
 	});
-
-	var showNoResults = function(query) {
-
-		var msg = _.template($("#no-results-template").html())
-		
-		$("#center-column").append(msg({'query':query}))
-	};
 
 	window.App = new ConversationRouter;
 	Backbone.history.start();

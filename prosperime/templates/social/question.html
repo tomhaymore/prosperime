@@ -38,8 +38,6 @@
 	<!-- Center -->
 	<div id="center-column">
 
-		
-		
 			<div class="question-column-left">
 				<div class="profile-pic-container">
 					<a href="/profile/{{question.user_id}}/"><img src="{{question.user_pic}}" title="{{question.user_name}}" /></a>
@@ -59,8 +57,9 @@
 			<!-- 	<div class="question-subtext">
 					Question asked by <a href="/profile/{{question.user_id}}">{{question.user_name}}</a>
 				</div> -->
-			<!-- </div> -->
-
+			<!-- </div> <-->
+				
+				<div class="comment-row"><!-- need this as placeholder --></div>
 			{% if comments %}
 				{% for c in comments %}
 				<div class="comment-module comment-row">
@@ -70,13 +69,10 @@
 							<a href="/profile/{{c.user_id}}/"><img src="{{c.user_pic}}"/></a>
 						</div>
 						
-
-
 					<!-- 	<div data-comment_id="{{c.id}}" class="vote-container">
 							<div data-type="down" class="vote-button vote"><i class="icon-chevron-left"></i></div>
 							<div class="comment-vote vote">{{c.votes}}</div>
 							<div data-type="up" class="vote-button vote"><i class="icon-chevron-right"></i></div>
-
 						</div>	 -->				
 					</div>
 
@@ -93,17 +89,12 @@
 				</div>
 				{% endfor %}
 			{% else %}
-				<div class="comment-module call-out-text">
-				{% if is_active %}
-
-						<!-- <p>Have a thought? Get this conversation started and help {{question.user_name}} out!</p> -->
-
-				{% else %}
-
-						<p>This conversation isn't active yet, but you can get it started by adding a comment and getting it on the home page.</p>
-
-				{% endif %}
-
+				<div class="comment-module call-out-text no-comments-module">
+					{% if is_active %}
+							<!-- <p>Have a thought? Get this conversation started and help {{question.user_name}} out!</p> -->
+					{% else %}
+							<p>This conversation isn't active yet, but you can get it started by adding a comment and getting it on the home page.</p>
+					{% endif %}
 				</div>
 			{% endif %}
 		
@@ -111,7 +102,6 @@
 		<div class="comment-module">
 			<div class="comment-column-left">
 				<div class="profile-pic-container-small">
-
 					<a href="/profile/{{user.id}}/"><img src="{{user_pic}}" /></a>
 				</div>
 			</div>
@@ -386,7 +376,6 @@
 		});
 
 		// function for actually pinging the advisor
-
 		$(document).on("click","#ask-advisor-button",function() {
 			var data = {
 				'advisor': $(this).data('a-id'),
@@ -399,10 +388,6 @@
 			console.log(data);
 			askAdvisor(data);
 		});
-
-
-
-
 
 		function askAdvisor(data) {
 			$.ajax({
@@ -418,9 +403,7 @@
 					"csrfmiddlewaretoken":"{{csrf_token}}"},
 				dataType:"json",
 
-				beforeSend: function() {
-					
-				},
+				beforeSend: function() { },
 				success: function(response) {
 					console.log(response);
 					if (response["result"] == "success") {
@@ -437,11 +420,7 @@
 						console.log(response["errors"]);
 					}
 				},
-				complete: function() {
-					
-					
-				},
-
+				complete: function() { },
 			})
 		};
 
@@ -474,16 +453,12 @@
 		if ("{{is_active}}" == "False") {
 			// make the question opaque
 			$(".center-column-module").css("opacity", "0.5")
-		}
-
-
-				
+		}			
 	});
 
 	function follow(ev) {
 
 		var conversation_id = getConversationId();
-
 
 		// Post to DB
 		$.ajax({
@@ -498,8 +473,7 @@
 
 			success:function(response) {
 				if (response["result"] == "success") {
-					console.log("success")
-					
+					console.log("success")			
 				} else console.log(response["errors"])
 			},
 
@@ -575,7 +549,7 @@
 
 						"votes":0,
 						"body":body
-					})).hide().fadeIn(250)
+					})).css("opacity",0).animate({"opacity":1}, 250)
 
 
 				} else console.log(response["errors"])
@@ -583,7 +557,7 @@
 
 			complete:function() {
 				// check if this was the first comment. if so, fix viz
-				if ($(".no-comments-module").length > 0) $(".comment-row :first").remove()
+				if ($(".no-comments-module").length > 0) $(".no-comments-module").remove()
 				// animate stat container
 				var num_answers = parseInt($(".stat :eq(1)").text())
 				// Update stats container
