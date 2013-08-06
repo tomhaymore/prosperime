@@ -1,12 +1,16 @@
 import time
 import urllib2
 import json
+import unicodedata
+import re
+
 
 # import simplejson
 from django.utils import simplejson
 import math
 import datetime
 from datetime import timedelta
+from django.utils.safestring import mark_safe
 
 def school_is_partner(email):
     # get list of approved emails
@@ -143,6 +147,11 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
         return f_retry  # true decorator
     return deco_retry
 
+# Imports (added @ top): 
+# import unicodedata
+# import re
+# from django.utils.safestring import mark_safe
+#   also, bugs when strings are input so I coerce to unicode, prob a better way to do this
 def slugify(value):
     """
     Converts to lowercase, removes non-word characters (alphanumerics and
@@ -150,6 +159,7 @@ def slugify(value):
     trailing whitespace.
     From django
     """
+    value = unicode(value)
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub('[^\w\s-]', '', value).strip().lower()
     return mark_safe(re.sub('[-\s]+', '-', value))

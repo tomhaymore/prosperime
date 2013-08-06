@@ -112,6 +112,7 @@ ul#topbar-nav
 	margin: 10px 0 0 0
 	padding: 0px
 	font-size: 1.2em
+	line-height: 1.2em
 	li
 		display: inline
 		margin-left: 10px
@@ -123,7 +124,7 @@ ul#topbar-nav
 
 
 div#content-container 
-	width: 1050px
+	width: 1000px
 	margin:
 		right: auto
 		left: auto
@@ -165,8 +166,9 @@ div.splash-container
 
 .feature-page-subheader
 	font:
-		size: 1.7em
+		size: 20px
 		family: "Helvetica Neue", Helvetica, "Lato"
+	line-height: 24px
 	color: $feature-page-header
 	margin-bottom: 10px
 
@@ -324,6 +326,24 @@ a.flat-button:hover
 .modal-close-button
 	@extend .flat-button
 
+.remove-x-button
+	background-color: $lightblue
+	color: $offwhite
+	text-align: center
+	display: inline-block
+	padding-left: 3px
+	padding-right: 3px
+	border-radius: 2px
+	font-size: 12px
+	vertical-align: top
+
+.remove-x-button:hover
+	color: $white
+	text-decoration: none
+
+.remove-x-button a:hover
+	color: $white
+	text-decoration: none
 /* Footer Styles */
 
 
@@ -353,6 +373,10 @@ div.footer
 	padding-top: 10px
 
 /* Form Styles */
+
+.form-header
+	font-size: 18px
+	font-weight: 500
 
 .flat-input 
 	border-radius: 0px
@@ -402,6 +426,9 @@ div.footer
 	padding: 5px
 	border-radius: 2px
 
+.tt-dropdown-menu.tt-is-open
+	width: 100%
+
 /* Picture Styles */
 
 .profile-pic-container 
@@ -411,6 +438,7 @@ div.footer
 	margin-right: 16px
 	margin-bottom: 16px 
 	vertical-align: top
+	border-radius: 75px
 
 	img 
 		border-radius: 75px
@@ -419,6 +447,13 @@ div.footer
 	@extend .profile-pic-container
 	width: 35px
 	height: 35px
+
+.circle
+	width: 75px
+	height: 75px
+	background-position: center
+	background-size: 100%
+	border-radius: 75px
 
 /* Tag Styles */
 

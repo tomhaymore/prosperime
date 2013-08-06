@@ -22,12 +22,13 @@
 
 </script>
 
+
 <script type="text/template" id="question-template">
 
 	<div class="single-question-module">
 		<div class="question-column-left">
 			<div class="profile-pic-container">
-				<a href="/profile/<%=owner_id%>/"><img src="<%=owner_pic%>" /><a/>
+				<div class="circle" style="background-image:url(<%=owner_pic%>)"></div>
 			</div>
 		</div>
 
@@ -36,21 +37,18 @@
 			<div class="question-body"><%=summary%></div>
 
 			<% for (t in tags) { %>
-				<div class="tags-container">
-					<a class="tag-inline" href="/tags/<%=tags[t].url_name%>"><%=tags[t].name%></a>
-				</div>
+				<a class="tag-inline" href="/tags/<%=tags[t].url_name%>"><%=tags[t].name%></a>
 			<% } %>
 
 
-			<% if (comments.length > 0) %>
+			<% if (comments.length > 0) { %>
 				<div class="comment-column-left">
-					<div class="profile-pic-container-small">
-						<a href="/profile/<%=comments[0].owner_id%>"><img src="<%=comments[0].owner_pic%>" /></a>
-					</div>
+					<div class="profile-pic-container-small"><img src="<%=comments[0].owner_pic%>" /></div>
 				</div>
 				<div class="comment-column-right">
 					<div class="comment-body"><%=comments[0].body%></div>
 				</div>
+			<% } %>
 			
 			<div class="question-subtext">
 				<% if (comments.length == 0) { %>
@@ -60,10 +58,7 @@
 				<% } else { %>
 					<a href="/question/<%=id%>">See all <%=comments.length%> answers </a>
 				<% } %> 
-
 			</div>
-
-
 		</div>
 		<br/>			
 	</div>

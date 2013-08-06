@@ -113,13 +113,11 @@ def question(request, conversation_id):
  	comments = Comment.objects.filter(conversation=conversation).select_related("owner")
  	formatted_comments = [{"user_name":c.owner.profile.full_name(), "user_id":c.owner.id, "user_pic":c.owner.profile.default_profile_pic(),"body":c.body,"id":c.id,"votes":Vote.objects.filter(comment=c).count(),"created":c.created} for c in comments]
  	
-
  	# (3) Get followers
  	## TODO: optimize this query
  	followers = [{"id":u.id, "pic":u.profile.default_profile_pic(), "name":u.profile.full_name()} for u in conversation.followers.all()]
 
  	# (4) Get popular tags
- 	## TODO: popular_tags API
  	popular_tags = Tag.objects.order_by("-count")[:10]
 
  	# (5) Get related questions
@@ -507,6 +505,7 @@ def api_start_conversation(request):
 		return HttpResponse(json.dumps(response))
 
 	# load form
+	print request.POST.getlist("tags[]")
 	form = ConversationForm(request.POST)
 	# validate form
 	if form.is_valid():
@@ -517,12 +516,20 @@ def api_start_conversation(request):
 		c.owner = request.user
 		c.save()
 		# add tags
+		print form.cleaned_data["tags"]
 		for t in form.cleaned_data['tags']:
 			c.tags.add(t)
 		c.save()
 		# add flags
 		response["result"] = "success"
 		response["conversation_id"] = c.id
+
+		# user follows his own Conversation
+		f = FollowConversation()
+		f.user = request.user
+		f.conversation = c
+		f.save()
+
 		return HttpResponse(json.dumps(response))
 	else:
 		# dump form errors	

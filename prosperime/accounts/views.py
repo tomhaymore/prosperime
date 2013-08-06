@@ -195,7 +195,7 @@ def register(request):
 				auth_login(request,user)
 
 			# send to personalization
-			return HttpResponseRedirect('/majors/')
+			return HttpResponseRedirect('/')
 	else:
 		form = RegisterForm()
 
@@ -504,7 +504,7 @@ def finish_registration(request):
 
 			#return HttpResponseRedirect('/account/success')
 			if 'next' not in request.session:
-				return HttpResponseRedirect('/majors/')
+				return HttpResponseRedirect('/')
 			else:
 				return HttpResponseRedirect(request.session['next'])
 	else:
@@ -1302,7 +1302,8 @@ def add_to_profile(request):
 				g.save()
 				response = {
 					'result':'success',
-					'goal':g.position.title
+					'goal':g.position.title,
+					'id':g.id
 				}
 			else:
 				response = {
@@ -1311,6 +1312,76 @@ def add_to_profile(request):
 				}
 			return HttpResponse(json.dumps(response))
 
+
+def remove_from_profile(request):
+
+	if request.POST:
+		from accounts.forms import AddEducationForm, AddExperienceForm, AddGeographyForm, AddGoalForm, AddProfilePicForm
+		from django.core.files import File
+		import accounts.tasks as tasks
+		if request.POST['type'] == "profile_pic":
+			pass
+		if request.POST['type'] == "education":
+			# retrieve education
+			ed = Position.object.get(id=request.POST.get("id"))
+			if ed:
+				ed.delete()
+				response = {
+					'result':'success'
+				}
+			else:
+				response = {
+					'result':'failure',
+					'errors': 'Couldn\'t find the education'
+				}
+		if request.POST['type'] == "experience":
+			# retrieve position
+			pos = Position.objects.get(id=request.POST["id"])
+			if pos:
+				pos.delete()
+				response = {
+					'result':'success'
+				}
+			else:
+				response = {
+					'result':'failure',
+					'errors': 'Couldn\'t find the position'
+				}
+		if request.POST['type'] == "geo":
+			# retrieve region
+			reg = Region.objects.get(id=request.POST['id'])
+			if reg:
+				user = User.objects.get(id=request.POST['user_id'])
+				reg.people.remove(user)
+				response = {
+					'result':'success'
+				}
+			else:
+				response = {
+					'result':'failure',
+					'errors': 'Something went wrong. Please try again.'
+				}
+			
+		if request.POST['type'] == "goal":
+			# retreive goal
+			goal = GoalPosition.objects.get(id=request.POST['id'])
+			if goal:
+				goal.delete()
+				response = {
+					'result': 'success'
+				}
+			else:
+				response = {
+					'result': 'failure',
+					'errors': 'Something went wrong'
+				}
+		return HttpResponse(json.dumps(response))
+	else:
+		response = {
+			'result': 'failure',
+			'errors': 'Something went wrong. Please try again.'
+		}
+		return HttpResponse(json.dumps(response))
 
 # Called after a goal position, saved career is added to a profile, allowing
 #	backbone to refresh the template

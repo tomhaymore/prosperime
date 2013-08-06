@@ -20,7 +20,6 @@
 
 {% block content %}
 
-	
 <!-- Main -->
 <div id="content-container">
 
@@ -30,62 +29,48 @@
 		<a class="flat-button search-button lightblue-button" id="search-conversations-button">Search</a>
 	</div>
 
-	<!-- Left -->
-	<div id="left-column">
-
-	</div>
+	<!-- Left [deprecated] -->
+	<!-- <div id="left-column"></div> -->
 	
 	<!-- Center -->
 	<div id="center-column">
 
-			<div class="question-column-left">
-				<div class="profile-pic-container">
-					<a href="/profile/{{question.user_id}}/"><img src="{{question.user_pic}}" title="{{question.user_name}}" /></a>
-				</div>
-
-				<div class="question-user-name">{{question.user_name}}</div>
+		<div class="question-column-left">
+			<div class="profile-pic-container">
+				<a href="/profile/{{question.user_id}}/"><img src="{{question.user_pic}}" title="{{question.user_name}}" /></a>
 			</div>
 
-			<div class="question-column-right">
-				<div class="question-title">{{question.title}}</div>
-				<div class="question-body">{{question.body}}</div>
+			<div class="question-user-name">{{question.user_name}}</div>
+		</div>
 
-				{% for t in question.tags %}
-					<a class="tag">{{t.name}}</a>
-				{% endfor %}
+		<div class="question-column-right">
+			<div class="question-title">{{question.title}}</div>
+			<div class="question-body">{{question.body}}</div>
 
-			<!-- 	<div class="question-subtext">
-					Question asked by <a href="/profile/{{question.user_id}}">{{question.user_name}}</a>
-				</div> -->
-			<!-- </div> <-->
-				
-				<div class="comment-row"><!-- need this as placeholder --></div>
+			{% for t in question.tags %}
+				<a href="/tags/{{t.url_name}}/" class="tag">{{t.name}}</a>
+			{% endfor %}
+			
+			<div class="comment-row"><!-- need this as placeholder --></div>
 			{% if comments %}
 				{% for c in comments %}
 				<div class="comment-module comment-row">
-
 					<div class="comment-column-left">
 						<div class="profile-pic-container-small">
 							<a href="/profile/{{c.user_id}}/"><img src="{{c.user_pic}}"/></a>
 						</div>
-						
-					<!-- 	<div data-comment_id="{{c.id}}" class="vote-container">
-							<div data-type="down" class="vote-button vote"><i class="icon-chevron-left"></i></div>
-							<div class="comment-vote vote">{{c.votes}}</div>
-							<div data-type="up" class="vote-button vote"><i class="icon-chevron-right"></i></div>
-						</div>	 -->				
+						<!-- Vote Module -->
+						<!-- 	<div data-comment_id="{{c.id}}" class="vote-container">
+								<div data-type="down" class="vote-button vote"><i class="icon-chevron-left"></i></div>
+								<div class="comment-vote vote">{{c.votes}}</div>
+								<div data-type="up" class="vote-button vote"><i class="icon-chevron-right"></i></div>
+							</div>	 -->				
 					</div>
 
 					<div class="comment-column-right">
-						<div class="body-text">
-							{{c.body}}
-						</div>
-
-						<div class="comment-subtext">
-							Posted {{c.created|naturaltime}} by {{c.user_name}}
-						</div>
+						<div class="body-text">{{c.body}}</div>
+						<div class="comment-subtext">Posted {{c.created|naturaltime}} by {{c.user_name}}</div>
 					</div>
-
 				</div>
 				{% endfor %}
 			{% else %}
@@ -97,23 +82,22 @@
 					{% endif %}
 				</div>
 			{% endif %}
-		
-
-		<div class="comment-module">
-			<div class="comment-column-left">
-				<div class="profile-pic-container-small">
-					<a href="/profile/{{user.id}}/"><img src="{{user_pic}}" /></a>
+			
+			<!-- Add Comment Module -->
+			<div class="comment-module">
+				<div class="comment-column-left">
+					<div class="profile-pic-container-small">
+						<a href="/profile/{{user.id}}/"><img src="{{user_pic}}" /></a>
+					</div>
+				</div>
+				<div class="comment-column-right">
+					<textarea class="comment-textarea" placeholder="Add a comment" ></textarea>
+					<span class="pull-right">
+						<a id="comment-button" class="green-button disabled">Post</a>
+					</span>
+					<span class="clear"></span>
 				</div>
 			</div>
-			<div class="comment-column-right">
-				<textarea class="comment-textarea" placeholder="Add a comment" ></textarea>
-				<span class="pull-right">
-					<a id="comment-button" class="green-button disabled">Post</a>
-				</span>
-				<span class="clear"></span>
-			</div>
-
-		</div>
 
 		<!-- <div class="comment-module social-sharing">
 			<p>Get additional insight. Share the link with your friends and get their views.</p>
@@ -155,29 +139,26 @@
 				{% endif %}
 
 		{% endif %} -->
+
 		{% if advisors %}
 			<div class="comment-module">
 				<p>Need more insight? Ask one of the experts below to share their advice.</p>
 				{% for a in advisors %}
 					<div class="advisor-container" data-methods="{{a.methods}}" data-id="{{a.id}}" data-name="{{a.name}}" data-position="{{a.position}}" data-pic="{{a.pic}}" data-alumni="{{a.alumni}}">
-						<div class="advisor-pic-container">
-							<img src="{{a.pic}}" />
-						</div>
+						<div class="advisor-pic-container"><img src="{{a.pic}}" /></div>
 						<div class="advisor-info-container">
 							<p>{{a.name}}</p>
 							<p>{{a.position}}</p>
 							{% if a.educations %}
-							<ul class="advisor-educations">
-								{% for e in a.educations %}
-								<li>{{e.degree}}</li>
-								{% endfor %}
-							</ul>
+								<ul class="advisor-educations">
+									{% for e in a.educations %}
+									<li>{{e.degree}}</li>
+									{% endfor %}
+								</ul>
 							{% endif %}
 						</div>
 						<div class="clear"></div>
-						
 					</div>
-					
 				{% endfor %}
 				<div class="clear"></div>
 			</div>
@@ -187,6 +168,7 @@
 
 	<!-- Right --> 
 	<div id="right-column">
+		<!-- Active/Inactive -->
 		{% if not is_active %}
 			<div class="right-column-module">
 				<span class="red-button nonclickable">Inactive</span>
@@ -194,18 +176,20 @@
 				<p class="note">What does this mean?</p>
 			</div>	
 		{% endif %}
-		<!-- Ask a Question -->
+
+		<!-- Follow Module -->
 		<div class="right-column-module">
 			{% if is_following %}
-					<div id="follow-button" class="lightblue-button" disabled>Following</div>
-				{% else %}
-					<div id="follow-button" class="green-button">Follow</div>
-				{% endif %}
+				<div id="follow-button" class="lightblue-button" disabled>Following</div>
+			{% else %}
+				<div id="follow-button" class="green-button">Follow</div>
+			{% endif %}
 		</div>
+
+		<!-- Stats -->
 		<div class="right-column-module">
 			<div class="module-header">Info </div>
 			<div class="stat-container">
-				
 				<div class="stat-module">
 					<span class="stat">{{stats.days_active}} </span>
 					{% if stats.days_active == 1 %}
@@ -215,7 +199,7 @@
 					{% endif %}
 				</div>
 				<div class="stat-module">
-					<span class="stat">{{stats.num_answers}}</span>
+					<span class="stat">{{stats.num_answers}} </span>
 					{% if stats.num_answers == 1 %}
 						Answer
 					{% else %}
@@ -224,7 +208,7 @@
 
 				</div>
 				<div class="stat-module">
-					<span class="stat">{{stats.num_followers}}</span>
+					<span class="stat">{{stats.num_followers}} </span>
 					{% if stats.num_followers == 1 %}
 						Follower
 					{% else %}
@@ -232,14 +216,11 @@
 					{% endif %}
 				</div>
 			</div>
-
 		</div>
 
 		<!-- Related Questions -->
 		{% if related_questions|length > 0 %}
-
 		<div class="right-column-module">
-
 			<div class="module-header">Related Questions: </div>
 			{% for q in related_questions %}
 				<div class="related-question">
@@ -250,16 +231,12 @@
 		{% endif %}
 
 		<!-- Followers -->
-
 		<div class="right-column-module followers-module">
-
-
 			<div class="module-header">Following: </div>
 			<!-- Default to first 5 -->
 			{% for f in followers %}
 				{% if forloop.counter0 < 5 %}
 					<div class="followers-profile-pic">
-						 <!-- TODO: Come back and fix this URL once profiles built -->
 						<a href="/profile/{{f.id}}"><img src="{{f.pic}}" title="{{f.name}}"/></a>
 					</div>
 				{% endif %}
@@ -270,30 +247,23 @@
 			{% endif %}
 
 			{% if followers|length == 0 %} 
-
 				<p>No followers yet</p>
-
 			{% endif %}
 		</div>
 
 		<!-- Popular Tags -->
-
 		<div class="right-column-module">
-
 			<div class="module-header">Popular Tags</div>
 			{% for t in popular_tags %}
-<!-- 			<div class="tag">{{t.name}}</div> -->
 				<p><a href="/tags/{{t.url_name}}/" class="tag">{{t.name}}</a></p>
 			{% endfor %}
 		</div>
-		
 	</div>
 	<div class="clear"></div>
 </div>
 
-<div id="advisor-modal" style="display:none;">
+<div id="advisor-modal" style="display:none;"></div>	
 
-</div>	
 {% endblock %}
 
 {% block templates %}
@@ -328,11 +298,8 @@
 		    style: {
 		    	def: false	
 		    }
-			
 		});
 	
-		// 
-
 		$(".advisor-container").click(function() {
 			console.log("advisor click");
 			// get variables
@@ -430,7 +397,7 @@
 
 		// Active post comment button
 		// TODO: provide safeguards against commenting tons of times
-		$(".comment-module textarea").on("keypress", function(e) {
+		$(".comment-module textarea").on("keyup", function(e) {
 			var comment_button = $("#comment-button")
 			// If now empty, disable
 			if ($(this).val().length == 0 && !$(comment_button).hasClass("disabled")) $(comment_button).addClass("disabled")

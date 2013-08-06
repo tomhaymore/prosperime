@@ -152,6 +152,7 @@ urlpatterns = patterns('',
     ## Accounts - AJAX calls
     url(r'^accounts/updateProfile/$', 'accounts.views.updateProfile'),
     url(r'^accounts/addToProfile/$','accounts.views.add_to_profile'),
+    url(r'^accounts/removeFromProfile/$','accounts.views.remove_from_profile'),
     url(r'^accounts/deleteItem/$', 'accounts.views.deleteItem'),
     url(r'^accounts/connect/$', 'accounts.views.connect'),                           # will be used
 

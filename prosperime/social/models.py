@@ -73,17 +73,16 @@ class Vote(models.Model):
 			return "Down vote by " + self.owner.username + " on " + self.comment
 
 class Tag(models.Model):
+
 	def get_url_name(self):
 		return slugify(self.name)
 
 	name = models.CharField(max_length=450)
 	count = models.IntegerField(default=1)
-	url_name = models.SlugField(max_length=450,default=get_url_name)
+	url_name = models.SlugField(max_length=450,default="get_url_name")
 
 	def tag_count(self):
 		return len(Conversation.objects.filter(tags=self))
-
-	
 
 	def __unicode__(self):
 		return self.name

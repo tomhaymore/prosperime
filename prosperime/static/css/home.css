@@ -12,11 +12,11 @@
 
 #center-question-column {
   margin-left: 0px;
-  width: 745px; }
+  width: 720px; }
 
 #right-question-column {
   margin-left: 0px;
-  width: 275px; }
+  width: 250px; }
 
 #question-page-container {
   padding-top: 24px; }
@@ -52,7 +52,7 @@
   vertical-align: top; }
 
 .question-column-right, .comment-column-right {
-  width: 650px;
+  width: 625px;
   display: inline-block;
   vertical-align: top; }
 
@@ -77,15 +77,12 @@
   margin-bottom: 12px; }
 
 .question-user-name {
-  font-weight: normal;
-  margin-top: 6px; }
-
-.question-user-name {
   font-weight: bold;
-  margin-top: 6px; }
+  margin-top: 6px;
+  text-align: center; }
 
 .question-subtext {
-  margin-top: 5px; }
+  margin-top: 8px; }
 
 .question-tags-container {
   margin-left: 90px; }
@@ -94,7 +91,7 @@
   width: 35px; }
 
 .comment-column-right {
-  width: 595px;
+  width: 570px;
   vertical-align: middle; }
 
 .comment-body {
@@ -116,7 +113,7 @@
 
 .comment-module {
   /* margin-left: 85px */
-  width: 650px;
+  width: 625px;
   margin-top: 32px; }
   .comment-module .comment-button {
     text-align: center;
@@ -133,7 +130,7 @@
     cursor: pointer; }
 
 .comment-textarea {
-  width: 585px;
+  width: 560px;
   height: 20px;
   resize: none; }
 
@@ -190,7 +187,7 @@
 
 .advisor-container {
   padding: 5px;
-  width: 305px;
+  width: 292.5px;
   margin-right: 10px;
   float: left;
   border-radius: 1px;

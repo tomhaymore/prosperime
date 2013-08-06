@@ -4,12 +4,18 @@
 <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/personalize.css" />
 <!-- <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/typeahead.min.css" />
 <script type="text/javascript" src="{{ STATIC_URL }}js/typeahead.min.js"></script> -->
-
+<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/personalize.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.form.min.js"></script>
 <script type="text/css">
 
 </script>
+
+<style type="text/css">
+.circle {
+	background-image:url({{ user.profile.default_profile_pic|safe }});
+}
+</style>
 {% endblock %}
 
 {% block extramessage %}
@@ -19,17 +25,18 @@
 {% block content %}
 {% csrf_token %}
 <div id="content-container" class="main-container">
-	<p class="default-header">Tell us more</p>
-	<p class="main-sub-header">Prospr.Me works best if you tell us more about yourself. That way we can personalize your experience.</p>
+	<p class="feature-page-header">Tell us more</p>
+	<p class="feature-page-subheader">Emplore works best if you tell us more about yourself. That way we can personalize your experience.</p>
 	<p>In a rush? <a href="/home">Skip ahead</a>, you can always add your information later.</p>
 
 	<div id="profile-pic-container" class="pull-left">
 		<!-- <div class="center profile-subheader" >You</div> -->
-		<div id="profile-pic" class="circle">
+		
+		<div id="profile-pic" class="circle" style="">
 		</div>
-		<div id="profile-pic-caption" class="center" style="display:none;">
+		<!-- <div id="profile-pic-caption" class="center" style="display:none;">
 			Add a picture
-		</div>
+		</div> -->
 		<form id="profile-pic-form" method="POST" action="/accounts/addToProfile/" enctype="multipart/form-data">
 			<input type="hidden" name="type" value="profile_pic" />
 			<input type="file" name="pic" id="id_profile-pic-file" style="visibility:hidden;" />
@@ -38,6 +45,7 @@
 	<div id="personalize-form-container" class="pull-left">
 		<div class="personalize-module" data-info="education">
 			<p class="form-header">Education</p>
+			<div class="errors"></div>
 			<ul id="personalize-educations" class="personalize-list">
 			{% if educations %}
 				
@@ -60,27 +68,18 @@
 				{% endfor %}
 			{% endif %}
 			</ul>
-			{% if educations %}
 			<a class="" id="ed-show-form">Add more education</a>
 			<div id="ed-form-holder" style="display:none;">
 				<p><input name="ed-degree" id="id_ed-degree" type="text" class="flat-input" data-autocomplete="degree" placeholder="degree" />
 				<p><input name="ed-field" id="id_ed-field" type="text" class="flat-input" data-autocomplete="field" placeholder="field / major" />
 				<p><input name="ed-school" id="id_ed-school" type="text" class="flat-input" data-autocomplete="school" placeholder="school" />
 				<p><input name="ed-grad" id="id_ed-grad" type="text" class="flat-input" placeholder="graduated (mm/yyyy)" >
-				<p><a class="flat-button small-button blue-button" id="ed-add-field">Add education</a>
+				<p><a class="flat-button small-button blue-button" id="ed-add-field">Add education</a> or <a id="ed-remove-form">Cancel</a>
 			</div>
-			{% else %}
-			<div id="ed-form-holder">
-				<p><input name="ed-degree" id="id_ed-degree" type="text" class="flat-input" data-autocomplete="degree" placeholder="degree" />
-				<p><input name="ed-field" id="id_ed-field" type="text" class="flat-input"data-autocomplete="field" placeholder="field / major" />
-				<p><input name="ed-school" id="id_ed-school" type="text" class="flat-input" data-autocomplete="school" placeholder="school" />
-				<p><input name="ed-grad" id="id_ed-grad" type="text" class="flat-input" placeholder="graduate (mm/yyyy)" >
-				<p><a class="flat-button small-button blue-button" id="ed-add-field">Add education</a>
-			</div>
-			{% endif %}
 		</div>
 		<div class="personalize-module" data-info="experience">
 			<p class="form-header">Experience</p>
+			<div class="errors"></div>
 			<ul id="personalize-positions" class="personalize-list">
 			{% if positions %}
 				
@@ -89,67 +88,64 @@
 				{% endfor %}
 			{% endif %}	
 			</ul>
-			{% if positions %}
 			<a class="" id="pos-show-form">Add more positions</a>
 			<div id="pos-form-holder" style="display:none;">
 				<p><input name="pos-title" id="id_pos-title" type="text" class="flat-input" data-autocomplete="title" placeholder="title" />
 				<p><input name="pos-org" id="id_pos-org" type="text" class="flat-input" data-autocomplete="organization" placeholder="org" />
 				<p><input name="pos-start" id="id_pos-start" type="date" class="flat-input-small" placeholder="start date" > to <input name="pos-end" id="id_pos-end" type="date" class="flat-input-small" placeholder="end date" >
-				<p><a class="flat-button small-button blue-button" id="pos-add-field">Add experience</a>
+				<p><a class="flat-button small-button blue-button" id="pos-add-field">Add experience</a> or <a id="pos-remove-form">Cancel</a>
 			</div>
-			{% else %}
-			<div id="pos-form-holder">
-				<p><input name="pos-title" id="id_pos-title" type="text" class="flat-input" data-autocomplete="title" placeholder="title" />
-				<p><input name="pos-org" id="id_pos-org" type="text" class="flat-input" data-autocomplete="organization" placeholder="org" />
-				<p><input name="pos-start" id="id_pos-start" type="date" class="flat-input-small" placeholder="start date" > to <input name="pos-end" id="id_pos-end" type="date" class="flat-input-small" placeholder="end date" >
-				<p><a class="flat-button small-button blue-button" id="pos-add-field">Add experience</a>
-			</div>
-			{% endif %}
+
 		</div>
 		<div class="personalize-module" data-info="geography">
 			<p class="form-header">Geography</p>
 			<label for="id_geography">Where would you like to live?</label>
+			<div class="errors"></div>
 			<ul id="personalize-geo" class="personalize-list">
 				{% for g in geographies %}
-					<li>{{g.name}}</li>
+					<li data-type="geo" data-id="{{g.id}}">{{g.name}} <a data-type="geo" data-id="{{g.id}}" class="remove-x-button">del</a></li>
 				{% endfor %}
 			</ul>
-			<input placeholder="Enter a region, city, or state" id="id_geography" name="geography" type="text" class="flat-input" data-autocomplete="geography"/> <button class="general-add-button" id="add-geo">Add</button>
+			<input placeholder="Enter a region, city, or state" id="id_geography" name="geography" type="text" class="flat-input" data-autocomplete="geography"/> <a class="blue-button search-button" id="add-geo">Add</a>
 			<!-- <p><a class="" id="geo-add">Add more geography</a> -->
 		</div>
 		<div class="personalize-module" data-info="goals">
 			<p class="form-header">Goals</p>
 			<label for="id_goal">What would you like to do?</label>
+			<div class="errors"></div>
 			<ul id="personalize-goals" class="personalize-list">
 				{% for g in goals %}
-					<li>{{g.title}}</li>
+					<li data-type="goal" data-id="{{g.id}}">{{g.position__title}} <a data-type="goal" data-id="{{g.id}}" class="remove-x-button">del</a>
 				{% endfor %}
 			</ul>
-			<input placeholder="Enter a job or career" id="id_goal" name="goal" type="text" class="flat-input" data-autocomplete="goal" /> <button class="general-add-button" id="add-goal">Add</button>
+			<input placeholder="Enter a job or career" id="id_goal" name="goal" type="text" class="flat-input" data-autocomplete="goal" /> <a class="blue-button search-button" id="add-goal">Add</a>
 			<!-- <a class="" id="geo-add">Add more goals</a> -->
+			<div>
+				<a class="flat-button green-button" style="width:100px;" href="/home">Next</a> or <a href="/home">skip ahead</a>
+			</div>
 		</div>
 	</div>
 	<div id="personalize-info-container" class="pull-left">
-		<div data-info="education" class="personalize-info-container">
-			<p class="info-header">How much does my education matter?</p>
+		<div data-info="education" class="personalize-info-module form-instructions">
+			<p class="module-header">How much does my education matter?</p>
 			<p>For most of us, our career begins with school. But it's not just the school that matters -- different degrees and fields can have diferent outcomes, so be as specific as you can.</p>
 		</div>
-		<div data-info="experience" class="personalize-info-container">
-			<p class="info-header">What experience matters?</p>
+		<div data-info="experience" class="personalize-info-module form-instructions">
+			<p class="module-header">What experience matters?</p>
 			<p>Every position, from internships to partnerships, matters. Prospr.Me matches each position to its own dataset of careers and helps you figure out where you're headed.</p>
 		</div>
-		<div data-info="geography" class="personalize-info-container">
-			<p class="info-header">Why is geography important?</p>
+		<div data-info="geography" class="personalize-info-module form-instructions">
+			<p class="module-header">Why is geography important?</p>
 			<p>It can be easy to forget, but where you want to live has a huge impact on what kind of careers are available. Whether it's technology in Silicon Valley, banking in New York, energy in Houston, each area has its own unique set of jobs.</p>
 		</div>
-		<div data-info="goals" class="personalize-info-container">
-			<p class="info-header">What should I even put here?</p>
+		<div data-info="goals" class="personalize-info-module form-instructions">
+			<p class="module-header">What should I even put here?</p>
 			<p>Put as much or as little as you like. The more Prospr.Me knows about your goals, the more personalized content we can show you. It's okay if you don't know what you want to do -- that's what Prospr.Me is for.</p>
 		</div>
 	</div>
 	<div class="clear"></div>
 	<div class="left125 top25">
-		<a class="flat-button green-button" style="width:100px;" href="/home">Next</a> or <a href="/home">skip ahead</a>
+		
 	</div>
 	
 </div>
@@ -268,9 +264,12 @@ $(function() {
 	});
 
 	$(".personalize-module").hover(
+		
 		function() {
+			
 			var module = $(this).data('info');
-			$(".personalize-info-container").hide();
+			
+			$(".personalize-info-module").hide();
 			$("div[data-info='"+module+"']").show();
 		},
 		function() {
@@ -385,7 +384,7 @@ $(function() {
 		}
 	});
 
-	$("button#add-geo").click(function() {
+	$("a#add-geo").click(function() {
 		console.log("trying to add a region...")
 		var valid = true;
 		var geo = $("#id_geography");
@@ -406,15 +405,16 @@ $(function() {
 			// add to profile
 			$.post('/accounts/addToProfile/',post_data,function(data) {
 				if (data['result'] == "success") {
-					var block = "<li>"+data['geo']+"</li>";
-					$("ul#personalize-geo").append(block);
+					var block = _.template($("#geo-template"));
+					// var block = "<li>"+data['geo']+"</li>";
+					$("ul#personalize-geo").append(block({"geo":data["geo"]}));
 					geo.val(geo_placeholder);
 				};
 			},'json');
 		}
 	});
 
-	$("button#add-goal").click(function() {
+	$("a#add-goal").click(function() {
 		console.log("trying to add a goal...")
 		var valid = true;
 		var goal = $("#id_goal");
@@ -435,8 +435,8 @@ $(function() {
 			// add to profile
 			$.post('/accounts/addToProfile/',post_data,function(data) {
 				if (data['result'] == "success") {
-					var block = "<li>"+data['goal']+"</li>";
-					$("ul#personalize-goals").append(block);
+					var block = _.template($("#goal-template"));
+					$("ul#personalize-goals").append(block({'goal':data['goal'],'id':data['id']}));
 					goal.val(goal_placeholder);
 				};
 			},'json');
@@ -448,10 +448,20 @@ $(function() {
 		$("#pos-form-holder").show()
 	});
 
+	$("#pos-remove-form").click(function() {
+		$("#pos-form-holder").hide();
+		$("#pos-show-form").show();
+	})
+
 	$("#ed-show-form").click(function() {
 		$(this).hide();
 		$("#ed-form-holder").show()
 	});
+
+	$("#ed-remove-form").click(function() {
+		$("#ed-form-holder").hide();
+		$("#ed-show-form").show();
+	})
 
 	$("input").focus(function(){
 		$(this).removeClass("form-error");
@@ -484,6 +494,40 @@ $(function() {
 		});
 	})
 
+	$(document).on("click",".remove-x-button",function() {
+		// get type and id
+		var id = $(this).data('id');
+		var type = $(this).data('type');
+		console.log(id,type);
+		removePersonalization(type,id);
+
+	});
+
+	var removePersonalization = function(type,id) {
+		// construct post data
+		var postData = {
+			'type': type,
+			'id': id,
+			'user_id': {{user.id}}
+		}
+		// hit api
+		$.ajax({
+			type: "POST",
+			url: '/accounts/removeFromProfile/',
+			data: postData,
+			dataType: "json",
+			success: function(data) {
+				if (data['result'] == 'success') {
+					// remove list item
+					$("li[data-type='"+type+"',data-id='"+id+"']").remove();
+				} else {
+					$("li[data-type='"+type+"',data-id='"+id+"']").closest("div.errors").append(data['errors']);
+				}
+			}
+		});
+			
+	}
+
 	// $("#personalize-form-container").find("input").change( function() {
 		
 	// 	clearTimeout(timer);
@@ -495,7 +539,19 @@ $(function() {
 	// 	},1000);
 	// })
 
-})
+});
+</script>
+<script type="text/template" id="goal-template">
+
+	<li><%= goal %><a data-type="goal" data-id="<%= id %>" class="remove-x-button">del</a></li>
 
 </script>
+
+<script type="text/template" id="geo-template">
+
+	<li><%= geo %><a data-type="goal" data-id="<%= geo %>" class="remove-x-button">del</a></li>
+
+</script>
+
+
 {% endblock %}

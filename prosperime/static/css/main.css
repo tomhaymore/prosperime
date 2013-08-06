@@ -63,12 +63,12 @@ body {
 
 #center-column {
   margin-right: 20px;
-  width: 745px;
+  width: 720px;
   min-height: 200px;
   float: left; }
 
 #right-column {
-  width: 275px;
+  width: 250px;
   float: left; }
 
 .note {
@@ -99,7 +99,8 @@ img#main-logo {
 ul#topbar-nav {
   margin: 10px 0 0 0;
   padding: 0px;
-  font-size: 1.2em; }
+  font-size: 1.2em;
+  line-height: 1.2em; }
   ul#topbar-nav li {
     display: inline;
     margin-left: 10px; }
@@ -109,7 +110,7 @@ ul#topbar-nav {
 
 /* Main Container Styles */
 div#content-container {
-  width: 1050px;
+  width: 1000px;
   margin-right: auto;
   margin-left: auto;
   margin-top: 15px;
@@ -146,8 +147,9 @@ div.splash-container {
     color: rgba(51, 51, 51, 0.8); }
 
 .feature-page-subheader {
-  font-size: 1.7em;
+  font-size: 20px;
   font-family: "Helvetica Neue", Helvetica, "Lato";
+  line-height: 24px;
   color: #253139;
   margin-bottom: 10px; }
 
@@ -279,6 +281,25 @@ a.flat-button:hover, a.red-button:hover, a.green-button:hover, a.submit-button:h
   background-color: silver !important;
   cursor: default !important; }
 
+.remove-x-button {
+  background-color: #6fb6d4;
+  color: #f7f7f7;
+  text-align: center;
+  display: inline-block;
+  padding-left: 3px;
+  padding-right: 3px;
+  border-radius: 2px;
+  font-size: 12px;
+  vertical-align: top; }
+
+.remove-x-button:hover {
+  color: #fffffe;
+  text-decoration: none; }
+
+.remove-x-button a:hover {
+  color: #fffffe;
+  text-decoration: none; }
+
 /* Footer Styles */
 div.footer-container {
   background-color: #333332;
@@ -306,6 +327,10 @@ div.footer {
   padding-top: 10px; }
 
 /* Form Styles */
+.form-header {
+  font-size: 18px;
+  font-weight: 500; }
+
 .flat-input, .flat-input-wide, .flat-textarea, .flat-textarea-wide {
   border-radius: 0px;
   width: 275px;
@@ -351,6 +376,9 @@ div.footer {
   padding: 5px;
   border-radius: 2px; }
 
+.tt-dropdown-menu.tt-is-open {
+  width: 100%; }
+
 /* Picture Styles */
 .profile-pic-container, .profile-pic-container-small {
   width: 75px;
@@ -358,13 +386,21 @@ div.footer {
   display: inline-block;
   margin-right: 16px;
   margin-bottom: 16px;
-  vertical-align: top; }
+  vertical-align: top;
+  border-radius: 75px; }
   .profile-pic-container img, .profile-pic-container-small img {
     border-radius: 75px; }
 
 .profile-pic-container-small {
   width: 35px;
   height: 35px; }
+
+.circle {
+  width: 75px;
+  height: 75px;
+  background-position: center;
+  background-size: 100%;
+  border-radius: 75px; }
 
 /* Tag Styles */
 .tags-container {

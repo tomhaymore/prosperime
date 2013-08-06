@@ -2,7 +2,7 @@
 from django.contrib import admin
 
 # from Prosperime
-from careers.models import Career, IdealPosition, SavedCareer, Position
+from careers.models import Career, IdealPosition, SavedCareer, Position, GoalPosition
 
 class CareerAdmin(admin.ModelAdmin):
 	search_fields = ['long_name','short_name']
@@ -16,8 +16,12 @@ class SavedCareerAdmin(admin.ModelAdmin):
 class PositionAdmin(admin.ModelAdmin):
 	pass
 
+class GoalPositionAdmin(admin.ModelAdmin):
+	pass
+
 admin.site.register(Career,CareerAdmin)
 admin.site.register(IdealPosition,IdealPositionAdmin)
 admin.site.register(SavedCareer,SavedCareerAdmin)
 admin.site.register(Position,PositionAdmin)
+admin.site.register(GoalPosition,GoalPositionAdmin)
 
