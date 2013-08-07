@@ -50,7 +50,10 @@ body {
   width: 40px; }
 
 .input-medium-large {
-  width: 190px; }
+  width: 180px; }
+
+.input-medium-small {
+  width: 140px; }
 
 #search-container {
   width: 630px;

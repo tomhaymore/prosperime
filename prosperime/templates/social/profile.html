@@ -27,9 +27,6 @@
 <!-- Main -->
 <div id="content-container">
 
-	<!-- Left (Nothing) -->
-	<div id="left-column"></div>
-	
 	<!-- Center -->
 	<div id="center-column">
 		<div class="feature-page-header">{{user_name}}</div>
@@ -49,8 +46,7 @@
 			<div id="timeline-edit-container"></div>
 		</div>
 
-
-		<!-- Conversations List(s) -->
+		<!-- Tab Section -->
 		<div class="row-fluid tab-container slide-container">
 			<ul class="nav nav-tabs" style="margin-bottom:0px;">
 				<li class="active"><a href="#started-convos-tab" data-toggle="tab">Started Conversations</a></li>
@@ -61,7 +57,6 @@
 			</ul>
 
 			<div class="tab-content">
-
 				<div class="tab-pane active" id="started-convos-tab">
 					{% for s in started_conversations %}
 						<div class="tab-conversation-container">
@@ -70,7 +65,7 @@
 							</div>
 
 							<div class="tab-conversation-col-right">
-								<div class="flat-button blue-button">Ask friends to answer</div>
+								<!-- <div class="flat-button blue-button">Ask friends to answer</div> -->
 								<div class="Profile-stat-container">
 									<div class="Profile-single-stat-container"><span class="stat">{{s.stats.num_followers}}</span> Followers</div>
 									<div class="Profile-single-stat-container"><span class="stat">{{s.stats.num_answers}}</span> Answers</div>
@@ -90,7 +85,7 @@
 								<div class="module-header"><a href="/question/{{f.id}}">{{f.name}}</a></div>
 							</div>
 							<div class="tab-conversation-col-right">
-								<div class="flat-button blue-button">Ask friends to answer</div>
+								<!-- <div class="flat-button blue-button">Ask friends to answer</div> -->
 								<div class="Profile-stat-container">
 									<div class="Profile-single-stat-container"><span class="stat">{{f.stats.num_followers}}</span> Followers</div>
 									<div class="Profile-single-stat-container"><span class="stat">{{f.stats.num_answers}}</span> Answers</div>
@@ -106,10 +101,9 @@
 				{% if own_profile %}
 				<div class="tab-pane settings-container" id="settings-tab">
 					<!-- <div class="row-fluid settings-container slide-container"> -->
-
 					<div class="settings-list">
 						<div><i class="icon-pencil icon-large" data-setting="addPosition"> </i>Add to your professional timeline</div>
-						<div><i class="icon-pencil icon-large" data-setting="uploadPic"> </i>Upload a new profile picture</div>
+						<!-- <div><i class="icon-pencil icon-large" data-setting="uploadPic"> </i>Upload a new profile picture</div> -->
 					</div>
 				</div>
 				{% endif %}
@@ -121,15 +115,10 @@
 	<!-- Right --> 
 	<div id="right-column">
 
-
 		<!-- Followers -->
 		<div class="right-column-module followers-module">
-
-
 			<div class="right-question-column-module">
-				<p>
-					<a href="/ask/" class="flat-button green-button">Start</a> a conversation
-				</p>
+				<p><a href="/ask/" class="flat-button green-button">Start</a> a conversation</p>
 			</div>
 				<!-- Connections (not currently in use) -->
 	
@@ -158,13 +147,6 @@
 			{% endif %} -->
 
 		</div>
-
-		<!-- Popular Tags -->
-
-		<div class="right-column-module">
-
-		</div>
-		
 	</div>
 	<div class="clear"></div>
 </div>
@@ -315,7 +297,10 @@
 					// delete CSRF token
 					delete position["csrfmiddlewaretoken"]
 					// update Timeline
-					if (position.id == -1) Timeline.addPosition(position)
+					if (position.id == -1) {
+						position.id = parseInt(response["pos_id"])
+						Timeline.addPosition(position)
+					}
 					else Timeline.editPosition(position)			
 				} else console.log(response["errors"])
 			},

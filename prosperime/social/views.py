@@ -3,6 +3,7 @@ import datetime
 import json
 import logging
 import datetime
+from urllib import unquote
 
 # Django
 from django.http import HttpResponseRedirect, HttpResponse
@@ -26,8 +27,8 @@ def welcome(request):
 		return HttpResponseRedirect('/home')
 	return render_to_response('welcome.html',context_instance=RequestContext(request))
 
+@login_required
 def home(request):
-
 	# check if user is logged in
 	if not request.user.is_authenticated():
 		return render_to_response('welcome.html',context_instance=RequestContext(request))
@@ -201,11 +202,14 @@ def api_conversation_search(request):
 	# get filters from url
 	params = request.GET.get('query',None)
 	# check to see that there are params
+	print params
 	if params:
-		convos = Conversation.objects.filter(name__icontains=params).order_by("-created")[:10]
+		convos = Conversation.objects.filter(name__icontains=unquote(params)).order_by("-created")[:10]
 	else:
 		convos = Conversation.objects.order_by("-created")[:10]
 				
+	print convos
+
 	convos_list = [{
 		'id':c.id,
 		'name':c.name,

@@ -18,12 +18,11 @@ $(function(){
 		},
 
 		url:function() {
-			if (this.meta("tagName") != "undefined") {
+			if (this.meta("tagName") != undefined) {
 				var path = "/api/conversations/?tag=" + this._meta['tagName'];
 			} else {
 				var path = "/api/conversations/?query=" + this._meta['query'];	
 			}
-			
 			return path;
 		},
 
@@ -119,12 +118,14 @@ $(function(){
 
 			// Listen to filter button
 			$("#search-conversations-button").on("click", function(ev) {
-
 				// var url = $.param({'query':$("input#search-conversations-input").val()});
-				var url = "search/" + encodeURIComponent($("input#search-conversations-input").val()) + "/"
+				var url_suffix = encodeURIComponent($("input#search-conversations-input").val()),
+					url_prefix;
 
-				window.location = url;
-				// window.App.navigate(url, {trigger:true})
+				// if empty search "go back"
+				if (url_suffix == "") url_prefix = "/"
+				else url_prefix = "#search/"
+				window.App.navigate(url_prefix + url_suffix, {trigger:true})
 			});
 
 			// Set collection, view
@@ -147,11 +148,13 @@ $(function(){
 			} else {
 				this.questions.meta("query",query)
 			}
+
 			this.questions.fetch();
 			this.questionsView.render();
 		},
 
 		tags: function(tagName) {
+			console.log("somehow this gets called")
 			if (tagName == "undefined") {
 				this.questions.meta("tagName","")
 			} else {
@@ -165,7 +168,6 @@ $(function(){
 
 	window.App = new ConversationRouter;
 	Backbone.history.start();
-
 });
 
 

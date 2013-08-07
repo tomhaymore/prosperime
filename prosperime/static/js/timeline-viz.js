@@ -291,6 +291,19 @@ var Timeline = (function() {
         return parseInt(date.substring(3) + date.substring(0,2))
     };
 
+    function formatEdPosition(position) {
+        if (position.degree.length > 1 && position.field.length > 1)
+            position.title = position.degree + " in " + position.field
+        else if (position.degree.length > 1)
+            position.title = position.degree
+        else if (position.field.length > 1)
+            position.title = position.field
+        else
+            position.title = "Student"
+        position.co_name = position.school
+        return position
+    };
+
     /**********/
     /* Public */
     /**********/
@@ -328,6 +341,9 @@ var Timeline = (function() {
             // find position in local array
             for (p in positions) {
                 if (edited_position.id == positions[p].id) {
+                    // format ed position
+                    if (position.type == "education")
+                        position = formatEdPosition(position)
                     // set position to new data
                     positions[p] = edited_position
                     // check that new position doesn't break timeline, resize if so
@@ -344,19 +360,10 @@ var Timeline = (function() {
             positions.push(position)
             // checks that new position dates don't break timeline, resizes if so
             checkTimelineBounds(position.start_date)
-
-            if (position.type == "education") {
-                if (position.degree.length > 1 && position.field.length > 1)
-                    position.title = position.degree + " in " + position.field
-                else if (position.degree.length > 1)
-                    position.title = position.degree
-                else if (position.field.length > 1)
-                    position.title = position.field
-                else
-                    position.title = "Student"
-
-                position.co_name = position.school
-            }
+            // format ed position
+            if (position.type == "education")
+                position = formatEdPosition(position)
+            
             // create new node for position
             createNode(position, positions.length - 1)
         },

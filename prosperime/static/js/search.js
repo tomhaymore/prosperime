@@ -66,16 +66,12 @@ $(function(){
 		template: _.template($('#question-list-template').html()),
 
 		initialize: function() {
-			_.bindAll(this,'render', 'showNoResults');
+			_.bindAll(this,'render','showNoResults','clearNoResults');
 			this.collection.bind('reset',this.render);
 		},
 
 		render: function() {
-			// if no results, show 
-			if (this.collection.length == 0) {
-				this.showNoResults(this.collection._meta["query"]);
-				return false;
-			}
+
 			// Don't pass anything to this template
 			$(this.el).html(this.template({}));
 			// Declare local collection variable outside (scoping)
@@ -92,13 +88,23 @@ $(function(){
 				});
 				$questions.append(view.render().el);
 			});
+
+			if (this.collection.length == 0) this.showNoResults(this.collection.meta("query"))
+			else this.clearNoResults()
+			
 			return this;
+		},
+
+
+		clearNoResults: function() {
+			if ($("#no-results-template").length > 0) $(".no-results-container").remove()
 		},
 
 		showNoResults: function(query) {
 			var msg = _.template($("#no-results-template").html())
 			$("#center-column").append(msg({'query':query}))
-		},	
+		},
+
 	});
 
 
@@ -114,6 +120,20 @@ $(function(){
 
 		initialize: function() {
 
+			$("input#search-conversations-input").typeahead({
+		    	name:'conversations',
+		    	remote:'/api/conversations_autocomplete/?q=%QUERY',
+		    	limit: 5
+		    });
+
+			// Listen to filter button
+			$("#search-conversations-button").on("click", function(ev) {
+				var url = encodeURIComponent($("input#search-conversations-input").val())
+				window.App.navigate("#" + url, {trigger:true})
+			})
+
+			// Set collection, view
+			// window.questions = new Questions()
 			this.questions = window.questions;
 			this.questionsView = new QuestionListView({collection:this.questions});
 		},
@@ -121,8 +141,10 @@ $(function(){
 		default: function() {
 			console.log('Default view');
 			this.questions.meta("query","");
-			this.questions.fetch();
-			this.questionsView.render();
+			// only need to fetch here because we've bound the reset handler to View
+			this.questions.fetch({error: function() { console.log(arguments); }});
+			// this.questionsView.render();
+
 		},
 
 		search: function(query) {
@@ -135,8 +157,10 @@ $(function(){
 				console.log(this.questions.url());
 			}
 			this.questions.fetch();
-			this.questionsView.render();
-		}
+			// this.questionsView.render();
+		},
+
+		
 
 	});
 

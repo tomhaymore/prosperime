@@ -66,7 +66,7 @@ def profile(request, user_id):
 		"connections":connections, 
 		"num_connections":num_connections,
 		"followed_conversations":followed_conversations,
-		"started_conversations":started_conversations
+		"started_conversations":started_conversations,
 	}
 
 	return render_to_response("social/profile.html", data, context_instance=RequestContext(request))
@@ -924,46 +924,67 @@ def profile_org(request, org_id):
 
 def save_position(request):
 	response = {}
-	if not request.POST or not request.is_ajax:
+
+	# Error checking
+	if not request.POST or not request.is_ajax():
 		response.update({"errors":["incorrect request type"], "result":"failure"})
 		return HttpResponse(json.dumps(response))
 
-	# position = request.POST.position
-	# if position.id == -1:
-	# 	# new position
-	# 	print "New Position"
-	# 	new_p = Position()
-	# 	new_p.person = request.user
-	# 	new_p.title = position.title
-	# 	new_p.type = position.type
-	# 	new_p.start_date = _convert_string_to_datetime(position.start_date)
-	# 	new_p.end_date = _convert_string_to_datetime(position.end_date)
+	# Grab values for the Position
+	position_id = int(request.POST.get("id"))
+	position_type = request.POST.get("type")
+	if position_type == "education":
+		field = request.POST.get("field")
+		degree = request.POST.get("degree")
+		title = "Student"
+	else:
+		title = request.POST.get("title")
+		field = None
+		degree = None
 
+	# Get or create entity
+	entity_name = request.POST.get("entity")
+	entity = _get_company_name_only(entity_name)
+	if entity is None:
+		entity = Entity(name=entity_name, status="stub") ## TODO: expand this
+		entity.save()
 
-	# 	if position.type == "education":
+	# Format dates
+	start_date = _convert_string_to_datetime(request.POST.get("start_date"))
+	end_date = _convert_string_to_datetime(request.POST.get("end_date"))
 
-	# 		new_p.field = position.field
-	# 		new_p.degree = position.field
+	try:
+		# (if, new position)
+		if position_id == -1:
+			# create new position
+			pos = Position(person=request.user, title=title, field=field, degree=degree, entity=entity, start_date=start_date, end_date=end_date, type=position_type, status="manual")
+			pos.save()
+			# map careers + ideals
+			careers = careerlib.match_careers_to_position(pos)
+			careerlib.match_position_to_ideals(pos)
+			for c_id in careers:
+				c = Career.objects.get(pk=c_id)
+				pos.careers.add(c)
+			pos.save()
 
-	# 	try:
-	# 		entity = Entity.objects.get(name)
-	# 		new_p.entity = entity
-	# 	except:
-	# 		# create a new entity...
-	# 		entity = Entity()
+		# (else, edit existing position)
+		else:
+			pos = Position.objects.get(id=position_id) # TODO: change this, right now bulk overwrite
+			pos.entity = entity
+			pos.type = position_type
+			pos.field = field
+			pos.degree = degree
+			pos.title = title
+			pos.start_date = start_date
+			pos.end_date = end_date
+			pos.save()
 
-	# 	# map to ideal
+		response.update({"result":"success", "pos_id": pos.id})
+	except:
+		response.update({"result":"failure", "errors":["Error writing to DB."]})
 
-	# else:
-	# 	print "Edit existing Position"
-	# 	old_position = Position.objects.get(id=position.id)
-	# 	changes = _diff_models(old_position)
-
-	response.update({"result":"success", "pos_id":"7"})
 
 	return HttpResponse(json.dumps(response))
-
-
 
 
 def validate_position(request):
@@ -1423,6 +1444,20 @@ def updateProfile(request):
 ###############
 ##  Helpers  ##
 ###############
+# taken from lilib
+def _get_company_name_only(name):
+	cos = Entity.objects.filter(name=name)
+	# use Filter for safety
+	if len(cos) > 0:
+		# check if one has li_univ_name and li_uniq_id
+		for c in cos:
+			if c.li_univ_name is not None and c.li_uniq_id is not None:
+				return c
+		# else just return first result
+		return cos[0]
+	else:
+		return None
+
 
 # From SO, returns dict of diff fields between models
 def _diff_models(model1, model2, excludes = []):
