@@ -82,12 +82,19 @@ def login(request):
 		request.session['_auth_user_backend'] = 'django.contrib.auth.backends.ModelBackend'
 		
 		form = AuthForm(request,request.POST)
-		
 		if form.is_valid():
 			user = authenticate(username=form.cleaned_data['username'],password=form.cleaned_data['password'])
 			if user is not None:
 				auth_login(request,user)
 				messages.success(request, 'You have successfully logged in.')
+
+				## TODO ## -- Code that pings lilib and udpates profile
+					# logic, if last_scanned was never set, or it's been longer than 1 week, rescan
+				if user.last_scanned is None or (datetime.now() - user.last_scanned).days >= 7:
+					x = 5
+					# rescan via celery --> lilib
+
+
 				return HttpResponseRedirect('/')
 
 
