@@ -863,7 +863,7 @@ class LIProfile(LIBase):
 		"""
 		Gets full LI profile from API (as much as they'll give us)
 		Return: API content (JSON)
-			"""
+		"""
 
 		# set fields to fetch from API
 		fields = "(headline,id,first-name,last-name,picture-urls::(original),positions:(start-date,end-date,title,is-current,summary,company:(id)),public-profile-url,educations:(school-name,field-of-study,degree,start-date,end-date))"
@@ -893,6 +893,7 @@ class LIProfile(LIBase):
 
 		self.user = User.objects.get(pk=user_id)
 		self.acct = Account.objects.get(owner=self.user,service="linkedin")
+		self.mark_as_scanning()
 
 		# fetch profile data from LinkedIn
 		profile = self.fetch_profile()
@@ -957,6 +958,8 @@ class LIProfile(LIBase):
 		except DatabaseError as e:
 			logger.error("Database error setting first ideal job, "+str(e))
 
+		# finish scanning
+		self.record_scan()
 
 
 ######################################
@@ -973,9 +976,9 @@ class LIConnections(LIBase):
 	# construct api url
 	api_url = "http://api.linkedin.com/v1/people/~/connections:" + fields + "?format=json"
 
-#################
-##    Setup    ##
-#################
+	#################
+	##    Setup    ##
+	#################
 
 	def __init__(self,user_id,acct_id):
 		self.user = User.objects.get(pk=user_id)
@@ -1449,6 +1452,87 @@ class LIConnections(LIBase):
 
 
 
+###################################
+	# 		  UPDATE         #
+###################################
+class LIUpdate(LIBase):
+
+
+	## Need picture-url b/c not crawlable, first-name/last-name to check if private
+	fields = "(id,picture-url,first-name,last-name,public-profile-url)"
+
+	# construct api url
+	api_url = "http://api.linkedin.com/v1/people/~/connections:" + fields + "?format=json"
+
+#################
+##    Setup    ##
+#################
+
+	access_token = {
+		'oauth_token_secret': '8b6f0d3c-07c4-473c-ae1d-861448af054c', 
+		'oauth_token': '3a966b90-a051-4c06-bc14-35e3628e4c98'
+	}
+
+	def update_profile(self, user_id, acct_id):
+
+		print "Update Profile... "
+
+		user = User.objects.get(id=user_id)
+		acct = Account.objects.get(id=acct_id)
+
+		# self.mark_as_scanning()
+
+		# TODO: Use existing code to parse LI profile, then diff the positions / metadata
+
+		# self.record_scan()
+
+	def update_industry(self,co):
+
+		if co.li_uniq_id is None:
+			return None
+
+		fields = "(id,name,universal-name,industries)"
+		api_url = "http://api.linkedin.com/v1/companies/" + co.li_uniq_id + ":" + fields + "?format=json"
+
+		consumer = oauth.Consumer(self.linkedin_key, self.linkedin_secret)
+		 
+		token = oauth.Token(
+			key=self.access_token['oauth_token'], 
+			secret=self.access_token['oauth_token_secret'])
+
+		client = oauth.Client(consumer, token)
+		resp, content = client.request(api_url)
+
+		data = json.loads(content)
+
+		if 'industries' in data:
+			for i in data['industries']['values']:
+				# check to see if industry already exists
+				print i
+				industry = self.get_industry(i['name'],i['code'])
+				if industry:
+					# add industry to domain of company
+					co.domains.add(industry)
+					if self.logging:
+						print '@update_industry(), found existing industry'
+				else:
+					# create new industry
+					if self.logging:
+						print "@update_industry(), creating new industry: " + i['name'] + ' - ' + str(i['code'])
+
+					industry = Industry()
+					industry.name=i['name']
+					industry.li_code=int(i['code'])
+					if industry.li_code in self.industry_groups:
+						industry.li_group=self.industry_groups[industry.li_code]
+					industry.save()
+					# add to domain of company
+					co.domains.add(industry)
+
+
+###################################
+	#    TEST (deprecated?)    #
+###################################
 class LITest(LIBase):
 	
 	access_token = {
@@ -1533,55 +1617,9 @@ class LITest(LIBase):
 
 		print content
 
-class LIUpdate(LIBase):
-
-	access_token = {
-		'oauth_token_secret': '8b6f0d3c-07c4-473c-ae1d-861448af054c', 
-		'oauth_token': '3a966b90-a051-4c06-bc14-35e3628e4c98'
-	}
-
-	def update_industry(self,co):
-
-		if co.li_uniq_id is None:
-			return None
-
-		fields = "(id,name,universal-name,industries)"
-
-		api_url = "http://api.linkedin.com/v1/companies/" + co.li_uniq_id + ":" + fields + "?format=json"
-
-		consumer = oauth.Consumer(self.linkedin_key, self.linkedin_secret)
-		 
-		token = oauth.Token(
-			key=self.access_token['oauth_token'], 
-			secret=self.access_token['oauth_token_secret'])
-
-		client = oauth.Client(consumer, token)
-		resp, content = client.request(api_url)
-
-		data = json.loads(content)
-
-		if 'industries' in data:
-			for i in data['industries']['values']:
-				# check to see if industry already exists
-				print i
-				industry = self.get_industry(i['name'],i['code'])
-				if industry:
-					# add industry to domain of company
-					co.domains.add(industry)
-					if self.logging:
-						print '@update_industry(), found existing industry'
-				else:
-					# create new industry
-					if self.logging:
-						print "@update_industry(), creating new industry: " + i['name'] + ' - ' + str(i['code'])
-
-					industry = Industry()
-					industry.name=i['name']
-					industry.li_code=int(i['code'])
-					if industry.li_code in self.industry_groups:
-						industry.li_group=self.industry_groups[industry.li_code]
-					industry.save()
-					# add to domain of company
-					co.domains.add(industry)
 
 
+
+
+
+	

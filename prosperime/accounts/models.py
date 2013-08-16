@@ -190,6 +190,9 @@ class Profile(models.Model):
     def schools(self):
         return Entity.objects.filter(positions__person=self.user,positions__type="education")
 
+    def entities(self):
+        return [str(e) for e in set([e['name'] for e in Entity.objects.filter(positions__person=self.user).values("name")])]
+
     def _industries(self):
         all_domains = []
         positions = self.user.positions.all().order_by('-start_date')
@@ -206,9 +209,6 @@ class Profile(models.Model):
 
     domains = property(_industries)
     
-    # Strategy: grab top career path, find others w/ same top career path
-    def get_similar_users(self):
-        top_career_path = get_top_career(self)
 
     def add_pref(self,key,value):
         if self.prefs:

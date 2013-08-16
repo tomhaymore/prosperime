@@ -12,8 +12,8 @@ from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
-
 # ProsperMe
+from accounts.models import Profile
 from careers.models import SavedPath
 from social.models import Comment, Conversation, Vote, FollowConversation, Tag
 import utilities.helpers as helpers
@@ -21,12 +21,85 @@ import utilities.helpers as helpers
 
 logger = logging.getLogger(__name__)
 
+# Welcome page, Guru V1
 def welcome(request):
 	if request.user.is_authenticated():
 		# user is logged in, display personalized information
+		## TODO - redirect to top aspiration
 		return HttpResponseRedirect('/home')
-	return render_to_response('welcome.html',context_instance=RequestContext(request))
 
+	data = {"pics":['https://prosperme_images.s3.amazonaws.com/pictures/greta_dyer/greta_dyer.jpg?Signature=XzY2q1BH4U7cae1dGA%2FMUaF7uyI%3D&Expires=1376443440&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82', 'https://prosperme_images.s3.amazonaws.com/pictures/michael_elgarico/michael_elgarico.jpg?Signature=sJNR1jQwV%2BYCmAb6UTVPvPvDji0%3D&Expires=1376443440&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82', 'https://prosperme_images.s3.amazonaws.com/pictures/solomon_k._enos/solomon_k._enos.jpg?Signature=veYuWGqzp3bYzLfKykfEHlkZo0w%3D&Expires=1376443440&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82', 'https://prosperme_images.s3.amazonaws.com/pictures/mike_field/mike_field.jpg?Signature=mc0yzXKO0YfIpE%2FoYMhSMxTjuOA%3D&Expires=1376443440&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82', 'https://prosperme_images.s3.amazonaws.com/pictures/marybeth_gasman/marybeth_gasman.jpg?Signature=rqlPgZUGKN0oK3hABr7WPHRd%2FPI%3D&Expires=1376443440&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82', 'https://prosperme_images.s3.amazonaws.com/pictures/jason_davies%2C_md%2C_phd/jason_davies%2C_md%2C_phd.jpg?Signature=sak9T6UwZzKINrwrGPPOatlS6LI%3D&Expires=1376443440&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82', 'https://prosperme_images.s3.amazonaws.com/pictures/adam_gillrie/adam_gillrie.jpg?Signature=xgNkGdwpsaO%2FWQpruTdUiAbhn4k%3D&Expires=1376443440&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82', 'https://prosperme_images.s3.amazonaws.com/pictures/matthew_gillrie/matthew_gillrie.jpg?Signature=pM9zNIDV1oSRHne9GEisYVZ%2FXIs%3D&Expires=1376443440&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82', 'https://prosperme_images.s3.amazonaws.com/pictures/nandita_gupta/nandita_gupta.jpg?Signature=GaTWMpVSwgQ90nYlh7hvIPHd0ao%3D&Expires=1376443440&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82', 'https://prosperme_images.s3.amazonaws.com/pictures/alec_gustafson/alec_gustafson.jpg?Signature=tq%2Fmche3G9l0Sg7DcOJRKugTODA%3D&Expires=1376443440&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82', 'https://prosperme_images.s3.amazonaws.com/pictures/shannon_hawley_mataele/shannon_hawley_mataele.jpg?Signature=FV8j0L%2BvwRgqmf1LZfSvxKmC6KQ%3D&Expires=1376443440&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82', 'https://prosperme_images.s3.amazonaws.com/pictures/luke_dyer/luke_dyer.jpg?Signature=DfMnnIAQ1L%2F%2B9t2XMkIMzH%2BUttU%3D&Expires=1376443440&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82', 'https://prosperme_images.s3.amazonaws.com/pictures/linda_j._hollenback/linda_j._hollenback.jpg?Signature=39SNxxtz5rvpigfvAcpUgRhkdTA%3D&Expires=1376443440&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82', 'https://prosperme_images.s3.amazonaws.com/pictures/stephanie_holson/stephanie_holson.jpg?Signature=cCCnMckh05sXrT06biSIUeU0oD4%3D&Expires=1376443440&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82', 'https://prosperme_images.s3.amazonaws.com/pictures/christopher_esplin/christopher_esplin.jpg?Signature=ByxMOtnqfe2YybaVNH2lSwUrXSE%3D&Expires=1376443440&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82', 'https://prosperme_images.s3.amazonaws.com/pictures/greg_jensen/greg_jensen.jpg?Signature=JIFYqoBCcRrqzP5NuHyQcdMb5oc%3D&Expires=1376443440&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82', 'https://prosperme_images.s3.amazonaws.com/pictures/sarah_jensen_clayton/sarah_jensen_clayton.jpg?Signature=gnHogtXW4UF430tRgFeE%2BN8Z%2BOE%3D&Expires=1376443440&AWSAccessKeyId=0MK6PWWNA8B6Q3FCZT82']}
+	# return render_to_response('welcome.html',context_instance=RequestContext(request))
+	return render_to_response("welcome_v3.html",data, context_instance=RequestContext(request))
+
+
+# Main view for a single Aspiration, Guru V1
+@login_required
+def single_aspiration(request, aspiration_slug):
+
+	## Dummy Data ## 
+		# TODO: Get this from real data
+	aspiration_name = "I want to run for the U.S. Senate"
+	aspiration_id = 7
+
+	# NOTE: data should be sorted by '-num_votes'
+	gurus = [
+		{"name":"Tom Sawyer" ,"count":7,"id":1},
+		{"name":"Ernest Hemingway" ,"count":3,"id":2},
+		{"name":"Corey Booker" ,"count":2,"id":3},
+		{"name":"George \"Dubya\" Bush","count":1,"id":4},
+		{"name":"Mihaly Csikszentmihalyi" ,"count":1,"id":5},
+	]
+
+	import random
+	# ten random ids
+	ids = [137237, 136725, 136265, 136931, 136259, 136260, 136129, 136459, 136460, 136261]
+	profile_objs = Profile.objects.filter(id__in=ids)
+	users = [{
+			"pic":p.default_profile_pic(),
+			"name":p.full_name(),
+			"first_position":p.current_position(),
+			"num_aspirations":random.randint(0,10),
+			"entities":p.entities(),
+			"id":p.id,
+			}
+		 for p in profile_objs]
+
+	fake_reasons = [
+		"Because changing the world is so noble and, like, awesome!",
+		"I have a dream, and that is to be the first Asian president. Using the rhetoric of MLK, of course.",
+		"HOPE.",
+		"I was inspired to pursue a future in U.S. Government after I saw the injustice that inflicted upon my people in the wake of Hurricane Katrina. Beauracracy and torpor led to the needless deaths of thousands of my fellow city-dwellers, and it was then that I pledged my life to ensure that such a tragedy never happens again.",
+		"Senators get tons of girls."
+	]
+	reasons = []
+	count = 0
+	for p in profile_objs[:5]:
+		reasons.append({"pic":p.default_profile_pic(), "id":p.id, "reason":fake_reasons[count]})
+		count += 1
+
+	# need all of these things to pass customize the form as question changes, best to do this server side
+	questions = [
+		{"alias":"why", "body":"What inspired this goal?", "placeholder":""},
+		{"alias":"how", "body":"How are you going to accomplish this goal?", "placeholder":""},
+		{"alias":"why-not", "body":"Why aren't you pursuing this goal now?", "placeholder":""}
+	]
+
+
+	data = {
+		"aspiration_name": aspiration_name,
+		"aspiration_id":aspiration_id,
+		"question":{"alias":"why", "body":"What inspired this goal?", "placeholder":"Because I want to change the world", "submit":"That's why"},
+		"users":users,
+		"gurus":gurus,
+		"reasons":reasons,
+		"user":{"id":request.user.id, "name":request.user.profile.full_name(), "pic":request.user.profile.default_profile_pic()}
+	}
+
+	return render_to_response("social/aspiration.html", data, context_instance=RequestContext(request))
+
+
+## 8/15, Guru V1, not in use ## 
 @login_required
 def home(request):
 	# check if user is logged in
@@ -46,27 +119,24 @@ def home(request):
 		"popular_tags": popular_tags
 	}
 
-
 	return render_to_response("social/home.html", data, context_instance=RequestContext(request))
 
+## 8/15, Guru V1, not currently in use (From QA Branch) ##
+## Also, untested ##
 @login_required
 def search(request):
 	popular_tags = Tag.objects.order_by("-count")[:10]
-
-	data = {
-		"popular_tags": popular_tags
-	}
-
+	data = {"popular_tags": popular_tags}
 	return render_to_response("social/search.html", data, context_instance=RequestContext(request))
 
+
+## 8/15, Guru V1, not currently in use (From QA Branch) ##
 @login_required
 def tags(request,tag_name):
 	# get popular tags
 	popular_tags = Tag.objects.order_by("-count")[:10]	
-
 	# get tag
 	tag = Tag.objects.get(url_name=tag_name)
-
 	questions = Conversation.objects.filter(tags=tag)
 
 	data = {
@@ -77,16 +147,13 @@ def tags(request,tag_name):
 
 	return render_to_response("social/tags.html", data, context_instance=RequestContext(request))
 
+## 8/15, Guru V1, not currently in use (From QA Branch) ##
 @login_required
 def ask(request):
-
-	data = {
-		"tags": Tag.objects.all().values("name", "id"), # needed for autocomplete in Form
-	}
-
+	data = {"tags": Tag.objects.all().values("name", "id")} # needed for autocomplete in Form
 	return render_to_response("social/ask.html", data, context_instance=RequestContext(request))
 
-# Force login to view questions?
+## 8/15, Guru V1, not currently in use (From QA Branch) ##
 def question(request, conversation_id):
 
 	## IF there's an error getting here, question_id will be -1, so redirect accordingly
@@ -138,7 +205,7 @@ def question(request, conversation_id):
  		"num_answers": num_answers,
  		"days_active": days_active
  	}
-
+ 	# dummy data
  	advisors = [
 	 	{'id':1,'alumni':'true','school':'Stanford University','school_id':1234,'name':'Alexander Hamilton','position':'Product Manager at Google','pic':'/media/pictures/anon.jpg','educations':[{'degree':'PhD'}],'methods':'all'},
 	 	{'id':1,'alumni':'false','school':None,'school_id':None,'name':'Alexander Hamilton','position':'Product Manager at Google','pic':'/media/pictures/anon.jpg','educations':[{'degree':'PhD'}],'methods':'em'},
@@ -170,10 +237,8 @@ def recruiters(request):
 	# check to see if email submitted
 	if request.POST:
 		form = RecruiterInterestForm(request.POST)
-		
-		
-		# validate form
-		
+
+		# validate form		
 		if form.is_valid():
 			from django.core.mail.backends.smtp import EmailBackend
 			from django.core.mail import EmailMultiAlternatives
@@ -191,9 +256,15 @@ def recruiters(request):
 
 	return render_to_response("recruiters.html",{'form':form},context_instance=RequestContext(request))
 
+
 def recruiters_thanks(request):
 
 	return render_to_response("recruiters_thanks.html",context_instance=RequestContext(request))
+
+
+def partners(request):
+	return render_to_response("partners.html",context_instance=RequestContext(request))
+
 
 ###############
 ##    API    ##
@@ -246,6 +317,27 @@ def api_conversation_autocomplete(request):
 		response = convos_list
 		return HttpResponse(json.dumps(response))
 
+def api_aspiration_autocomplete(request):
+
+	params = request.GET.get("query") # ?query= ... using a different autocomplete library
+	print params
+
+	# TODO: implement this API
+	# sample: {value:"I want to rule the world", data: 7 } <-- id
+	suggestions = [
+		{"value":"King of the world", "data": 7},
+		{"value":"a lawyer", "data": 8},
+		{"value":"a professional soccer player", "data": 9},
+		{"value":"World's Strongest Man", "data": 10}
+	]
+
+	## response must follow this weird format
+	response = {
+		"query":params,
+		"suggestions":suggestions
+	}
+
+	return HttpResponse(json.dumps(response))
 
 
 # Adds request user as a follower of a given thread
@@ -298,37 +390,6 @@ def api_follow_conversation(request):
 
 	return HttpResponse(json.dumps(response))
 
-# Deletes FollowThread object between given thread + user
-def unfollowThread(request):
-	response = {}
-
-	try:
-		thread = Thread.objects.get(id=request.POST.get("thread_id"))
-	except:
-		response = {
-			"result":"failure",
-			"errors":"No thread id or thread not found"
-		}
-		return HttpResponse(json.dumps(response))
-
-	try:
-		follow = FollowThread.objects.get(thread=thread, user=request.user)
-		follow.delete()
-
-		response = {
-			"result":"success",
-		}
-
-	except:
-		response = {
-			"result":"failure",
-			"errors":"Error writing to DB",
-		}
-
-
-	return HttpResponse(json.dumps(response))
-
-
 # Updates like total for a give comment of a particular thread
 def updateVotes(request):
 	response = {}
@@ -351,36 +412,6 @@ def updateVotes(request):
 
 	return HttpResponse(json.dumps(response))
 
-
-# Adds a comment to a given thread
-def postComment(request):
-	response = {}
-	try:
-		thread = Thread.objects.get(id=request.POST.get("thread_id"))
-		body = request.POST.get("body")
-	except:
-		response = {
-			"result":"failure",
-			"errors":"Can't find thread or missing data from template"
-		}
-		return HttpResponse(json.dumps(response))
-
-
-	print body
-
-	# id, owner_pic, owner_name, created
-
-
-	response["result"] = "success"
-	response["data"] = {
-		"id":1,
-		"owner_pic":request.user.profile.default_profile_pic(),
-		"owner_name":request.user.profile.first_name,
-		"created":helpers._formatted_date(datetime.datetime.now())
-	}
-	
-
-	return HttpResponse(json.dumps(response))
 
 # Adds comment to given conversation
 def api_add_comment(request):
@@ -575,103 +606,10 @@ def api_ask_advisor(request):
 
 	return HttpResponse(json.dumps(response))
 
-def saveComment(request):
+def api_add_reason(request):
+
 
 	response = {}
 
-	if not request.POST:
-		response["result"] = "failure"
-		response["errors"] = "Incorrect request type"
-		return HttpResponse(json.dumps(response))
-
-	body = request.POST.get("body")
-	path_id = request.POST.get("path_id")
-	comment_type = request.POST.get("type")
-
-	## Check all params, save comment, 
-	##	then send back data needed to update DOM
-	if len(body) > 0 and int(path_id) > 0 and len(comment_type) > 0:
-		try:
-			c = Comment()
-			c.owner = request.user
-			c.path = SavedPath.objects.get(pk=int(path_id))
-			c.type = comment_type
-			c.body = body
-			c.save()
-		except:
-			response = {
-				"result":"failure",
-				"errors":"Error creating comment @ db level"
-			}
-			return HttpResponse(json.dumps(response))
-	else:
-		response = {
-			"result":"failure",
-			"errors":"one or more blank parameters"
-		}
-		return HttpResponse(json.dumps(response))
-
-	response["user_name"] = request.user.profile.full_name()
-	response["profile_pic"] = request.user.profile.default_profile_pic()
-	response["date_created"] = helpers._formatted_date(c.created) ## need to format this
-	response["result"] = "success"
 
 	return HttpResponse(json.dumps(response))
-
-
-
-
-
-
-
-
-
-
-## DEPRECATED: keep around for now for code review
-def thread(request, thread_id):
-	thread = Thread.objects.get(id=thread_id)
-	comments = Comment.objects.filter(thread=thread).order_by("index")
-
-
-	owner_positions = comments[0].owner.positions.all().order_by('-start_date').exclude(type="education")
-	if owner_positions.exists():
-		owner_current_position = {"title":owner_positions[0].title, "entity_id":owner_positions[0].id, "entity_logo":owner_positions[0].entity.default_logo()}
-	else:
-		owner_current_position = None
-
-	if request.user in thread.followers.all():
-		is_following = True
-	else:
-		is_following = False
-
-	total_followers = thread.followers.all().count()
-	## TODO: implement way to get "# followers from your network"
-	network_followers = total_followers
-
-	data = {
-		"thread_id":thread_id,
-		"is_following":is_following,
-		"total_followers":total_followers,
-		"network_followers":network_followers,
-		"comments":[{"owner_name":c.owner.profile.first_name, "owner_id":c.owner.id, "owner_pic":c.owner.profile.default_profile_pic(), "goal":c.meta, "body":c.body, "id":c.id, "votes":Vote.objects.filter(owner=c.owner).count(), "created":helpers._formatted_date(c.created), "modified":helpers._formatted_date(c.updated)} for c in comments],
-		"owner_current_position":owner_current_position,
-	}
-
-
-	return render_to_response("social/thread.html",data,context_instance=RequestContext(request))
-
-def partners(request):
-	return render_to_response("partners.html",context_instance=RequestContext(request))
-
-## DEPRECATED: keep around for now for code review
-def create_thread(request):
-
-	data = {}
-	data["foo"] = "bar"
-	return render_to_response("social/createThread.html", data, context_instance=RequestContext(request))
-
-
-
-
-
-	

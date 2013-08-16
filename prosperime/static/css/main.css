@@ -33,6 +33,36 @@ body {
   -webkit-filter: grayscale(100%); }
 
 /* General styles */
+.border-box {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+
+.align-left {
+  text-align: left; }
+
+.align-right {
+  text-align: right; }
+
+.align-center {
+  text-align: center; }
+
+.align-top {
+  vertical-align: top; }
+
+.align-middle {
+  vertical-align: middle; }
+
+.align-bottom {
+  vertical-align: bottom; }
+
+.inline {
+  display: inline-block; }
+
+.centered {
+  display: inline-block;
+  margin: 0 auto; }
+
 .pull-left {
   float: left; }
 
@@ -46,6 +76,7 @@ body {
   float: left;
   width: 50%; }
 
+/* START: Re-write of Bootstrap Form Styling */
 .input-extra-small {
   width: 40px; }
 
@@ -55,6 +86,40 @@ body {
 .input-medium-small {
   width: 140px; }
 
+.input-xxlarge {
+  width: 315px; }
+
+.inline-input-add-on {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 4px 5px;
+  text-align: center;
+  border: 1px solid #d0d5cb;
+  color: rgba(51, 51, 51, 0.8); }
+
+.inline-input-prepend {
+  border-radius: 4px 0px 0px 4px;
+  -webkit-border-radius: 4px 0px 0px 4px;
+  -moz-border-radius: 4px 0px 0px 4px;
+  margin-right: -5px; }
+
+.inline-input-append {
+  border-radius: 0px 4px 4px 0px;
+  -webkit-border-radius: 0px 4px 4px 0px;
+  -moz-border-radius: 0px 4px 4px 0px;
+  margin-left: -5px; }
+
+.input-tall {
+  height: 44px !important;
+  line-height: 44px !important;
+  font-size: 1.4em !important; }
+
+.input-taller {
+  height: 32px !important;
+  line-height: 32px !important;
+  font-size: 1.2em !important; }
+
+/* END */
 #search-container {
   width: 630px;
   height: 50px; }
@@ -77,6 +142,34 @@ body {
 .note {
   font-size: 12px;
   color: #2c5c82; }
+
+/* Shared Styles */
+.banner-main {
+  line-height: 2.4;
+  margin-top: 8px;
+  font-size: 2.5em;
+  font-weight: 500;
+  color: #333333; }
+
+.banner-h1 {
+  line-height: 1.8em;
+  margin-top: 8px;
+  font-size: 2em;
+  font-weight: 500;
+  color: rgba(51, 51, 51, 0.9); }
+
+.banner-h3 {
+  line-height: 1.4em;
+  margin-top: 8px;
+  font-size: 1.5em;
+  font-weight: 500;
+  color: rgba(51, 51, 51, 0.9); }
+
+/* Extra info that goes beneath main input */
+.form-subtext {
+  font-size: 0.9em;
+  margin-top: 8px;
+  color: rgba(51, 51, 51, 0.8); }
 
 /* Header Styles */
 #topbar {
@@ -120,7 +213,8 @@ div#content-container {
   min-height: 500px;
   padding-top: 5px;
   padding-bottom: 5px;
-  background-color: white; }
+  background-color: white;
+  overflow: auto; }
 
 div#background-container {
   background-color: white;
@@ -426,19 +520,6 @@ div.footer {
 
 .tag:hover, .tag-inline:hover {
   text-decoration: none; }
-
-/* Stats styles */
-.stat-module {
-  margin-bottom: 5px; }
-
-.stat {
-  text-align: center;
-  font-weight: 500;
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border-radius: 2px;
-  line-height: 20px; }
 
 /* Partner Styles */
 .partner-info {

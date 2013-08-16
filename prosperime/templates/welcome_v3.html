@@ -1,0 +1,193 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/welcome.css" />
+	<!-- Source: https://github.com/devbridge/jQuery-Autocomplete -->
+	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.autocomplete.min.js"></script>
+
+	<style>
+	.input-success { border: 1px solid #27AE60 !important; }
+	.input-error { border: 1px solid #e74c3c !important; }
+	</style>
+
+
+{% endblock %}
+
+<!-- Messages -->
+{% block message %}
+{% endblock %}
+
+{% block content %}
+<!-- previous... brillant, ice_age, snow -->
+<div id="welcome-splash-container" style="">
+
+	<div id="welcome-splash-inner-container" style="padding:12px 24px; box-sizing: border-box;min-height:500px;">
+
+		<div class="banner-main align-center" style="margin-bottom: 24px; margin-top: 24px;">Dream out loud</div>
+		<div id="welcome-sub-banner" class="banner-h3 align-center" style="margin-top:16px;">Find others with the aspirations. Meet the gurus who can help you live them.</div>
+
+		<div class="welcome-input-container">
+			<form class="form-inline" name="aspiration-form">
+				<div id="welcome-add-on-prepend" class="input-tall inline-input-add-on inline-input-prepend">I want to be</div>
+				<input type="text" class="input-tall" id="welcome-aspiration-input" placeholder="CEO of a Social Enterprise, a Triathlon finisher, and a great Dad." name="aspiration-input" maxlength="2000" autofocus/>
+				<div id="welcome-add-on-append" class="input-tall inline-input-add-on inline-input-append">Begin</div>
+				<div class="form-subtext align-right" style='margin-right:125px;'>Separate goals by commas, enter as many as you like.</div>
+			</form>
+		</div>
+
+
+		<div class="welcome-input-container secondary-form" style="display:none">
+			<form name="signup" method="POST">{% csrf_token %}
+				<div class="half secondary-form-half border-box">
+					<div class="form-number">1</div>
+					<input class="inline input-medium input-taller" type="text" placeholder="First" name="first_name" maxlength="150" autofocus/>
+					<input class="inline input-medium input-taller" type="text" placeholder="Last" name="last_name" maxlength="150" />
+					<input class="input-xxlarge input-taller" type="text" placeholder="Email" name="email" maxlength="75" style="margin-left:0px;width:318px;" /><br/>
+					<input class="input-xxlarge input-taller" type="password" placeholder="Password" name="password" maxlength="30" style="margin-left:0px;width:318px;"/><br/>
+				</div>
+
+				<div class="half secondary-form-half border-box">
+					<div class="form-number">2</div>
+					<input class="flat-button submit-button full-button" type="submit" value="Get Started with LinkedIn" data-type="linkedin" /><br/>
+					<input class="flat-button gray-button full-button" type="submit" value="Signup with e-mail" data-type="email" /><br/>
+					<div class="form-subtext align-center centered" style="width:60%;">By clicking above you agree to Emplore's terms of service and privacy policy</div>
+				</div>
+			</form>
+
+			<div class="back-button centered" style="width:100%"><a onclick="goBack()">Wait, go back, I thought of something else</a></div>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+
+	// Vars used to keep state between transitions
+	var aspirations,
+		original_banner;
+
+	// Constants
+	var MIN_PASSWORD_LENGTH = 6;
+	var form_router = {
+		"linkedin":"/account/authorize",
+		"email":"/account/login" // TODO: Thomas -- where should this go?
+	}
+	
+	$(function() {
+
+		// Autocomplete for 1st form
+		$("#welcome-aspiration-input").autocomplete({
+			serviceUrl:"/api/aspirations_autocomplete/",
+			minChars:2,
+			delimiter:", ",
+			dateType:"jsonp",
+			width: "658px"
+		})
+
+		// Click handler for 1st form
+		$("#welcome-add-on-append").on("click", function(ev) {
+			// get entered text
+			aspirations = $("#welcome-aspiration-input").val()
+			if (aspirations.length == 0)
+				// TODO: animation for error
+				return false;
+			// animate form out
+			$(".welcome-input-container :first").css("position","relative").animate({"left":1100}, 200, function() {
+				// hide welcome banner
+				$(".h1-").animate({"opacity":0}, 500)
+				// hide form
+				$(this).css("display","none").css("position","")
+				// animate in second form
+				$(".welcome-input-container :last").css("display","").css("opacity", 0).animate({"opacity":1}, 500, function() {
+					// set original text in case they go back
+					original_banner = $("#welcome-sub-banner").text()
+					// set banner to entered aspirations
+					if (aspirations.slice(-1) != ".") aspirations += "." // make sure that it's properly punctuated
+					$("#welcome-sub-banner").text("I want to be " + aspirations).animate({"opacity":1},500)
+				})
+			});
+		});	
+		// Second half of form defaults to opaque
+		$(".secondary-form-half :last").css("opacity","0.5")
+		// Listen for keyup events on password field, if valid, open up buttons
+		$(".secondary-form-half input[type='password']").on("keyup",function(ev) {
+			if (validateSecondaryForm()) {
+				$(".secondary-form-half :last").animate({"opacity":1},500, function() {
+				})
+			}
+		});
+
+		// Prevent default form submit
+		$("form[name='signup']").on("submit", function() { event.preventDefault() })
+		// Catch the click event, redirect form to appropriate location
+		$("input[type='submit']").on("click", function(ev) {
+			var url = form_router[$(ev.currentTarget).data("type")]
+			event.preventDefault()
+			$("form[name='signup']").attr("action", url).submit()
+
+		});
+	});
+
+	var goBack = function(ev) {
+		// hide welcome banner
+		$("#welcome-sub-banner").animate({"opacity":0}, 500)
+		// hide secondary form
+		$(".welcome-input-container :last").css("position","relative").animate({"left":-1100}, 500, function() {
+			$(this).css("position","").css("display","none")
+			// show original form
+			$(".welcome-input-container :first").css("opacity","0").css("display","").animate({"opacity":1},500)
+			// return welcome banner to original
+			$("#welcome-sub-banner").text(original_banner).animate({"opacity":1},500)
+		})
+	};
+
+
+	function validateSecondaryForm() {
+		// TODO: beef up validation
+		// Ensure all blanks filled in before validating
+		$("form[name='signup'] input").each(function() {
+			if ($(this).val() == "") return false;
+		})
+
+		// Animate for OK names... // TODO: validation on names? regex for char only?
+		// $("form[name='signup'] input[name='first_name']").addClass("input-success")
+		// $("form[name='signup'] input[name='last_name']").addClass("input-success")
+
+		// Ensure password fits min length
+		if ($("form[name='signup'] input[name='password']").val().length < MIN_PASSWORD_LENGTH) {
+			// TODO: return feedback
+			// $("form[name='signup'] input[name='password']").addClass("input-failure")
+			return false;
+		}
+		// Email validation
+		if (!validateEmail($("form[name='signup'] input[name='email']").val()))
+			// TODO: return feedback
+			return false;
+
+
+		return true;
+	}
+
+	// Not perfect but a good filter, thanks SO: http://stackoverflow.com/questions/46155/validate-email-address-in-javascript
+	function validateEmail(email) {
+    	var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    	return re.test(email);
+	}
+
+
+</script>
+
+{% endblock %}
+
+{% block promo %}
+
+
+{% endblock %}
+
+{% block templates %}
+
+{% endblock %}
+
+
+

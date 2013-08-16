@@ -82,6 +82,11 @@ function is_a_month(mo) {
 	return (parseInt(mo) <= 12 && parseInt(mo) > 0)
 }
 
+// Takes a newly created element and fade it in the DOM
+function animateInNew(el, duration) {
+	$(el).css("opacity","0").animate({"opacity": 1}, duration)
+};
+
 
 
 

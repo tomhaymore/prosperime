@@ -5,7 +5,7 @@ import logging
 from celery import task
 
 # Prosperime
-from lilib import LIConnections, LIProfile
+from lilib import LIConnections, LIProfile, LIUpdate
 import accounts.cblib as cblib
 from careers.careerlib import CareerMapBase
 ## somewhat useful for celery debugging
@@ -31,6 +31,12 @@ def process_li_profile(user_id,acct_id,**kwargs):
 	# li_parser = LIProfile(career_mapper)
 	li_parser = LIProfile()
 	li_parser.process_profile(user_id,acct_id)
+
+@task()
+def update_li_profile(user_id,acct_id,**kwargs):
+	print LIUpdate
+	li_updater = LIUpdate()
+	li_updater.update_profile(user_id, acct_id)
 
 @task()
 def match_position(pos):

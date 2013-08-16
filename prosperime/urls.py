@@ -16,6 +16,8 @@ urlpatterns = patterns('',
     url(r'^search/$', 'social.views.search'),
     url(r'^tags/(\w+)/$', 'social.views.tags'),
 
+    url(r'^aspiration/(\w+)/$','social.views.single_aspiration'),
+
 
     # Accounts Views
     url(r'^profile/(\d+)/$', 'accounts.views.profile'),
@@ -24,6 +26,7 @@ urlpatterns = patterns('',
     url(r'^copyright/$','accounts.views.copyright'),
     url(r'^use/$','accounts.views.use'),
     url(r'^unsubscribe/$','accounts.views.unsubscribe'),
+    url(r'^faq/$', 'accounts.views.faq'),
 
     # Entities Views
     url(r'^contact/$', 'entities.views.contact'),
@@ -50,6 +53,8 @@ urlpatterns = patterns('',
     url(r'^api/addComment/$', 'social.views.api_add_comment'),
     url(r'^api/voteComment/$', 'social.views.api_vote_comment'),
     url(r'^api/askAdvisor/$', 'social.views.api_ask_advisor'),
+    url(r'^social/addReason/$', 'social.views.api_add_reason'),
+    url(r'^api/aspirations_autocomplete/$', 'social.views.api_aspiration_autocomplete'),
 
     # Partner Views
     url(r'^employers/$', 'social.views.recruiters'),

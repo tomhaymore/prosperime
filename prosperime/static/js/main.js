@@ -36,7 +36,7 @@ $(function() {
 	$(".form-input-container").blur(function() {
 		var labelId = $(this).find("input").attr("id");
 		$(".form-help[data-target='"+labelId+"']").hide();
-	});
+	});	
 
 	/* For now, delegate this to home.js and search.js... once code / use is known there, can port here */
 	// $("#search-conversations-button").on("click", function(ev) {
