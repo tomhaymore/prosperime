@@ -93,8 +93,8 @@ def login(request):
 				auth_login(request,user)
 				messages.success(request, 'You have successfully logged in.')
 
-				# if last scan > 1 week ago, update profile
-				## DEV ##
+				## 8/16 - not ready for primetime yet, but all scaffolding in place, code needed in lilib.LIUpdate
+				##  if last scan > 1 week ago, update profile
 				# try:
 				# 	acct = Account.objects.get(owner=user)
 				# 	if acct.last_scanned is None or (datetime.now() - user.last_scanned).days > 7:
@@ -106,9 +106,6 @@ def login(request):
 
 			
 				return HttpResponseRedirect('/')
-
-
-		
 	else:
 		form = AuthForm()
 

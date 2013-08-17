@@ -34,7 +34,6 @@ def process_li_profile(user_id,acct_id,**kwargs):
 
 @task()
 def update_li_profile(user_id,acct_id,**kwargs):
-	print LIUpdate
 	li_updater = LIUpdate()
 	li_updater.update_profile(user_id, acct_id)
 

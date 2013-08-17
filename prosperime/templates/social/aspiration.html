@@ -1,0 +1,358 @@
+
+{% extends "base_full.html" %}
+{% load humanize %}
+{% block head %}
+
+<!-- CSS -->
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/home.css"/>
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
+
+
+<!-- JS -->
+	<script type="text/javascript" src="{{ STATIC_URL }}js/helpers.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/underscore.js"></script>
+
+
+	<style>
+
+		/* General */
+
+		.user-card {
+			background-color: #f8f8f8;
+			display: inline-block;
+			margin: 0 auto;
+			width: 220px;
+			height: 250px;
+			border: 2px solid #d0d5cb;
+			border-radius: 4px;
+			vertical-align: middle;	
+			margin-bottom: 6px;
+			text-align: center;
+			font-size: 0.9em;
+		}
+
+		.user-card-pic {
+			width: 80px;
+			height: 80px;
+			display: inline-block;
+			margin-left:10px;
+			margin-top: 10px;
+			border: 1px solid #d0d5cb;
+			float: left;
+		}
+
+		.user-card-name {
+			font-weight: bold;
+			display: inline-block;
+			text-align: left;
+			width: 110px;
+			height: 100px;
+			font-size: 1.5em;
+			line-height: 1.1em;
+			padding:6px 4px;
+			padding-top:28px;
+			color: rgba(51,51,51,0.8);
+		}
+
+/*		.user-card-name:before {
+			content: '';
+			height: 100%;
+			vertical-align: middle;
+			margin-right: -0.25em;
+			background: #808080; width: 5px;
+		}
+
+		.c {
+			display:  inline-block;
+			vertical-align: middle;
+			width: 110px;
+
+		}*/
+
+		.user-card-position {
+			text-align: left;
+			margin-left: 12px;
+			height: 32px;
+			overflow: hidden;
+			padding: 2px 4px;
+			margin-bottom: 0px;
+			line-height: 16px;
+		}
+
+		.user-card-aspirations {
+			border-top: 1px solid #d0d5cb;
+			height: 30px;
+			line-height: 30px;
+			font-size: 1em;
+		}
+
+		.user-card-button {
+
+		}
+
+		.user-card-mini-header {
+			text-align: left;
+			font-weight: bold; 
+			padding-left: 8px;
+			padding-bottom: 0px;
+			margin-top:0px;
+		}
+
+
+
+
+
+
+
+	
+	/* V2 */
+
+
+
+
+	/* Page Specific */	
+
+
+	</style>
+
+
+{% endblock %}
+
+{% block extramessage %} {% endblock %}
+
+{% block content %}
+
+<div id="content-container">
+
+	<div id="center-column">
+		<div class="banner-h1">{{aspiration.name}}</div>
+		
+		<!-- Reason Form -->
+		<div id="reason-form" class="reason-input-container">
+			<div id="inline-input-label" class="input-semi-tall inline-input-add-on inline-input-prepend">{{question.body}}</div>
+			<input id="reason-input" data-alias="{{question.alias}}" type="text" class="input-semi-tall" placeholder="{{question.placeholder}}" maxlength="2000" />
+			<div id="reason-input-submit" style="border-right:none;" class="inline-input-add-on inline-input-append">{{question.submit}}</div>
+		</div>
+
+		<!-- Reasons Container -->
+		<div class="reasons-container">
+		{% for r in reasons %}
+			<div class="aspiration-horizontal-item">
+				<img data-user_id="{{r.id}}" class="thumbnail-pic profile-hover inline" src="{{r.pic}}" />
+				{% if r.id == user.id %}
+					<div class="aspiration-horizontal-item-body inline highlight-row">"{{r.reason}}"</div>
+				{% else %}
+					<div class="aspiration-horizontal-item-body inline">"{{r.reason}}"</div>
+				{% endif %}
+			</div>
+		{% endfor %}
+		</div>
+
+		<!-- Members -->
+		<div class="members-container">
+			<div class="banner-h3">Members:</div>
+			{% for u in members %}
+				<div class="aspiration-horizontal-item">
+					<img data-user_id="{{u.id}}" class="thumbnail-pic profile-hover inline" src="{{u.pic}}" /><div class="align-middle aspiration-horizontal-item-body inline">{{u.name}}</div>
+				</div>
+			{% endfor %}
+		</div>
+
+		<!-- Create (Hidden) Profiles -->
+		{% for u in members %}
+			<div data-user_id="{{u.id}}" class="user-card offscreen">
+				<img class="user-card-pic" src="{{u.pic}}" />
+				<div class="user-card-name border-box"><div class="c">{{u.name}}</div></div>
+				
+				<div class="user-card-mini-header">Current: </div>
+				<div class="user-card-position">
+					{{u.first_position}}
+				</div>
+
+				<div class='user-card-mini-header'>Past: </div>
+				<div class="user-card-position">
+					{% for e in u.entities %}
+						{{e}}{% if not forloop.last %}, {% endif %}
+					{% endfor %}
+				</div>
+	
+				<div class="user-card-aspirations">{{u.num_aspirations}} Aspirations</div>
+			</div>
+		{% endfor %}
+	</div>
+
+	<div id="right-column">
+		<!-- Gurus Container -->
+		<div class="gurus-container">
+			<div class="banner-h3">Related Gurus: </div>
+			<div class="add-guru-button inline guru"><span class="stat add-sign"> + </span>&nbsp;&nbsp;Add</div>
+			{% for g in gurus %}
+				<div class="guru inline border-box" data-guru_id="{{g.id}}"><span class="stat">{{g.count}}</span>&nbsp;&nbsp;{{g.name}}</div>
+			{% endfor %}
+		</div>
+	</div>
+
+</div>
+
+	
+{% endblock %}
+
+{% block templates %}
+
+<!-- V3 Script -->
+<script type="text/javascript">
+	
+	
+	$(function() {
+
+		// Hover handler for profile thumbnail pictures
+		$(".profile-hover").each(function() {
+			$(this)
+				.on("mouseenter",profileMouseenter)
+				.on("mouseleave",profileMouseleave)
+		});
+
+		// Click handler for adding a new "reason"
+		$("#reason-form #reason-input-submit").on("click",reasonEntered)
+
+		// Click handler for "voting" on gurus
+		$(".guru").on("click", function(ev) {
+
+			if ($(this).hasClass("add-guru-button")) {
+				addGuru()
+				return true;
+			}
+
+			// TODO: move this logic into voteForGuru()
+			// don't allow multiple votes (no un-voting either for now)
+			$(this).off("click")
+			// update stat container
+			var prev_val = parseInt($(".stat", this).text())
+			var prev_color = $(".stat", this).css("background-color")
+			$(".stat", this).animate({"background-color":"rgb(44,93,130)"}, 500, function() {
+				$(this).text((prev_val + 1)) // .animate({"background-color":prev_color}, 500)
+				$(ev.currentTarget).css("cursor","default").animate({"background-color":"#f0f0f0", "color":"rgba(51,51,51,0.5)"}, 250)
+			});
+			// post vote to DB
+			var guru_id = $(ev.currentTarget).data("guru_id")
+			voteForGuru(guru_id)
+		});
+	});	
+
+	// handler for displaying "add guru" modal
+	function addGuru() {
+		// TODO: display modal
+		console.log("Add guru.")
+	};
+
+	function voteForGuru(guru_id) {
+		console.log("Vote for Guru: " + guru_id)
+		$.ajax({
+			type: "POST",
+			url: "/api/vote/",
+			data: {"aspiration_id":{{aspiration.id}}, "guru_id":guru_id, "type":"guru", "csrfmiddlewaretoken":"{{csrf_token}}"},
+			dataType:"json",
+			beforeSend: function() {
+
+			},
+			success:function(response) {
+				if (response["result"] == "success") {
+					console.log("success")
+					// TODO: something when it returns				
+				} else console.log(response["errors"])
+			},
+		});
+	}
+
+	// 1. create all the boxes @ the beginning
+	// 2. position all offscreen
+	// 3. reposition on hover
+	function profileMouseenter(ev) {
+		var u_id = $(ev.currentTarget).data("user_id")
+		var offset = $(ev.currentTarget).offset()
+
+		var left = parseInt(offset.left) + 60
+		var top = parseInt(offset.top) - 100
+
+		// grab profile & reposition it
+		$(".user-card[data-user_id='" + u_id + "']").css("left",left + "px").css("top",top + "px").animate({"opacity":1},150)
+
+	};
+	// hide profile back offscreen
+	function profileMouseleave(ev) {
+		var u_id = $(ev.currentTarget).data("user_id")
+		$(".user-card[data-user_id='" + u_id + "']").animate({"opacity":1},50, function() {
+			$(this).css("left","-1000px").css("top","")
+		})
+	};
+
+	// Handler for adding a new "reason"
+	function reasonEntered() {
+		var reason = $("#reason-input").val()
+		// Add to DOM
+		var template = _.template($("#aspiration-horizontal-item-template").html())
+		$(".reasons-container").prepend(template({"body":reason, "id":{{user.id}}, "type":"reason", "pic":"{{user_pic}}"}))
+		animateInNew($(".reasons-container .aspiration-horizontal-item :first"), 500)
+		// Post to DB
+		$.ajax({
+			type: "POST",
+			url: "/social/addReason/",
+			data: {"reason":reason, "alias":"{{question.alias}}", "aspiration_id":{{aspiration.id}}, "user_id":{{user.id}}},
+			dataType:"json",
+			beforeSend: function() {
+
+			},
+			success:function(response) {
+				if (response["result"] == "success") {
+					// TODO: action if successful
+								
+				} else console.log(response["errors"])
+			},
+		});
+	};
+
+
+</script>
+
+<script type="text/template" id="user-card-template">
+
+	<div class="user-card">
+			<img class="user-card-pic" src="<%=pic%>" />
+			<div class="user-card-name border-box"><div class="c"><%name%></div></div>
+			
+			<div class="user-card-mini-header">Current: </div>
+			<div class="user-card-position">
+				<%=first_position%>
+			</div>
+
+			<div class='user-card-mini-header'>Past: </div>
+			<div class="user-card-position">
+				<% for var i = 0; i < entities.length; i++) { %>
+					<%=entities.length%>
+					<% if (i < entities.length -1) { %>, <% } %>
+				<% } %>
+			</div> 
+
+			<div class="user-card-aspirations"><%=num_aspirations%> Aspirations</div>
+		</div>
+
+</script>
+
+<script type="text/template" id="aspiration-horizontal-item-template">
+	
+	<div class="aspiration-horizontal-item">
+		<img data-user_id="<%=id%>" class="thumbnail-pic profile-hover inline" src="<%=pic%>" />
+		<% if (type == "reason") { %>
+			<div class="aspiration-horizontal-item-body inline highlight-row">"<%=body%>"</div>
+		<% } else { %>
+			<div class="aspiration-horizontal-item-body inline"><%=body%></div>
+		<% } %>
+	</div>
+
+</script>
+
+
+
+{% endblock %}

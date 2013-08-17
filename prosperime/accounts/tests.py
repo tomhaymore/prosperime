@@ -272,181 +272,181 @@ class LI2Test(SessionTestCase):
 			print "ERROR: Brogan not found."
 
 
-	# def test_get_company_name_only(self):
-	# 	base = self.lilib.LIBase()
+	def test_get_company_name_only(self):
+		base = self.lilib.LIBase()
 
-	# 	# (1) multiple entities, one of which is "correct"
-	# 	for i in range(4):
-	# 		e = Entity(name="foo")
-	# 		e.save()
-	# 	e = Entity(name="foo", li_univ_name="univ_foo", li_uniq_id="uniq_foo")
-	# 	e.save()
-	# 	ent = base.get_company_name_only("foo")
-	# 	self.assertIsNot(None, ent)
-	# 	self.assertIsNot(None, ent.li_univ_name)
-	# 	self.assertIsNot(None, ent.li_uniq_id)
+		# (1) multiple entities, one of which is "correct"
+		for i in range(4):
+			e = Entity(name="foo")
+			e.save()
+		e = Entity(name="foo", li_univ_name="univ_foo", li_uniq_id="uniq_foo")
+		e.save()
+		ent = base.get_company_name_only("foo")
+		self.assertIsNot(None, ent)
+		self.assertIsNot(None, ent.li_univ_name)
+		self.assertIsNot(None, ent.li_uniq_id)
 
-	# 	# (2) multiple entities, > 1 of which is "correct"
-	# 	for i in range(3):
-	# 		e = Entity(name="bar")
-	# 		e.save()
-	# 	for i in range(3):
-	# 		e = Entity(name="bar", li_uniq_id="uniq_bar", li_univ_name="univ_bar")
-	# 		e.save()
-	# 	ent = base.get_company_name_only("bar")
-	# 	self.assertIsNot(None, ent)
-	# 	self.assertIsNot(None, ent.li_univ_name)
-	# 	self.assertIsNot(None, ent.li_uniq_id)
+		# (2) multiple entities, > 1 of which is "correct"
+		for i in range(3):
+			e = Entity(name="bar")
+			e.save()
+		for i in range(3):
+			e = Entity(name="bar", li_uniq_id="uniq_bar", li_univ_name="univ_bar")
+			e.save()
+		ent = base.get_company_name_only("bar")
+		self.assertIsNot(None, ent)
+		self.assertIsNot(None, ent.li_univ_name)
+		self.assertIsNot(None, ent.li_uniq_id)
 
-	# 	# (3) multiple entities, none of which are "correct"
-	# 	for i in range(8):
-	# 		e = Entity(name="baz")
-	# 		e.save()
-	# 	ent = base.get_company_name_only("baz")
-	# 	self.assertIsNot(None, ent)
-	# 	self.assertIs(None, ent.li_univ_name)
-	# 	self.assertIs(None, ent.li_uniq_id)	
+		# (3) multiple entities, none of which are "correct"
+		for i in range(8):
+			e = Entity(name="baz")
+			e.save()
+		ent = base.get_company_name_only("baz")
+		self.assertIsNot(None, ent)
+		self.assertIs(None, ent.li_univ_name)
+		self.assertIs(None, ent.li_uniq_id)	
 
-	# 	# (4) one entity, correct
-	# 	e = Entity(name="foobar", li_univ_name="univ_foo", li_uniq_id="uniq_foo")
-	# 	e.save()
-	# 	ent = base.get_company_name_only("foobar")
-	# 	self.assertIsNot(None, ent)
-	# 	self.assertIsNot(None, ent.li_univ_name)
-	# 	self.assertIsNot(None, ent.li_uniq_id)
+		# (4) one entity, correct
+		e = Entity(name="foobar", li_univ_name="univ_foo", li_uniq_id="uniq_foo")
+		e.save()
+		ent = base.get_company_name_only("foobar")
+		self.assertIsNot(None, ent)
+		self.assertIsNot(None, ent.li_univ_name)
+		self.assertIsNot(None, ent.li_uniq_id)
 
-	# 	# (5) one entity, not correct
-	# 	e = Entity(name="foobaz")
-	# 	e.save()
-	# 	ent = base.get_company_name_only("foobaz")
-	# 	self.assertIsNot(None, ent)
-	# 	self.assertIs(None, ent.li_univ_name)
-	# 	self.assertIs(None, ent.li_uniq_id)
+		# (5) one entity, not correct
+		e = Entity(name="foobaz")
+		e.save()
+		ent = base.get_company_name_only("foobaz")
+		self.assertIsNot(None, ent)
+		self.assertIs(None, ent.li_univ_name)
+		self.assertIs(None, ent.li_uniq_id)
 
-	# 	# (6) no match
-	# 	ent = base.get_company_name_only("romeo & juliet")
-	# 	self.assertIs(None, ent)
-
-
-	# def test_add_unverified_position(self):
-	# 	base = self.lilib.LIBase()
-
-	# 	person = User(username="test_user")
-	# 	person.save()
-
-	# 	entity = base.add_unverified_company(({"entity_name":unicode("Artists of the Haight")}))
-
-	# 	p = base.add_unverified_position(person, entity, {"title":unicode("Artist in Residence"), "summary":None, "isCurrent":True})
-	# 	self.assertIsNotNone(entity)
-	# 	self.assertIsNotNone(p)
-	# 	self.assertIs(p.status, "unverified")
-	# 	self.assertIs(entity.status, "unverified")
-
-	# def test_process_unverified_org_position(self):
-	# 	# create user
-	# 	user = User(username="MistaFu")
-	# 	user.save()
-	# 	# create acct
-	# 	acct = Account(service="linkedin", owner=user, expires_on=datetime.datetime(2013, 6, 23, 15, 36, 51, 694994), status=unicode("active"), token_secret=u'67cbcc33-30bf-423d-b677-92bc3f775559', access_token=u'0a0d3a27-5713-439e-a57e-c2f35798b4a5')
-	# 	acct.save()
-	# 	# instantiate liConnections
-	# 	base = self.lilib.LIConnections(user.id, acct.id)	
-
-	# 	entity = Entity(name=unicode("FooBar, Inc."))
-	# 	entity.save()
-
-	# 	p1 = {
-	# 		'title':unicode("East Harlem"),
-	# 		'entity_name':unicode("FooBar, Inc."),
-	# 		'co_uniq_name':None,
-	# 		'startDate':None,
-	# 		'endDate':None,
-	# 		'summary':None,
-	# 		'isCurrent':False
-	# 		}
-
-	# 	p2 = {
-	# 		'title':unicode("West Harlem"),
-	# 		'entity_name':unicode("BarFoo"),
-	# 		'co_uniq_name':None,
-	# 		'startDate':None,
-	# 		'endDate':None,
-	# 		'summary':None,
-	# 		'isCurrent':False
-	# 		}
-
-	# 	# (1) Entity match
-	# 	base.process_unverified_org_position(p1,user)
-	# 	self.assertIsNotNone(user.positions.get(title="East Harlem"))
-	# 	self.assertEqual(1, Entity.objects.filter(name="FooBar, Inc.").count())
-	# 	self.assertEqual(unicode("FooBar, Inc."), user.positions.get(title="East Harlem").entity.name)
-	# 	self.assertEqual(unicode("unverified"), user.positions.get(title="East Harlem").status)
-
-	# 	# (2) New Entity
-	# 	base.process_unverified_org_position(p2,user)
-	# 	self.assertEqual(1, Entity.objects.filter(name="BarFoo").count())
-	# 	self.assertIsNotNone(user.positions.get(title="West Harlem"))
-	# 	self.assertEqual(unicode("BarFoo"), user.positions.get(title="West Harlem").entity.name)
-	# 	self.assertEqual(unicode("unverified"), user.positions.get(title="West Harlem").entity.status)
-	# 	self.assertEqual(unicode("unverified"), user.positions.get(title="West Harlem").status)
+		# (6) no match
+		ent = base.get_company_name_only("romeo & juliet")
+		self.assertIs(None, ent)
 
 
-	# def test_process_org_position(self):
-	# 	# create user
-	# 	user = User(username="test_user")
-	# 	user.save()
-	# 	# create acct
-	# 	acct = Account(service="linkedin", owner=user, expires_on=datetime.datetime(2013, 6, 23, 15, 36, 51, 694994), status=unicode("active"), token_secret=u'67cbcc33-30bf-423d-b677-92bc3f775559', access_token=u'0a0d3a27-5713-439e-a57e-c2f35798b4a5')
-	# 	acct.save()
-	# 	# instantiate liConnections
-	# 	base = self.lilib.LIConnections(user.id, acct.id)		
+	def test_add_unverified_position(self):
+		base = self.lilib.LIBase()
+
+		person = User(username="test_user")
+		person.save()
+
+		entity = base.add_unverified_company(({"entity_name":unicode("Artists of the Haight")}))
+
+		p = base.add_unverified_position(person, entity, {"title":unicode("Artist in Residence"), "summary":None, "isCurrent":True})
+		self.assertIsNotNone(entity)
+		self.assertIsNotNone(p)
+		self.assertIs(p.status, "unverified")
+		self.assertIs(entity.status, "unverified")
+
+	def test_process_unverified_org_position(self):
+		# create user
+		user = User(username="MistaFu")
+		user.save()
+		# create acct
+		acct = Account(service="linkedin", owner=user, expires_on=datetime.datetime(2013, 6, 23, 15, 36, 51, 694994), status=unicode("active"), token_secret=u'67cbcc33-30bf-423d-b677-92bc3f775559', access_token=u'0a0d3a27-5713-439e-a57e-c2f35798b4a5')
+		acct.save()
+		# instantiate liConnections
+		base = self.lilib.LIConnections(user.id, acct.id)	
+
+		entity = Entity(name=unicode("FooBar, Inc."))
+		entity.save()
+
+		p1 = {
+			'title':unicode("East Harlem"),
+			'entity_name':unicode("FooBar, Inc."),
+			'co_uniq_name':None,
+			'startDate':None,
+			'endDate':None,
+			'summary':None,
+			'isCurrent':False
+			}
+
+		p2 = {
+			'title':unicode("West Harlem"),
+			'entity_name':unicode("BarFoo"),
+			'co_uniq_name':None,
+			'startDate':None,
+			'endDate':None,
+			'summary':None,
+			'isCurrent':False
+			}
+
+		# (1) Entity match
+		base.process_unverified_org_position(p1,user)
+		self.assertIsNotNone(user.positions.get(title="East Harlem"))
+		self.assertEqual(1, Entity.objects.filter(name="FooBar, Inc.").count())
+		self.assertEqual(unicode("FooBar, Inc."), user.positions.get(title="East Harlem").entity.name)
+		self.assertEqual(unicode("unverified"), user.positions.get(title="East Harlem").status)
+
+		# (2) New Entity
+		base.process_unverified_org_position(p2,user)
+		self.assertEqual(1, Entity.objects.filter(name="BarFoo").count())
+		self.assertIsNotNone(user.positions.get(title="West Harlem"))
+		self.assertEqual(unicode("BarFoo"), user.positions.get(title="West Harlem").entity.name)
+		self.assertEqual(unicode("unverified"), user.positions.get(title="West Harlem").entity.status)
+		self.assertEqual(unicode("unverified"), user.positions.get(title="West Harlem").status)
 
 
-	# 	# create "real" entity
-	# 	e_real = Entity(name=unicode("Twitter"), li_univ_name=unicode("twitter"), li_uniq_id=7)
-	# 	e_real.save()
+	def test_process_org_position(self):
+		# create user
+		user = User(username="test_user")
+		user.save()
+		# create acct
+		acct = Account(service="linkedin", owner=user, expires_on=datetime.datetime(2013, 6, 23, 15, 36, 51, 694994), status=unicode("active"), token_secret=u'67cbcc33-30bf-423d-b677-92bc3f775559', access_token=u'0a0d3a27-5713-439e-a57e-c2f35798b4a5')
+		acct.save()
+		# instantiate liConnections
+		base = self.lilib.LIConnections(user.id, acct.id)		
 
-	# 	e_stub = Entity(name=unicode("Foobar"))
-	# 	e_stub.save()
 
-	# 	p_real = {
-	# 		'title':unicode("Brand Strategist"),
-	# 		'entity_name':unicode("Twitter"),
-	# 		'co_uniq_name':unicode("twitter"),
-	# 		'startDate':None,
-	# 		'endDate':None,
-	# 		'summary':None,
-	# 		'isCurrent':False
-	# 		}
+		# create "real" entity
+		e_real = Entity(name=unicode("Twitter"), li_univ_name=unicode("twitter"), li_uniq_id=7)
+		e_real.save()
 
-	# 	p_stub = {
-	# 		'title':unicode("DJ"),
-	# 		'entity_name':unicode("Foobar"),
-	# 		'co_uniq_name':None,
-	# 		'startDate':None,
-	# 		'endDate':None,
-	# 		'summary':None,
-	# 		'isCurrent':False
-	# 	} 
+		e_stub = Entity(name=unicode("Foobar"))
+		e_stub.save()
 
-	# 	# (1) When org exists
-	# 	base.process_org_position(p_real, user)
-	# 	self.assertEqual(1, Entity.objects.filter(name="Twitter").count())
-	# 	self.assertIsNotNone(user.positions.get(title="Brand Strategist"))
-	# 	self.assertEqual(unicode("Twitter"), user.positions.get(title="Brand Strategist").entity.name)
+		p_real = {
+			'title':unicode("Brand Strategist"),
+			'entity_name':unicode("Twitter"),
+			'co_uniq_name':unicode("twitter"),
+			'startDate':None,
+			'endDate':None,
+			'summary':None,
+			'isCurrent':False
+			}
 
-	# 	# (2) When org exists & position exists
-	# 	base.process_org_position(p_real, user)
-	# 	self.assertEqual(1, Entity.objects.filter(name="Twitter").count())
-	# 	self.assertEqual(1, user.positions.all().count())
-	# 	self.assertIsNotNone(user.positions.get(title="Brand Strategist"))
-	# 	self.assertEqual(unicode("Twitter"), user.positions.get(title="Brand Strategist").entity.name)
+		p_stub = {
+			'title':unicode("DJ"),
+			'entity_name':unicode("Foobar"),
+			'co_uniq_name':None,
+			'startDate':None,
+			'endDate':None,
+			'summary':None,
+			'isCurrent':False
+		} 
 
-	# 	# (3) When no org exists	
-	# 	base.process_org_position(p_real, user)
-	# 	self.assertIsNotNone(Entity.objects.get(li_univ_name="twitter"))
-	# 	self.assertIsNotNone(user.positions.get(title="Brand Strategist"))
-	# 	self.assertEqual(unicode("Twitter"), user.positions.get(title="Brand Strategist").entity.name)
+		# (1) When org exists
+		base.process_org_position(p_real, user)
+		self.assertEqual(1, Entity.objects.filter(name="Twitter").count())
+		self.assertIsNotNone(user.positions.get(title="Brand Strategist"))
+		self.assertEqual(unicode("Twitter"), user.positions.get(title="Brand Strategist").entity.name)
+
+		# (2) When org exists & position exists
+		base.process_org_position(p_real, user)
+		self.assertEqual(1, Entity.objects.filter(name="Twitter").count())
+		self.assertEqual(1, user.positions.all().count())
+		self.assertIsNotNone(user.positions.get(title="Brand Strategist"))
+		self.assertEqual(unicode("Twitter"), user.positions.get(title="Brand Strategist").entity.name)
+
+		# (3) When no org exists	
+		base.process_org_position(p_real, user)
+		self.assertIsNotNone(Entity.objects.get(li_univ_name="twitter"))
+		self.assertIsNotNone(user.positions.get(title="Brand Strategist"))
+		self.assertEqual(unicode("Twitter"), user.positions.get(title="Brand Strategist").entity.name)
 
 			
 

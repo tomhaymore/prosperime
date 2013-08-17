@@ -37,12 +37,22 @@ def welcome(request):
 @login_required
 def single_aspiration(request, aspiration_slug):
 
-	## Dummy Data ## 
-		# TODO: Get this from real data
-	aspiration_name = "I want to run for the U.S. Senate"
-	aspiration_id = 7
-
-	# NOTE: data should be sorted by '-num_votes'
+	## Fake "Reason" Data ##
+	# need all of these things to customize the form language around different questions, best to do this server side
+	questions = [
+		{"alias":"why", "body":"What inspired this goal?", "placeholder":"Because I want to change the world", "submit":"That's why"},
+		{"alias":"how", "body":"How are you going to accomplish this goal?", "placeholder":"By rising above", "submit":"That's how"},
+		{"alias":"why-not", "body":"Why aren't you pursuing this goal now?", "placeholder":"I am","submit":"Boom"},
+		{"alias":"obstacle", "body":"What is the biggest obstacle in your way?", "placeholder":"I have to finish my degree first", "submit":"But then..."}
+	]
+	## Fake "Aspiration" Data ## 
+	aspiration = {
+		"name":"I want to run for the U.S. Senate",
+		"id":7,
+		"slug":str(helpers.slugify("I want to run for the U.S. Senate"))
+	}
+	## Fake "Guru" Data ##
+		# NOTE: data should be sorted by '-num_votes'
 	gurus = [
 		{"name":"Tom Sawyer" ,"count":7,"id":1},
 		{"name":"Ernest Hemingway" ,"count":3,"id":2},
@@ -51,11 +61,10 @@ def single_aspiration(request, aspiration_slug):
 		{"name":"Mihaly Csikszentmihalyi" ,"count":1,"id":5},
 	]
 
+	## Random "Users who share this Aspiration" Data ##
+	profile_objs = Profile.objects.filter(id__in=[137237, 136725, 136265, 136931, 136259, 136260, 136129, 136459, 136460, 136261]) # random id_s
 	import random
-	# ten random ids
-	ids = [137237, 136725, 136265, 136931, 136259, 136260, 136129, 136459, 136460, 136261]
-	profile_objs = Profile.objects.filter(id__in=ids)
-	users = [{
+	members = [{
 			"pic":p.default_profile_pic(),
 			"name":p.full_name(),
 			"first_position":p.current_position(),
@@ -74,26 +83,20 @@ def single_aspiration(request, aspiration_slug):
 	]
 	reasons = []
 	count = 0
+	# get top 'N' reasons related to current question
 	for p in profile_objs[:5]:
 		reasons.append({"pic":p.default_profile_pic(), "id":p.id, "reason":fake_reasons[count]})
 		count += 1
 
-	# need all of these things to pass customize the form as question changes, best to do this server side
-	questions = [
-		{"alias":"why", "body":"What inspired this goal?", "placeholder":""},
-		{"alias":"how", "body":"How are you going to accomplish this goal?", "placeholder":""},
-		{"alias":"why-not", "body":"Why aren't you pursuing this goal now?", "placeholder":""}
-	]
 
 
 	data = {
-		"aspiration_name": aspiration_name,
-		"aspiration_id":aspiration_id,
-		"question":{"alias":"why", "body":"What inspired this goal?", "placeholder":"Because I want to change the world", "submit":"That's why"},
-		"users":users,
+		"aspiration":aspiration,
+		"question":questions[0],
+		"members":members,
 		"gurus":gurus,
 		"reasons":reasons,
-		"user":{"id":request.user.id, "name":request.user.profile.full_name(), "pic":request.user.profile.default_profile_pic()}
+		"user_pic":request.user.profile.default_profile_pic()
 	}
 
 	return render_to_response("social/aspiration.html", data, context_instance=RequestContext(request))
@@ -155,6 +158,7 @@ def ask(request):
 
 ## 8/15, Guru V1, not currently in use (From QA Branch) ##
 def question(request, conversation_id):
+
 
 	## IF there's an error getting here, question_id will be -1, so redirect accordingly
 	if conversation_id == -1:
@@ -320,7 +324,6 @@ def api_conversation_autocomplete(request):
 def api_aspiration_autocomplete(request):
 
 	params = request.GET.get("query") # ?query= ... using a different autocomplete library
-	print params
 
 	# TODO: implement this API
 	# sample: {value:"I want to rule the world", data: 7 } <-- id
@@ -337,6 +340,20 @@ def api_aspiration_autocomplete(request):
 		"suggestions":suggestions
 	}
 
+	return HttpResponse(json.dumps(response))
+
+def api_vote(request):
+	response = {}
+
+	vote_type = request.GET.get("type")
+	aspiration_id = request.GET.get("aspiration_id")
+	guru_id = request.GET.get("guru_id")
+
+	# TODO: proper error checking
+
+
+	# TODO: implement
+	response["result"] = "success"
 	return HttpResponse(json.dumps(response))
 
 

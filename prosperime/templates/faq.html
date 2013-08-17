@@ -1,0 +1,101 @@
+{% extends "base_full.html" %}
+
+{% block head %}
+	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/contact.css" />
+
+	<style>
+	
+	.faq-section {
+		padding-left: 50px;
+		padding-right: 50px;
+	}
+
+	.faq-module {
+		padding-bottom: 20px;
+		border-bottom: 1px solid #c0c0c0;
+		padding-top: 20px;
+	}
+
+	.faq-question {
+		font-weight:600;
+	}
+
+	.faq-question-q {
+		font-size: 1.2em;
+		padding-right: 10px;
+	}
+
+	.faq-body {
+		padding-left:25px;
+		font-size: 0.9em;
+		font-family: "Helvetica", "Arial", sans-serif;
+	}
+
+	li {
+		padding-left:50px;
+	}
+
+
+	</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div id="content-container">		
+	<div>
+		<p class="feature-page-header">Frequently Asked Questions</p>
+		<div class="content">
+			
+
+			<div class="faq-section">
+				<!-- <div class="faq-section-header">Privacy</div> -->
+				<div class="faq-module">
+					<div class="faq-question"><span class="faq-question-q">Q:</span>Why Join?</div>
+					<div class="faq-body">
+						To help out kids who were just like you, bright, driven students who may have needed a little help finding their way. Whether you realize it or not, you've collected a wealth of information and experience during your career that could be invaluable to a young professional who is just starting out. Sharing this information with them could mean all the difference in their lives, and help guide them toward a profession that really love.
+						<br/><br/>
+						If you aren't convinced yet, here are some other great reasons to take part:
+						<ol>
+							<li>Show yourself as an industry expert,</li>
+							<li>Represent your company, and</li>
+							<li>Develop valuable relationships with motivated, talented students.</li>
+						</ol>
+					</div>
+				</div>
+				<div class="faq-module">
+					<div class="faq-question"><span class="faq-question-q">Q:</span>How does it work?</div>
+					<div class="faq-body">
+						Emplore works by creating tight-knit conversations around students' burning career questions. We emphasize tight-knit, as we place heavy emphasis on finding the right people for each conversation; if your background is in Finance, we won't bother your with questions about Medical School.
+						<br/>
+						
+
+					</div>
+				</div>
+				<div class="faq-module">
+					<div class="faq-question"><span class="faq-question-q">Q:</span>I'm worried about time commitment</div>
+					<div class="faq-body">
+						Trust, me understand. Our #1 priority is not to waste anyone's time. We work to ensure this in a few ways:
+						<ol>	
+							<li>You will not be asked to join a conversation until the conversation has met a minimum threshold of traction among students, represented by users "following" your conversation. That way we ensure that you have an audience, and that your question is meaningful to students.</li>
+							<li>You dictate which conversations you want to be a part of. You can answer at your convenience--once a week or once a month, it's completely up to you.</li>
+							<li>There is no contract of mentorship involved, and your interactions are not limited to just one student. We know that one-on-one mentoring can be a terrific resource, but we also understand the burden that comes with that commitment. On Emplore, a single answer can serve hundreds of students instantly, and you don't have to worry about scheduling a second coffee date next week.</li>
+						</ol>
+					</div>
+				</div>
+				<div class="faq-module">
+					<div class="faq-question"><span class="faq-question-q">Q:</span>How can I get more involved?</div>
+					<div class="faq-body">
+						On the flipside, if you become a part of a great conversation or want to engage with more students, <a href="mailto:feedback@emplore.co">let us know!</a> We can work toward creating the conversations that you are interested in, and target the most relevant students who would benefit from your participation.
+					</div>
+				</div>
+				<div class="faq-module">
+					<div class="faq-question"><span class="faq-question-q">Q:</span>More questions?</div>
+					<div class="faq-body">Well, Janet, lorem ipsum dolor comes from Cicero, did you know that?</div>
+				</div>			
+			</div>
+
+		</div>
+	</div>
+</div>
+{% endblock %}

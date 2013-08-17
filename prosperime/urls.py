@@ -55,6 +55,7 @@ urlpatterns = patterns('',
     url(r'^api/askAdvisor/$', 'social.views.api_ask_advisor'),
     url(r'^social/addReason/$', 'social.views.api_add_reason'),
     url(r'^api/aspirations_autocomplete/$', 'social.views.api_aspiration_autocomplete'),
+    url(r'^api/vote/$', 'social.views.api_vote'),
 
     # Partner Views
     url(r'^employers/$', 'social.views.recruiters'),
